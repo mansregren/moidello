@@ -78,7 +78,19 @@ export default function FeedPage() {
           </Container>
         </div>
 
-        <Container className="pt-8">
+        <div className="relative">
+          {/* Subtle background on mobile only */}
+          <div className="absolute inset-0 md:hidden">
+            <Image
+              src="/images/bg/boats.jpg"
+              alt=""
+              fill
+              className="object-cover opacity-[0.08]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
+          </div>
+
+        <Container className="relative z-10 pt-8">
           {/* Garment type filter */}
           <div className="mb-6 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {garmentTypes.map((type) => {
@@ -187,6 +199,7 @@ export default function FeedPage() {
         </Container>
 
         <div className="py-16" />
+        </div>
       </main>
       <Footer />
     </>
