@@ -1,22 +1,24 @@
-import { Home, Compass, Plus, Tag, User, type LucideIcon } from "lucide-react";
+import { Home, Search, Plus, Sparkles, User, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   href: string;
   label: string;
   icon: LucideIcon;
   primary?: boolean;
+  /** If set, clicking the tab triggers this auth action when logged out instead of navigating. */
+  authAction?: "create" | "profile";
 }
 
 export const primaryNav: NavItem[] = [
-  { href: "/feed", label: "Hem", icon: Home },
-  { href: "/discover", label: "Upptäck", icon: Compass },
-  { href: "/create", label: "Skapa", icon: Plus, primary: true },
-  { href: "/brands", label: "Märken", icon: Tag },
-  { href: "/profile", label: "Profil", icon: User },
+  { href: "/", label: "Hem", icon: Home },
+  { href: "/upptack", label: "Upptäck", icon: Search },
+  { href: "/skapa", label: "Skapa", icon: Plus, primary: true, authAction: "create" },
+  { href: "/trendigt", label: "Trendigt", icon: Sparkles },
+  { href: "/profil", label: "Profil", icon: User, authAction: "profile" },
 ];
 
 export function isLandingRoute(pathname: string | null): boolean {
-  return pathname === "/";
+  return pathname === "/welcome";
 }
 
 function isOnboardingRoute(pathname: string | null): boolean {
@@ -24,12 +26,34 @@ function isOnboardingRoute(pathname: string | null): boolean {
   return pathname === "/onboarding" || pathname.startsWith("/onboarding/");
 }
 
+function isAuthRoute(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return (
+    pathname === "/login" ||
+    pathname.startsWith("/login/") ||
+    pathname === "/signup" ||
+    pathname.startsWith("/signup/")
+  );
+}
+
 export function shouldShowSidebar(pathname: string | null): boolean {
   if (!pathname) return false;
-  return !isLandingRoute(pathname) && !isOnboardingRoute(pathname);
+  return (
+    !isLandingRoute(pathname) &&
+    !isOnboardingRoute(pathname) &&
+    !isAuthRoute(pathname)
+  );
 }
 
 export function shouldShowBottomTabBar(pathname: string | null): boolean {
   if (!pathname) return false;
-  return !isOnboardingRoute(pathname);
+  return (
+    !isLandingRoute(pathname) &&
+    !isOnboardingRoute(pathname) &&
+    !isAuthRoute(pathname)
+  );
+}
+
+export function shouldShowAppHeader(pathname: string | null): boolean {
+  return shouldShowSidebar(pathname);
 }

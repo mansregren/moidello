@@ -6,6 +6,7 @@ import { Heart, Bookmark, LayoutGrid, Tag } from "lucide-react";
 import { Outfit } from "@/lib/types";
 import { UserAvatar } from "../user/UserAvatar";
 import { useState, MouseEvent } from "react";
+import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
 interface OutfitCardProps {
@@ -13,6 +14,7 @@ interface OutfitCardProps {
 }
 
 export function OutfitCard({ outfit }: OutfitCardProps) {
+  const { requireAuth } = useAuth();
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [hovering, setHovering] = useState(false);
@@ -20,12 +22,14 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
   const handleSave = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!requireAuth("save")) return;
     setSaved((s) => !s);
   };
 
   const handleLike = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!requireAuth("like")) return;
     setLiked((l) => !l);
   };
 
@@ -47,7 +51,7 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
             className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
 
-          {/* Top-left: type / tag count badges */}
+          {/* Top-left badges */}
           <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
             {outfit.type === "flatlay" && (
               <div className="flex items-center gap-1.5 rounded-full bg-black/70 backdrop-blur-sm px-3 py-1.5">
@@ -66,7 +70,7 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
             </div>
           </div>
 
-          {/* Top-right: save button (always visible) */}
+          {/* Save toggle */}
           <button
             onClick={handleSave}
             aria-label={saved ? "Ta bort sparad" : "Spara outfit"}
@@ -84,7 +88,7 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
             />
           </button>
 
-          {/* Hover overlay (desktop) — tag dots + title */}
+          {/* Hover overlay */}
           <div
             className={`absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent transition-opacity duration-300 ${
               hovering ? "opacity-100" : "opacity-0"
@@ -134,7 +138,9 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
             <Heart
               className={`h-4 w-4 ${liked ? "fill-white text-white" : ""}`}
             />
-            <span className="text-xs">{liked ? outfit.likes + 1 : outfit.likes}</span>
+            <span className="text-xs">
+              {liked ? outfit.likes + 1 : outfit.likes}
+            </span>
           </button>
           <button
             onClick={handleSave}
@@ -145,7 +151,9 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
             <Bookmark
               className={cn("h-4 w-4", saved && "fill-white text-white")}
             />
-            <span className="text-xs">{saved ? outfit.saves + 1 : outfit.saves}</span>
+            <span className="text-xs">
+              {saved ? outfit.saves + 1 : outfit.saves}
+            </span>
           </button>
         </div>
       </div>

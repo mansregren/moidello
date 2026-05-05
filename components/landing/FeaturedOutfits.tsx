@@ -30,7 +30,7 @@ export function FeaturedOutfits() {
               <span className="text-foreground-subtle">Outfits</span>
             </h2>
           </div>
-          <Link href="/feed" className="hidden md:block">
+          <Link href="/" className="hidden md:block">
             <PremiumButton variant="secondary" size="sm">
               Visa alla
               <ArrowRight className="h-4 w-4" />
@@ -55,7 +55,7 @@ export function FeaturedOutfits() {
         </div>
 
         <div className="mt-12 text-center md:hidden">
-          <Link href="/feed">
+          <Link href="/">
             <PremiumButton variant="secondary">
               Visa alla outfits
               <ArrowRight className="h-4 w-4" />

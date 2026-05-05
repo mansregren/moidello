@@ -2,12 +2,12 @@
 
 import { Upload, Plus, Eye, X } from "lucide-react";
 import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 import { PremiumButton } from "@/components/shared/PremiumButton";
 import { IconButton } from "@/components/shared/IconButton";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth-context";
 
 interface DemoTag {
   id: number;
@@ -18,7 +18,8 @@ interface DemoTag {
   url: string;
 }
 
-export default function CreatePage() {
+export default function SkapaPage() {
+  const { requireAuth } = useAuth();
   const [tags, setTags] = useState<DemoTag[]>([]);
   const [previewMode, setPreviewMode] = useState(false);
 
@@ -40,11 +41,15 @@ export default function CreatePage() {
     setTags(tags.filter((t) => t.id !== id));
   };
 
+  const handlePublish = () => {
+    requireAuth("create");
+  };
+
   return (
     <>
       <Header />
-      <main className="flex-1 pt-20 md:pt-24">
-        <Container className="max-w-4xl">
+      <main className="flex-1 pt-6 md:pt-10">
+        <Container className="max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -59,7 +64,7 @@ export default function CreatePage() {
           </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-8">
-            {/* Left — Image upload */}
+            {/* Image upload */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -77,7 +82,6 @@ export default function CreatePage() {
                   JPG, PNG, WebP — Max 10MB
                 </p>
 
-                {/* Demo tags on image */}
                 {tags.map((tag) => (
                   <div
                     key={tag.id}
@@ -87,12 +91,15 @@ export default function CreatePage() {
                     <div className="relative">
                       <span className="absolute inset-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/40 animate-ping" />
                       <span className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
-                      <button
-                        onClick={() => removeTag(tag.id)}
-                        className="absolute -top-3 -right-3 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center"
-                      >
-                        <X className="h-3 w-3 text-white" />
-                      </button>
+                      {!previewMode && (
+                        <button
+                          onClick={() => removeTag(tag.id)}
+                          className="absolute -top-3 -right-3 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center"
+                          aria-label="Ta bort tagg"
+                        >
+                          <X className="h-3 w-3 text-white" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -118,7 +125,7 @@ export default function CreatePage() {
               </div>
             </motion.div>
 
-            {/* Right — Form */}
+            {/* Form */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -164,7 +171,6 @@ export default function CreatePage() {
                 </select>
               </div>
 
-              {/* Tagged items form */}
               <div>
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
                   Taggade plagg ({tags.length})
@@ -187,6 +193,7 @@ export default function CreatePage() {
                           <IconButton
                             size="sm"
                             onClick={() => removeTag(tag.id)}
+                            aria-label="Ta bort"
                           >
                             <X className="h-4 w-4" />
                           </IconButton>
@@ -212,7 +219,7 @@ export default function CreatePage() {
                 )}
               </div>
 
-              <PremiumButton size="lg" className="w-full">
+              <PremiumButton size="lg" className="w-full" onClick={handlePublish}>
                 Publicera outfit
               </PremiumButton>
             </motion.div>
@@ -221,7 +228,6 @@ export default function CreatePage() {
           <div className="py-16" />
         </Container>
       </main>
-      <Footer />
     </>
   );
 }

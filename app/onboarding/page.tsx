@@ -8,10 +8,10 @@ import { Container } from "@/components/layout/Container";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { categories, users } from "@/lib/data";
 import { useGender } from "@/lib/gender-context";
-import { Gender } from "@/lib/types";
+import { GenderFilter } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-type GenderChoice = Gender | "both";
+type GenderChoice = GenderFilter;
 type Step = 0 | 1 | 2;
 
 const TOTAL_STEPS = 3;
@@ -26,10 +26,10 @@ export default function OnboardingPage() {
   const [following, setFollowing] = useState<Set<string>>(new Set());
 
   const finish = () => {
-    if (genderChoice && genderChoice !== "both") {
+    if (genderChoice) {
       setGender(genderChoice);
     }
-    router.push("/feed");
+    router.push("/");
   };
 
   const next = () => {

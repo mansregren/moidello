@@ -63,7 +63,7 @@ export function HeroSection() {
               Tagga varje plagg, länka var du köper.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/feed">
+              <Link href="/">
                 <PremiumButton variant="primary" size="lg">
                   Utforska outfits
                   <ArrowRight className="h-5 w-5" />

@@ -5,9 +5,11 @@ import { Container } from "./Container";
 
 const footerLinks = {
   Plattform: [
-    { href: "/feed", label: "Feed" },
-    { href: "/discover", label: "Upptäck" },
-    { href: "/create", label: "Skapa" },
+    { href: "/", label: "Hem" },
+    { href: "/upptack", label: "Upptäck" },
+    { href: "/trendigt", label: "Trendigt" },
+    { href: "/skapa", label: "Skapa" },
+    { href: "/welcome", label: "Om Moidello" },
   ],
   Företag: [
     { href: "#", label: "Om oss" },
