@@ -42,7 +42,7 @@ export interface Comment {
 
 export type Gender = "herr" | "dam";
 
-export type GenderFilter = "herr" | "dam" | "both";
+export type GenderFilter = Gender;
 
 export interface Outfit {
   id: string;

@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 
 const OPTIONS: { id: GenderFilter; label: string; toast: string }[] = [
   { id: "dam", label: "Dam", toast: "Visar Dam-outfits" },
-  { id: "both", label: "Båda", toast: "Visar alla outfits" },
   { id: "herr", label: "Herr", toast: "Visar Herr-outfits" },
 ];
 
