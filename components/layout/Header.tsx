@@ -9,7 +9,7 @@ import { Container } from "./Container";
 import { IconButton } from "../shared/IconButton";
 import { useGender } from "@/lib/gender-context";
 import { Gender } from "@/lib/types";
-import { shouldShowAppNav } from "@/lib/nav";
+import { shouldShowSidebar } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -50,7 +50,7 @@ function GenderToggle() {
 
 export function Header() {
   const pathname = usePathname();
-  const showAppNav = shouldShowAppNav(pathname);
+  const showAppNav = shouldShowSidebar(pathname);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);

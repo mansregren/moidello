@@ -19,11 +19,17 @@ export function isLandingRoute(pathname: string | null): boolean {
   return pathname === "/";
 }
 
-const noShellRoutes = ["/", "/onboarding"];
-
-export function shouldShowAppNav(pathname: string | null): boolean {
+function isOnboardingRoute(pathname: string | null): boolean {
   if (!pathname) return false;
-  return !noShellRoutes.some(
-    (r) => pathname === r || pathname.startsWith(r + "/")
-  );
+  return pathname === "/onboarding" || pathname.startsWith("/onboarding/");
+}
+
+export function shouldShowSidebar(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return !isLandingRoute(pathname) && !isOnboardingRoute(pathname);
+}
+
+export function shouldShowBottomTabBar(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return !isOnboardingRoute(pathname);
 }
