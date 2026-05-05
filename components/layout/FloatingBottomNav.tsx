@@ -33,14 +33,11 @@ export function FloatingBottomNav() {
 
   return (
     <nav
-      aria-label="Variant B — flytande bottom"
+      aria-label="Huvudnavigation"
       className="fixed inset-x-3 bottom-0 z-40 md:hidden pointer-events-none"
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.5rem)" }}
     >
       <div className="pointer-events-auto rounded-3xl bg-black/70 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50 px-2 py-2">
-        <div className="text-[8px] uppercase tracking-wider text-white/30 text-center mb-1">
-          B · Floating bottom
-        </div>
         <ul className="flex items-center justify-around">
           {primaryNav.map((item) => {
             const active = isActive(pathname, item.href);
