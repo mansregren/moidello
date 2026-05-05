@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { Upload, Plus, Eye, X } from "lucide-react";
+import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { PremiumButton } from "@/components/shared/PremiumButton";
 import { IconButton } from "@/components/shared/IconButton";
@@ -47,14 +47,7 @@ export default function SkapaPage() {
 
   return (
     <>
-      <Link
-        href="/"
-        aria-label="Stäng"
-        className="fixed top-4 right-4 z-50 inline-flex items-center justify-center h-11 w-11 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white hover:bg-white/10 transition-colors"
-        style={{ top: "calc(env(safe-area-inset-top) + 1rem)" }}
-      >
-        <X className="h-5 w-5" />
-      </Link>
+      <Header />
       <main className="flex-1 pt-6 md:pt-10">
         <Container className="max-w-5xl">
           <motion.div
