@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Anton } from "next/font/google";
 import { GenderProvider } from "@/lib/gender-context";
+import { AppShell } from "@/components/layout/AppShell";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,7 +32,9 @@ export default function RootLayout({
       className={`${inter.variable} ${anton.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <GenderProvider>{children}</GenderProvider>
+        <GenderProvider>
+          <AppShell>{children}</AppShell>
+        </GenderProvider>
       </body>
     </html>
   );
