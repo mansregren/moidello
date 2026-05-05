@@ -36,7 +36,7 @@ function isAuthRoute(pathname: string | null): boolean {
   );
 }
 
-export function shouldShowSidebar(pathname: string | null): boolean {
+export function shouldShowAppNav(pathname: string | null): boolean {
   if (!pathname) return false;
   return (
     !isLandingRoute(pathname) &&
@@ -46,5 +46,5 @@ export function shouldShowSidebar(pathname: string | null): boolean {
 }
 
 export function shouldShowAppHeader(pathname: string | null): boolean {
-  return shouldShowSidebar(pathname);
+  return shouldShowAppNav(pathname);
 }

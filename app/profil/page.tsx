@@ -40,8 +40,9 @@ export default function ProfilPage() {
               src={me.coverImage}
               alt=""
               fill
-              className="object-cover"
               priority
+              sizes="(min-width: 768px) 100vw, 100vw"
+              className="object-cover"
             />
           )}
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-background" />

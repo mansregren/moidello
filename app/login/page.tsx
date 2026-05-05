@@ -12,7 +12,14 @@ export default function LoginPage() {
       <Header />
       <main className="relative flex-1 flex items-center justify-center min-h-screen px-6">
         <div className="absolute inset-0">
-          <Image src="/images/bg/riviera.jpg" alt="" fill className="object-cover" />
+          <Image
+            src="/images/bg/riviera.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
           <div className="absolute inset-0 bg-black/60" />
         </div>
         <motion.div
