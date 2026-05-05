@@ -1,20 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Search, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, MouseEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Container } from "./Container";
 import { IconButton } from "../shared/IconButton";
 import { GenderToggle } from "../shared/GenderToggle";
+import { primaryNav } from "@/lib/nav";
 import { shouldShowAppHeader } from "@/lib/nav";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, AuthAction } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
+
+function isActive(pathname: string | null, href: string): boolean {
+  if (!pathname) return false;
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(href + "/");
+}
 
 export function Header() {
   const pathname = usePathname();
-  const { isLoggedIn } = useAuth();
+  const router = useRouter();
+  const { isLoggedIn, requireAuth } = useAuth();
   const showHeader = shouldShowAppHeader(pathname);
 
   const [scrolled, setScrolled] = useState(false);
@@ -34,6 +42,19 @@ export function Header() {
     }
   }, [searchOpen]);
 
+  const handleNavClick = (
+    e: MouseEvent<HTMLAnchorElement>,
+    authAction?: "create" | "profile"
+  ) => {
+    if (!authAction || isLoggedIn) return;
+    e.preventDefault();
+    if (authAction === "profile") {
+      router.push("/login");
+      return;
+    }
+    requireAuth(authAction as AuthAction);
+  };
+
   if (!showHeader) return null;
 
   return (
@@ -41,17 +62,16 @@ export function Header() {
       className={cn(
         "sticky top-0 right-0 z-40 transition-colors duration-300",
         scrolled
-          ? "bg-black/70 backdrop-blur-xl border-b border-white/5"
+          ? "bg-black/80 backdrop-blur-xl border-b border-white/5"
           : "bg-transparent"
       )}
     >
-      <Container className="relative flex items-center justify-between h-16 md:h-20 gap-3">
-        {/* Left — Gender toggle */}
+      {/* Row 1 — Gender toggle / Logo / Search + Login */}
+      <Container className="relative flex items-center justify-between h-14 md:h-20 gap-3">
         <div className="flex items-center min-w-0">
           <GenderToggle orientation="horizontal" />
         </div>
 
-        {/* Center — Logo */}
         <Link
           href="/"
           className="absolute left-1/2 -translate-x-1/2 font-heading text-2xl md:text-3xl uppercase tracking-tight text-white"
@@ -59,7 +79,6 @@ export function Header() {
           Moidello
         </Link>
 
-        {/* Right — Search + login */}
         <div className="flex items-center gap-1">
           <IconButton aria-label="Sök" onClick={() => setSearchOpen(true)}>
             <Search className="h-5 w-5" />
@@ -74,7 +93,7 @@ export function Header() {
           )}
         </div>
 
-        {/* Expanded search */}
+        {/* Expanded mobile search overlay (covers row 1 only) */}
         <AnimatePresence initial={false}>
           {searchOpen && (
             <motion.div
@@ -97,6 +116,53 @@ export function Header() {
             </motion.div>
           )}
         </AnimatePresence>
+      </Container>
+
+      {/* Row 2 — Nav (mobile only; desktop uses the sidebar) */}
+      <Container className="md:hidden">
+        <nav aria-label="Huvudnavigation" className="border-t border-white/5">
+          <ul className="flex items-center justify-around py-1.5">
+            {primaryNav.map((item) => {
+              const active = isActive(pathname, item.href);
+              const Icon = item.icon;
+
+              if (item.primary) {
+                return (
+                  <li key={item.href} className="flex-1 flex justify-center">
+                    <Link
+                      href={item.href}
+                      aria-label={item.label}
+                      aria-current={active ? "page" : undefined}
+                      onClick={(e) => handleNavClick(e, item.authAction)}
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-black shadow-[0_4px_14px_rgba(255,255,255,0.18)] transition-transform active:scale-95"
+                    >
+                      <Icon className="h-5 w-5" strokeWidth={2.4} />
+                    </Link>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={item.href} className="flex-1">
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    onClick={(e) => handleNavClick(e, item.authAction)}
+                    className={cn(
+                      "flex flex-col items-center gap-0.5 py-1 transition-colors",
+                      active ? "text-white" : "text-white/40 hover:text-white/70"
+                    )}
+                  >
+                    <Icon className="h-5 w-5" strokeWidth={active ? 2.4 : 1.8} />
+                    <span className="text-[10px] font-medium tracking-wide">
+                      {item.label}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
       </Container>
     </header>
   );

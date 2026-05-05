@@ -45,15 +45,6 @@ export function shouldShowSidebar(pathname: string | null): boolean {
   );
 }
 
-export function shouldShowBottomTabBar(pathname: string | null): boolean {
-  if (!pathname) return false;
-  return (
-    !isLandingRoute(pathname) &&
-    !isOnboardingRoute(pathname) &&
-    !isAuthRoute(pathname)
-  );
-}
-
 export function shouldShowAppHeader(pathname: string | null): boolean {
   return shouldShowSidebar(pathname);
 }
