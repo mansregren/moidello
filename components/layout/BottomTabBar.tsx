@@ -38,7 +38,7 @@ export function BottomTabBar() {
       className="fixed bottom-0 left-0 right-0 z-40 md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="border-t border-white/5 bg-black/75 backdrop-blur-xl backdrop-saturate-150">
+      <div className="border-t border-white/5 bg-black">
         <ul className="flex items-end justify-around px-2 pt-2 pb-2">
           {primaryNav.map((item) => {
             const active = isActive(pathname, item.href);
