@@ -27,6 +27,12 @@ interface FilterState {
   price: Set<string>;
 }
 
+interface ActiveChip {
+  label: string;
+  category: FilterCategory;
+  value: string;
+}
+
 const EMPTY_FILTERS: FilterState = {
   garment: new Set(),
   style: new Set(),
@@ -41,6 +47,15 @@ const SEASONS = ["Sommar", "Höst", "Vinter", "Vår"];
 const PRICES = ["Budget", "Mid", "Premium", "Lyx"];
 const STYLES = ["Streetwear", "Minimalism", "Vintage", "Lyx", "Casual", "Sport"];
 
+const CATEGORY_LABELS: Record<FilterCategory, string> = {
+  garment: "Plagg",
+  style: "Stil",
+  brand: "Märke",
+  color: "Färg",
+  season: "Säsong",
+  price: "Pris",
+};
+
 export default function UpptackPage() {
   const { gender } = useGender();
   const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
@@ -54,6 +69,16 @@ export default function UpptackPage() {
     filters.color.size +
     filters.season.size +
     filters.price.size;
+
+  const activeChips: ActiveChip[] = useMemo(() => {
+    const chips: ActiveChip[] = [];
+    (Object.keys(filters) as FilterCategory[]).forEach((cat) => {
+      filters[cat].forEach((value) => {
+        chips.push({ label: value, category: cat, value });
+      });
+    });
+    return chips;
+  }, [filters]);
 
   const toggleFilter = (cat: FilterCategory, value: string) => {
     setFilters((prev) => {
@@ -98,7 +123,7 @@ export default function UpptackPage() {
       <main className="flex-1">
         <Container className="pt-6 md:pt-10">
           {/* Title + search */}
-          <div className="mb-6">
+          <div className="mb-5">
             <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
               Upptäck
             </h1>
@@ -123,31 +148,110 @@ export default function UpptackPage() {
             </div>
           </div>
 
-          {/* Mobile filter trigger */}
-          <div className="lg:hidden mb-4 flex items-center justify-between">
-            <button
-              onClick={() => setMobileFiltersOpen(true)}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-background-secondary px-4 py-2 text-sm text-white"
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Filter
-              {totalActive > 0 && (
-                <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white text-black px-1.5 text-[10px] font-semibold">
-                  {totalActive}
-                </span>
-              )}
-            </button>
-            {totalActive > 0 && (
-              <button
-                onClick={clearAll}
-                className="text-xs text-foreground-muted hover:text-white"
-              >
-                Rensa filter
-              </button>
-            )}
+          {/* Quick filters — garment chips (always visible) */}
+          <div className="-mx-6 md:-mx-12 px-6 md:px-12 mb-4 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {garmentTypes.map((g) => {
+              const active = filters.garment.has(g);
+              return (
+                <button
+                  key={g}
+                  onClick={() => toggleFilter("garment", g)}
+                  aria-pressed={active}
+                  className={cn(
+                    "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 active:scale-95",
+                    active
+                      ? "bg-white text-black"
+                      : "border border-border text-foreground-muted hover:text-white hover:border-white/30"
+                  )}
+                >
+                  {g}
+                </button>
+              );
+            })}
           </div>
 
-          <div className="flex gap-8">
+          {/* Sticky filter bar */}
+          <div className="sticky top-14 md:top-20 z-20 -mx-6 md:-mx-12 px-6 md:px-12 py-3 bg-background/85 backdrop-blur-md border-b border-white/5">
+            <div className="flex items-center justify-between gap-3 lg:hidden">
+              <button
+                onClick={() => setMobileFiltersOpen(true)}
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors active:scale-95",
+                  totalActive > 0
+                    ? "bg-white text-black"
+                    : "border border-border text-white bg-background-secondary"
+                )}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                Filter
+                {totalActive > 0 && (
+                  <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-black text-white px-1.5 text-[11px] font-bold">
+                    {totalActive}
+                  </span>
+                )}
+              </button>
+
+              <p className="text-xs text-foreground-muted">
+                <span className="text-white font-semibold">{visible.length}</span>{" "}
+                resultat
+              </p>
+            </div>
+
+            {/* Desktop result count */}
+            <div className="hidden lg:flex items-center justify-between">
+              <p className="text-sm text-foreground-muted">
+                <span className="text-white font-semibold">{visible.length}</span>{" "}
+                {visible.length === 1 ? "outfit" : "outfits"}
+              </p>
+              {totalActive > 0 && (
+                <button
+                  onClick={clearAll}
+                  className="text-sm text-foreground-muted hover:text-white"
+                >
+                  Rensa alla filter
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Active filter chips */}
+          <AnimatePresence initial={false}>
+            {activeChips.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="flex flex-wrap items-center gap-2 pt-3 pb-1">
+                  {activeChips.map((chip) => (
+                    <button
+                      key={`${chip.category}-${chip.value}`}
+                      onClick={() => toggleFilter(chip.category, chip.value)}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-white text-black pl-3 pr-2 py-1 text-xs font-medium transition-transform active:scale-95"
+                    >
+                      <span className="text-[10px] uppercase tracking-wider text-black/50">
+                        {CATEGORY_LABELS[chip.category]}:
+                      </span>
+                      {chip.label}
+                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-black/10">
+                        <X className="h-2.5 w-2.5" strokeWidth={2.5} />
+                      </span>
+                    </button>
+                  ))}
+                  <button
+                    onClick={clearAll}
+                    className="text-xs text-foreground-muted hover:text-white px-2 py-1 lg:hidden"
+                  >
+                    Rensa alla
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="flex gap-8 mt-4">
             {/* Desktop filter sidebar */}
             <aside className="hidden lg:block w-72 shrink-0">
               <FilterPanel
@@ -201,10 +305,17 @@ export default function UpptackPage() {
                 exit={{ x: "100%" }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 onClick={(e) => e.stopPropagation()}
-                className="absolute top-0 bottom-0 right-0 w-[85vw] max-w-sm bg-background border-l border-white/5 overflow-y-auto"
+                className="absolute top-0 bottom-0 right-0 w-[88vw] max-w-sm bg-background border-l border-white/5 flex flex-col"
               >
-                <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-background border-b border-white/5">
-                  <h2 className="text-base font-semibold text-white">Filter</h2>
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
+                  <h2 className="text-base font-semibold text-white">
+                    Filter
+                    {totalActive > 0 && (
+                      <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white text-black px-1.5 text-[11px] font-bold align-middle">
+                        {totalActive}
+                      </span>
+                    )}
+                  </h2>
                   <button
                     onClick={() => setMobileFiltersOpen(false)}
                     aria-label="Stäng filter"
@@ -213,16 +324,29 @@ export default function UpptackPage() {
                     <X className="h-5 w-5" />
                   </button>
                 </div>
-                <div className="p-5">
+
+                <div className="flex-1 overflow-y-auto p-5">
                   <FilterPanel
                     filters={filters}
                     onToggle={toggleFilter}
                     onClear={clearAll}
                     totalActive={totalActive}
                   />
+                </div>
+
+                {/* Sticky bottom bar */}
+                <div className="border-t border-white/5 p-4 flex gap-3 shrink-0 bg-background">
+                  {totalActive > 0 && (
+                    <button
+                      onClick={clearAll}
+                      className="rounded-full border border-border text-white px-4 py-3 text-sm font-medium hover:border-white/30"
+                    >
+                      Rensa
+                    </button>
+                  )}
                   <button
                     onClick={() => setMobileFiltersOpen(false)}
-                    className="mt-6 w-full rounded-full bg-white text-black py-3 text-sm font-medium"
+                    className="flex-1 rounded-full bg-white text-black py-3 text-sm font-semibold transition-transform active:scale-95"
                   >
                     Visa {visible.length} resultat
                   </button>
@@ -258,7 +382,7 @@ function FilterPanel({
         </button>
       )}
 
-      <Accordion title="Plagg" badge={filters.garment.size}>
+      <Accordion title="Plagg" badge={filters.garment.size} defaultOpen>
         <CheckList
           values={garmentTypes as readonly string[]}
           selected={filters.garment}
@@ -266,7 +390,7 @@ function FilterPanel({
         />
       </Accordion>
 
-      <Accordion title="Stil" badge={filters.style.size}>
+      <Accordion title="Stil" badge={filters.style.size} defaultOpen>
         <CheckList
           values={Array.from(new Set([...STYLES, ...categories]))}
           selected={filters.style}
@@ -311,13 +435,15 @@ function FilterPanel({
 function Accordion({
   title,
   badge,
+  defaultOpen = false,
   children,
 }: {
   title: string;
   badge?: number;
+  defaultOpen?: boolean;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="border-b border-border py-3">
       <button
