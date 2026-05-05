@@ -120,7 +120,10 @@ export function Header() {
 
       {/* Row 2 — Nav (mobile only; desktop uses the sidebar) */}
       <Container className="md:hidden">
-        <nav aria-label="Huvudnavigation" className="border-t border-white/5">
+        <nav aria-label="Variant A — Top inline" className="border-t border-white/5">
+          <div className="text-[8px] uppercase tracking-wider text-white/30 text-center pt-1">
+            A · Top inline
+          </div>
           <ul className="flex items-center justify-around py-1.5">
             {primaryNav.map((item) => {
               const active = isActive(pathname, item.href);
