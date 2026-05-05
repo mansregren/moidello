@@ -141,6 +141,7 @@ function StepGender({
 }) {
   const options: { id: GenderChoice; label: string }[] = [
     { id: "dam", label: "Dam" },
+    { id: "both", label: "Båda" },
     { id: "herr", label: "Herr" },
   ];
 
@@ -153,7 +154,7 @@ function StepGender({
         Välj vad du vill upptäcka. Du kan ändra detta senare.
       </p>
 
-      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
         {options.map((opt) => {
           const active = value === opt.id;
           return (

@@ -5,10 +5,10 @@ import { GenderFilter } from "./types";
 
 const STORAGE_KEY = "moidello-gender-filter";
 const EVENT_NAME = "moidello-gender-filter:change";
-const DEFAULT_FILTER: GenderFilter = "dam";
+const DEFAULT_FILTER: GenderFilter = "both";
 
 function isValidFilter(value: string | null): value is GenderFilter {
-  return value === "dam" || value === "herr";
+  return value === "dam" || value === "herr" || value === "both";
 }
 
 function readGender(): GenderFilter {
@@ -61,5 +61,6 @@ export function matchesGenderFilter(
   outfitGender: "herr" | "dam",
   filter: GenderFilter
 ): boolean {
+  if (filter === "both") return true;
   return outfitGender === filter;
 }

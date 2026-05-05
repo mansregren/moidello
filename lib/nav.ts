@@ -36,22 +36,29 @@ function isAuthRoute(pathname: string | null): boolean {
   );
 }
 
+function isFullscreenModalRoute(pathname: string | null): boolean {
+  if (!pathname) return false;
+  // /skapa is treated as a fullscreen modal — both nav surfaces hide.
+  return pathname === "/skapa" || pathname.startsWith("/skapa/");
+}
+
+function isChromeExcluded(pathname: string | null): boolean {
+  return (
+    isLandingRoute(pathname) ||
+    isOnboardingRoute(pathname) ||
+    isAuthRoute(pathname) ||
+    isFullscreenModalRoute(pathname)
+  );
+}
+
 export function shouldShowSidebar(pathname: string | null): boolean {
   if (!pathname) return false;
-  return (
-    !isLandingRoute(pathname) &&
-    !isOnboardingRoute(pathname) &&
-    !isAuthRoute(pathname)
-  );
+  return !isChromeExcluded(pathname);
 }
 
 export function shouldShowBottomTabBar(pathname: string | null): boolean {
   if (!pathname) return false;
-  return (
-    !isLandingRoute(pathname) &&
-    !isOnboardingRoute(pathname) &&
-    !isAuthRoute(pathname)
-  );
+  return !isChromeExcluded(pathname);
 }
 
 export function shouldShowAppHeader(pathname: string | null): boolean {
