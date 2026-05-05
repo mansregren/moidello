@@ -23,7 +23,7 @@ export default function NavLabPage() {
           Jämför varianter av navigationen. Säg vilken du vill rulla ut.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
           <Variant name="A. Top inline (nuvarande)" subtitle="2 rader, sticky">
             <TopInline />
           </Variant>
@@ -76,18 +76,18 @@ function Variant({
 }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-wider text-foreground-subtle mb-1">
+      <PhoneFrame>{children}</PhoneFrame>
+      <p className="mt-2 text-[10px] sm:text-xs uppercase tracking-wider text-foreground-subtle">
         {subtitle}
       </p>
-      <h2 className="text-base font-semibold text-white mb-3">{name}</h2>
-      <PhoneFrame>{children}</PhoneFrame>
+      <h2 className="text-xs sm:text-base font-semibold text-white">{name}</h2>
     </div>
   );
 }
 
 function PhoneFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="relative w-full aspect-[9/16] max-w-[280px] mx-auto rounded-[2.5rem] border-[6px] border-zinc-800 bg-background-tertiary overflow-hidden shadow-2xl shadow-black/50">
+    <div className="relative w-full aspect-[9/16] mx-auto rounded-[1.75rem] sm:rounded-[2.5rem] border-[4px] sm:border-[6px] border-zinc-800 bg-background-tertiary overflow-hidden shadow-2xl shadow-black/50">
       {children}
     </div>
   );
