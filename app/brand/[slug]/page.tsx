@@ -90,7 +90,7 @@ export default function BrandPage({
               <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-4">
                 Plagg från {brand.name}
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                 {brandItems.map((item) => (
                   <div
                     key={item.id}
@@ -115,7 +115,7 @@ export default function BrandPage({
               <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-6">
                 Outfits med {brand.name}
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                 {brandOutfits.map((outfit, i) => (
                   <motion.div
                     key={outfit.id}

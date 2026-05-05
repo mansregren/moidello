@@ -61,7 +61,7 @@ export default function TrendigtPage() {
 
           {/* Trending now — hero outfits */}
           <Section title="Trending just nu" href="/upptack">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {trendingNow.map((outfit, i) => (
                 <motion.div
                   key={outfit.id}
@@ -182,7 +182,7 @@ export default function TrendigtPage() {
             href="/upptack"
             icon={<MapPin className="h-6 w-6 text-white" />}
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {localOutfits.map((outfit, i) => (
                 <motion.div
                   key={outfit.id}

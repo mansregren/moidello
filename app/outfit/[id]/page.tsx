@@ -195,7 +195,7 @@ export default function OutfitPage({
             <h2 className="font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-white mb-8">
               Liknande <span className="text-foreground-subtle">outfits</span>
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {similar.map((o) => (
                 <OutfitCard key={o.id} outfit={o} />
               ))}

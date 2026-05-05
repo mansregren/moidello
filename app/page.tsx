@@ -1,190 +1,271 @@
 "use client";
 
-import { useRef, useState, TouchEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { ChevronRight, Sparkles, Search, Plus } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
-import { outfits, users } from "@/lib/data";
+import { UserAvatar } from "@/components/user/UserAvatar";
+import { outfits, users, categories } from "@/lib/data";
 import { useGender, matchesGenderFilter } from "@/lib/gender-context";
-import { cn } from "@/lib/utils";
 
-type FeedTab = "for-you" | "following";
-
-const PULL_THRESHOLD = 80;
-const PULL_MAX = 120;
+const CATEGORY_DESCRIPTIONS: Record<string, string> = {
+  Streetwear: "Edge möter komfort",
+  Minimalism: "Mindre är mer",
+  Vintage: "Tidlöst & unikt",
+  Casual: "Avslappnat & lätt",
+  Formal: "Tailored & polerat",
+  Sporty: "Aktiv vardag",
+  Bohemian: "Fri & flödande",
+  Preppy: "Klassisk & ren",
+};
 
 export default function HomePage() {
   const { gender } = useGender();
-  const [tab, setTab] = useState<FeedTab>("for-you");
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [refreshing, setRefreshing] = useState(false);
 
-  // Pull-to-refresh state (mobile only)
-  const [pullDistance, setPullDistance] = useState(0);
-  const startYRef = useRef<number | null>(null);
-  const pullingRef = useRef(false);
+  const visible = outfits.filter((o) => matchesGenderFilter(o.gender, gender));
+  const recent = [...visible]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    .slice(0, 6);
+  const newCreators = users.slice(0, 6);
 
-  const followedIds = new Set(users.slice(0, 3).map((u) => u.id));
-
-  const filtered = outfits.filter((o) => matchesGenderFilter(o.gender, gender));
-  const visible =
-    tab === "following"
-      ? filtered.filter((o) => followedIds.has(o.creator.id))
-      : filtered;
-
-  const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
-    if (window.scrollY > 0) return;
-    startYRef.current = e.touches[0].clientY;
-    pullingRef.current = true;
-  };
-
-  const handleTouchMove = (e: TouchEvent<HTMLDivElement>) => {
-    if (!pullingRef.current || startYRef.current === null) return;
-    if (window.scrollY > 0) {
-      pullingRef.current = false;
-      setPullDistance(0);
-      return;
-    }
-    const delta = e.touches[0].clientY - startYRef.current;
-    if (delta <= 0) {
-      setPullDistance(0);
-      return;
-    }
-    setPullDistance(Math.min(delta * 0.5, PULL_MAX));
-  };
-
-  const handleTouchEnd = () => {
-    if (!pullingRef.current) return;
-    pullingRef.current = false;
-    const triggered = pullDistance >= PULL_THRESHOLD;
-    setPullDistance(0);
-    startYRef.current = null;
-    if (triggered) refresh();
-  };
-
-  const refresh = () => {
-    setRefreshing(true);
-    setRefreshKey((k) => k + 1);
-    window.setTimeout(() => setRefreshing(false), 700);
+  // Pick an image per category from outfits
+  const categoryImage = (cat: string): string => {
+    const match = visible.find((o) => o.category === cat);
+    if (match) return match.image;
+    return visible[0]?.image ?? outfits[0].image;
   };
 
   return (
     <>
       <Header />
-      <main
-        className="flex-1"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
-      >
-        {/* Tabs */}
-        <div className="sticky top-16 md:top-20 z-30 bg-background/80 backdrop-blur-md border-b border-white/5">
-          <Container>
-            <div className="flex items-center gap-1 h-12">
-              <FeedTabButton
-                active={tab === "for-you"}
-                onClick={() => setTab("for-you")}
+      <main className="flex-1">
+        {/* Hero */}
+        <section className="relative">
+          <div className="relative h-[44vh] md:h-[60vh] min-h-[320px] overflow-hidden">
+            <Image
+              src="/images/bg/positano.jpg"
+              alt=""
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-background" />
+            <Container className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
               >
-                För dig
-              </FeedTabButton>
-              <FeedTabButton
-                active={tab === "following"}
-                onClick={() => setTab("following")}
-              >
-                Följer
-              </FeedTabButton>
-            </div>
-          </Container>
-        </div>
-
-        {/* Pull-to-refresh indicator */}
-        <div
-          className="md:hidden flex items-center justify-center overflow-hidden transition-[height] duration-200"
-          style={{
-            height: refreshing ? 56 : pullDistance,
-          }}
-        >
-          <Loader2
-            className={cn(
-              "h-5 w-5 text-white/70",
-              refreshing ? "animate-spin" : ""
-            )}
-            style={{
-              transform: refreshing
-                ? undefined
-                : `rotate(${(pullDistance / PULL_THRESHOLD) * 270}deg)`,
-              opacity: Math.min(pullDistance / PULL_THRESHOLD, 1) || (refreshing ? 1 : 0),
-            }}
-          />
-        </div>
-
-        <Container className="pt-6">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${tab}-${gender}-${refreshKey}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              {visible.length > 0 ? (
-                <OutfitGrid outfits={visible} columns={3} />
-              ) : (
-                <div className="py-24 text-center">
-                  <p className="text-foreground-muted text-lg">
-                    {tab === "following"
-                      ? "Du följer inga kreatörer än"
-                      : "Inga outfits hittades"}
-                  </p>
-                  {tab === "following" && (
-                    <button
-                      onClick={() => setTab("for-you")}
-                      className="mt-4 text-sm text-white underline"
-                    >
-                      Bläddra &quot;För dig&quot;
-                    </button>
-                  )}
+                <p className="text-xs uppercase tracking-[0.2em] text-white/70">
+                  Inspiration for every outfit
+                </p>
+                <h1 className="mt-3 font-heading text-[44px] md:text-[88px] leading-[0.92] uppercase tracking-[-0.02em] text-white max-w-3xl">
+                  Hitta din nästa
+                  <br />
+                  <span className="text-white/60">outfit</span>
+                </h1>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Link
+                    href="/upptack"
+                    className="inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
+                  >
+                    <Search className="h-4 w-4" />
+                    Utforska
+                  </Link>
+                  <Link
+                    href="/trendigt"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/20 text-white px-5 py-2.5 text-sm font-medium transition-colors hover:bg-white/10"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Trendigt nu
+                  </Link>
                 </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
+              </motion.div>
+            </Container>
+          </div>
+        </section>
 
-          <div className="py-16" />
+        <Container className="space-y-14 pt-10 md:pt-14">
+          {/* Categories */}
+          <Section
+            title="Bläddra kategorier"
+            href="/upptack"
+            seeAllLabel="Alla kategorier"
+          >
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+              {categories.map((cat, i) => (
+                <motion.div
+                  key={cat}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.35, delay: i * 0.04 }}
+                >
+                  <Link
+                    href="/upptack"
+                    className="group relative block aspect-[4/5] rounded-2xl overflow-hidden"
+                  >
+                    <Image
+                      src={categoryImage(cat)}
+                      alt={cat}
+                      fill
+                      sizes="(min-width: 1024px) 22vw, (min-width: 640px) 33vw, 50vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+                    <div className="absolute inset-x-3 bottom-3">
+                      <p className="font-heading text-lg md:text-xl uppercase tracking-tight text-white leading-tight">
+                        {cat}
+                      </p>
+                      <p className="text-[11px] text-white/70 mt-0.5">
+                        {CATEGORY_DESCRIPTIONS[cat]}
+                      </p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </Section>
+
+          {/* Recent outfits */}
+          <Section title="Senast på Moidello" href="/upptack">
+            <OutfitGrid outfits={recent} columns={3} />
+          </Section>
+
+          {/* Lifestyle banner */}
+          <motion.section
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6 }}
+            className="relative -mx-6 md:-mx-12 h-[40vh] md:h-[50vh] overflow-hidden"
+          >
+            <Image
+              src="/images/bg/parasols.jpg"
+              alt=""
+              fill
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-black/45" />
+            <div className="absolute inset-0 flex items-center justify-center px-6">
+              <div className="text-center max-w-3xl">
+                <p className="font-heading text-[36px] md:text-[64px] lg:text-[80px] uppercase tracking-[-0.02em] text-white leading-[0.95]">
+                  Dress for the
+                  <br />
+                  <span className="text-white/60">life you want</span>
+                </p>
+                <p className="mt-4 text-sm md:text-base text-white/70 max-w-md mx-auto">
+                  Tagga varje plagg, länka var du köper. Inspirera och
+                  inspireras.
+                </p>
+              </div>
+            </div>
+          </motion.section>
+
+          {/* New creators */}
+          <Section title="Nya kreatörer" href="/trendigt">
+            <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
+              {newCreators.map((u, i) => (
+                <motion.div
+                  key={u.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.3, delay: i * 0.05 }}
+                  className="shrink-0"
+                >
+                  <Link
+                    href={`/profile/${u.username}`}
+                    className="flex flex-col items-center gap-3 w-28 group"
+                  >
+                    <UserAvatar src={u.avatar} alt={u.displayName} size="lg" />
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-white truncate max-w-[7rem]">
+                        {u.displayName}
+                      </p>
+                      <p className="text-[11px] text-foreground-subtle">
+                        {u.outfitCount} outfits
+                      </p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </Section>
+
+          {/* Soft CTA */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
+            className="rounded-3xl border border-border bg-background-secondary p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
+          >
+            <div className="max-w-lg">
+              <h2 className="font-heading text-3xl md:text-5xl uppercase tracking-tight text-white leading-[0.95]">
+                Bygg ditt eget bibliotek
+              </h2>
+              <p className="mt-3 text-foreground-muted text-sm md:text-base">
+                Spara outfits, följ kreatörer och skapa dina egna. Det är
+                gratis.
+              </p>
+            </div>
+            <div className="flex gap-3 shrink-0">
+              <Link
+                href="/skapa"
+                className="inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
+              >
+                <Plus className="h-4 w-4" />
+                Skapa outfit
+              </Link>
+              <Link
+                href="/welcome"
+                className="inline-flex items-center rounded-full border border-border text-white px-5 py-2.5 text-sm font-medium hover:border-white/30 transition-colors"
+              >
+                Lär dig mer
+              </Link>
+            </div>
+          </motion.section>
+
+          <div className="py-12" />
         </Container>
       </main>
     </>
   );
 }
 
-function FeedTabButton({
-  active,
-  onClick,
+function Section({
+  title,
+  href,
+  seeAllLabel = "Se alla",
   children,
 }: {
-  active: boolean;
-  onClick: () => void;
+  title: string;
+  href: string;
+  seeAllLabel?: string;
   children: React.ReactNode;
 }) {
   return (
-    <button
-      onClick={onClick}
-      aria-current={active ? "page" : undefined}
-      className={cn(
-        "relative px-4 py-2 text-sm font-medium transition-colors",
-        active ? "text-white" : "text-foreground-subtle hover:text-foreground-muted"
-      )}
-    >
+    <section>
+      <div className="flex items-end justify-between mb-5">
+        <h2 className="font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+          {title}
+        </h2>
+        <Link
+          href={href}
+          className="inline-flex items-center gap-1 text-sm text-foreground-muted hover:text-white transition-colors shrink-0"
+        >
+          {seeAllLabel}
+          <ChevronRight className="h-4 w-4" />
+        </Link>
+      </div>
       {children}
-      {active && (
-        <motion.span
-          layoutId="feed-tab-indicator"
-          className="absolute inset-x-3 -bottom-px h-0.5 bg-white rounded-full"
-          transition={{ duration: 0.3, ease: "easeOut" }}
-        />
-      )}
-    </button>
+    </section>
   );
 }
