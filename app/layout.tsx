@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Anton } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { GenderProvider } from "@/lib/gender-context";
 import { ToastProvider } from "@/lib/toast-context";
 import { AuthProvider } from "@/lib/auth-context";
@@ -18,9 +19,56 @@ const anton = Anton({
 });
 
 export const metadata: Metadata = {
-  title: "Moidello — Inspiration for Every Outfit",
+  metadataBase: new URL("https://moidello.com"),
+  title: {
+    default: "Moidello — Inspiration för varje outfit",
+    template: "%s | Moidello",
+  },
   description:
-    "Discover, share, and shop outfits. Tag every piece, link where to buy.",
+    "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
+  applicationName: "Moidello",
+  keywords: [
+    "outfits",
+    "mode",
+    "stil",
+    "inspiration",
+    "shopping",
+    "kläder",
+    "fashion",
+    "moidello",
+  ],
+  authors: [{ name: "Moidello" }],
+  openGraph: {
+    type: "website",
+    locale: "sv_SE",
+    url: "https://moidello.com",
+    siteName: "Moidello",
+    title: "Moidello — Inspiration för varje outfit",
+    description:
+      "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
+    images: [
+      {
+        url: "/images/bg/positano.jpg",
+        alt: "Moidello",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Moidello — Inspiration för varje outfit",
+    description:
+      "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
+    images: ["/images/bg/positano.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
 };
 
 export default function RootLayout({
@@ -41,6 +89,7 @@ export default function RootLayout({
             </GenderProvider>
           </ToastProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
