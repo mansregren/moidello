@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { Header } from "@/components/layout/Header";
@@ -172,6 +172,7 @@ export default function UpptackPage() {
 
           {/* Sticky filter bar */}
           <div className="sticky top-14 md:top-20 z-20 -mx-6 md:-mx-12 px-6 md:px-12 py-3 bg-background/85 backdrop-blur-md border-b border-white/5">
+            {/* Mobile: single Filter button */}
             <div className="flex items-center justify-between gap-3 lg:hidden">
               <button
                 onClick={() => setMobileFiltersOpen(true)}
@@ -197,20 +198,64 @@ export default function UpptackPage() {
               </p>
             </div>
 
-            {/* Desktop result count */}
-            <div className="hidden lg:flex items-center justify-between">
-              <p className="text-sm text-foreground-muted">
-                <span className="text-white font-semibold">{visible.length}</span>{" "}
-                {visible.length === 1 ? "outfit" : "outfits"}
-              </p>
-              {totalActive > 0 && (
-                <button
-                  onClick={clearAll}
-                  className="text-sm text-foreground-muted hover:text-white"
-                >
-                  Rensa alla filter
-                </button>
-              )}
+            {/* Desktop: row of filter dropdowns + count + clear */}
+            <div className="hidden lg:flex items-center gap-2 flex-wrap">
+              <FilterDropdown label="Plagg" badge={filters.garment.size}>
+                <CheckList
+                  values={garmentTypes as readonly string[]}
+                  selected={filters.garment}
+                  onToggle={(v) => toggleFilter("garment", v)}
+                />
+              </FilterDropdown>
+              <FilterDropdown label="Stil" badge={filters.style.size}>
+                <CheckList
+                  values={Array.from(new Set([...STYLES, ...categories]))}
+                  selected={filters.style}
+                  onToggle={(v) => toggleFilter("style", v)}
+                />
+              </FilterDropdown>
+              <FilterDropdown label="Märken" badge={filters.brand.size} width="w-80">
+                <BrandList
+                  selected={filters.brand}
+                  onToggle={(v) => toggleFilter("brand", v)}
+                />
+              </FilterDropdown>
+              <FilterDropdown label="Färg" badge={filters.color.size}>
+                <CheckList
+                  values={COLORS}
+                  selected={filters.color}
+                  onToggle={(v) => toggleFilter("color", v)}
+                />
+              </FilterDropdown>
+              <FilterDropdown label="Säsong" badge={filters.season.size}>
+                <CheckList
+                  values={SEASONS}
+                  selected={filters.season}
+                  onToggle={(v) => toggleFilter("season", v)}
+                />
+              </FilterDropdown>
+              <FilterDropdown label="Pris" badge={filters.price.size}>
+                <CheckList
+                  values={PRICES}
+                  selected={filters.price}
+                  onToggle={(v) => toggleFilter("price", v)}
+                />
+              </FilterDropdown>
+
+              <div className="ml-auto flex items-center gap-4">
+                <p className="text-sm text-foreground-muted whitespace-nowrap">
+                  <span className="text-white font-semibold">{visible.length}</span>{" "}
+                  {visible.length === 1 ? "outfit" : "outfits"}
+                </p>
+                {totalActive > 0 && (
+                  <button
+                    onClick={clearAll}
+                    className="text-sm text-foreground-muted hover:text-white whitespace-nowrap"
+                  >
+                    Rensa alla
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -251,39 +296,26 @@ export default function UpptackPage() {
             )}
           </AnimatePresence>
 
-          <div className="flex gap-8 mt-4">
-            {/* Desktop filter sidebar */}
-            <aside className="hidden lg:block w-72 shrink-0">
-              <FilterPanel
-                filters={filters}
-                onToggle={toggleFilter}
-                onClear={clearAll}
-                totalActive={totalActive}
-              />
-            </aside>
-
-            {/* Results */}
-            <div className="flex-1 min-w-0">
-              {visible.length > 0 ? (
-                <OutfitGrid outfits={visible} columns={3} />
-              ) : (
-                <div className="py-24 text-center">
-                  <p className="text-foreground-muted text-lg">
-                    Inga outfits hittades
-                  </p>
-                  <button
-                    onClick={() => {
-                      clearAll();
-                      setSearch("");
-                    }}
-                    className="mt-4 text-sm text-white underline"
-                  >
-                    Rensa allt
-                  </button>
-                </div>
-              )}
-              <div className="py-16" />
-            </div>
+          <div className="mt-4">
+            {visible.length > 0 ? (
+              <OutfitGrid outfits={visible} columns={4} />
+            ) : (
+              <div className="py-24 text-center">
+                <p className="text-foreground-muted text-lg">
+                  Inga outfits hittades
+                </p>
+                <button
+                  onClick={() => {
+                    clearAll();
+                    setSearch("");
+                  }}
+                  className="mt-4 text-sm text-white underline"
+                >
+                  Rensa allt
+                </button>
+              </div>
+            )}
+            <div className="py-16" />
           </div>
         </Container>
 
@@ -541,6 +573,89 @@ function CheckList({
         );
       })}
     </ul>
+  );
+}
+
+function FilterDropdown({
+  label,
+  badge,
+  width = "w-72",
+  children,
+}: {
+  label: string;
+  badge: number;
+  width?: string;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onMouseDown = (e: MouseEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onMouseDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const active = badge > 0;
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className={cn(
+          "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+          active
+            ? "bg-white text-black hover:bg-white/90"
+            : "border border-border text-white bg-background-secondary hover:border-white/30"
+        )}
+      >
+        {label}
+        {active && (
+          <span
+            className={cn(
+              "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold",
+              "bg-black text-white"
+            )}
+          >
+            {badge}
+          </span>
+        )}
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 transition-transform",
+            open && "rotate-180"
+          )}
+        />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+            className={cn(
+              "absolute top-full left-0 mt-2 max-h-[60vh] overflow-y-auto rounded-2xl bg-background-secondary border border-border p-4 z-30 shadow-2xl shadow-black/50",
+              width
+            )}
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
