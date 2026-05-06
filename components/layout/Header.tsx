@@ -64,6 +64,7 @@ export function Header() {
           ? "bg-black/80 backdrop-blur-xl border-b border-white/5"
           : "bg-transparent"
       )}
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <Container className="relative flex items-center h-14 md:h-20 gap-4">
         {/* Mobile: gender toggle (left) */}
