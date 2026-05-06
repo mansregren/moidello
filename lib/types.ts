@@ -1,3 +1,6 @@
+/** ISO 3166-1 alpha-2 country code (e.g. "SE", "NO", "DK"). */
+export type Region = string;
+
 export interface User {
   id: string;
   username: string;
@@ -8,6 +11,8 @@ export interface User {
   following: number;
   outfitCount: number;
   coverImage?: string;
+  /** User's primary market — used to default-suggest store links per region. */
+  region?: Region;
 }
 
 export type GarmentType =
@@ -25,7 +30,15 @@ export interface TaggedItem {
   name: string;
   price: number;
   currency: string;
+  /** Default buy URL (Phase 1). When per-region links arrive, prefer buyUrls. */
   buyUrl: string;
+  /** Per-region buy URLs. ISO country codes as keys (e.g. { SE: "...", NO: "..." }). */
+  buyUrls?: Record<Region, string>;
+  /**
+   * Whether the link is an affiliate link. When true, the UI must display a
+   * "Reklam" disclosure per Marknadsföringslagen / Konsumentverkets riktlinjer.
+   */
+  isAffiliate?: boolean;
   garment: GarmentType;
   /** Position on image as percentage (0-100) */
   x: number;
