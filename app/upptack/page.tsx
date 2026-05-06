@@ -148,8 +148,8 @@ export default function UpptackPage() {
             </div>
           </div>
 
-          {/* Quick filters — garment chips (always visible) */}
-          <div className="-mx-6 md:-mx-12 px-6 md:px-12 mb-4 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {/* Quick filters — garment chips (mobile only; desktop has Plagg dropdown) */}
+          <div className="lg:hidden -mx-6 md:-mx-12 px-6 md:px-12 mb-4 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {garmentTypes.map((g) => {
               const active = filters.garment.has(g);
               return (
