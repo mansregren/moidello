@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Search, Crown, Star, Gem, ShoppingBag } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { brands, outfits } from "@/lib/data";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -139,9 +140,11 @@ export default function BrandsPage() {
           </div>
 
           {filtered.length === 0 && (
-            <div className="py-24 text-center">
-              <p className="text-foreground-muted">Inga märken hittades</p>
-            </div>
+            <EmptyState
+              icon={Search}
+              title="Inga märken hittades"
+              description="Prova en annan sökterm eller bläddra bland alla märken."
+            />
           )}
         </Container>
       </main>

@@ -6,6 +6,7 @@ import { Search, X, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { outfits, brands, garmentTypes, categories } from "@/lib/data";
 import { useGender, matchesGenderFilter } from "@/lib/gender-context";
 import { cn } from "@/lib/utils";
@@ -300,20 +301,22 @@ export default function UpptackPage() {
             {visible.length > 0 ? (
               <OutfitGrid outfits={visible} columns={4} />
             ) : (
-              <div className="py-24 text-center">
-                <p className="text-foreground-muted text-lg">
-                  Inga outfits hittades
-                </p>
-                <button
-                  onClick={() => {
-                    clearAll();
-                    setSearch("");
-                  }}
-                  className="mt-4 text-sm text-white underline"
-                >
-                  Rensa allt
-                </button>
-              </div>
+              <EmptyState
+                icon={Search}
+                title="Inga outfits hittades"
+                description="Prova att rensa filtren eller söka på något annat. Det finns alltid något att upptäcka."
+                action={
+                  <button
+                    onClick={() => {
+                      clearAll();
+                      setSearch("");
+                    }}
+                    className="rounded-full bg-white text-black px-6 py-2.5 text-sm font-medium transition-transform active:scale-95 hover:bg-white/90"
+                  >
+                    Rensa alla filter
+                  </button>
+                }
+              />
             )}
             <div className="py-16" />
           </div>
