@@ -46,19 +46,12 @@ export const metadata: Metadata = {
     title: "Moidello — Inspiration för varje outfit",
     description:
       "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
-    images: [
-      {
-        url: "/images/bg/positano.jpg",
-        alt: "Moidello",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Moidello — Inspiration för varje outfit",
     description:
       "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
-    images: ["/images/bg/positano.jpg"],
   },
   robots: {
     index: true,
