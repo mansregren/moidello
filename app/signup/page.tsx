@@ -10,7 +10,7 @@ export default function SignupPage() {
   return (
     <>
       <Header />
-      <main className="relative flex-1 flex items-center justify-center min-h-screen px-6">
+      <main id="main" tabIndex={-1} className="relative flex-1 flex items-center justify-center min-h-screen px-6">
         <div className="absolute inset-0">
           <Image src="/images/bg/boats.jpg" alt="" fill className="object-cover" />
           <div className="absolute inset-0 bg-black/60" />

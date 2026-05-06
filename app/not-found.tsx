@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function NotFound() {
   return (
-    <main className="flex-1 flex items-center justify-center py-24">
+    <main id="main" tabIndex={-1} className="flex-1 flex items-center justify-center py-24">
       <Container className="text-center max-w-xl">
         <p className="font-heading text-foreground-subtle text-sm tracking-[0.3em] uppercase mb-6">
           Error 404

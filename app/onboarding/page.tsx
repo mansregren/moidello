@@ -48,7 +48,7 @@ export default function OnboardingPage() {
     step === 2;
 
   return (
-    <main className="min-h-screen flex flex-col bg-background">
+    <main id="main" tabIndex={-1} className="min-h-screen flex flex-col bg-background">
       {/* Top bar */}
       <header className="flex items-center justify-between px-6 md:px-12 pt-6">
         <span className="font-heading text-2xl uppercase tracking-tight text-white">

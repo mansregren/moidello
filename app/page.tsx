@@ -44,7 +44,7 @@ export default function HomePage() {
   return (
     <>
       <Header />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1">
         {/* Hero */}
         <section className="relative">
           <div className="relative h-[44vh] md:h-[60vh] min-h-[320px] overflow-hidden">

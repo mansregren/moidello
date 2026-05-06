@@ -5,7 +5,7 @@ export default function KontaktPage() {
   return (
     <>
       <Header />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1">
         <Container className="py-20 md:py-32 max-w-3xl">
           <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-4">
             Kontakt

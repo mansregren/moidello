@@ -6,7 +6,7 @@ export default function VillkorPage() {
   return (
     <>
       <Header />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1">
         <Container className="py-16 md:py-24 max-w-3xl">
           <div className="border-b border-border pb-10 mb-12">
             <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-4">

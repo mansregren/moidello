@@ -35,7 +35,7 @@ export default function BrandsPage() {
   return (
     <>
       <Header />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1">
         {/* Hero */}
         <div className="relative h-[28vh] md:h-[35vh] overflow-hidden">
           <Image src="/images/bg/boats.jpg" alt="" fill className="object-cover" priority />

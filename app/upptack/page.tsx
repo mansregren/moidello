@@ -120,7 +120,7 @@ export default function UpptackPage() {
   return (
     <>
       <Header />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1">
         <Container className="pt-6 md:pt-10">
           {/* Title + search */}
           <div className="mb-5">

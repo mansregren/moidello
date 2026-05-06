@@ -48,7 +48,7 @@ export default function SkapaPage() {
   return (
     <>
       <Header />
-      <main className="flex-1 pt-6 md:pt-10">
+      <main id="main" tabIndex={-1} className="flex-1 pt-6 md:pt-10">
         <Container className="max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -29,7 +29,7 @@ export default function OutfitPage({
   return (
     <>
       <Header />
-      <main className="flex-1 pt-20 md:pt-24">
+      <main id="main" tabIndex={-1} className="flex-1 pt-20 md:pt-24">
         <Container>
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
             {/* Left — Image with tags */}

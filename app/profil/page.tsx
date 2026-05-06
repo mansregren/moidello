@@ -32,7 +32,7 @@ export default function ProfilPage() {
   return (
     <>
       <Header />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1">
         {/* Cover */}
         <div className="relative h-44 md:h-64 overflow-hidden">
           {me.coverImage && (

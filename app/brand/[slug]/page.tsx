@@ -40,7 +40,7 @@ export default function BrandPage({
   return (
     <>
       <Header />
-      <main className="flex-1 pt-20 md:pt-24">
+      <main id="main" tabIndex={-1} className="flex-1 pt-20 md:pt-24">
         <Container>
           {/* Back */}
           <Link

@@ -108,6 +108,28 @@
     @apply font-sans;
   }
 
+  /* Visible focus ring on keyboard navigation; suppressed on mouse */
+  :focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Reduced motion: respect user preference */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   /* Scrollbar styling */
   ::-webkit-scrollbar {
     width: 6px;
@@ -122,6 +144,24 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #555555;
   }
+}
+
+/* Skip link — visually hidden until focused */
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: #ffffff;
+  color: #000000;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transform: translateY(-100%);
+  transition: transform 0.2s ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
 }
 
 /* Glassmorphism utility */

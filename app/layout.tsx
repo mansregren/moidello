@@ -91,6 +91,9 @@ export default function RootLayout({
       className={`${inter.variable} ${anton.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <a href="#main" className="skip-link">
+          Hoppa till innehåll
+        </a>
         <AuthProvider>
           <ToastProvider>
             <GenderProvider>

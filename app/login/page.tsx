@@ -10,7 +10,7 @@ export default function LoginPage() {
   return (
     <>
       <Header />
-      <main className="relative flex-1 flex items-center justify-center min-h-screen px-6">
+      <main id="main" tabIndex={-1} className="relative flex-1 flex items-center justify-center min-h-screen px-6">
         <div className="absolute inset-0">
           <Image
             src="/images/bg/riviera.jpg"

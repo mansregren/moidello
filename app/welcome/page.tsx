@@ -10,7 +10,7 @@ export default function WelcomePage() {
   return (
     <>
       <Header />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1">
         <HeroSection />
         <FeaturedOutfits />
         <LifestyleBanner />

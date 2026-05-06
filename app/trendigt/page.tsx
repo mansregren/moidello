@@ -43,7 +43,7 @@ export default function TrendigtPage() {
   return (
     <>
       <Header />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1">
         <Container className="pt-6 md:pt-10 space-y-14">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
