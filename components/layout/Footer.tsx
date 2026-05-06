@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Globe, Mail } from "lucide-react";
 import { Container } from "./Container";
 
 const footerLinks = {
@@ -9,31 +8,28 @@ const footerLinks = {
     { href: "/upptack", label: "Upptäck" },
     { href: "/trendigt", label: "Trendigt" },
     { href: "/skapa", label: "Skapa" },
-    { href: "/welcome", label: "Om Moidello" },
   ],
   Företag: [
-    { href: "#", label: "Om oss" },
-    { href: "#", label: "Karriär" },
-    { href: "#", label: "Press" },
+    { href: "/welcome", label: "Om Moidello" },
+    { href: "/kontakt", label: "Kontakt" },
   ],
-  Support: [
-    { href: "#", label: "Hjälpcenter" },
-    { href: "#", label: "Villkor" },
-    { href: "#", label: "Integritet" },
+  Juridik: [
+    { href: "/villkor", label: "Användarvillkor" },
+    { href: "/integritet", label: "Integritetspolicy" },
   ],
 };
 
 export function Footer() {
+  const year = new Date().getFullYear();
+
   return (
     <footer className="relative border-t border-border overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0">
         <Image src="/images/bg/harbor.jpg" alt="" fill className="object-cover" />
         <div className="absolute inset-0 bg-black/85" />
       </div>
       <Container className="relative z-10 py-16 md:py-24">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          {/* Brand */}
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
           <div className="col-span-2 md:col-span-1">
             <Link
               href="/"
@@ -41,35 +37,28 @@ export function Footer() {
             >
               Moidello
             </Link>
-            <p className="mt-4 text-sm text-foreground-muted max-w-xs">
-              Upptäck, dela och shoppa outfits. Tagga varje plagg, länka var du köper.
+            <p className="mt-4 text-sm text-foreground-muted max-w-xs leading-relaxed">
+              En plattform för outfits och inspiration. Tagga varje plagg, dela var du fann det.
             </p>
-            <div className="mt-6 flex gap-3">
-              <a
-                href="#"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-border transition-colors hover:bg-white/10"
-              >
-                <Globe className="h-4 w-4" />
-              </a>
-              <a
-                href="#"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-border transition-colors hover:bg-white/10"
-              >
-                <Mail className="h-4 w-4" />
-              </a>
-            </div>
+            <a
+              href="mailto:hello@moidello.com"
+              className="mt-6 inline-block text-sm text-white border-b border-white/30 hover:border-white transition-colors"
+            >
+              hello@moidello.com
+            </a>
           </div>
 
-          {/* Link columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h4 className="text-sm font-semibold text-white mb-4">{title}</h4>
+              <h4 className="text-xs font-semibold text-white mb-4 uppercase tracking-[0.15em]">
+                {title}
+              </h4>
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-foreground-muted hover:text-white transition-colors duration-300"
+                      className="text-sm text-foreground-muted hover:text-white transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -80,13 +69,12 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-16 border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="mt-16 border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
           <p className="text-xs text-foreground-subtle">
-            © 2025 Moidello. Alla rättigheter förbehållna.
+            © {year} Moidello. Alla rättigheter förbehållna.
           </p>
-          <p className="text-xs text-foreground-subtle flex items-center gap-1.5">
-            Created in Sweden
-            <span className="inline-block text-sm">🇸🇪</span>
+          <p className="text-xs text-foreground-subtle tracking-wide">
+            Made in Stockholm
           </p>
         </div>
       </Container>
