@@ -4,7 +4,6 @@ import { use } from "react";
 import Link from "next/link";
 import { Globe, Crown, Star, Gem, ShoppingBag, ArrowLeft } from "lucide-react";
 import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 import { OutfitCard } from "@/components/outfit/OutfitCard";
 import { PremiumButton } from "@/components/shared/PremiumButton";
@@ -142,7 +141,6 @@ export default function BrandPage({
           )}
         </Container>
       </main>
-      <Footer />
     </>
   );
 }

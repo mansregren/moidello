@@ -1,5 +1,4 @@
 import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { FeaturedOutfits } from "@/components/landing/FeaturedOutfits";
 import { LifestyleBanner } from "@/components/landing/LifestyleBanner";
@@ -19,7 +18,6 @@ export default function WelcomePage() {
         <TopCreators />
         <CtaBanner />
       </main>
-      <Footer />
     </>
   );
 }

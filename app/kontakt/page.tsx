@@ -1,5 +1,4 @@
 import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 
 export default function KontaktPage() {
@@ -58,7 +57,6 @@ export default function KontaktPage() {
           </div>
         </Container>
       </main>
-      <Footer />
     </>
   );
 }

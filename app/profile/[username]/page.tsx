@@ -3,7 +3,6 @@
 import { use, useState } from "react";
 import Image from "next/image";
 import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { FollowButton } from "@/components/user/FollowButton";
@@ -155,7 +154,6 @@ export default function ProfilePage({
           </motion.div>
         </Container>
       </main>
-      <Footer />
     </>
   );
 }

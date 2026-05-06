@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 
 export default function VillkorPage() {
@@ -193,7 +192,6 @@ export default function VillkorPage() {
           </div>
         </Container>
       </main>
-      <Footer />
     </>
   );
 }

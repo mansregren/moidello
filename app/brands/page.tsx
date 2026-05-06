@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Search, Crown, Star, Gem, ShoppingBag } from "lucide-react";
 import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 import { brands, outfits } from "@/lib/data";
 import { motion } from "framer-motion";
@@ -146,7 +145,6 @@ export default function BrandsPage() {
           )}
         </Container>
       </main>
-      <Footer />
     </>
   );
 }

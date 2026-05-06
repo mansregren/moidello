@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 
 export default function IntegritetPage() {
@@ -170,7 +169,6 @@ export default function IntegritetPage() {
           </div>
         </Container>
       </main>
-      <Footer />
     </>
   );
 }

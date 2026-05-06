@@ -36,6 +36,20 @@ function isAuthRoute(pathname: string | null): boolean {
   );
 }
 
+function isCreateRoute(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return pathname === "/skapa" || pathname.startsWith("/skapa/");
+}
+
+export function shouldShowFooter(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return (
+    !isOnboardingRoute(pathname) &&
+    !isAuthRoute(pathname) &&
+    !isCreateRoute(pathname)
+  );
+}
+
 export function shouldShowAppNav(pathname: string | null): boolean {
   if (!pathname) return false;
   return (

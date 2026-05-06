@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart, Bookmark, Share2, MessageCircle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 import { OutfitTag } from "@/components/outfit/OutfitTag";
 import { TaggedItemCard } from "@/components/outfit/TaggedItem";
@@ -203,7 +202,6 @@ export default function OutfitPage({
           </section>
         </Container>
       </main>
-      <Footer />
     </>
   );
 }
