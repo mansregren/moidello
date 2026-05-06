@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Anton } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { GenderProvider } from "@/lib/gender-context";
@@ -69,6 +69,22 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
     },
   },
+  appleWebApp: {
+    capable: true,
+    title: "Moidello",
+    statusBarStyle: "black-translucent",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
