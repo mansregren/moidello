@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Send } from "lucide-react";
 import { UserAvatar } from "@/components/user/UserAvatar";
-import { sendMessage } from "@/app/actions/messaging";
+import { sendMessage, markConversationRead } from "@/app/actions/messaging";
 import { createClient } from "@/lib/supabase/client";
 import {
   OutfitShareCard,
@@ -61,6 +61,12 @@ export function ConversationThread({
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages.length]);
+
+  // Mark incoming messages as read once on mount. Server-side render
+  // can't call this (Next 16 forbids revalidatePath during render).
+  useEffect(() => {
+    void markConversationRead(conversationId);
+  }, [conversationId]);
 
   // Realtime: append incoming messages
   useEffect(() => {

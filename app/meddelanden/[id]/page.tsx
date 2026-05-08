@@ -5,7 +5,6 @@ import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { createClient } from "@/lib/supabase/server";
-import { markConversationRead } from "@/app/actions/messaging";
 import { ConversationThread } from "./ConversationThread";
 
 export const dynamic = "force-dynamic";
@@ -74,9 +73,9 @@ export default async function ConversationPage({
     .eq("conversation_id", id)
     .order("created_at", { ascending: true });
 
-  // Mark unread incoming messages as read on view (fire-and-forget;
-  // the action revalidates /meddelanden so the inbox count updates).
-  await markConversationRead(id);
+  // markConversationRead runs from the client (ConversationThread
+  // mount effect) — Next 16 forbids revalidatePath during server
+  // render, and that action revalidates /meddelanden.
 
   return (
     <>
