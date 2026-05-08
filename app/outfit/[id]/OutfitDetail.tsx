@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/auth-context";
 import { motion } from "framer-motion";
 import type { Outfit } from "@/lib/types";
 import { toggleLike, toggleSave, postComment } from "@/app/actions/engagement";
+import { TrackView } from "@/components/outfit/TrackView";
 
 export default function OutfitDetail({
   outfit,
@@ -85,6 +86,7 @@ export default function OutfitDetail({
   return (
     <>
       <Header />
+      {isPersisted && <TrackView outfitId={outfit.id} />}
       <main id="main" tabIndex={-1} className="flex-1 pt-20 md:pt-24">
         <Container>
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
@@ -192,7 +194,11 @@ export default function OutfitDetail({
                     </p>
                   ) : (
                     outfit.tags.map((tag) => (
-                      <TaggedItemCard key={tag.id} item={tag} />
+                      <TaggedItemCard
+                        key={tag.id}
+                        item={tag}
+                        outfitId={isPersisted ? outfit.id : undefined}
+                      />
                     ))
                   )}
                 </div>

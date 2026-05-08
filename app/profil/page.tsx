@@ -321,7 +321,7 @@ export default function ProfilPage() {
             </p>
           )}
 
-          <div className="mt-5">
+          <div className="mt-5 flex flex-wrap gap-3">
             <button
               type="button"
               onClick={() => setEditOpen(true)}
@@ -329,6 +329,12 @@ export default function ProfilPage() {
             >
               Redigera profil
             </button>
+            <a
+              href="/profil/statistik"
+              className="rounded-full border border-border text-white px-5 py-2 text-sm font-medium hover:border-white/30 transition-colors"
+            >
+              Statistik
+            </a>
           </div>
 
           <div className="mt-6 flex gap-8 border-y border-border py-4">
