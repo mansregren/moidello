@@ -140,9 +140,13 @@ function rowToOutfit(row: OutfitRow): Outfit {
   };
 }
 
+// Disambiguate the embed: outfits has FKs to profiles via user_id AND
+// transitively via likes / saves, so PostgREST refuses to embed without
+// the !fkey hint. Comments on the outfit detail page get a similar
+// hint when fetched separately.
 const OUTFIT_COLUMNS = `
   id, user_id, image_url, type, gender, title, description, category, created_at,
-  profiles ( id, username, display_name, avatar_url, bio, region ),
+  profiles!outfits_user_id_fkey ( id, username, display_name, avatar_url, bio, region ),
   tagged_items ( id, brand, name, price, currency, buy_url, buy_urls, garment, position_x, position_y, is_affiliate )
 `;
 
