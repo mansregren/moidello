@@ -205,7 +205,7 @@ export function ItemShareCard({
   return (
     <ShareCardShell fromMe={fromMe}>
       <Link
-        href={`/outfit/${preview.outfit_id}`}
+        href={`/produkt/${preview.id}`}
         className="flex gap-3 p-3 hover:bg-white/5 transition-colors"
       >
         <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-background-tertiary">
@@ -239,7 +239,7 @@ export function ItemShareCard({
         <a
           href={preview.buy_url}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="ugc nofollow noopener noreferrer"
           className="flex items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-medium text-white hover:bg-white/5"
         >
           Köp

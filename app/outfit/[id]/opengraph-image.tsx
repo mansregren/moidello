@@ -5,7 +5,30 @@ import { loadAnton, loadInter } from "@/lib/og-fonts";
 export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Outfit på Moidello";
+
+/**
+ * Dynamic per-outfit alt-text so og:image:alt is descriptive instead of
+ * the generic "Outfit på Moidello". Mirrors the auto-description in
+ * generateMetadata so screen readers + crawlers get consistent copy.
+ */
+export async function generateImageMetadata({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const outfit = await fetchOutfitById(params.id);
+  if (!outfit) {
+    return [{ id: "default", alt: "Moidello", contentType, size }];
+  }
+  const top = outfit.tags
+    .slice(0, 3)
+    .map((t) => `${t.brand} ${t.name}`)
+    .join(", ");
+  const altText = top
+    ? `${outfit.title} av ${outfit.creator.displayName} — ${top}`
+    : `${outfit.title} av ${outfit.creator.displayName}`;
+  return [{ id: "default", alt: altText, contentType, size }];
+}
 
 export default async function Image({
   params,

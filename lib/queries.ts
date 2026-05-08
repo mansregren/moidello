@@ -497,6 +497,145 @@ export async function fetchBrandsAggregated(): Promise<BrandAggregate[]> {
   return result.sort((a, b) => b.outfitCount - a.outfitCount);
 }
 
+export interface TaggedItemDetail {
+  id: string;
+  brand: string;
+  name: string;
+  price: number;
+  currency: string;
+  buyUrl: string;
+  buyUrls?: Record<string, string>;
+  garment: string;
+  isAffiliate: boolean;
+  outfitId: string;
+  outfitImage: string;
+  outfitTitle: string;
+  /** Tag's pinned x/y on the outfit image, in percent (0-100) */
+  positionX: number;
+  positionY: number;
+  creator: {
+    id: string;
+    username: string;
+    displayName: string;
+    avatarUrl: string | null;
+  };
+}
+
+interface TaggedItemDetailRow {
+  id: string;
+  brand: string;
+  name: string;
+  price: number | null;
+  currency: string | null;
+  buy_url: string | null;
+  buy_urls: Record<string, string> | null;
+  garment: string;
+  position_x: number;
+  position_y: number;
+  is_affiliate: boolean;
+  outfit_id: string;
+  outfits: {
+    id: string;
+    image_url: string;
+    title: string;
+    profiles: {
+      id: string;
+      username: string;
+      display_name: string | null;
+      avatar_url: string | null;
+    } | null;
+  } | null;
+}
+
+export async function fetchTaggedItemById(
+  id: string,
+): Promise<TaggedItemDetail | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("tagged_items")
+    .select(
+      `id, brand, name, price, currency, buy_url, buy_urls, garment,
+       position_x, position_y, is_affiliate, outfit_id,
+       outfits(
+         id, image_url, title,
+         profiles!outfits_user_id_fkey(id, username, display_name, avatar_url)
+       )`,
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  const r = data as unknown as TaggedItemDetailRow;
+  if (!r.outfits) return null;
+
+  const profile = r.outfits.profiles;
+  return {
+    id: r.id,
+    brand: r.brand,
+    name: r.name,
+    price: r.price ?? 0,
+    currency: r.currency ?? "SEK",
+    buyUrl: r.buy_url ?? "",
+    buyUrls: r.buy_urls ?? undefined,
+    garment: r.garment,
+    isAffiliate: r.is_affiliate,
+    outfitId: r.outfit_id,
+    outfitImage: r.outfits.image_url,
+    outfitTitle: r.outfits.title,
+    positionX: Number(r.position_x),
+    positionY: Number(r.position_y),
+    creator: {
+      id: profile?.id ?? "",
+      username: profile?.username ?? "",
+      displayName: profile?.display_name ?? profile?.username ?? "",
+      avatarUrl: profile?.avatar_url ?? null,
+    },
+  };
+}
+
+/**
+ * Outfits that tag the same brand+name combination — i.e. "andra outfits
+ * som stylar detta plagg". Excludes the source outfit unless explicitly
+ * passed.
+ */
+export async function fetchOutfitsByItem(
+  brand: string,
+  name: string,
+  excludeOutfitId?: string,
+): Promise<Outfit[]> {
+  const supabase = await createClient();
+  const { data: tagRows } = await supabase
+    .from("tagged_items")
+    .select("outfit_id, brand, name");
+  if (!tagRows) return [];
+
+  const targetBrand = brand.toLowerCase();
+  const targetName = name.toLowerCase();
+  const ids = Array.from(
+    new Set(
+      tagRows
+        .filter(
+          (r) =>
+            (r.brand as string).toLowerCase() === targetBrand &&
+            (r.name as string).toLowerCase() === targetName,
+        )
+        .map((r) => r.outfit_id as string)
+        .filter((id) => id !== excludeOutfitId),
+    ),
+  );
+  if (ids.length === 0) return [];
+
+  const { data } = await supabase
+    .from("outfits")
+    .select(OUTFIT_COLUMNS)
+    .in("id", ids)
+    .eq("is_published", true)
+    .order("created_at", { ascending: false });
+
+  const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  return attachOutfitStats(mapped);
+}
+
 export async function fetchBrandOutfits(brandName: string): Promise<Outfit[]> {
   const supabase = await createClient();
 
