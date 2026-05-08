@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import {
   fetchProfileByUsername,
   fetchOutfitsByUser,
+  fetchEngagementForViewer,
+  isFollowing,
 } from "@/lib/queries";
 import { users as mockUsers, outfits as mockOutfits } from "@/lib/data";
 import ProfileDetail from "./ProfileDetail";
@@ -28,5 +30,20 @@ export default async function ProfilePage({
     ? await fetchOutfitsByUser(profile.id)
     : mockOutfits.filter((o) => o.creator.id === profile.id);
 
-  return <ProfileDetail user={profile} outfits={userOutfits} />;
+  const [{ liked, saved }, alreadyFollowing] = dbProfile
+    ? await Promise.all([
+        fetchEngagementForViewer(userOutfits.map((o) => o.id)),
+        isFollowing(profile.id),
+      ])
+    : [{ liked: new Set<string>(), saved: new Set<string>() }, false];
+
+  return (
+    <ProfileDetail
+      user={profile}
+      outfits={userOutfits}
+      likedIds={Array.from(liked)}
+      savedIds={Array.from(saved)}
+      initiallyFollowing={alreadyFollowing}
+    />
+  );
 }

@@ -22,6 +22,7 @@ interface DemoTag {
   name: string;
   url: string;
   garment: string;
+  isAffiliate: boolean;
 }
 
 const GARMENTS = [
@@ -88,6 +89,7 @@ export default function SkapaPage() {
         name: "",
         url: "",
         garment: "Toppar",
+        isAffiliate: false,
       },
     ]);
   };
@@ -129,6 +131,7 @@ export default function SkapaPage() {
       garment: t.garment,
       x: t.x,
       y: t.y,
+      isAffiliate: t.isAffiliate,
     }));
 
   if (loading || !isLoggedIn) {
@@ -397,6 +400,23 @@ export default function SkapaPage() {
                           }
                           className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
                         />
+                        <label className="flex items-start gap-2.5 cursor-pointer pt-1">
+                          <input
+                            type="checkbox"
+                            checked={tag.isAffiliate}
+                            onChange={(e) =>
+                              updateTag(tag.id, { isAffiliate: e.target.checked })
+                            }
+                            className="mt-0.5 h-4 w-4 rounded border-border bg-background-tertiary accent-white"
+                          />
+                          <span className="text-xs text-foreground-muted leading-snug">
+                            Affiliatelänk —{" "}
+                            <span className="text-foreground-subtle">
+                              kryssa i om du tjänar pengar när någon klickar.
+                              Outfit märks då med &quot;Reklam&quot;.
+                            </span>
+                          </span>
+                        </label>
                       </div>
                     ))}
                   </div>

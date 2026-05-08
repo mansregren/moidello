@@ -42,6 +42,7 @@ export default function ProfilPage() {
   const [profile, setProfile] = useState<MoidelloUser | null>(null);
   const [outfits, setOutfits] = useState<Outfit[]>([]);
   const [savedOutfits, setSavedOutfits] = useState<Outfit[]>([]);
+  const [likedSet, setLikedSet] = useState<Set<string>>(new Set());
   const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
@@ -88,20 +89,36 @@ export default function ProfilPage() {
 
       if (cancelled) return;
 
-      if (profileRow) {
-        const p = profileRow as ProfileRow;
-        setProfile({
-          id: p.id,
-          username: p.username,
-          displayName: p.display_name ?? p.username,
-          avatar: p.avatar_url ?? "",
-          bio: p.bio ?? "",
-          followers: statsRow?.followers ?? 0,
-          following: statsRow?.following ?? 0,
-          outfitCount: statsRow?.outfits ?? 0,
-          region: p.region,
-        });
-      }
+      // Build a creator object now (synchronously) so we don't rely on the
+      // useState `profile` value, which is null on first render.
+      const fallbackUsername =
+        user.email?.split("@")[0]?.replace(/[^a-z0-9_]/gi, "_").toLowerCase() ??
+        "user";
+      const resolved: MoidelloUser = profileRow
+        ? {
+            id: profileRow.id,
+            username: profileRow.username,
+            displayName: profileRow.display_name ?? profileRow.username,
+            avatar: profileRow.avatar_url ?? "",
+            bio: profileRow.bio ?? "",
+            followers: statsRow?.followers ?? 0,
+            following: statsRow?.following ?? 0,
+            outfitCount: statsRow?.outfits ?? 0,
+            region: (profileRow as ProfileRow).region,
+          }
+        : {
+            id: user.id,
+            username: fallbackUsername,
+            displayName:
+              (user.user_metadata?.display_name as string | undefined) ??
+              fallbackUsername,
+            avatar: (user.user_metadata?.avatar_url as string | undefined) ?? "",
+            bio: "",
+            followers: 0,
+            following: 0,
+            outfitCount: 0,
+          };
+      setProfile(resolved);
 
       if (outfitRows) {
         setOutfits(
@@ -112,16 +129,7 @@ export default function ProfilPage() {
             gender: o.gender as Outfit["gender"],
             title: o.title,
             description: o.description ?? "",
-            creator: profile ?? {
-              id: o.user_id,
-              username: "",
-              displayName: "",
-              avatar: "",
-              bio: "",
-              followers: 0,
-              following: 0,
-              outfitCount: 0,
-            },
+            creator: resolved,
             tags: [],
             likes: 0,
             saves: 0,
@@ -201,6 +209,31 @@ export default function ProfilPage() {
         );
       }
 
+      // Fetch which outfits in this view the user has liked, so the heart
+      // shows the correct filled state on the user's own + saved outfits.
+      const allIds = [
+        ...(outfitRows?.map((o) => o.id) ?? []),
+      ];
+      // Type narrows: saveRows is optional, the outfit join may be null.
+      type SaveJoinIds = { outfit: { id: string } | null };
+      const savedIds = ((saveRows ?? []) as unknown as SaveJoinIds[])
+        .map((r) => r.outfit?.id)
+        .filter((id): id is string => !!id);
+      allIds.push(...savedIds);
+
+      if (allIds.length > 0) {
+        const { data: likeRows } = await supabase
+          .from("likes")
+          .select("outfit_id")
+          .eq("user_id", user.id)
+          .in("outfit_id", allIds);
+        if (!cancelled) {
+          setLikedSet(
+            new Set((likeRows ?? []).map((r) => r.outfit_id as string)),
+          );
+        }
+      }
+
       setProfileLoading(false);
     })();
 
@@ -224,7 +257,7 @@ export default function ProfilPage() {
     router.push("/");
   };
 
-  if (loading || !isLoggedIn || !profile) {
+  if (loading || !isLoggedIn) {
     return (
       <>
         <Header />
@@ -232,6 +265,19 @@ export default function ProfilPage() {
       </>
     );
   }
+
+  if (!profile) {
+    // Should be unreachable because the effect always sets a fallback,
+    // but render a placeholder rather than blanking the whole page.
+    return (
+      <>
+        <Header />
+        <main id="main" tabIndex={-1} className="flex-1" />
+      </>
+    );
+  }
+
+  const savedSet = new Set(savedOutfits.map((o) => o.id));
 
   return (
     <>
@@ -313,7 +359,12 @@ export default function ProfilPage() {
                   (profileLoading ? (
                     <Empty text="Laddar outfits…" />
                   ) : filteredOutfits.length > 0 ? (
-                    <OutfitGrid outfits={filteredOutfits} columns={3} />
+                    <OutfitGrid
+                      outfits={filteredOutfits}
+                      columns={3}
+                      liked={likedSet}
+                      saved={savedSet}
+                    />
                   ) : (
                     <Empty text="Inga outfits ännu — tryck Skapa för att lägga upp din första." />
                   ))}
@@ -322,7 +373,12 @@ export default function ProfilPage() {
                   (profileLoading ? (
                     <Empty text="Laddar sparade…" />
                   ) : filteredSaved.length > 0 ? (
-                    <OutfitGrid outfits={filteredSaved} columns={3} />
+                    <OutfitGrid
+                      outfits={filteredSaved}
+                      columns={3}
+                      liked={likedSet}
+                      saved={savedSet}
+                    />
                   ) : (
                     <Empty text="Du har inte sparat något än." />
                   ))}

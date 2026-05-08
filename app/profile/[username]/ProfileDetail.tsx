@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useTransition } from "react";
+import { useMemo, useOptimistic, useState, useTransition } from "react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { UserAvatar } from "@/components/user/UserAvatar";
@@ -19,14 +19,25 @@ function formatNumber(n: number): string {
 export default function ProfileDetail({
   user,
   outfits,
+  likedIds = [],
+  savedIds = [],
+  initiallyFollowing = false,
 }: {
   user: MoidelloUser;
   outfits: Outfit[];
+  likedIds?: string[];
+  savedIds?: string[];
+  initiallyFollowing?: boolean;
 }) {
   const { user: viewer, isLoggedIn, requireAuth } = useAuth();
   const [activeTab, setActiveTab] = useState<"outfits" | "about">("outfits");
-  const [following, setFollowing] = useState(false);
+  const [following, setFollowing] = useOptimistic(
+    initiallyFollowing,
+    (_state, next: boolean) => next,
+  );
   const [, startTransition] = useTransition();
+  const liked = useMemo(() => new Set(likedIds), [likedIds]);
+  const saved = useMemo(() => new Set(savedIds), [savedIds]);
 
   const isOwnProfile = viewer?.id === user.id;
 
@@ -37,9 +48,9 @@ export default function ProfileDetail({
     }
     if (isOwnProfile) return;
     startTransition(async () => {
-      setFollowing((prev) => !prev);
+      setFollowing(!following);
       const res = await toggleFollow(user.id);
-      if (!res.ok) setFollowing((prev) => !prev);
+      if (!res.ok) setFollowing(following);
     });
   };
 
@@ -164,7 +175,7 @@ export default function ProfileDetail({
           >
             {activeTab === "outfits" &&
               (outfits.length > 0 ? (
-                <OutfitGrid outfits={outfits} columns={3} />
+                <OutfitGrid outfits={outfits} columns={3} liked={liked} saved={saved} />
               ) : (
                 <p className="py-16 text-center text-foreground-muted">
                   Inga outfits ännu.

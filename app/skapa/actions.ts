@@ -14,6 +14,7 @@ interface TagInput {
   garment: string;
   x: number;
   y: number;
+  isAffiliate?: boolean;
 }
 
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -111,6 +112,7 @@ export async function createOutfit(
         garment: t.garment || "Toppar",
         position_x: t.x,
         position_y: t.y,
+        is_affiliate: !!t.isAffiliate,
       }));
 
     if (taggedRows.length > 0) {

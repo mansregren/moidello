@@ -58,8 +58,18 @@ const CATEGORY_LABELS: Record<FilterCategory, string> = {
   price: "Pris",
 };
 
-export default function UpptackClient({ outfits }: { outfits: Outfit[] }) {
+export default function UpptackClient({
+  outfits,
+  likedIds = [],
+  savedIds = [],
+}: {
+  outfits: Outfit[];
+  likedIds?: string[];
+  savedIds?: string[];
+}) {
   const { gender } = useGender();
+  const liked = useMemo(() => new Set(likedIds), [likedIds]);
+  const saved = useMemo(() => new Set(savedIds), [savedIds]);
   const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
   const [search, setSearch] = useState("");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -300,7 +310,7 @@ export default function UpptackClient({ outfits }: { outfits: Outfit[] }) {
 
           <div className="mt-4">
             {visible.length > 0 ? (
-              <OutfitGrid outfits={visible} columns={4} />
+              <OutfitGrid outfits={visible} columns={4} liked={liked} saved={saved} />
             ) : (
               <EmptyState
                 icon={Search}

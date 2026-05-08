@@ -4,6 +4,7 @@ import {
   fetchOutfits,
   fetchOutfitComments,
   fetchEngagementForViewer,
+  isFollowing,
 } from "@/lib/queries";
 import { outfits as mockOutfits } from "@/lib/data";
 import OutfitDetail from "./OutfitDetail";
@@ -28,24 +29,32 @@ export default async function OutfitPage({
 
   const outfit = dbOutfit ?? mockMatch!;
 
-  const [allOutfits, comments, engagement] = await Promise.all([
+  const [allOutfits, comments, engagement, followingCreator] = await Promise.all([
     fetchOutfits(20),
     dbOutfit ? fetchOutfitComments(outfit.id) : Promise.resolve([]),
     dbOutfit
       ? fetchEngagementForViewer([outfit.id])
       : Promise.resolve({ liked: new Set<string>(), saved: new Set<string>() }),
+    dbOutfit ? isFollowing(outfit.creator.id) : Promise.resolve(false),
   ]);
 
   const similar = (allOutfits.length > 0 ? allOutfits : mockOutfits)
     .filter((o) => o.id !== outfit.id)
     .slice(0, 3);
 
+  const similarEngagement = await fetchEngagementForViewer(
+    similar.filter((o) => /^[0-9a-f-]{36}$/i.test(o.id)).map((o) => o.id),
+  );
+
   return (
     <OutfitDetail
       outfit={{ ...outfit, comments }}
       similar={similar}
+      similarLikedIds={Array.from(similarEngagement.liked)}
+      similarSavedIds={Array.from(similarEngagement.saved)}
       initiallyLiked={engagement.liked.has(outfit.id)}
       initiallySaved={engagement.saved.has(outfit.id)}
+      initiallyFollowingCreator={followingCreator}
       isPersisted={!!dbOutfit}
     />
   );

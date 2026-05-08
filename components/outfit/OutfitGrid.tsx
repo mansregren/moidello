@@ -4,9 +4,11 @@ import { OutfitCard } from "./OutfitCard";
 interface OutfitGridProps {
   outfits: Outfit[];
   columns?: 2 | 3 | 4;
+  liked?: Set<string>;
+  saved?: Set<string>;
 }
 
-export function OutfitGrid({ outfits, columns = 3 }: OutfitGridProps) {
+export function OutfitGrid({ outfits, columns = 3, liked, saved }: OutfitGridProps) {
   return (
     <div
       className={`grid gap-3 sm:gap-6 ${
@@ -18,7 +20,12 @@ export function OutfitGrid({ outfits, columns = 3 }: OutfitGridProps) {
       }`}
     >
       {outfits.map((outfit) => (
-        <OutfitCard key={outfit.id} outfit={outfit} />
+        <OutfitCard
+          key={outfit.id}
+          outfit={outfit}
+          initiallyLiked={liked?.has(outfit.id)}
+          initiallySaved={saved?.has(outfit.id)}
+        />
       ))}
     </div>
   );

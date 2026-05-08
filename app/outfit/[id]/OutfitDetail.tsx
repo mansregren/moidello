@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useOptimistic, useState, useTransition } from "react";
+import { useMemo, useOptimistic, useState, useTransition } from "react";
 import { Heart, Bookmark, Share2, MessageCircle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
@@ -20,18 +20,26 @@ import { toggleLike, toggleSave, postComment } from "@/app/actions/engagement";
 export default function OutfitDetail({
   outfit,
   similar,
+  similarLikedIds = [],
+  similarSavedIds = [],
   initiallyLiked,
   initiallySaved,
+  initiallyFollowingCreator = false,
   isPersisted,
 }: {
   outfit: Outfit;
   similar: Outfit[];
+  similarLikedIds?: string[];
+  similarSavedIds?: string[];
   initiallyLiked: boolean;
   initiallySaved: boolean;
+  initiallyFollowingCreator?: boolean;
   isPersisted: boolean;
 }) {
   const { isLoggedIn, requireAuth, user } = useAuth();
   const [, startTransition] = useTransition();
+  const similarLiked = useMemo(() => new Set(similarLikedIds), [similarLikedIds]);
+  const similarSaved = useMemo(() => new Set(similarSavedIds), [similarSavedIds]);
 
   const [likeState, setLikeState] = useOptimistic(
     { liked: initiallyLiked, count: outfit.likes },
@@ -124,7 +132,10 @@ export default function OutfitDetail({
                     </p>
                   </div>
                 </Link>
-                <FollowButton userId={outfit.creator.id} />
+                <FollowButton
+                  userId={outfit.creator.id}
+                  initiallyFollowing={initiallyFollowingCreator}
+                />
               </div>
 
               <h1 className="font-heading text-[32px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-white mb-4">
@@ -204,7 +215,12 @@ export default function OutfitDetail({
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {similar.map((o) => (
-                <OutfitCard key={o.id} outfit={o} />
+                <OutfitCard
+                  key={o.id}
+                  outfit={o}
+                  initiallyLiked={similarLiked.has(o.id)}
+                  initiallySaved={similarSaved.has(o.id)}
+                />
               ))}
             </div>
           </section>

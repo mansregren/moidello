@@ -12,12 +12,18 @@ import { toggleLike, toggleSave } from "@/app/actions/engagement";
 
 interface OutfitCardProps {
   outfit: Outfit;
+  initiallyLiked?: boolean;
+  initiallySaved?: boolean;
 }
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export function OutfitCard({ outfit }: OutfitCardProps) {
+export function OutfitCard({
+  outfit,
+  initiallyLiked = false,
+  initiallySaved = false,
+}: OutfitCardProps) {
   const { isLoggedIn, requireAuth } = useAuth();
   const [hovering, setHovering] = useState(false);
   const [, startTransition] = useTransition();
@@ -25,14 +31,14 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
   const isPersisted = UUID_RE.test(outfit.id);
 
   const [likeState, setLikeState] = useOptimistic(
-    { liked: false, count: outfit.likes },
+    { liked: initiallyLiked, count: outfit.likes },
     (state, next: boolean) => ({
       liked: next,
       count: state.count + (next ? 1 : -1),
     }),
   );
   const [saveState, setSaveState] = useOptimistic(
-    { saved: false, count: outfit.saves },
+    { saved: initiallySaved, count: outfit.saves },
     (state, next: boolean) => ({
       saved: next,
       count: state.count + (next ? 1 : -1),
