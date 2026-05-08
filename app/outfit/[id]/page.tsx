@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import {
   fetchOutfitById,
   fetchOutfits,
@@ -21,6 +21,16 @@ export default async function OutfitPage({
 
   const outfit = await fetchOutfitById(id);
   if (!outfit) notFound();
+
+  // Canonical URL is /<username>/<slug>. 301 every legacy /outfit/<uuid>
+  // hit so old shared links + Google's existing index roll over to the
+  // new structure without a flicker. Backwards-compat for outfits
+  // without a slug (legacy/mock) is preserved by the slug guard.
+  if (outfit.slug && outfit.creator.username) {
+    permanentRedirect(
+      `/${outfit.creator.username.toLowerCase()}/${outfit.slug}`,
+    );
+  }
 
   const [allOutfits, comments, engagement, followingCreator] = await Promise.all([
     fetchOutfits(20),

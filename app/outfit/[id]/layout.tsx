@@ -49,7 +49,13 @@ export async function generateMetadata({
   // duplicate the suffix here.
   const title = `${outfit.title} av ${outfit.creator.displayName}`;
   const description = buildDescription(outfit);
-  const canonical = `/outfit/${outfit.id}`;
+  // Canonical points at the new /<username>/<slug> URL when available;
+  // the page itself 301-redirects there, but search engines that read
+  // metadata before following redirects need the canonical too.
+  const canonical =
+    outfit.slug && outfit.creator.username
+      ? `/${outfit.creator.username.toLowerCase()}/${outfit.slug}`
+      : `/outfit/${outfit.id}`;
 
   // Thin-content guard: if the outfit has neither a creator description
   // nor a single tagged item, leave it out of the index until the creator
