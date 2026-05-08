@@ -298,6 +298,177 @@ export async function fetchEngagementForViewer(
   };
 }
 
+export async function fetchTopCreators(limit = 12): Promise<MoidelloUser[]> {
+  const supabase = await createClient();
+  // Use the profile_stats view to sort by followers; falls back to recent
+  // profiles if the view doesn't exist yet.
+  const { data: stats, error: statsError } = await supabase
+    .from("profile_stats")
+    .select("profile_id, outfits, followers, following")
+    .order("followers", { ascending: false })
+    .limit(limit);
+
+  if (statsError) return [];
+  if (!stats || stats.length === 0) return [];
+
+  const ids = stats.map((s) => s.profile_id as string);
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, username, display_name, avatar_url, bio, region")
+    .in("id", ids);
+
+  const profileMap = new Map(
+    (profiles ?? []).map((p) => [p.id as string, p as ProfileRow]),
+  );
+
+  return stats
+    .map((s) => {
+      const p = profileMap.get(s.profile_id as string);
+      if (!p) return null;
+      return profileToUser(p, s as ProfileStatsRow);
+    })
+    .filter((u): u is MoidelloUser => !!u);
+}
+
+export async function fetchTopOutfits(limit = 12): Promise<Outfit[]> {
+  const supabase = await createClient();
+  const { data: statsRows, error } = await supabase
+    .from("outfit_stats")
+    .select("outfit_id, likes, saves, comments")
+    .order("likes", { ascending: false })
+    .limit(limit);
+
+  if (error || !statsRows || statsRows.length === 0) return [];
+
+  const ids = statsRows.map((r) => r.outfit_id as string);
+  const { data: outfitRows } = await supabase
+    .from("outfits")
+    .select(OUTFIT_COLUMNS)
+    .in("id", ids)
+    .eq("is_published", true);
+
+  if (!outfitRows) return [];
+  const byId = new Map(
+    (outfitRows as unknown as OutfitRow[]).map((o) => [o.id, o]),
+  );
+  // Preserve sort order from outfit_stats
+  return statsRows
+    .map((r) => byId.get(r.outfit_id as string))
+    .filter((o): o is OutfitRow => !!o)
+    .map(rowToOutfit);
+}
+
+export interface BrandAggregate {
+  name: string;
+  slug: string;
+  outfitCount: number;
+  isClaimed: boolean;
+  claimedBy?: { username: string; avatar: string; website: string | null };
+}
+
+function brandSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+interface ClaimedBrandRow {
+  id: string;
+  username: string;
+  avatar_url: string | null;
+  brand_name: string;
+  brand_website: string | null;
+}
+
+export async function fetchBrandsAggregated(): Promise<BrandAggregate[]> {
+  const supabase = await createClient();
+
+  const [{ data: items }, { data: claimed }] = await Promise.all([
+    supabase.from("tagged_items").select("brand, outfit_id"),
+    supabase
+      .from("profiles")
+      .select("id, username, avatar_url, brand_name, brand_website")
+      .eq("account_type", "brand")
+      .not("brand_name", "is", null),
+  ]);
+
+  const claimedRows = (claimed ?? []) as unknown as ClaimedBrandRow[];
+
+  const counts = new Map<string, { display: string; outfits: Set<string> }>();
+  for (const row of items ?? []) {
+    const display = (row.brand as string).trim();
+    if (!display) continue;
+    const key = display.toLowerCase();
+    const entry = counts.get(key) ?? { display, outfits: new Set<string>() };
+    entry.outfits.add(row.outfit_id as string);
+    counts.set(key, entry);
+  }
+
+  const claimedByKey = new Map<string, ClaimedBrandRow>();
+  for (const c of claimedRows) {
+    if (c.brand_name) claimedByKey.set(c.brand_name.toLowerCase(), c);
+  }
+  // Brands with claimed profiles but zero tagged outfits should still appear.
+  for (const c of claimedRows) {
+    if (!c.brand_name) continue;
+    const key = c.brand_name.toLowerCase();
+    if (!counts.has(key)) {
+      counts.set(key, { display: c.brand_name, outfits: new Set() });
+    }
+  }
+
+  const result: BrandAggregate[] = [];
+  for (const [key, value] of counts) {
+    const claim = claimedByKey.get(key);
+    result.push({
+      name: claim?.brand_name ?? value.display,
+      slug: brandSlug(claim?.brand_name ?? value.display),
+      outfitCount: value.outfits.size,
+      isClaimed: !!claim,
+      claimedBy: claim
+        ? {
+            username: claim.username,
+            avatar: claim.avatar_url ?? "",
+            website: claim.brand_website,
+          }
+        : undefined,
+    });
+  }
+  return result.sort((a, b) => b.outfitCount - a.outfitCount);
+}
+
+export async function fetchBrandOutfits(brandName: string): Promise<Outfit[]> {
+  const supabase = await createClient();
+
+  // tagged_items has a lower(brand) index from migration 0007
+  const { data: tagRows } = await supabase
+    .from("tagged_items")
+    .select("outfit_id, brand");
+
+  if (!tagRows) return [];
+  const targetKey = brandName.toLowerCase();
+  const outfitIds = Array.from(
+    new Set(
+      tagRows
+        .filter((r) => (r.brand as string).toLowerCase() === targetKey)
+        .map((r) => r.outfit_id as string),
+    ),
+  );
+  if (outfitIds.length === 0) return [];
+
+  const { data } = await supabase
+    .from("outfits")
+    .select(OUTFIT_COLUMNS)
+    .in("id", outfitIds)
+    .eq("is_published", true)
+    .order("created_at", { ascending: false });
+
+  return ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+}
+
 export async function isFollowing(followeeId: string): Promise<boolean> {
   const supabase = await createClient();
   const {
