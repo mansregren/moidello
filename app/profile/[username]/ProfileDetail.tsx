@@ -15,6 +15,10 @@ import { useAuth } from "@/lib/auth-context";
 import { motion } from "framer-motion";
 import type { Outfit, User as MoidelloUser } from "@/lib/types";
 import { toggleFollow } from "@/app/actions/engagement";
+import { getLocalFollow, setLocalFollow } from "@/lib/local-engagement";
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface PublicBoardSummary {
   id: string;
@@ -48,10 +52,15 @@ export default function ProfileDetail({
   const [activeTab, setActiveTab] = useState<"outfits" | "boards" | "about">(
     "outfits",
   );
+  const isPersisted = UUID_RE.test(user.id);
   const [following, setFollowing] = useState(initiallyFollowing);
   useEffect(() => {
-    setFollowing(initiallyFollowing);
-  }, [user.id, initiallyFollowing]);
+    if (isPersisted) {
+      setFollowing(initiallyFollowing);
+    } else {
+      setFollowing(getLocalFollow(user.id));
+    }
+  }, [user.id, initiallyFollowing, isPersisted]);
   const [, startTransition] = useTransition();
   const liked = useMemo(() => new Set(likedIds), [likedIds]);
   const saved = useMemo(() => new Set(savedIds), [savedIds]);
@@ -66,6 +75,10 @@ export default function ProfileDetail({
     if (isOwnProfile) return;
     const next = !following;
     setFollowing(next);
+    if (!isPersisted) {
+      setLocalFollow(user.id, next);
+      return;
+    }
     startTransition(async () => {
       const res = await toggleFollow(user.id);
       if (!res.ok) setFollowing(!next);

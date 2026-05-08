@@ -16,6 +16,12 @@ import { useAuth } from "@/lib/auth-context";
 import { motion } from "framer-motion";
 import type { Outfit, Region } from "@/lib/types";
 import { toggleLike, toggleSave, postComment } from "@/app/actions/engagement";
+import {
+  getLocalLike,
+  getLocalSave,
+  setLocalLike,
+  setLocalSave,
+} from "@/lib/local-engagement";
 import { TrackView } from "@/components/outfit/TrackView";
 import { AddToBoardButton } from "@/components/outfit/AddToBoardButton";
 import { ShareButton } from "@/components/shared/ShareButton";
@@ -53,15 +59,19 @@ export default function OutfitDetail({
   const [saveCount, setSaveCount] = useState(outfit.saves);
 
   useEffect(() => {
-    setLiked(initiallyLiked);
+    if (isPersisted) {
+      setLiked(initiallyLiked);
+      setSaved(initiallySaved);
+    } else {
+      setLiked(getLocalLike(outfit.id));
+      setSaved(getLocalSave(outfit.id));
+    }
     setLikeCount(outfit.likes);
-    setSaved(initiallySaved);
     setSaveCount(outfit.saves);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [outfit.id]);
 
   const handleLike = () => {
-    if (!isPersisted) return;
     if (!isLoggedIn) {
       requireAuth("like");
       return;
@@ -69,6 +79,10 @@ export default function OutfitDetail({
     const next = !liked;
     setLiked(next);
     setLikeCount((c) => c + (next ? 1 : -1));
+    if (!isPersisted) {
+      setLocalLike(outfit.id, next);
+      return;
+    }
     startTransition(async () => {
       const res = await toggleLike(outfit.id);
       if (!res.ok) {
@@ -79,7 +93,6 @@ export default function OutfitDetail({
   };
 
   const handleSave = () => {
-    if (!isPersisted) return;
     if (!isLoggedIn) {
       requireAuth("save");
       return;
@@ -87,6 +100,10 @@ export default function OutfitDetail({
     const next = !saved;
     setSaved(next);
     setSaveCount((c) => c + (next ? 1 : -1));
+    if (!isPersisted) {
+      setLocalSave(outfit.id, next);
+      return;
+    }
     startTransition(async () => {
       const res = await toggleSave(outfit.id);
       if (!res.ok) {
