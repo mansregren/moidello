@@ -6,6 +6,8 @@ import { GenderProvider } from "@/lib/gender-context";
 import { ToastProvider } from "@/lib/toast-context";
 import { AuthProvider, type AuthProfile } from "@/lib/auth-context";
 import { AppShell } from "@/components/layout/AppShell";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { siteJsonLd } from "@/lib/json-ld";
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
@@ -116,6 +118,9 @@ export default async function RootLayout({
       className={`${inter.variable} ${anton.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        {/* Site-wide structured data: Organization + WebSite (with sitelinks
+            search box). Page-level JSON-LD goes inside the route components. */}
+        <JsonLd data={siteJsonLd()} />
         <a href="#main" className="skip-link">
           Hoppa till innehåll
         </a>

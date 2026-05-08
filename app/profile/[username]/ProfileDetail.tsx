@@ -11,6 +11,8 @@ import { SocialLinks } from "@/components/user/SocialLinks";
 import { MessageButton } from "@/components/user/MessageButton";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { ShareButton } from "@/components/shared/ShareButton";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { profilePageJsonLd } from "@/lib/json-ld";
 import { useAuth } from "@/lib/auth-context";
 import { motion } from "framer-motion";
 import type { Outfit, User as MoidelloUser } from "@/lib/types";
@@ -87,6 +89,7 @@ export default function ProfileDetail({
   return (
     <>
       <Header />
+      <JsonLd data={profilePageJsonLd(user, outfits)} />
       <main id="main" tabIndex={-1} className="flex-1 pt-16 md:pt-20">
         {user.coverImage && (
           <div className="relative h-48 md:h-72 overflow-hidden">

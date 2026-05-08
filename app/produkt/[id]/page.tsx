@@ -7,6 +7,8 @@ import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { ShareButton } from "@/components/shared/ShareButton";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { produktPageJsonLd } from "@/lib/json-ld";
 import { ProduktSaveAndShare } from "./ProduktSaveAndShare";
 import {
   fetchTaggedItemById,
@@ -63,6 +65,19 @@ export default async function ProduktPage({
   return (
     <>
       <Header />
+      <JsonLd
+        data={produktPageJsonLd({
+          id: item.id,
+          brand: item.brand,
+          name: item.name,
+          price: item.price,
+          currency: item.currency,
+          buyUrl: item.buyUrl,
+          outfitImage: item.outfitImage,
+          outfitId: item.outfitId,
+          outfitTitle: item.outfitTitle,
+        })}
+      />
       <main id="main" tabIndex={-1} className="flex-1 pt-6 md:pt-10">
         <Container>
           <Link
