@@ -21,6 +21,7 @@ import { useGender, matchesGenderFilter } from "@/lib/gender-context";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import type { Outfit, User as MoidelloUser } from "@/lib/types";
+import { ProfileEditSheet } from "./ProfileEditSheet";
 
 type ProfileTab = "outfits" | "saved" | "about";
 
@@ -39,6 +40,7 @@ export default function ProfilPage() {
   const { user, isLoggedIn, loading, signOut } = useAuth();
   const [tab, setTab] = useState<ProfileTab>("outfits");
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [profile, setProfile] = useState<MoidelloUser | null>(null);
   const [outfits, setOutfits] = useState<Outfit[]>([]);
   const [savedOutfits, setSavedOutfits] = useState<Outfit[]>([]);
@@ -319,6 +321,16 @@ export default function ProfilPage() {
             </p>
           )}
 
+          <div className="mt-5">
+            <button
+              type="button"
+              onClick={() => setEditOpen(true)}
+              className="rounded-full border border-border text-white px-5 py-2 text-sm font-medium hover:border-white/30 transition-colors"
+            >
+              Redigera profil
+            </button>
+          </div>
+
           <div className="mt-6 flex gap-8 border-y border-border py-4">
             <Stat label="Outfits" value={profile.outfitCount} />
             <Stat label="Följare" value={profile.followers} />
@@ -403,6 +415,12 @@ export default function ProfilPage() {
 
           <div className="py-16" />
         </Container>
+
+        <ProfileEditSheet
+          open={editOpen}
+          onClose={() => setEditOpen(false)}
+          profile={profile}
+        />
 
         <AnimatePresence>
           {settingsOpen && (

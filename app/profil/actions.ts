@@ -1,0 +1,103 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+
+export interface ProfileUpdateState {
+  ok?: boolean;
+  error?: string;
+  fieldErrors?: { username?: string; displayName?: string; bio?: string };
+}
+
+const USERNAME_RE = /^[a-z0-9_]{3,24}$/;
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_AVATAR_BYTES = 5 * 1024 * 1024; // 5 MB
+
+export async function updateProfile(
+  _prev: ProfileUpdateState,
+  formData: FormData,
+): Promise<ProfileUpdateState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Du måste logga in först." };
+
+  const username = ((formData.get("username") as string | null) ?? "")
+    .trim()
+    .toLowerCase();
+  const displayName =
+    ((formData.get("display_name") as string | null) ?? "").trim() || null;
+  const bio = ((formData.get("bio") as string | null) ?? "").trim() || null;
+  const region =
+    ((formData.get("region") as string | null) ?? "SE").trim().toUpperCase() ||
+    "SE";
+  const avatar = formData.get("avatar");
+
+  if (!USERNAME_RE.test(username)) {
+    return {
+      fieldErrors: {
+        username: "3–24 tecken: små bokstäver, siffror, understreck.",
+      },
+    };
+  }
+
+  if (bio && bio.length > 500) {
+    return { fieldErrors: { bio: "För lång bio (max 500 tecken)." } };
+  }
+
+  // Username collision check (skip our own row).
+  const { data: collision } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("username", username)
+    .neq("id", user.id)
+    .maybeSingle();
+  if (collision) {
+    return { fieldErrors: { username: "Användarnamnet är upptaget." } };
+  }
+
+  let avatarUrl: string | null = null;
+  if (avatar instanceof File && avatar.size > 0) {
+    if (!ACCEPTED_IMAGE_TYPES.includes(avatar.type)) {
+      return { error: "Avataren måste vara JPG, PNG eller WebP." };
+    }
+    if (avatar.size > MAX_AVATAR_BYTES) {
+      return { error: "Avataren är för stor (max 5 MB)." };
+    }
+    const ext = avatar.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(path, avatar, { contentType: avatar.type, upsert: false });
+    if (uploadError) {
+      return { error: `Avataruppladdning misslyckades: ${uploadError.message}` };
+    }
+    avatarUrl = supabase.storage.from("avatars").getPublicUrl(path).data
+      .publicUrl;
+  }
+
+  // Upsert covers the case where the on_auth_user_created trigger never ran
+  // (or ran but the row got cleaned up) so the user still ends up with a
+  // valid profile after editing.
+  const update: Record<string, unknown> = {
+    id: user.id,
+    username,
+    display_name: displayName,
+    bio,
+    region,
+  };
+  if (avatarUrl) update.avatar_url = avatarUrl;
+
+  const { error: upsertError } = await supabase
+    .from("profiles")
+    .upsert(update, { onConflict: "id" });
+
+  if (upsertError) {
+    return { error: `Kunde inte spara profilen: ${upsertError.message}` };
+  }
+
+  revalidatePath("/profil");
+  revalidatePath(`/profile/${username}`);
+  return { ok: true };
+}
