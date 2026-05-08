@@ -42,6 +42,9 @@ export function MessageButton({ userId }: { userId: string }) {
       const res = await getOrCreateConversation(userId);
       if (res.ok && res.conversationId) {
         router.push(`/meddelanden/${res.conversationId}`);
+      } else {
+        console.error("[MessageButton] failed to open conversation:", res.error);
+        alert(`Kunde inte öppna samtalet: ${res.error ?? "okänt fel"}`);
       }
     });
   };

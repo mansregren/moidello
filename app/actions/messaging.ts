@@ -35,12 +35,17 @@ export async function getOrCreateConversation(
   const [a, b] =
     user.id < otherUserId ? [user.id, otherUserId] : [otherUserId, user.id];
 
-  const { data: existing } = await supabase
+  const { data: existing, error: selectError } = await supabase
     .from("conversations")
     .select("id")
     .eq("user_a", a)
     .eq("user_b", b)
     .maybeSingle();
+
+  if (selectError) {
+    console.error("[messaging] conversation lookup failed:", selectError);
+    return { ok: false, error: selectError.message };
+  }
 
   if (existing) {
     return { ok: true, conversationId: existing.id as string };
@@ -53,7 +58,11 @@ export async function getOrCreateConversation(
     .single();
 
   if (error || !created) {
-    return { ok: false, error: error?.message ?? "Kunde inte starta samtal" };
+    console.error("[messaging] conversation insert failed:", error);
+    return {
+      ok: false,
+      error: error?.message ?? "Kunde inte starta samtal",
+    };
   }
   return { ok: true, conversationId: created.id as string };
 }
