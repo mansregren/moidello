@@ -72,87 +72,94 @@ export default function TrendigtClient({
             </p>
           </motion.div>
 
-          <Section title="Trending just nu" href="/upptack">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-              {trendingNow.map((outfit, i) => (
-                <motion.div
-                  key={outfit.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.08 }}
-                >
-                  <OutfitCard
-                    outfit={outfit}
-                    initiallyLiked={liked.has(outfit.id)}
-                    initiallySaved={saved.has(outfit.id)}
-                  />
-                </motion.div>
-              ))}
-            </div>
-          </Section>
-
-          <Section title="Top creators denna vecka" href="/upptack">
-            <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
-              {creators.map((user, i) => (
-                <motion.div
-                  key={user.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: i * 0.05 }}
-                  className="shrink-0"
-                >
-                  <Link
-                    href={`/profile/${user.username}`}
-                    className="flex flex-col items-center gap-3 w-32 group"
+          {trendingNow.length > 0 && (
+            <Section title="Trending just nu" href="/upptack">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                {trendingNow.map((outfit, i) => (
+                  <motion.div
+                    key={outfit.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: i * 0.08 }}
                   >
-                    <div className="relative">
-                      <UserAvatar
-                        src={user.avatar}
-                        alt={user.displayName}
-                        size="lg"
-                      />
-                      <span className="absolute -top-1 -right-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-black text-[10px] font-bold">
-                        {i + 1}
-                      </span>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-white truncate max-w-[8rem]">
-                        {user.displayName}
-                      </p>
-                      <p className="text-xs text-foreground-subtle">
-                        {user.followers.toLocaleString("sv-SE")} följare
-                      </p>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </Section>
+                    <OutfitCard
+                      outfit={outfit}
+                      initiallyLiked={liked.has(outfit.id)}
+                      initiallySaved={saved.has(outfit.id)}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </Section>
+          )}
 
-          <Section title="Heta märken" href="/brands">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              {brands.map((b, i) => (
-                <motion.div
-                  key={b.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: i * 0.05 }}
-                >
-                  <Link
-                    href={`/brand/${b.slug}`}
-                    className="block rounded-2xl border border-border bg-background-secondary p-5 text-center transition-colors hover:border-white/30 hover:bg-background-tertiary"
+          {creators.length > 0 && (
+            <Section title="Top creators denna vecka" href="/upptack">
+              <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
+                {creators.map((user, i) => (
+                  <motion.div
+                    key={user.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                    className="shrink-0"
                   >
-                    <p className="font-medium text-white text-sm truncate">
-                      {b.name}
-                    </p>
-                    <p className="mt-1 text-[11px] text-foreground-subtle">
-                      {b.newOutfits} {b.newOutfits === 1 ? "outfit" : "outfits"}
-                    </p>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </Section>
+                    <Link
+                      href={`/profile/${user.username}`}
+                      aria-label={`${user.displayName} — ${user.followers.toLocaleString("sv-SE")} följare`}
+                      className="flex flex-col items-center gap-3 w-32 group"
+                    >
+                      <div className="relative">
+                        <UserAvatar src={user.avatar} alt="" size="lg" />
+                        <span
+                          aria-hidden="true"
+                          className="absolute -top-1 -right-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-black text-[10px] font-bold"
+                        >
+                          {i + 1}
+                        </span>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-white truncate max-w-[8rem]">
+                          {user.displayName}
+                        </p>
+                        <p className="text-xs text-foreground-subtle">
+                          {user.followers.toLocaleString("sv-SE")} följare
+                        </p>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </Section>
+          )}
+
+          {brands.length > 0 && (
+            <Section title="Heta märken" href="/brands">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                {brands.map((b, i) => (
+                  <motion.div
+                    key={b.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                  >
+                    <Link
+                      href={`/brand/${b.slug}`}
+                      className="block rounded-2xl border border-border bg-background-secondary p-5 text-center transition-colors hover:border-white/30 hover:bg-background-tertiary"
+                    >
+                      <p className="font-medium text-white text-sm truncate">
+                        {b.name}
+                      </p>
+                      <p className="mt-1 text-[11px] text-foreground-subtle">
+                        {b.newOutfits}{" "}
+                        {b.newOutfits === 1 ? "outfit" : "outfits"}
+                      </p>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </Section>
+          )}
 
           <Section title="Trending stilar" href="/upptack">
             <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-4 overflow-x-auto pb-3 scrollbar-hide">
@@ -189,28 +196,30 @@ export default function TrendigtClient({
             </div>
           </Section>
 
-          <Section
-            title="Populärt i Stockholm"
-            href="/upptack"
-            icon={<MapPin className="h-6 w-6 text-white" />}
-          >
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-              {localOutfits.map((outfit, i) => (
-                <motion.div
-                  key={outfit.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.08 }}
-                >
-                  <OutfitCard
-                    outfit={outfit}
-                    initiallyLiked={liked.has(outfit.id)}
-                    initiallySaved={saved.has(outfit.id)}
-                  />
-                </motion.div>
-              ))}
-            </div>
-          </Section>
+          {localOutfits.length > 0 && (
+            <Section
+              title="Populärt i Stockholm"
+              href="/upptack"
+              icon={<MapPin className="h-6 w-6 text-white" />}
+            >
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                {localOutfits.map((outfit, i) => (
+                  <motion.div
+                    key={outfit.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: i * 0.08 }}
+                  >
+                    <OutfitCard
+                      outfit={outfit}
+                      initiallyLiked={liked.has(outfit.id)}
+                      initiallySaved={saved.has(outfit.id)}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </Section>
+          )}
 
           <div className="py-16" />
         </Container>

@@ -84,7 +84,10 @@ export function OutfitCard({
 
   return (
     <div className="group">
-      <Link href={`/outfit/${outfit.id}`}>
+      <Link
+        href={`/outfit/${outfit.id}`}
+        aria-label={`${outfit.title} av ${outfit.creator.displayName}, ${outfit.tags.length} taggade plagg`}
+      >
         <div
           className={`relative overflow-hidden rounded-2xl ${
             outfit.type === "flatlay" ? "bg-white" : "bg-background-tertiary"
@@ -94,7 +97,7 @@ export function OutfitCard({
         >
           <Image
             src={outfit.image}
-            alt={outfit.title}
+            alt=""
             width={400}
             height={550}
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
@@ -102,7 +105,10 @@ export function OutfitCard({
             unoptimized={outfit.image.startsWith("http")}
           />
 
-          <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
+          <div
+            aria-hidden="true"
+            className="absolute top-3 left-3 z-10 flex items-center gap-1.5"
+          >
             {outfit.type === "flatlay" && (
               <div className="flex items-center gap-1.5 rounded-full bg-black/70 backdrop-blur-sm px-3 py-1.5">
                 <LayoutGrid className="h-3 w-3 text-white" />
@@ -111,10 +117,7 @@ export function OutfitCard({
                 </span>
               </div>
             )}
-            <div
-              className="flex items-center gap-1 rounded-full bg-black/70 backdrop-blur-sm px-2.5 py-1.5"
-              aria-label={`${outfit.tags.length} taggade plagg`}
-            >
+            <div className="flex items-center gap-1 rounded-full bg-black/70 backdrop-blur-sm px-2.5 py-1.5">
               <Tag className="h-3 w-3 text-white" />
               <span className="text-[10px] font-medium text-white">
                 {outfit.tags.length}
@@ -140,6 +143,7 @@ export function OutfitCard({
           </button>
 
           <div
+            aria-hidden="true"
             className={`absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent transition-opacity duration-300 ${
               hovering ? "opacity-100" : "opacity-0"
             } pointer-events-none md:group-hover:opacity-100`}
@@ -165,13 +169,10 @@ export function OutfitCard({
       <div className="mt-3 flex items-center justify-between">
         <Link
           href={`/profile/${outfit.creator.username}`}
+          aria-label={outfit.creator.displayName}
           className="flex items-center gap-2 group/user"
         >
-          <UserAvatar
-            src={outfit.creator.avatar}
-            alt={outfit.creator.displayName}
-            size="sm"
-          />
+          <UserAvatar src={outfit.creator.avatar} alt="" size="sm" />
           <span className="text-sm text-foreground-muted group-hover/user:text-white transition-colors">
             {outfit.creator.displayName}
           </span>

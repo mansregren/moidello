@@ -10,7 +10,6 @@ import {
   fetchBrandOutfits,
   fetchEngagementForViewer,
 } from "@/lib/queries";
-import { brands as mockBrands, outfits as mockOutfits } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
@@ -32,51 +31,29 @@ export default async function BrandPage({
 
   const aggregated = await fetchBrandsAggregated();
   const dbMatch = aggregated.find((b) => b.slug === slug);
+  if (!dbMatch) notFound();
 
-  if (dbMatch) {
-    const dbOutfits = await fetchBrandOutfits(dbMatch.name);
-    const { liked, saved } = await fetchEngagementForViewer(
-      dbOutfits.map((o) => o.id),
-    );
-    return (
-      <BrandShell
-        name={dbMatch.name}
-        description={
-          dbMatch.isClaimed
-            ? "Verifierat märke på Moidello"
-            : `Outfits som taggar ${dbMatch.name}.`
-        }
-        website={dbMatch.claimedBy?.website ?? null}
-        tierLabel="Contemporary"
-        TierIcon={Star}
-        outfits={dbOutfits}
-        likedIds={Array.from(liked)}
-        savedIds={Array.from(saved)}
-        outfitsCount={dbOutfits.length}
-        verified={dbMatch.isClaimed}
-      />
-    );
-  }
-
-  // Fall back to the mock brand fixtures
-  const mockBrand = mockBrands.find((b) => b.slug === slug);
-  if (!mockBrand) notFound();
-
-  const { icon: TierIcon, label: tierLabel } = tierLabels[mockBrand.tier];
-  const brandOutfits = mockOutfits.filter((o) =>
-    o.tags.some((t) => t.brand === mockBrand.name),
+  const dbOutfits = await fetchBrandOutfits(dbMatch.name);
+  const { liked, saved } = await fetchEngagementForViewer(
+    dbOutfits.map((o) => o.id),
   );
 
   return (
     <BrandShell
-      name={mockBrand.name}
-      description={mockBrand.description}
-      website={mockBrand.website}
-      tierLabel={tierLabel}
-      TierIcon={TierIcon}
-      outfits={brandOutfits}
-      outfitsCount={brandOutfits.length}
-      verified={false}
+      name={dbMatch.name}
+      description={
+        dbMatch.isClaimed
+          ? "Verifierat märke på Moidello"
+          : `Outfits som taggar ${dbMatch.name}.`
+      }
+      website={dbMatch.claimedBy?.website ?? null}
+      tierLabel="Contemporary"
+      TierIcon={Star}
+      outfits={dbOutfits}
+      likedIds={Array.from(liked)}
+      savedIds={Array.from(saved)}
+      outfitsCount={dbOutfits.length}
+      verified={dbMatch.isClaimed}
     />
   );
 }

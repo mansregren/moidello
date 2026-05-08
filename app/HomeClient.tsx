@@ -24,6 +24,19 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   Preppy: "Klassisk & ren",
 };
 
+// Static cover per category — used when no real outfits exist for that
+// category yet. Avoids leaking placeholder outfit imagery in production.
+const CATEGORY_COVER: Record<string, string> = {
+  Streetwear: "/images/bg/harbor.jpg",
+  Minimalism: "/images/bg/parasols.jpg",
+  Vintage: "/images/bg/positano.jpg",
+  Casual: "/images/bg/riviera.jpg",
+  Formal: "/images/bg/boats.jpg",
+  Sporty: "/images/bg/parasols.jpg",
+  Bohemian: "/images/bg/positano.jpg",
+  Preppy: "/images/bg/harbor.jpg",
+};
+
 export default function HomeClient({
   outfits,
   creators,
@@ -50,7 +63,7 @@ export default function HomeClient({
   const categoryImage = (cat: string): string => {
     const match = visible.find((o) => o.category === cat);
     if (match) return match.image;
-    return visible[0]?.image ?? outfits[0]?.image ?? "/images/bg/positano.jpg";
+    return CATEGORY_COVER[cat] ?? "/images/bg/positano.jpg";
   };
 
   return (
@@ -119,11 +132,12 @@ export default function HomeClient({
                 >
                   <Link
                     href="/upptack"
+                    aria-label={`${cat} — ${CATEGORY_DESCRIPTIONS[cat]}`}
                     className="group relative block aspect-[4/5] rounded-2xl overflow-hidden"
                   >
                     <Image
                       src={categoryImage(cat)}
-                      alt={cat}
+                      alt=""
                       fill
                       sizes="(min-width: 1024px) 22vw, (min-width: 640px) 33vw, 50vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -145,7 +159,27 @@ export default function HomeClient({
           </Section>
 
           <Section title="Senast på Moidello" href="/upptack">
-            <OutfitGrid outfits={recent} columns={3} liked={liked} saved={saved} />
+            {recent.length > 0 ? (
+              <OutfitGrid
+                outfits={recent}
+                columns={3}
+                liked={liked}
+                saved={saved}
+              />
+            ) : (
+              <div className="rounded-2xl border border-border bg-background-secondary p-10 text-center">
+                <p className="text-foreground-muted">
+                  Inga outfits ännu — bli först att lägga upp en.
+                </p>
+                <Link
+                  href="/skapa"
+                  className="mt-4 inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-medium hover:bg-white/90 transition-colors"
+                >
+                  <Plus className="h-4 w-4" />
+                  Skapa outfit
+                </Link>
+              </div>
+            )}
           </Section>
 
           <motion.section
@@ -177,35 +211,38 @@ export default function HomeClient({
             </div>
           </motion.section>
 
-          <Section title="Nya kreatörer" href="/trendigt">
-            <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
-              {creators.map((u, i) => (
-                <motion.div
-                  key={u.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.3, delay: i * 0.05 }}
-                  className="shrink-0"
-                >
-                  <Link
-                    href={`/profile/${u.username}`}
-                    className="flex flex-col items-center gap-3 w-28 group"
+          {creators.length > 0 && (
+            <Section title="Nya kreatörer" href="/trendigt">
+              <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
+                {creators.map((u, i) => (
+                  <motion.div
+                    key={u.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                    className="shrink-0"
                   >
-                    <UserAvatar src={u.avatar} alt={u.displayName} size="lg" />
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-white truncate max-w-[7rem]">
-                        {u.displayName}
-                      </p>
-                      <p className="text-[11px] text-foreground-subtle">
-                        {u.outfitCount} outfits
-                      </p>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </Section>
+                    <Link
+                      href={`/profile/${u.username}`}
+                      aria-label={`${u.displayName} — ${u.outfitCount} outfits`}
+                      className="flex flex-col items-center gap-3 w-28 group"
+                    >
+                      <UserAvatar src={u.avatar} alt="" size="lg" />
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-white truncate max-w-[7rem]">
+                          {u.displayName}
+                        </p>
+                        <p className="text-[11px] text-foreground-subtle">
+                          {u.outfitCount} outfits
+                        </p>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </Section>
+          )}
 
           <motion.section
             initial={{ opacity: 0, y: 20 }}

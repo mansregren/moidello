@@ -28,6 +28,9 @@ function initials(value: string): string {
 export function UserAvatar({ src, alt, size = "md", className }: UserAvatarProps) {
   const trimmed = (src ?? "").trim();
   const hasImage = trimmed.length > 0;
+  // An empty alt = decorative avatar (the name is rendered next to it).
+  // Hide the wrapper from a11y so screen readers don't read the name twice.
+  const decorative = alt.trim().length === 0;
 
   return (
     <div
@@ -36,7 +39,8 @@ export function UserAvatar({ src, alt, size = "md", className }: UserAvatarProps
         sizeMap[size],
         className,
       )}
-      aria-label={alt}
+      aria-label={decorative ? undefined : alt}
+      aria-hidden={decorative ? "true" : undefined}
     >
       {hasImage ? (
         <Image
@@ -48,7 +52,7 @@ export function UserAvatar({ src, alt, size = "md", className }: UserAvatarProps
           unoptimized={trimmed.startsWith("http")}
         />
       ) : (
-        <span aria-hidden="true">{initials(alt)}</span>
+        <span aria-hidden="true">{initials(alt || "?")}</span>
       )}
     </div>
   );
