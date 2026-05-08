@@ -7,8 +7,11 @@
 
 const ANTON_URL =
   "https://github.com/google/fonts/raw/main/ofl/anton/Anton-Regular.ttf";
+// Static, non-variable Inter — Satori (the engine behind ImageResponse)
+// historically fails on the variable-font shipped in google/fonts, so we
+// pull from fontsource which provides a per-weight TTF.
 const INTER_REGULAR_URL =
-  "https://github.com/google/fonts/raw/main/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf";
+  "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf";
 
 let antonCache: ArrayBuffer | null = null;
 let interCache: ArrayBuffer | null = null;
