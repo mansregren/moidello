@@ -60,18 +60,19 @@ export async function generateMetadata({
     robots: isThin
       ? { index: false, follow: true }
       : { index: true, follow: true },
+    // OG + Twitter images come from opengraph-image.tsx in this route —
+    // Next.js auto-populates og:image and twitter:image from the file
+    // route, so we omit them here to avoid double-specification.
     openGraph: {
       title,
       description,
       url: canonical,
       type: "article",
-      images: [{ url: outfit.image, alt: outfit.title }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [outfit.image],
     },
   };
 }

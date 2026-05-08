@@ -45,20 +45,18 @@ export async function generateMetadata({
     robots: isPlaceholder || isThin
       ? { index: false, follow: true }
       : { index: true, follow: true },
+    // OG + Twitter images come from opengraph-image.tsx — Next.js auto-
+    // populates them from the file route at this directory.
     openGraph: {
       title: `${user.displayName} (${handle}) på ${SITE}`,
       description,
       url: canonical,
       type: "profile",
-      images: user.avatar
-        ? [{ url: user.avatar, alt: user.displayName }]
-        : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title: `${user.displayName} (${handle})`,
       description,
-      images: user.avatar ? [user.avatar] : undefined,
     },
   };
 }
