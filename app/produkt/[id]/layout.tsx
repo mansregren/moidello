@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { fetchTaggedItemById } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
 
 const SITE = "Moidello";
 
@@ -9,7 +10,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const item = await fetchTaggedItemById(id);
+  const item = await fetchTaggedItemById(id, createPublicClient());
 
   if (!item) {
     return {

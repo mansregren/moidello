@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { fetchProfileByUsername } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
 
 const SITE = "Moidello";
 
@@ -9,7 +10,7 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
-  const user = await fetchProfileByUsername(username);
+  const user = await fetchProfileByUsername(username, createPublicClient());
 
   if (!user) {
     return {

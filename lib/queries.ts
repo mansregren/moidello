@@ -6,6 +6,25 @@ import type {
   Comment as MoidelloComment,
 } from "@/lib/types";
 
+/**
+ * Wide client type that fits both the cookie-based server client and
+ * the anon supabase-js client. We don't need any of the divergent
+ * methods — only `.from(...)` chains — so a permissive shape is fine.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type QueryClient = any;
+
+/**
+ * Resolve a usable client. Build-time / static callers pass an
+ * already-constructed public client (createPublicClient) to avoid
+ * reaching for cookies. Request-bound callers pass nothing and we
+ * fall through to the cookie-aware server client.
+ */
+async function resolveClient(client?: QueryClient): Promise<QueryClient> {
+  if (client) return client;
+  return await createClient();
+}
+
 interface ProfileRow {
   id: string;
   username: string;
@@ -155,9 +174,12 @@ const OUTFIT_COLUMNS = `
  * expose a foreign-key relationship to outfits in PostgREST's metadata so
  * embedded selects can fail; fetching it as a separate query is reliable.
  */
-async function attachOutfitStats(outfits: Outfit[]): Promise<Outfit[]> {
+async function attachOutfitStats(
+  outfits: Outfit[],
+  client?: QueryClient,
+): Promise<Outfit[]> {
   if (outfits.length === 0) return outfits;
-  const supabase = await createClient();
+  const supabase = await resolveClient(client);
   const { data } = await supabase
     .from("outfit_stats")
     .select("outfit_id, likes, saves, comments")
@@ -178,8 +200,11 @@ async function attachOutfitStats(outfits: Outfit[]): Promise<Outfit[]> {
  * Returns published outfits ordered by recency. Empty array if the table
  * doesn't exist yet (migration not run) — caller can fall back to mocks.
  */
-export async function fetchOutfits(limit = 60): Promise<Outfit[]> {
-  const supabase = await createClient();
+export async function fetchOutfits(
+  limit = 60,
+  client?: QueryClient,
+): Promise<Outfit[]> {
+  const supabase = await resolveClient(client);
   const { data, error } = await supabase
     .from("outfits")
     .select(OUTFIT_COLUMNS)
@@ -194,11 +219,14 @@ export async function fetchOutfits(limit = 60): Promise<Outfit[]> {
   }
 
   const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
-  return attachOutfitStats(mapped);
+  return attachOutfitStats(mapped, supabase);
 }
 
-export async function fetchOutfitsByUser(userId: string): Promise<Outfit[]> {
-  const supabase = await createClient();
+export async function fetchOutfitsByUser(
+  userId: string,
+  client?: QueryClient,
+): Promise<Outfit[]> {
+  const supabase = await resolveClient(client);
   const { data, error } = await supabase
     .from("outfits")
     .select(OUTFIT_COLUMNS)
@@ -210,7 +238,7 @@ export async function fetchOutfitsByUser(userId: string): Promise<Outfit[]> {
     return [];
   }
   const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
-  return attachOutfitStats(mapped);
+  return attachOutfitStats(mapped, supabase);
 }
 
 export async function fetchSavedOutfitsByUser(userId: string): Promise<Outfit[]> {
@@ -229,8 +257,11 @@ export async function fetchSavedOutfitsByUser(userId: string): Promise<Outfit[]>
   return attachOutfitStats(mapped);
 }
 
-export async function fetchOutfitById(id: string): Promise<Outfit | null> {
-  const supabase = await createClient();
+export async function fetchOutfitById(
+  id: string,
+  client?: QueryClient,
+): Promise<Outfit | null> {
+  const supabase = await resolveClient(client);
   const { data, error } = await supabase
     .from("outfits")
     .select(OUTFIT_COLUMNS)
@@ -239,7 +270,7 @@ export async function fetchOutfitById(id: string): Promise<Outfit | null> {
 
   if (error || !data) return null;
   const mapped = rowToOutfit(data as unknown as OutfitRow);
-  const [withStats] = await attachOutfitStats([mapped]);
+  const [withStats] = await attachOutfitStats([mapped], supabase);
   return withStats;
 }
 
@@ -269,8 +300,9 @@ export async function fetchOutfitComments(
 
 export async function fetchProfileByUsername(
   username: string,
+  client?: QueryClient,
 ): Promise<MoidelloUser | null> {
-  const supabase = await createClient();
+  const supabase = await resolveClient(client);
   const { data, error } = await supabase
     .from("profiles")
     .select(
@@ -440,8 +472,10 @@ interface ClaimedBrandRow {
   brand_website: string | null;
 }
 
-export async function fetchBrandsAggregated(): Promise<BrandAggregate[]> {
-  const supabase = await createClient();
+export async function fetchBrandsAggregated(
+  client?: QueryClient,
+): Promise<BrandAggregate[]> {
+  const supabase = await resolveClient(client);
 
   const [{ data: items }, { data: claimed }] = await Promise.all([
     supabase.from("tagged_items").select("brand, outfit_id"),
@@ -549,8 +583,9 @@ interface TaggedItemDetailRow {
 
 export async function fetchTaggedItemById(
   id: string,
+  client?: QueryClient,
 ): Promise<TaggedItemDetail | null> {
-  const supabase = await createClient();
+  const supabase = await resolveClient(client);
   const { data, error } = await supabase
     .from("tagged_items")
     .select(

@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { fetchOutfitById } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
 import { loadAnton, loadInter } from "@/lib/og-fonts";
 
 export const runtime = "nodejs";
@@ -16,7 +17,9 @@ export async function generateImageMetadata({
 }: {
   params: { id: string };
 }) {
-  const outfit = await fetchOutfitById(params.id);
+  // Public client (no cookies) — generateImageMetadata runs at build time
+  // and during static generation; the cookie-based server client throws.
+  const outfit = await fetchOutfitById(params.id, createPublicClient());
   if (!outfit) {
     return [{ id: "default", alt: "Moidello", contentType, size }];
   }
@@ -36,7 +39,7 @@ export default async function Image({
   params: { id: string };
 }) {
   const [outfit, antonFont, interFont] = await Promise.all([
-    fetchOutfitById(params.id),
+    fetchOutfitById(params.id, createPublicClient()),
     loadAnton(),
     loadInter(),
   ]);

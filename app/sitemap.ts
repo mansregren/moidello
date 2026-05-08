@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 
 const BASE_URL = "https://moidello.com";
 
@@ -20,7 +20,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/integritet`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
 
-  const supabase = await createClient();
+  // Sitemap runs at build time (and revalidation) without an HTTP
+  // request, so we can't use the cookie-based server client. The
+  // anon-key client respects the same RLS policies — it just sees the
+  // public-readable subset (published outfits, named profiles, etc.).
+  const supabase = createPublicClient();
 
   const [outfitsRes, profilesRes, brandsRes] = await Promise.all([
     supabase

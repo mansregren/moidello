@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { fetchOutfitById } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
 
 const SITE = "Moidello";
 
@@ -34,7 +35,8 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const outfit = await fetchOutfitById(id);
+  // Public client — generateMetadata can run during static prerender.
+  const outfit = await fetchOutfitById(id, createPublicClient());
 
   if (!outfit) {
     return {

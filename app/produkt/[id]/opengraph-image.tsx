@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { fetchTaggedItemById } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
 import { loadAnton, loadInter } from "@/lib/og-fonts";
 
 export const runtime = "nodejs";
@@ -13,7 +14,7 @@ export default async function Image({
   params: { id: string };
 }) {
   const [item, antonFont, interFont] = await Promise.all([
-    fetchTaggedItemById(params.id),
+    fetchTaggedItemById(params.id, createPublicClient()),
     loadAnton(),
     loadInter(),
   ]);

@@ -3,6 +3,7 @@ import {
   fetchProfileByUsername,
   fetchOutfitsByUser,
 } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
 import { loadAnton, loadInter } from "@/lib/og-fonts";
 
 export const runtime = "nodejs";
@@ -15,8 +16,9 @@ export default async function Image({
 }: {
   params: { username: string };
 }) {
+  const sb = createPublicClient();
   const [user, antonFont, interFont] = await Promise.all([
-    fetchProfileByUsername(params.username),
+    fetchProfileByUsername(params.username, sb),
     loadAnton(),
     loadInter(),
   ]);
@@ -25,7 +27,7 @@ export default async function Image({
     return brandFallback(antonFont, interFont);
   }
 
-  const outfits = (await fetchOutfitsByUser(user.id)).slice(0, 4);
+  const outfits = (await fetchOutfitsByUser(user.id, sb)).slice(0, 4);
   const collageImages = outfits.map((o) => o.image);
 
   return new ImageResponse(
