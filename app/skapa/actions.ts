@@ -88,20 +88,49 @@ export async function createOutfit(
     data: { publicUrl },
   } = supabase.storage.from("outfits").getPublicUrl(path);
 
-  const { data: outfit, error: outfitError } = await supabase
-    .from("outfits")
-    .insert({
-      user_id: user.id,
-      image_url: publicUrl,
-      image_path: path,
-      title,
-      description: description || null,
-      category: category || null,
-      gender,
-      type: "photo",
-    })
-    .select("id")
-    .single();
+  // Generate the URL slug. Try the clean form first; on uniqueness
+  // collision append a 4-char hash so we land on something like
+  // "venice-cardigan-a3f9". Cap retries to avoid infinite loops.
+  const baseSlug = slugify(title);
+  let chosenSlug = baseSlug || "outfit";
+  let outfitInsert:
+    | { id: string; slug: string | null }
+    | null = null;
+  let outfitError: { code?: string; message?: string } | null = null;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const { data, error } = await supabase
+      .from("outfits")
+      .insert({
+        user_id: user.id,
+        image_url: publicUrl,
+        image_path: path,
+        title,
+        slug: chosenSlug,
+        description: description || null,
+        category: category || null,
+        gender,
+        type: "photo",
+      })
+      .select("id, slug")
+      .single();
+
+    if (!error && data) {
+      outfitInsert = data as { id: string; slug: string | null };
+      outfitError = null;
+      break;
+    }
+    // 23505 = unique_violation
+    if (error?.code === "23505" && attempt < 4) {
+      const suffix = Math.random().toString(36).slice(2, 6);
+      chosenSlug = `${baseSlug || "outfit"}-${suffix}`;
+      outfitError = error;
+      continue;
+    }
+    outfitError = error ?? null;
+    break;
+  }
+
+  const outfit = outfitInsert;
 
   if (outfitError || !outfit) {
     await supabase.storage.from("outfits").remove([path]);
@@ -133,6 +162,21 @@ export async function createOutfit(
       if (tagError) {
         console.error("tagged_items insert failed:", tagError);
       }
+    }
+  }
+
+  // Redirect to the new /<username>/<slug> URL when we have a slug,
+  // fall back to /outfit/<uuid> (which 301s to the canonical URL via
+  // the existing route).
+  if (outfit.slug) {
+    const { data: profileRow } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", user.id)
+      .maybeSingle();
+    const username = profileRow?.username as string | undefined;
+    if (username) {
+      redirect(`/${username.toLowerCase()}/${outfit.slug}`);
     }
   }
 
