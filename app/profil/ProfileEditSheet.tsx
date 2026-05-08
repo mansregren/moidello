@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Camera } from "lucide-react";
 import Image from "next/image";
@@ -45,6 +46,7 @@ export function ProfileEditSheet({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(
     updateProfile,
     initialState,
@@ -53,8 +55,11 @@ export function ProfileEditSheet({
   useEffect(() => {
     if (state.ok) {
       onClose();
+      // Refresh server components so root layout re-fetches profile
+      // → header avatar updates immediately.
+      router.refresh();
     }
-  }, [state.ok, onClose]);
+  }, [state.ok, onClose, router]);
 
   useEffect(() => {
     if (!avatarFile) {

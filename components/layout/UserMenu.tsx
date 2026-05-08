@@ -9,7 +9,7 @@ import { UserAvatar } from "@/components/user/UserAvatar";
 import { useAuth } from "@/lib/auth-context";
 
 export function UserMenu() {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -32,7 +32,13 @@ export function UserMenu() {
 
   if (!user) return null;
 
-  const avatarUrl = (user.user_metadata?.avatar_url as string | undefined) ?? "";
+  // Prefer the avatar from the profiles row (updated via /profil edit) over
+  // the OAuth metadata which only reflects what the provider returned at
+  // sign-up time.
+  const avatarUrl =
+    profile?.avatarUrl ??
+    (user.user_metadata?.avatar_url as string | undefined) ??
+    "";
   const email = user.email ?? "";
 
   const handleSignOut = async () => {

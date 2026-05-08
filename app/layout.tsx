@@ -4,8 +4,9 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GenderProvider } from "@/lib/gender-context";
 import { ToastProvider } from "@/lib/toast-context";
-import { AuthProvider } from "@/lib/auth-context";
+import { AuthProvider, type AuthProfile } from "@/lib/auth-context";
 import { AppShell } from "@/components/layout/AppShell";
+import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 const inter = Inter({
@@ -81,11 +82,34 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Resolve auth + profile server-side so the header renders with the
+  // logged-in state on first paint (no flash of "Logga in").
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let initialProfile: AuthProfile | null = null;
+  if (user) {
+    const { data: profileRow } = await supabase
+      .from("profiles")
+      .select("username, display_name, avatar_url")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (profileRow) {
+      initialProfile = {
+        username: profileRow.username as string,
+        displayName: (profileRow.display_name as string | null) ?? null,
+        avatarUrl: (profileRow.avatar_url as string | null) ?? null,
+      };
+    }
+  }
+
   return (
     <html
       lang="sv"
@@ -95,7 +119,7 @@ export default function RootLayout({
         <a href="#main" className="skip-link">
           Hoppa till innehåll
         </a>
-        <AuthProvider>
+        <AuthProvider initialUser={user} initialProfile={initialProfile}>
           <ToastProvider>
             <GenderProvider>
               <AppShell>{children}</AppShell>

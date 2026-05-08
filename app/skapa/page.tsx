@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload, Plus, Eye, X } from "lucide-react";
+import { Upload, Eye, X } from "lucide-react";
 import Image from "next/image";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
@@ -88,13 +88,13 @@ export default function SkapaPage() {
     return () => URL.revokeObjectURL(imagePreview);
   }, [imagePreview]);
 
-  const addTag = () => {
+  const addTagAt = (xPct: number, yPct: number) => {
     setTags((prev) => [
       ...prev,
       {
-        id: Date.now(),
-        x: 30 + Math.random() * 40,
-        y: 30 + Math.random() * 40,
+        id: Date.now() + Math.random(),
+        x: xPct,
+        y: yPct,
         brand: "",
         name: "",
         url: "",
@@ -104,6 +104,42 @@ export default function SkapaPage() {
         showRegions: false,
       },
     ]);
+  };
+
+  const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (previewMode || !imagePreview) return;
+    const target = e.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+    const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+    // Clamp to leave a tiny safe-zone at the edges so dots aren't half-cut.
+    const clamp = (v: number) => Math.max(2, Math.min(98, v));
+    addTagAt(clamp(xPct), clamp(yPct));
+  };
+
+  const handleTagDragStart = (
+    e: React.PointerEvent<HTMLDivElement>,
+    tagId: number,
+  ) => {
+    if (previewMode) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const container = (e.currentTarget.parentElement?.parentElement ??
+      e.currentTarget) as HTMLDivElement;
+    const rect = container.getBoundingClientRect();
+
+    const onMove = (ev: PointerEvent) => {
+      const xPct = ((ev.clientX - rect.left) / rect.width) * 100;
+      const yPct = ((ev.clientY - rect.top) / rect.height) * 100;
+      const clamp = (v: number) => Math.max(2, Math.min(98, v));
+      updateTag(tagId, { x: clamp(xPct), y: clamp(yPct) });
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
   };
 
   const removeTag = (id: number) =>
@@ -189,69 +225,103 @@ export default function SkapaPage() {
               value={JSON.stringify(tagsForSubmit)}
             />
 
-            {/* Image upload */}
+            {/* File input — always present so the form can submit it.
+                Hidden visually; the upload UI below triggers it. */}
+            <input
+              id="image-input"
+              ref={fileInputRef}
+              name="image"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleFileChange}
+              className="sr-only"
+              required
+            />
+
+            {/* Image upload + tag placement */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <label
-                className="relative aspect-[3/4] rounded-2xl border-2 border-dashed border-border bg-background-secondary flex flex-col items-center justify-center cursor-pointer hover:border-white/30 transition-colors group overflow-hidden"
-                htmlFor="image-input"
-              >
-                {imagePreview ? (
+              {!imagePreview ? (
+                <label
+                  htmlFor="image-input"
+                  className="relative aspect-[3/4] rounded-2xl border-2 border-dashed border-border bg-background-secondary flex flex-col items-center justify-center cursor-pointer hover:border-white/30 transition-colors group overflow-hidden"
+                >
+                  <Upload className="h-12 w-12 text-foreground-subtle mb-4 group-hover:text-foreground-muted transition-colors" />
+                  <p className="text-foreground-muted font-medium">
+                    Dra & släpp din bild
+                  </p>
+                  <p className="text-sm text-foreground-subtle mt-1">
+                    eller klicka för att välja
+                  </p>
+                  <p className="text-xs text-foreground-subtle mt-4">
+                    JPG, PNG, WebP — Max 10MB
+                  </p>
+                </label>
+              ) : (
+                <div
+                  onClick={handleImageClick}
+                  className={`relative aspect-[3/4] rounded-2xl bg-background-secondary overflow-hidden select-none ${
+                    previewMode ? "cursor-default" : "cursor-crosshair"
+                  }`}
+                  role={previewMode ? undefined : "button"}
+                  aria-label={
+                    previewMode
+                      ? undefined
+                      : "Klicka på bilden för att placera en tagg"
+                  }
+                >
                   <Image
                     src={imagePreview}
                     alt="Förhandsvisning"
                     fill
-                    className="object-cover"
+                    className="object-cover pointer-events-none"
                     sizes="(min-width: 1024px) 50vw, 100vw"
                     unoptimized
+                    draggable={false}
                   />
-                ) : (
-                  <>
-                    <Upload className="h-12 w-12 text-foreground-subtle mb-4 group-hover:text-foreground-muted transition-colors" />
-                    <p className="text-foreground-muted font-medium">
-                      Dra & släpp din bild
-                    </p>
-                    <p className="text-sm text-foreground-subtle mt-1">
-                      eller klicka för att välja
-                    </p>
-                    <p className="text-xs text-foreground-subtle mt-4">
-                      JPG, PNG, WebP — Max 10MB
-                    </p>
-                  </>
-                )}
 
-                <input
-                  id="image-input"
-                  ref={fileInputRef}
-                  name="image"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={handleFileChange}
-                  className="sr-only"
-                  required
-                />
+                  {!previewMode && tags.length === 0 && (
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pointer-events-none">
+                      <p className="text-center text-sm font-medium text-white">
+                        Klicka på ett plagg för att tagga det
+                      </p>
+                    </div>
+                  )}
 
-                {imagePreview &&
-                  tags.map((tag) => (
+                  {tags.map((tag, i) => (
                     <div
                       key={tag.id}
                       className="absolute"
                       style={{ left: `${tag.x}%`, top: `${tag.y}%` }}
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <div className="relative">
+                      <div
+                        className={`relative ${
+                          previewMode ? "" : "cursor-grab active:cursor-grabbing"
+                        }`}
+                        onPointerDown={
+                          previewMode
+                            ? undefined
+                            : (e) => handleTagDragStart(e, tag.id)
+                        }
+                      >
                         <span className="absolute inset-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/40 animate-ping" />
                         <span className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                        <span className="absolute -translate-x-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-black/0">
+                          {i + 1}
+                        </span>
                         {!previewMode && (
                           <button
                             type="button"
                             onClick={(e) => {
                               e.preventDefault();
+                              e.stopPropagation();
                               removeTag(tag.id);
                             }}
-                            className="absolute -top-3 -right-3 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center"
+                            className="absolute -top-3 -right-3 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center hover:bg-red-600"
                             aria-label="Ta bort tagg"
                           >
                             <X className="h-3 w-3 text-white" />
@@ -260,29 +330,38 @@ export default function SkapaPage() {
                       </div>
                     </div>
                   ))}
-              </label>
+                </div>
+              )}
 
-              <div className="mt-4 flex gap-3">
+              <div className="mt-4 flex flex-wrap gap-3">
                 <PremiumButton
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={addTag}
+                  onClick={() => fileInputRef.current?.click()}
                   disabled={!imageFile}
                 >
-                  <Plus className="h-4 w-4" />
-                  Lägg till tagg
+                  <Upload className="h-4 w-4" />
+                  Byt bild
                 </PremiumButton>
                 <PremiumButton
                   type="button"
                   variant="glass"
                   size="sm"
                   onClick={() => setPreviewMode((p) => !p)}
+                  disabled={!imageFile}
                 >
                   <Eye className="h-4 w-4" />
                   {previewMode ? "Redigera" : "Förhandsvisa"}
                 </PremiumButton>
               </div>
+              {imageFile && !previewMode && (
+                <p className="mt-3 text-xs text-foreground-subtle">
+                  Tips: dra prickarna för att flytta dem. {tags.length}{" "}
+                  {tags.length === 1 ? "tagg" : "taggar"} placerad
+                  {tags.length === 1 ? "" : "e"}.
+                </p>
+              )}
             </motion.div>
 
             {/* Form */}
@@ -358,7 +437,8 @@ export default function SkapaPage() {
                 </label>
                 {tags.length === 0 ? (
                   <p className="text-sm text-foreground-subtle">
-                    Klicka &quot;Lägg till tagg&quot; och placera den på bilden
+                    Klicka direkt på bilden för att placera en tagg på det
+                    plagget.
                   </p>
                 ) : (
                   <div className="space-y-3">

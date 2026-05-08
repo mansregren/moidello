@@ -23,6 +23,12 @@ export type AuthAction =
   | "profile"
   | "comment";
 
+export interface AuthProfile {
+  username: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+}
+
 const PROMPTS: Record<AuthAction, { title: string; icon: typeof Heart }> = {
   like: { title: "Skapa konto för att gilla", icon: Heart },
   save: { title: "Skapa konto för att spara", icon: Bookmark },
@@ -34,6 +40,7 @@ const PROMPTS: Record<AuthAction, { title: string; icon: typeof Heart }> = {
 
 interface AuthContextValue {
   user: SupabaseUser | null;
+  profile: AuthProfile | null;
   isLoggedIn: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
@@ -43,34 +50,77 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
+  profile: null,
   isLoggedIn: false,
   loading: true,
   signOut: async () => {},
   requireAuth: () => false,
 });
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [loading, setLoading] = useState(true);
+export function AuthProvider({
+  children,
+  initialUser = null,
+  initialProfile = null,
+}: {
+  children: ReactNode;
+  initialUser?: SupabaseUser | null;
+  initialProfile?: AuthProfile | null;
+}) {
+  const [user, setUser] = useState<SupabaseUser | null>(initialUser);
+  const [profile, setProfile] = useState<AuthProfile | null>(initialProfile);
+  // If we already have a user from the server, we're not "loading" — the
+  // header can render the logged-in state on first paint with no flash.
+  const [loading, setLoading] = useState(initialUser === null);
   const [activePrompt, setActivePrompt] = useState<AuthAction | null>(null);
-  // Memoize so the client identity stays stable; otherwise the useEffect
-  // below re-runs on every render and unmounts the subtree mid-render.
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
+    // Only re-check on mount if we don't already have a server-seeded user.
+    if (initialUser !== null) {
+      return undefined;
+    }
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
       setLoading(false);
     });
 
+    return undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supabase]);
+
+  useEffect(() => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      // When the user signs out we should clear the cached profile too.
+      if (!session?.user) setProfile(null);
     });
 
     return () => subscription.unsubscribe();
   }, [supabase]);
+
+  // Refresh profile when user changes (e.g. after sign-in via OAuth)
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("username, display_name, avatar_url")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (cancelled || !data) return;
+      setProfile({
+        username: data.username as string,
+        displayName: (data.display_name as string | null) ?? null,
+        avatarUrl: (data.avatar_url as string | null) ?? null,
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, supabase]);
 
   const isLoggedIn = !!user;
 
@@ -89,7 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoggedIn, loading, signOut, requireAuth }}
+      value={{ user, profile, isLoggedIn, loading, signOut, requireAuth }}
     >
       {children}
       <AnimatePresence>
