@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { fetchProfileByUsername } from "@/lib/queries";
 
+const SITE = "Moidello";
+
 export async function generateMetadata({
   params,
 }: {
@@ -16,18 +18,47 @@ export async function generateMetadata({
     };
   }
 
+  // Always canonicalize to lowercase username so /profile/EmmaStyle and
+  // /profile/emmastyle don't compete in Google's eyes.
+  const canonicalUsername = user.username.toLowerCase();
+  const canonical = `/profile/${canonicalUsername}`;
+
+  const handle = `@${user.username}`;
+  const countLabel = user.outfitCount > 0
+    ? `${user.outfitCount} outfit${user.outfitCount === 1 ? "" : "s"}`
+    : "Ny kreatör";
+
+  const title = `${user.displayName} (${handle}) — ${countLabel} | ${SITE}`;
+  const ownBio = user.bio?.trim();
+  const description = ownBio
+    ? ownBio
+    : `Stilkreatör på ${SITE} med ${user.outfitCount} ${user.outfitCount === 1 ? "outfit" : "outfits"}.`;
+
+  // Hide trigger-default usernames + outfit-less profiles from the index.
+  const isPlaceholder = user.username.startsWith("user_");
+  const isThin = user.outfitCount === 0 && !ownBio;
+
   return {
-    title: `${user.displayName} (@${user.username})`,
-    description: user.bio,
-    alternates: { canonical: `/profile/${user.username}` },
+    title,
+    description,
+    alternates: { canonical },
+    robots: isPlaceholder || isThin
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
     openGraph: {
-      title: `${user.displayName} (@${user.username}) på Moidello`,
-      description: user.bio,
-      url: `/profile/${user.username}`,
+      title: `${user.displayName} (${handle}) på ${SITE}`,
+      description,
+      url: canonical,
       type: "profile",
       images: user.avatar
         ? [{ url: user.avatar, alt: user.displayName }]
         : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${user.displayName} (${handle})`,
+      description,
+      images: user.avatar ? [user.avatar] : undefined,
     },
   };
 }

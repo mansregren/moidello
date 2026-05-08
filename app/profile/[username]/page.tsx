@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import {
   fetchProfileByUsername,
   fetchOutfitsByUser,
@@ -16,6 +16,13 @@ export default async function ProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
+
+  // Canonicalize to lowercase. A 301 makes /profile/EmmaStyle visibly
+  // become /profile/emmastyle in the browser bar AND tells search engines
+  // there's only one URL for this profile.
+  if (username !== username.toLowerCase()) {
+    permanentRedirect(`/profile/${username.toLowerCase()}`);
+  }
 
   const profile = await fetchProfileByUsername(username);
   if (!profile) notFound();
