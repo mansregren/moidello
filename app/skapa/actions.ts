@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { slugify, storageFilename } from "@/lib/slug";
 
 export interface CreateOutfitState {
   error?: string;
@@ -63,8 +64,15 @@ export async function createOutfit(
   }
 
   // Upload image. Path must start with user.id for storage RLS to allow it.
+  // We slugify the title so the stored file is e.g.
+  // "<user_id>/venice-cardigan-a3f9.jpg" instead of an opaque UUID — much
+  // friendlier for image SEO + when files are downloaded.
   const ext = image.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+  const path = storageFilename({
+    userId: user.id,
+    slug: slugify(title),
+    ext,
+  });
   const { error: uploadError } = await supabase.storage
     .from("outfits")
     .upload(path, image, {

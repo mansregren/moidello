@@ -134,7 +134,23 @@ export default function OutfitDetail({
             >
               <Image
                 src={outfit.image}
-                alt={outfit.title}
+                alt={(() => {
+                  // Auto-alt: "{category}-outfit med {brand1 name1}, ... av {creator}"
+                  // mirrors the meta description pattern so screen readers and
+                  // image-search crawlers see consistent copy.
+                  const top = outfit.tags
+                    .slice(0, 3)
+                    .map((t) => `${t.brand} ${t.name}`)
+                    .join(", ");
+                  const cat = outfit.category?.trim();
+                  if (top && cat) {
+                    return `${cat}-outfit med ${top} av ${outfit.creator.displayName}`;
+                  }
+                  if (top) {
+                    return `Outfit med ${top} av ${outfit.creator.displayName}`;
+                  }
+                  return `${outfit.title} av ${outfit.creator.displayName}`;
+                })()}
                 width={800}
                 height={1100}
                 className="w-full object-cover"

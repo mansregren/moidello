@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { slugify, storageFilename } from "@/lib/slug";
 
 export interface ProfileUpdateState {
   ok?: boolean;
@@ -85,8 +86,15 @@ export async function updateProfile(
     if (avatar.size > MAX_AVATAR_BYTES) {
       return { error: "Avataren är för stor (max 5 MB)." };
     }
+    // Filename: "<user_id>/<username>-profile-<hash>.jpg" — search-engine
+    // friendly slug instead of a Date-stamp UUID.
     const ext = avatar.name.split(".").pop()?.toLowerCase() || "jpg";
-    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+    const path = storageFilename({
+      userId: user.id,
+      slug: slugify(username || "user"),
+      ext,
+      prefix: "profile",
+    });
     const { error: uploadError } = await supabase.storage
       .from("avatars")
       .upload(path, avatar, { contentType: avatar.type, upsert: false });
