@@ -124,7 +124,7 @@ export default function OutfitDetail({
                     </p>
                   </div>
                 </Link>
-                <FollowButton />
+                <FollowButton userId={outfit.creator.id} />
               </div>
 
               <h1 className="font-heading text-[32px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-white mb-4">
