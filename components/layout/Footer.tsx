@@ -10,7 +10,7 @@ const footerLinks = {
     { href: "/skapa", label: "Skapa" },
   ],
   Företag: [
-    { href: "/welcome", label: "Om Moidello" },
+    { href: "/om", label: "Om Moidello" },
     { href: "/kontakt", label: "Kontakt" },
   ],
   Juridik: [
