@@ -11,6 +11,7 @@ interface TagInput {
   brand: string;
   name: string;
   buyUrl: string;
+  buyUrls?: Record<string, string>;
   garment: string;
   x: number;
   y: number;
@@ -109,6 +110,8 @@ export async function createOutfit(
         brand: t.brand.trim(),
         name: t.name.trim(),
         buy_url: t.buyUrl.trim() || null,
+        buy_urls:
+          t.buyUrls && Object.keys(t.buyUrls).length > 0 ? t.buyUrls : null,
         garment: t.garment || "Toppar",
         position_x: t.x,
         position_y: t.y,

@@ -1,14 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { TaggedItem as TaggedItemType } from "@/lib/types";
+import { ExternalLink } from "lucide-react";
+import { TaggedItem as TaggedItemType, Region } from "@/lib/types";
+import { resolveBuyUrl } from "@/lib/region";
+import { recordTagClick } from "@/app/actions/tracking";
 
 interface OutfitTagProps {
   tag: TaggedItemType;
+  outfitId?: string;
+  region?: Region;
 }
 
-export function OutfitTag({ tag }: OutfitTagProps) {
+export function OutfitTag({ tag, outfitId, region }: OutfitTagProps) {
   const [showTooltip, setShowTooltip] = useState(false);
+  const buyUrl = resolveBuyUrl(tag, region);
+
+  const handleBuyClick = () => {
+    if (!outfitId) return;
+    recordTagClick(tag.id, outfitId).catch(() => {
+      // Click logging is best-effort.
+    });
+  };
 
   return (
     <div
@@ -20,20 +33,45 @@ export function OutfitTag({ tag }: OutfitTagProps) {
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         onClick={() => setShowTooltip(!showTooltip)}
+        aria-label={`${tag.brand} ${tag.name}`}
+        aria-expanded={showTooltip}
       >
-        {/* Pulsing dot */}
         <span className="absolute inset-0 rounded-full bg-white/40 animate-ping" />
         <span className="absolute inset-[3px] rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
       </button>
 
-      {/* Tooltip */}
       {showTooltip && (
-        <div className="absolute left-6 top-1/2 -translate-y-1/2 z-10 glass-strong rounded-xl px-4 py-3 min-w-[180px]">
-          <p className="text-xs text-foreground-muted">{tag.brand}</p>
-          <p className="text-sm font-medium text-white">{tag.name}</p>
-          <p className="text-sm font-semibold text-white mt-1">
-            {tag.price.toLocaleString("sv-SE")} {tag.currency}
+        <div
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-10 glass-strong rounded-xl px-4 py-3 min-w-[200px]"
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          <p className="text-xs text-foreground-muted">
+            {tag.brand}
+            {tag.isAffiliate && (
+              <span className="ml-1.5 text-[9px] uppercase tracking-wider text-foreground-subtle">
+                Reklam
+              </span>
+            )}
           </p>
+          <p className="text-sm font-medium text-white">{tag.name}</p>
+          {tag.price > 0 && (
+            <p className="text-sm font-semibold text-white mt-1">
+              {tag.price.toLocaleString("sv-SE")} {tag.currency}
+            </p>
+          )}
+          {buyUrl && (
+            <a
+              href={buyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleBuyClick}
+              className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white text-black px-3 py-1.5 text-xs font-medium hover:bg-white/90"
+            >
+              Köp
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          )}
         </div>
       )}
     </div>

@@ -23,7 +23,17 @@ interface DemoTag {
   url: string;
   garment: string;
   isAffiliate: boolean;
+  /** Per-region overrides: ISO country code → URL. */
+  regionUrls: Record<string, string>;
+  showRegions: boolean;
 }
+
+const REGION_OPTIONS: { code: string; label: string }[] = [
+  { code: "SE", label: "Sverige" },
+  { code: "NO", label: "Norge" },
+  { code: "DK", label: "Danmark" },
+  { code: "FI", label: "Finland" },
+];
 
 const GARMENTS = [
   "Toppar",
@@ -90,6 +100,8 @@ export default function SkapaPage() {
         url: "",
         garment: "Toppar",
         isAffiliate: false,
+        regionUrls: {},
+        showRegions: false,
       },
     ]);
   };
@@ -124,15 +136,23 @@ export default function SkapaPage() {
 
   const tagsForSubmit = tags
     .filter((t) => t.brand.trim() && t.name.trim())
-    .map((t) => ({
-      brand: t.brand,
-      name: t.name,
-      buyUrl: t.url,
-      garment: t.garment,
-      x: t.x,
-      y: t.y,
-      isAffiliate: t.isAffiliate,
-    }));
+    .map((t) => {
+      // Strip empty region URLs so we don't store {SE: ""} blobs
+      const regionUrls: Record<string, string> = {};
+      for (const [code, url] of Object.entries(t.regionUrls)) {
+        if (url.trim()) regionUrls[code] = url.trim();
+      }
+      return {
+        brand: t.brand,
+        name: t.name,
+        buyUrl: t.url,
+        buyUrls: Object.keys(regionUrls).length > 0 ? regionUrls : undefined,
+        garment: t.garment,
+        x: t.x,
+        y: t.y,
+        isAffiliate: t.isAffiliate,
+      };
+    });
 
   if (loading || !isLoggedIn) {
     return (
@@ -417,6 +437,46 @@ export default function SkapaPage() {
                             </span>
                           </span>
                         </label>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateTag(tag.id, { showRegions: !tag.showRegions })
+                          }
+                          className="text-[11px] uppercase tracking-wider text-foreground-subtle hover:text-white transition-colors text-left"
+                        >
+                          {tag.showRegions
+                            ? "Dölj region-länkar"
+                            : "+ Lägg till region-länkar"}
+                        </button>
+                        {tag.showRegions && (
+                          <div className="space-y-2 pt-1 border-t border-border/60">
+                            <p className="text-[11px] text-foreground-subtle">
+                              Visa rätt butik per region. Lämna tomt för att
+                              använda standardlänken.
+                            </p>
+                            {REGION_OPTIONS.map((r) => (
+                              <div key={r.code} className="flex items-center gap-2">
+                                <span className="w-12 shrink-0 text-[11px] uppercase tracking-wider text-foreground-muted">
+                                  {r.code}
+                                </span>
+                                <input
+                                  type="url"
+                                  placeholder={`Länk för ${r.label}`}
+                                  value={tag.regionUrls[r.code] ?? ""}
+                                  onChange={(e) =>
+                                    updateTag(tag.id, {
+                                      regionUrls: {
+                                        ...tag.regionUrls,
+                                        [r.code]: e.target.value,
+                                      },
+                                    })
+                                  }
+                                  className="flex-1 rounded-lg bg-background-tertiary border border-border px-3 py-1.5 text-xs text-white placeholder:text-foreground-subtle outline-none"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

@@ -51,6 +51,7 @@ interface TaggedItemRow {
   price: number | null;
   currency: string | null;
   buy_url: string | null;
+  buy_urls: Record<string, string> | null;
   garment: string;
   position_x: number;
   position_y: number;
@@ -99,6 +100,7 @@ function rowToOutfit(row: OutfitRow): Outfit {
     price: t.price ?? 0,
     currency: t.currency ?? "SEK",
     buyUrl: t.buy_url ?? "",
+    buyUrls: t.buy_urls ?? undefined,
     garment: t.garment as TaggedItem["garment"],
     x: Number(t.position_x),
     y: Number(t.position_y),
@@ -125,7 +127,7 @@ function rowToOutfit(row: OutfitRow): Outfit {
 const OUTFIT_COLUMNS = `
   id, user_id, image_url, type, gender, title, description, category, created_at,
   profiles ( id, username, display_name, avatar_url, bio, region ),
-  tagged_items ( id, brand, name, price, currency, buy_url, garment, position_x, position_y, is_affiliate ),
+  tagged_items ( id, brand, name, price, currency, buy_url, buy_urls, garment, position_x, position_y, is_affiliate ),
   outfit_stats ( outfit_id, likes, saves, comments )
 `;
 

@@ -7,6 +7,8 @@ import {
   isFollowing,
 } from "@/lib/queries";
 import { outfits as mockOutfits } from "@/lib/data";
+import { createClient } from "@/lib/supabase/server";
+import { DEFAULT_REGION } from "@/lib/region";
 import OutfitDetail from "./OutfitDetail";
 
 export const dynamic = "force-dynamic";
@@ -46,6 +48,21 @@ export default async function OutfitPage({
     similar.filter((o) => /^[0-9a-f-]{36}$/i.test(o.id)).map((o) => o.id),
   );
 
+  // Resolve viewer region for region-aware buy URLs
+  const supabase = await createClient();
+  const {
+    data: { user: viewer },
+  } = await supabase.auth.getUser();
+  let viewerRegion = DEFAULT_REGION;
+  if (viewer) {
+    const { data: profileRow } = await supabase
+      .from("profiles")
+      .select("region")
+      .eq("id", viewer.id)
+      .maybeSingle();
+    if (profileRow?.region) viewerRegion = profileRow.region as string;
+  }
+
   return (
     <OutfitDetail
       outfit={{ ...outfit, comments }}
@@ -56,6 +73,7 @@ export default async function OutfitPage({
       initiallySaved={engagement.saved.has(outfit.id)}
       initiallyFollowingCreator={followingCreator}
       isPersisted={!!dbOutfit}
+      viewerRegion={viewerRegion}
     />
   );
 }

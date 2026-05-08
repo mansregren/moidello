@@ -1,16 +1,20 @@
 "use client";
 
 import { ExternalLink } from "lucide-react";
-import { TaggedItem as TaggedItemType } from "@/lib/types";
+import { TaggedItem as TaggedItemType, Region } from "@/lib/types";
+import { resolveBuyUrl } from "@/lib/region";
 import { PremiumButton } from "../shared/PremiumButton";
 import { recordTagClick } from "@/app/actions/tracking";
 
 interface TaggedItemProps {
   item: TaggedItemType;
   outfitId?: string;
+  region?: Region;
 }
 
-export function TaggedItemCard({ item, outfitId }: TaggedItemProps) {
+export function TaggedItemCard({ item, outfitId, region }: TaggedItemProps) {
+  const buyUrl = resolveBuyUrl(item, region);
+
   const handleClick = () => {
     if (!outfitId) return;
     recordTagClick(item.id, outfitId).catch(() => {
@@ -36,17 +40,19 @@ export function TaggedItemCard({ item, outfitId }: TaggedItemProps) {
           </p>
         )}
       </div>
-      <a
-        href={item.buyUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={handleClick}
-      >
-        <PremiumButton variant="primary" size="sm">
-          Köp
-          <ExternalLink className="h-3 w-3" />
-        </PremiumButton>
-      </a>
+      {buyUrl && (
+        <a
+          href={buyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleClick}
+        >
+          <PremiumButton variant="primary" size="sm">
+            Köp
+            <ExternalLink className="h-3 w-3" />
+          </PremiumButton>
+        </a>
+      )}
     </div>
   );
 }

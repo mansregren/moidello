@@ -14,7 +14,7 @@ import { FollowButton } from "@/components/user/FollowButton";
 import { IconButton } from "@/components/shared/IconButton";
 import { useAuth } from "@/lib/auth-context";
 import { motion } from "framer-motion";
-import type { Outfit } from "@/lib/types";
+import type { Outfit, Region } from "@/lib/types";
 import { toggleLike, toggleSave, postComment } from "@/app/actions/engagement";
 import { TrackView } from "@/components/outfit/TrackView";
 import { AddToBoardButton } from "@/components/outfit/AddToBoardButton";
@@ -28,6 +28,7 @@ export default function OutfitDetail({
   initiallySaved,
   initiallyFollowingCreator = false,
   isPersisted,
+  viewerRegion,
 }: {
   outfit: Outfit;
   similar: Outfit[];
@@ -37,6 +38,7 @@ export default function OutfitDetail({
   initiallySaved: boolean;
   initiallyFollowingCreator?: boolean;
   isPersisted: boolean;
+  viewerRegion?: Region;
 }) {
   const { isLoggedIn, requireAuth, user } = useAuth();
   const [, startTransition] = useTransition();
@@ -107,7 +109,12 @@ export default function OutfitDetail({
                 unoptimized={outfit.image.startsWith("http")}
               />
               {outfit.tags.map((tag) => (
-                <OutfitTag key={tag.id} tag={tag} />
+                <OutfitTag
+                  key={tag.id}
+                  tag={tag}
+                  outfitId={isPersisted ? outfit.id : undefined}
+                  region={viewerRegion}
+                />
               ))}
             </motion.div>
 
@@ -205,6 +212,7 @@ export default function OutfitDetail({
                         key={tag.id}
                         item={tag}
                         outfitId={isPersisted ? outfit.id : undefined}
+                        region={viewerRegion}
                       />
                     ))
                   )}

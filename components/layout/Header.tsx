@@ -9,6 +9,7 @@ import { Container } from "./Container";
 import { IconButton } from "../shared/IconButton";
 import { GenderToggle } from "../shared/GenderToggle";
 import { UserMenu } from "./UserMenu";
+import { NotificationBell } from "./NotificationBell";
 import { primaryNav, shouldShowAppHeader } from "@/lib/nav";
 import { useAuth, AuthAction } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -127,7 +128,10 @@ export function Header() {
             <Search className="h-5 w-5" />
           </IconButton>
           {isLoggedIn ? (
-            <UserMenu />
+            <>
+              <NotificationBell />
+              <UserMenu />
+            </>
           ) : (
             <Link
               href="/login"

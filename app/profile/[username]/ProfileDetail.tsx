@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useMemo, useOptimistic, useState, useTransition } from "react";
+import { Globe } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { UserAvatar } from "@/components/user/UserAvatar";
@@ -10,6 +12,14 @@ import { useAuth } from "@/lib/auth-context";
 import { motion } from "framer-motion";
 import type { Outfit, User as MoidelloUser } from "@/lib/types";
 import { toggleFollow } from "@/app/actions/engagement";
+
+export interface PublicBoardSummary {
+  id: string;
+  name: string;
+  description: string | null;
+  outfitCount: number;
+  coverImage: string | null;
+}
 
 function formatNumber(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
@@ -22,15 +32,19 @@ export default function ProfileDetail({
   likedIds = [],
   savedIds = [],
   initiallyFollowing = false,
+  publicBoards = [],
 }: {
   user: MoidelloUser;
   outfits: Outfit[];
   likedIds?: string[];
   savedIds?: string[];
   initiallyFollowing?: boolean;
+  publicBoards?: PublicBoardSummary[];
 }) {
   const { user: viewer, isLoggedIn, requireAuth } = useAuth();
-  const [activeTab, setActiveTab] = useState<"outfits" | "about">("outfits");
+  const [activeTab, setActiveTab] = useState<"outfits" | "boards" | "about">(
+    "outfits",
+  );
   const [following, setFollowing] = useOptimistic(
     initiallyFollowing,
     (_state, next: boolean) => next,
@@ -54,9 +68,16 @@ export default function ProfileDetail({
     });
   };
 
-  const tabs = [
-    { key: "outfits" as const, label: "Outfits", count: outfits.length },
-    { key: "about" as const, label: "Om" },
+  const tabs: Array<{
+    key: "outfits" | "boards" | "about";
+    label: string;
+    count?: number;
+  }> = [
+    { key: "outfits", label: "Outfits", count: outfits.length },
+    ...(publicBoards.length > 0
+      ? [{ key: "boards" as const, label: "Samlingar", count: publicBoards.length }]
+      : []),
+    { key: "about", label: "Om" },
   ];
 
   return (
@@ -181,6 +202,48 @@ export default function ProfileDetail({
                   Inga outfits ännu.
                 </p>
               ))}
+            {activeTab === "boards" && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {publicBoards.map((b) => (
+                  <Link
+                    key={b.id}
+                    href={`/board/${b.id}`}
+                    className="group rounded-2xl border border-border bg-background-secondary overflow-hidden hover:border-white/20 transition-colors"
+                  >
+                    <div className="relative aspect-[4/3] bg-background-tertiary">
+                      {b.coverImage ? (
+                        <Image
+                          src={b.coverImage}
+                          alt=""
+                          fill
+                          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          unoptimized={b.coverImage.startsWith("http")}
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-foreground-subtle text-sm">
+                          Tom samling
+                        </div>
+                      )}
+                      <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 backdrop-blur px-2.5 py-1 text-[10px] uppercase tracking-wider text-white">
+                        <Globe className="h-3 w-3" /> Publik
+                      </span>
+                    </div>
+                    <div className="p-4">
+                      <p className="font-medium text-white truncate">{b.name}</p>
+                      <p className="text-xs text-foreground-subtle mt-0.5">
+                        {b.outfitCount} {b.outfitCount === 1 ? "outfit" : "outfits"}
+                      </p>
+                      {b.description && (
+                        <p className="text-sm text-foreground-muted mt-2 line-clamp-2">
+                          {b.description}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
             {activeTab === "about" && (
               <div className="max-w-md mx-auto text-center">
                 {user.bio ? (
