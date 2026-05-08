@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useOptimistic, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { Globe } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
@@ -48,10 +48,10 @@ export default function ProfileDetail({
   const [activeTab, setActiveTab] = useState<"outfits" | "boards" | "about">(
     "outfits",
   );
-  const [following, setFollowing] = useOptimistic(
-    initiallyFollowing,
-    (_state, next: boolean) => next,
-  );
+  const [following, setFollowing] = useState(initiallyFollowing);
+  useEffect(() => {
+    setFollowing(initiallyFollowing);
+  }, [user.id, initiallyFollowing]);
   const [, startTransition] = useTransition();
   const liked = useMemo(() => new Set(likedIds), [likedIds]);
   const saved = useMemo(() => new Set(savedIds), [savedIds]);
@@ -64,10 +64,11 @@ export default function ProfileDetail({
       return;
     }
     if (isOwnProfile) return;
+    const next = !following;
+    setFollowing(next);
     startTransition(async () => {
-      setFollowing(!following);
       const res = await toggleFollow(user.id);
-      if (!res.ok) setFollowing(following);
+      if (!res.ok) setFollowing(!next);
     });
   };
 

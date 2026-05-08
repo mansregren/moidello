@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
-import { users } from "@/lib/data";
 import { fetchProfileByUsername } from "@/lib/queries";
-
-export function generateStaticParams() {
-  return users.map((u) => ({ username: u.username }));
-}
 
 export async function generateMetadata({
   params,
@@ -12,10 +7,7 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
-
-  const user =
-    (await fetchProfileByUsername(username)) ??
-    users.find((u) => u.username === username);
+  const user = await fetchProfileByUsername(username);
 
   if (!user) {
     return {

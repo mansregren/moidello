@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Heart, Bookmark, LayoutGrid, Tag } from "lucide-react";
 import { Outfit } from "@/lib/types";
 import { UserAvatar } from "../user/UserAvatar";
-import { useOptimistic, useState, useTransition, MouseEvent } from "react";
+import { useEffect, useState, useTransition, MouseEvent } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { toggleLike, toggleSave } from "@/app/actions/engagement";
@@ -30,20 +30,22 @@ export function OutfitCard({
 
   const isPersisted = UUID_RE.test(outfit.id);
 
-  const [likeState, setLikeState] = useOptimistic(
-    { liked: initiallyLiked, count: outfit.likes },
-    (state, next: boolean) => ({
-      liked: next,
-      count: state.count + (next ? 1 : -1),
-    }),
-  );
-  const [saveState, setSaveState] = useOptimistic(
-    { saved: initiallySaved, count: outfit.saves },
-    (state, next: boolean) => ({
-      saved: next,
-      count: state.count + (next ? 1 : -1),
-    }),
-  );
+  // Persistent state (not useOptimistic — that reverts the count back to the
+  // SSR value as soon as the transition completes, which made the heart
+  // flicker 0 → 1 → 0 after every click). We mirror the props on initial
+  // mount + when the outfit id changes; user toggles persist locally.
+  const [liked, setLiked] = useState(initiallyLiked);
+  const [likeCount, setLikeCount] = useState(outfit.likes);
+  const [saved, setSaved] = useState(initiallySaved);
+  const [saveCount, setSaveCount] = useState(outfit.saves);
+
+  useEffect(() => {
+    setLiked(initiallyLiked);
+    setLikeCount(outfit.likes);
+    setSaved(initiallySaved);
+    setSaveCount(outfit.saves);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outfit.id]);
 
   const handleLike = (e: MouseEvent) => {
     e.preventDefault();
@@ -52,15 +54,17 @@ export function OutfitCard({
       requireAuth("like");
       return;
     }
-    if (!isPersisted) {
-      // Mock outfit — just flip local state for visual feedback.
-      startTransition(() => setLikeState(!likeState.liked));
-      return;
-    }
+    const next = !liked;
+    setLiked(next);
+    setLikeCount((c) => c + (next ? 1 : -1));
+    if (!isPersisted) return;
     startTransition(async () => {
-      setLikeState(!likeState.liked);
       const res = await toggleLike(outfit.id);
-      if (!res.ok) setLikeState(likeState.liked);
+      if (!res.ok) {
+        // Roll back
+        setLiked(!next);
+        setLikeCount((c) => c + (next ? -1 : 1));
+      }
     });
   };
 
@@ -71,14 +75,16 @@ export function OutfitCard({
       requireAuth("save");
       return;
     }
-    if (!isPersisted) {
-      startTransition(() => setSaveState(!saveState.saved));
-      return;
-    }
+    const next = !saved;
+    setSaved(next);
+    setSaveCount((c) => c + (next ? 1 : -1));
+    if (!isPersisted) return;
     startTransition(async () => {
-      setSaveState(!saveState.saved);
       const res = await toggleSave(outfit.id);
-      if (!res.ok) setSaveState(saveState.saved);
+      if (!res.ok) {
+        setSaved(!next);
+        setSaveCount((c) => c + (next ? -1 : 1));
+      }
     });
   };
 
@@ -89,7 +95,7 @@ export function OutfitCard({
         aria-label={`${outfit.title} av ${outfit.creator.displayName}, ${outfit.tags.length} taggade plagg`}
       >
         <div
-          className={`relative overflow-hidden rounded-2xl ${
+          className={`relative overflow-hidden rounded-2xl aspect-[3/4] ${
             outfit.type === "flatlay" ? "bg-white" : "bg-background-tertiary"
           }`}
           onMouseEnter={() => setHovering(true)}
@@ -98,10 +104,9 @@ export function OutfitCard({
           <Image
             src={outfit.image}
             alt=""
-            width={400}
-            height={550}
+            fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
             unoptimized={outfit.image.startsWith("http")}
           />
 
@@ -127,17 +132,17 @@ export function OutfitCard({
 
           <button
             onClick={handleSave}
-            aria-label={saveState.saved ? "Ta bort sparad" : "Spara outfit"}
-            aria-pressed={saveState.saved}
+            aria-label={saved ? "Ta bort sparad" : "Spara outfit"}
+            aria-pressed={saved}
             className={cn(
               "absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-md transition-all duration-300 active:scale-90",
-              saveState.saved
+              saved
                 ? "bg-white text-black"
                 : "bg-black/50 text-white hover:bg-black/70",
             )}
           >
             <Bookmark
-              className={cn("h-4 w-4", saveState.saved && "fill-current")}
+              className={cn("h-4 w-4", saved && "fill-current")}
               strokeWidth={2}
             />
           </button>
@@ -182,27 +187,27 @@ export function OutfitCard({
           <button
             onClick={handleLike}
             className="flex items-center gap-1 text-foreground-subtle hover:text-white transition-colors active:scale-95"
-            aria-label={likeState.liked ? "Ta bort gilla" : "Gilla"}
-            aria-pressed={likeState.liked}
+            aria-label={liked ? "Ta bort gilla" : "Gilla"}
+            aria-pressed={liked}
           >
             <Heart
-              className={`h-4 w-4 ${likeState.liked ? "fill-white text-white" : ""}`}
+              className={`h-4 w-4 ${liked ? "fill-white text-white" : ""}`}
             />
-            <span className="text-xs">{likeState.count}</span>
+            <span className="text-xs">{likeCount}</span>
           </button>
           <button
             onClick={handleSave}
             className="flex items-center gap-1 text-foreground-subtle hover:text-white transition-colors active:scale-95"
-            aria-label={saveState.saved ? "Ta bort sparad" : "Spara"}
-            aria-pressed={saveState.saved}
+            aria-label={saved ? "Ta bort sparad" : "Spara"}
+            aria-pressed={saved}
           >
             <Bookmark
               className={cn(
                 "h-4 w-4",
-                saveState.saved && "fill-white text-white",
+                saved && "fill-white text-white",
               )}
             />
-            <span className="text-xs">{saveState.count}</span>
+            <span className="text-xs">{saveCount}</span>
           </button>
         </div>
       </div>

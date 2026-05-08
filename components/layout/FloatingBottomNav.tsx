@@ -45,15 +45,23 @@ export function FloatingBottomNav() {
 
             if (item.primary) {
               return (
-                <li key={item.href} className="flex-1 flex justify-center">
+                <li key={item.href} className="flex-1">
                   <Link
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     onClick={(e) => handleClick(e, item.authAction)}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-black shadow-[0_4px_14px_rgba(255,255,255,0.18)] transition-transform active:scale-95"
+                    className="flex flex-col items-center gap-0.5 py-1 transition-transform active:scale-95"
                   >
-                    <Icon className="h-5 w-5" strokeWidth={2.4} aria-hidden="true" />
-                    <span className="sr-only">{item.label}</span>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-black shadow-[0_4px_14px_rgba(255,255,255,0.18)]">
+                      <Icon
+                        className="h-5 w-5"
+                        strokeWidth={2.4}
+                        aria-hidden="true"
+                      />
+                    </span>
+                    <span className="text-[10px] font-medium tracking-wide text-white">
+                      {item.label}
+                    </span>
                   </Link>
                 </li>
               );

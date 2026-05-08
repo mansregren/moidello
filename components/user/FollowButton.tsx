@@ -1,6 +1,6 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { PremiumButton } from "../shared/PremiumButton";
 import { useAuth } from "@/lib/auth-context";
 import { toggleFollow } from "@/app/actions/engagement";
@@ -17,10 +17,14 @@ export function FollowButton({
 }) {
   const { user, isLoggedIn, requireAuth } = useAuth();
   const [, startTransition] = useTransition();
-  const [following, setFollowing] = useOptimistic(
-    initiallyFollowing,
-    (_state, next: boolean) => next,
-  );
+  // Plain useState (not useOptimistic) so the toggle persists visually
+  // after the server action's transition completes — useOptimistic would
+  // revert to `initiallyFollowing` and make the click look like a no-op.
+  const [following, setFollowing] = useState(initiallyFollowing);
+
+  useEffect(() => {
+    setFollowing(initiallyFollowing);
+  }, [userId, initiallyFollowing]);
 
   const isOwnProfile = userId && user?.id === userId;
   const isPersisted = userId && UUID_RE.test(userId);
@@ -32,14 +36,12 @@ export function FollowButton({
       requireAuth("follow");
       return;
     }
-    if (!isPersisted) {
-      startTransition(() => setFollowing(!following));
-      return;
-    }
+    const next = !following;
+    setFollowing(next);
+    if (!isPersisted) return;
     startTransition(async () => {
-      setFollowing(!following);
       const res = await toggleFollow(userId!);
-      if (!res.ok) setFollowing(following);
+      if (!res.ok) setFollowing(!next);
     });
   };
 

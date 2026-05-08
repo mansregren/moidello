@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useOptimistic, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { Heart, Bookmark, MessageCircle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
@@ -46,31 +46,35 @@ export default function OutfitDetail({
   const similarLiked = useMemo(() => new Set(similarLikedIds), [similarLikedIds]);
   const similarSaved = useMemo(() => new Set(similarSavedIds), [similarSavedIds]);
 
-  const [likeState, setLikeState] = useOptimistic(
-    { liked: initiallyLiked, count: outfit.likes },
-    (state, next: boolean) => ({
-      liked: next,
-      count: state.count + (next ? 1 : -1),
-    }),
-  );
-  const [saveState, setSaveState] = useOptimistic(
-    { saved: initiallySaved, count: outfit.saves },
-    (state, next: boolean) => ({
-      saved: next,
-      count: state.count + (next ? 1 : -1),
-    }),
-  );
+  // Plain useState — see OutfitCard for why useOptimistic was wrong here.
+  const [liked, setLiked] = useState(initiallyLiked);
+  const [likeCount, setLikeCount] = useState(outfit.likes);
+  const [saved, setSaved] = useState(initiallySaved);
+  const [saveCount, setSaveCount] = useState(outfit.saves);
+
+  useEffect(() => {
+    setLiked(initiallyLiked);
+    setLikeCount(outfit.likes);
+    setSaved(initiallySaved);
+    setSaveCount(outfit.saves);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outfit.id]);
 
   const handleLike = () => {
-    if (!isPersisted) return; // engagement disabled on mock data
+    if (!isPersisted) return;
     if (!isLoggedIn) {
       requireAuth("like");
       return;
     }
+    const next = !liked;
+    setLiked(next);
+    setLikeCount((c) => c + (next ? 1 : -1));
     startTransition(async () => {
-      setLikeState(!likeState.liked);
       const res = await toggleLike(outfit.id);
-      if (!res.ok) setLikeState(likeState.liked);
+      if (!res.ok) {
+        setLiked(!next);
+        setLikeCount((c) => c + (next ? -1 : 1));
+      }
     });
   };
 
@@ -80,10 +84,15 @@ export default function OutfitDetail({
       requireAuth("save");
       return;
     }
+    const next = !saved;
+    setSaved(next);
+    setSaveCount((c) => c + (next ? 1 : -1));
     startTransition(async () => {
-      setSaveState(!saveState.saved);
       const res = await toggleSave(outfit.id);
-      if (!res.ok) setSaveState(saveState.saved);
+      if (!res.ok) {
+        setSaved(!next);
+        setSaveCount((c) => c + (next ? -1 : 1));
+      }
     });
   };
 
@@ -160,31 +169,31 @@ export default function OutfitDetail({
                 <IconButton
                   size="lg"
                   onClick={handleLike}
-                  className={likeState.liked ? "bg-white/10" : ""}
-                  aria-label={likeState.liked ? "Ta bort gillning" : "Gilla"}
-                  aria-pressed={likeState.liked}
+                  className={liked ? "bg-white/10" : ""}
+                  aria-label={liked ? "Ta bort gillning" : "Gilla"}
+                  aria-pressed={liked}
                 >
                   <Heart
-                    className={`h-5 w-5 ${likeState.liked ? "fill-white text-white" : ""}`}
+                    className={`h-5 w-5 ${liked ? "fill-white text-white" : ""}`}
                   />
                 </IconButton>
                 <span className="text-sm text-foreground-muted mr-2">
-                  {likeState.count}
+                  {likeCount}
                 </span>
 
                 <IconButton
                   size="lg"
                   onClick={handleSave}
-                  className={saveState.saved ? "bg-white/10" : ""}
-                  aria-label={saveState.saved ? "Ta bort sparad" : "Spara"}
-                  aria-pressed={saveState.saved}
+                  className={saved ? "bg-white/10" : ""}
+                  aria-label={saved ? "Ta bort sparad" : "Spara"}
+                  aria-pressed={saved}
                 >
                   <Bookmark
-                    className={`h-5 w-5 ${saveState.saved ? "fill-white text-white" : ""}`}
+                    className={`h-5 w-5 ${saved ? "fill-white text-white" : ""}`}
                   />
                 </IconButton>
                 <span className="text-sm text-foreground-muted mr-2">
-                  {saveState.count}
+                  {saveCount}
                 </span>
 
                 <ShareButton
