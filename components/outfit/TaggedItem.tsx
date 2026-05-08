@@ -9,8 +9,18 @@ import { resolveBuyUrl } from "@/lib/region";
 import { recordTagClick } from "@/app/actions/tracking";
 import { toggleSavedItem } from "@/app/actions/saved-items";
 import { ShareToDmSheet } from "@/components/shared/ShareToDmSheet";
+import { UserLink } from "@/components/shared/UserLink";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
+
+/**
+ * Treats `#` and empty strings as missing — those came from seed data
+ * placeholders. When the affiliate wrapper /go/[item_id] lands later
+ * we'll instead always render the button and route through it.
+ */
+function isUsableBuyUrl(url: string | undefined): url is string {
+  return !!url && url !== "#" && /^https?:\/\//i.test(url);
+}
 
 interface TaggedItemProps {
   item: TaggedItemType;
@@ -140,18 +150,19 @@ export function TaggedItemCard({
           >
             <Send className="h-4 w-4" />
           </button>
-          {buyUrl && (
-            <a
+          {/* TODO(affiliate): swap href for `/go/${item.id}` once the
+              wrapper exists so click logging + per-region affiliate
+              suffixes are applied server-side. */}
+          {isUsableBuyUrl(buyUrl) && (
+            <UserLink
               href={buyUrl}
-              target="_blank"
-              rel="ugc nofollow noopener noreferrer"
               onClick={handleBuyClick}
               aria-label={`Köp ${item.brand} ${item.name}`}
               className="inline-flex items-center gap-1 rounded-full bg-white text-black px-3 py-2 text-xs font-semibold hover:bg-white/90 transition-colors"
             >
               Köp
               <ExternalLink className="h-3 w-3" />
-            </a>
+            </UserLink>
           )}
         </div>
       </article>

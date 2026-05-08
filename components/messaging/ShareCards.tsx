@@ -235,17 +235,19 @@ export function ItemShareCard({
           )}
         </div>
       </Link>
-      {preview.buy_url && (
-        <a
-          href={preview.buy_url}
-          target="_blank"
-          rel="ugc nofollow noopener noreferrer"
-          className="flex items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-medium text-white hover:bg-white/5"
-        >
-          Köp
-          <ExternalLink className="h-3 w-3" />
-        </a>
-      )}
+      {preview.buy_url &&
+        preview.buy_url !== "#" &&
+        /^https?:\/\//i.test(preview.buy_url) && (
+          <a
+            href={preview.buy_url}
+            target="_blank"
+            rel="ugc nofollow noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-medium text-white hover:bg-white/5"
+          >
+            Köp
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        )}
     </ShareCardShell>
   );
 }

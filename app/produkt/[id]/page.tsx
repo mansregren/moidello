@@ -7,9 +7,14 @@ import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { ShareButton } from "@/components/shared/ShareButton";
+import { UserLink } from "@/components/shared/UserLink";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { produktPageJsonLd } from "@/lib/json-ld";
 import { ProduktSaveAndShare } from "./ProduktSaveAndShare";
+
+function isUsableBuyUrl(url: string | undefined): url is string {
+  return !!url && url !== "#" && /^https?:\/\//i.test(url);
+}
 import {
   fetchTaggedItemById,
   fetchOutfitsByItem,
@@ -130,16 +135,16 @@ export default async function ProduktPage({
               )}
 
               <div className="mt-7 flex flex-wrap items-center gap-3">
-                {item.buyUrl && (
-                  <a
+                {/* TODO(affiliate): replace href with /go/${item.id}
+                    once the click-tracking wrapper exists. */}
+                {isUsableBuyUrl(item.buyUrl) && (
+                  <UserLink
                     href={item.buyUrl}
-                    target="_blank"
-                    rel="ugc nofollow noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-full bg-white text-black px-6 py-3 text-sm font-semibold hover:bg-white/90 transition-colors"
                   >
                     Köp hos {item.brand}
                     <ExternalLink className="h-4 w-4" />
-                  </a>
+                  </UserLink>
                 )}
                 <ProduktSaveAndShare
                   itemId={item.id}
