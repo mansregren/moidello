@@ -58,6 +58,7 @@ interface OutfitStatsRow {
 
 interface OutfitRow {
   id: string;
+  slug: string | null;
   user_id: string;
   image_url: string;
   type: "photo" | "flatlay";
@@ -144,6 +145,7 @@ function rowToOutfit(row: OutfitRow): Outfit {
 
   return {
     id: row.id,
+    slug: row.slug ?? undefined,
     image: row.image_url,
     type: row.type,
     gender: row.gender,
@@ -164,7 +166,7 @@ function rowToOutfit(row: OutfitRow): Outfit {
 // the !fkey hint. Comments on the outfit detail page get a similar
 // hint when fetched separately.
 const OUTFIT_COLUMNS = `
-  id, user_id, image_url, type, gender, title, description, category, created_at,
+  id, slug, user_id, image_url, type, gender, title, description, category, created_at,
   profiles!outfits_user_id_fkey ( id, username, display_name, avatar_url, bio, region ),
   tagged_items ( id, brand, name, price, currency, buy_url, buy_urls, garment, position_x, position_y, is_affiliate )
 `;
@@ -255,6 +257,39 @@ export async function fetchSavedOutfitsByUser(userId: string): Promise<Outfit[]>
     .filter((o): o is OutfitRow => !!o)
     .map(rowToOutfit);
   return attachOutfitStats(mapped);
+}
+
+/**
+ * Resolve an outfit by its canonical /<username>/<slug> path. Looks up
+ * the profile first (lowercased username) so we don't have to
+ * denormalize username onto outfits.
+ */
+export async function fetchOutfitBySlug(
+  username: string,
+  slug: string,
+  client?: QueryClient,
+): Promise<Outfit | null> {
+  const supabase = await resolveClient(client);
+
+  const { data: profileRow } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("username", username.toLowerCase())
+    .maybeSingle();
+  if (!profileRow) return null;
+
+  const { data, error } = await supabase
+    .from("outfits")
+    .select(OUTFIT_COLUMNS)
+    .eq("user_id", profileRow.id)
+    .eq("slug", slug)
+    .eq("is_published", true)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  const mapped = rowToOutfit(data as unknown as OutfitRow);
+  const [withStats] = await attachOutfitStats([mapped], supabase);
+  return withStats;
 }
 
 export async function fetchOutfitById(

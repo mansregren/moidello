@@ -70,6 +70,10 @@ export type GenderFilter = Gender;
 
 export interface Outfit {
   id: string;
+  /** URL-friendly slug, unique per creator. Combined with creator.username
+   *  forms the canonical /<username>/<slug> path. May be empty for
+   *  legacy/mock outfits. */
+  slug?: string;
   image: string;
   /** "photo" = person wearing outfit, "flatlay" = clothes laid out */
   type: "photo" | "flatlay";

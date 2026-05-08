@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isReservedUsername } from "@/lib/reserved-usernames";
 
 export interface OnboardingState {
   error?: string;
@@ -32,6 +33,14 @@ export async function completeOnboarding(
       fieldErrors: {
         username:
           "3–24 tecken: små bokstäver, siffror, understreck. Inga mellanslag.",
+      },
+    };
+  }
+
+  if (isReservedUsername(username)) {
+    return {
+      fieldErrors: {
+        username: "Det användarnamnet är reserverat — välj ett annat.",
       },
     };
   }

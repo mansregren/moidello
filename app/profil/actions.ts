@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { slugify, storageFilename } from "@/lib/slug";
+import { isReservedUsername } from "@/lib/reserved-usernames";
 
 export interface ProfileUpdateState {
   ok?: boolean;
@@ -52,6 +53,14 @@ export async function updateProfile(
     return {
       fieldErrors: {
         username: "3–24 tecken: små bokstäver, siffror, understreck.",
+      },
+    };
+  }
+
+  if (isReservedUsername(username)) {
+    return {
+      fieldErrors: {
+        username: "Det användarnamnet är reserverat — välj ett annat.",
       },
     };
   }
