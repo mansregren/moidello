@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { users } from "@/lib/data";
+import { fetchProfileByUsername } from "@/lib/queries";
 
 export function generateStaticParams() {
   return users.map((u) => ({ username: u.username }));
@@ -11,7 +12,10 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
-  const user = users.find((u) => u.username === username);
+
+  const user =
+    (await fetchProfileByUsername(username)) ??
+    users.find((u) => u.username === username);
 
   if (!user) {
     return {
@@ -29,11 +33,17 @@ export async function generateMetadata({
       description: user.bio,
       url: `/profile/${user.username}`,
       type: "profile",
-      images: user.avatar ? [{ url: user.avatar, alt: user.displayName }] : undefined,
+      images: user.avatar
+        ? [{ url: user.avatar, alt: user.displayName }]
+        : undefined,
     },
   };
 }
 
-export default function ProfileLayout({ children }: { children: React.ReactNode }) {
+export default function ProfileLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return children;
 }
