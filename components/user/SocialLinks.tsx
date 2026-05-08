@@ -6,6 +6,7 @@ import {
   youtubeUrl,
   websiteUrl,
 } from "@/lib/social";
+import { UserLink } from "@/components/shared/UserLink";
 
 const InstagramIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -56,15 +57,13 @@ export function SocialLinks({
       <ul className="flex flex-wrap items-center gap-2">
         {items.map(({ label, href, Icon }) => (
           <li key={label}>
-            <a
+            <UserLink
               href={href}
-              target={href.startsWith("mailto:") ? undefined : "_blank"}
-              rel="noopener noreferrer"
               aria-label={label}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 transition-colors"
             >
               <Icon className="h-4 w-4" />
-            </a>
+            </UserLink>
           </li>
         ))}
       </ul>

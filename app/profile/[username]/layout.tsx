@@ -37,8 +37,11 @@ export async function generateMetadata({
     : `Stilkreatör på ${SITE} med ${user.outfitCount} ${user.outfitCount === 1 ? "outfit" : "outfits"}.`;
 
   // Hide trigger-default usernames + outfit-less profiles from the index.
+  // A profile with zero outfits is too thin to surface in search even
+  // if the user wrote a bio — they haven't produced indexable content
+  // yet, so the page is essentially a stub.
   const isPlaceholder = user.username.startsWith("user_");
-  const isThin = user.outfitCount === 0 && !ownBio;
+  const isThin = user.outfitCount === 0;
 
   return {
     title,
