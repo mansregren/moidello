@@ -91,11 +91,12 @@ export async function updateProfile(
       .publicUrl;
   }
 
-  // Upsert covers the case where the on_auth_user_created trigger never ran
-  // (or ran but the row got cleaned up) so the user still ends up with a
-  // valid profile after editing.
-  const update: Record<string, unknown> = {
-    id: user.id,
+  // The on_auth_user_created trigger seeds a profile row when the auth user
+  // is created, so the typical path is a plain UPDATE. We INSERT as a
+  // fallback only if the row is genuinely missing (trigger never ran, or
+  // the row was deleted). UPDATE-then-INSERT plays nicer with RLS than a
+  // single upsert because each path hits exactly one policy.
+  const fields: Record<string, unknown> = {
     username,
     display_name: displayName,
     bio,
@@ -105,14 +106,25 @@ export async function updateProfile(
     brand_website:
       accountType === "brand" ? (brandWebsite || null) : null,
   };
-  if (avatarUrl) update.avatar_url = avatarUrl;
+  if (avatarUrl) fields.avatar_url = avatarUrl;
 
-  const { error: upsertError } = await supabase
+  const { data: updated, error: updateError } = await supabase
     .from("profiles")
-    .upsert(update, { onConflict: "id" });
+    .update(fields)
+    .eq("id", user.id)
+    .select("id");
 
-  if (upsertError) {
-    return { error: `Kunde inte spara profilen: ${upsertError.message}` };
+  if (updateError) {
+    return { error: `Kunde inte spara profilen: ${updateError.message}` };
+  }
+
+  if (!updated || updated.length === 0) {
+    const { error: insertError } = await supabase
+      .from("profiles")
+      .insert({ id: user.id, ...fields });
+    if (insertError) {
+      return { error: `Kunde inte skapa profilen: ${insertError.message}` };
+    }
   }
 
   revalidatePath("/profil");
