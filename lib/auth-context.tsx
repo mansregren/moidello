@@ -1,9 +1,18 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { X, Heart, Bookmark, UserPlus, Plus, User } from "lucide-react";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
 
 export type AuthAction =
   | "like"
@@ -23,20 +32,44 @@ const PROMPTS: Record<AuthAction, { title: string; icon: typeof Heart }> = {
 };
 
 interface AuthContextValue {
+  user: SupabaseUser | null;
   isLoggedIn: boolean;
+  loading: boolean;
+  signOut: () => Promise<void>;
   /** Returns true if user is logged in (action can proceed). False = prompt was shown. */
   requireAuth: (action: AuthAction) => boolean;
 }
 
 const AuthContext = createContext<AuthContextValue>({
+  user: null,
   isLoggedIn: false,
+  loading: true,
+  signOut: async () => {},
   requireAuth: () => false,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Phase 1: always logged-out (Pinterest model)
-  const isLoggedIn = false;
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [loading, setLoading] = useState(true);
   const [activePrompt, setActivePrompt] = useState<AuthAction | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
+
+  const isLoggedIn = !!user;
 
   const requireAuth = useCallback(
     (action: AuthAction): boolean => {
@@ -44,11 +77,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setActivePrompt(action);
       return false;
     },
-    [isLoggedIn]
+    [isLoggedIn],
   );
 
+  const signOut = useCallback(async () => {
+    await supabase.auth.signOut();
+  }, [supabase]);
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, requireAuth }}>
+    <AuthContext.Provider
+      value={{ user, isLoggedIn, loading, signOut, requireAuth }}
+    >
       {children}
       <AnimatePresence>
         {activePrompt && (
@@ -114,18 +153,11 @@ function AuthPrompt({
 
         <div className="mt-7 flex flex-col gap-3">
           <Link
-            href="/signup"
+            href="/login"
             onClick={onClose}
             className="inline-flex items-center justify-center rounded-full bg-white text-black px-6 py-3 text-sm font-medium transition-transform active:scale-[0.98]"
           >
-            Skapa konto
-          </Link>
-          <Link
-            href="/login"
-            onClick={onClose}
-            className="inline-flex items-center justify-center rounded-full border border-border text-white px-6 py-3 text-sm font-medium transition-colors hover:border-white/30"
-          >
-            Logga in
+            Skapa konto / logga in
           </Link>
         </div>
       </motion.div>
