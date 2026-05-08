@@ -124,3 +124,21 @@ export async function postComment(
   revalidatePath(`/outfit/${outfitId}`);
   return { ok: true };
 }
+
+export async function deleteComment(
+  commentId: string,
+  outfitId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const { supabase, user } = await requireUser();
+  if (!user) return { ok: false, error: "Inte inloggad" };
+
+  // RLS gates: comment author OR outfit owner. We don't need to
+  // duplicate the check here.
+  const { error } = await supabase
+    .from("comments")
+    .delete()
+    .eq("id", commentId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/outfit/${outfitId}`);
+  return { ok: true };
+}

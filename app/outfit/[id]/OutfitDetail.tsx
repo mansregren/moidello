@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { Heart, Bookmark, MessageCircle } from "lucide-react";
+import { Heart, Bookmark, MessageCircle, X } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { OutfitTag } from "@/components/outfit/OutfitTag";
@@ -15,7 +15,12 @@ import { IconButton } from "@/components/shared/IconButton";
 import { useAuth } from "@/lib/auth-context";
 import { motion } from "framer-motion";
 import type { Outfit, Region } from "@/lib/types";
-import { toggleLike, toggleSave, postComment } from "@/app/actions/engagement";
+import {
+  toggleLike,
+  toggleSave,
+  postComment,
+  deleteComment,
+} from "@/app/actions/engagement";
 import { TrackView } from "@/components/outfit/TrackView";
 import { AddToBoardButton } from "@/components/outfit/AddToBoardButton";
 import { ShareButton } from "@/components/shared/ShareButton";
@@ -261,9 +266,11 @@ export default function OutfitDetail({
 
               <CommentsSection
                 outfitId={outfit.id}
+                outfitOwnerId={outfit.creator.id}
                 comments={outfit.comments}
                 isPersisted={isPersisted}
                 isLoggedIn={isLoggedIn}
+                viewerId={user?.id ?? null}
                 requireAuth={() => requireAuth("comment")}
                 viewerAvatar={user?.user_metadata?.avatar_url ?? ""}
               />
@@ -293,22 +300,32 @@ export default function OutfitDetail({
 
 function CommentsSection({
   outfitId,
-  comments,
+  outfitOwnerId,
+  comments: initialComments,
   isPersisted,
   isLoggedIn,
+  viewerId,
   requireAuth,
   viewerAvatar,
 }: {
   outfitId: string;
+  outfitOwnerId: string;
   comments: Outfit["comments"];
   isPersisted: boolean;
   isLoggedIn: boolean;
+  viewerId: string | null;
   requireAuth: () => void;
   viewerAvatar: string;
 }) {
   const [body, setBody] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [comments, setComments] = useState(initialComments);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+
+  useEffect(() => {
+    setComments(initialComments);
+  }, [initialComments]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -341,29 +358,97 @@ function CommentsSection({
             Inga kommentarer än. Var först med att kommentera!
           </p>
         )}
-        {comments.map((comment) => (
-          <div key={comment.id} className="flex gap-3">
-            <UserAvatar
-              src={comment.user.avatar}
-              alt={comment.user.displayName}
-              size="sm"
-            />
-            <div>
-              <p className="text-sm">
-                <span className="font-medium text-white">
-                  {comment.user.displayName}
-                </span>{" "}
-                <span className="text-foreground-muted">{comment.text}</span>
+        {comments.map((comment) => {
+          const canDelete =
+            viewerId !== null &&
+            (viewerId === comment.user.id || viewerId === outfitOwnerId);
+          return (
+            <div key={comment.id} className="flex gap-3 group">
+              <UserAvatar
+                src={comment.user.avatar}
+                alt={comment.user.displayName}
+                size="sm"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm">
+                  <span className="font-medium text-white">
+                    {comment.user.displayName}
+                  </span>{" "}
+                  <span className="text-foreground-muted">{comment.text}</span>
+                </p>
+                <p className="text-xs text-foreground-subtle mt-1">
+                  {new Date(comment.createdAt).toLocaleString("sv-SE", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </p>
+              </div>
+              {canDelete && (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(comment.id)}
+                  aria-label="Radera kommentar"
+                  className="shrink-0 self-start text-foreground-subtle hover:text-red-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          );
+        })}
+
+        {confirmDelete && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-6">
+            <div className="w-full max-w-sm rounded-3xl bg-background-secondary border border-white/10 p-6">
+              <h3 className="font-heading text-2xl uppercase tracking-tight text-white">
+                Radera kommentar?
+              </h3>
+              <p className="mt-3 text-sm text-foreground-muted">
+                Detta går inte att ångra.
               </p>
-              <p className="text-xs text-foreground-subtle mt-1">
-                {new Date(comment.createdAt).toLocaleString("sv-SE", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                })}
-              </p>
+              <div className="mt-6 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(null)}
+                  className="flex-1 rounded-full border border-border text-white py-3 text-sm font-medium hover:border-white/30"
+                >
+                  Avbryt
+                </button>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => {
+                    const targetId = confirmDelete;
+                    setConfirmDelete(null);
+                    setComments((prev) =>
+                      prev.filter((c) => c.id !== targetId),
+                    );
+                    startTransition(async () => {
+                      const res = await deleteComment(targetId, outfitId);
+                      if (!res.ok) {
+                        // Restore on failure
+                        const restored = initialComments.find(
+                          (c) => c.id === targetId,
+                        );
+                        if (restored) {
+                          setComments((prev) =>
+                            prev.some((c) => c.id === restored.id)
+                              ? prev
+                              : [...prev, restored],
+                          );
+                        }
+                        setError(res.error ?? "Kunde inte radera.");
+                      }
+                    });
+                  }}
+                  className="flex-1 rounded-full bg-red-500 text-white py-3 text-sm font-semibold hover:bg-red-600 disabled:opacity-60"
+                >
+                  Radera
+                </button>
+              </div>
             </div>
           </div>
-        ))}
+        )}
 
         <form
           onSubmit={submit}
