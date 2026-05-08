@@ -24,6 +24,33 @@ import type { Outfit, User as MoidelloUser } from "@/lib/types";
 import { ProfileEditSheet } from "./ProfileEditSheet";
 import { ShareButton } from "@/components/shared/ShareButton";
 import { SocialLinks } from "@/components/user/SocialLinks";
+import { outfits as mockOutfits } from "@/lib/data";
+
+const LOCAL_ENGAGEMENT_KEY = "moidello_local_engagement_v1";
+
+function readLocalSaves(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(LOCAL_ENGAGEMENT_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw) as { saves?: Record<string, boolean> };
+    return new Set(Object.keys(parsed.saves ?? {}));
+  } catch {
+    return new Set();
+  }
+}
+
+function readLocalLikes(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(LOCAL_ENGAGEMENT_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw) as { likes?: Record<string, boolean> };
+    return new Set(Object.keys(parsed.likes ?? {}));
+  } catch {
+    return new Set();
+  }
+}
 
 type ProfileTab = "outfits" | "saved" | "about";
 
@@ -154,6 +181,13 @@ export default function ProfilPage() {
         );
       }
 
+      // Pull in seed outfits the user has "saved" via localStorage so they
+      // show up in the Sparade tab too. Real DB saves still take priority.
+      const localSaveIds = readLocalSaves();
+      const localSavedSeeds = mockOutfits.filter((o) =>
+        localSaveIds.has(o.id),
+      );
+
       if (saveRows) {
         type SaveJoin = {
           outfit:
@@ -165,8 +199,7 @@ export default function ProfilPage() {
             | null;
         };
         const rows = saveRows as unknown as SaveJoin[];
-        setSavedOutfits(
-          rows
+        const dbSaved = rows
             .map((r) => r.outfit)
             .filter(Boolean)
             .map((o) => {
@@ -219,8 +252,10 @@ export default function ProfilPage() {
                 category: out.category ?? "",
                 createdAt: out.created_at,
               } satisfies Outfit;
-            }),
-        );
+            });
+        setSavedOutfits([...dbSaved, ...localSavedSeeds]);
+      } else {
+        setSavedOutfits(localSavedSeeds);
       }
 
       // Fetch which outfits in this view the user has liked, so the heart
@@ -235,6 +270,7 @@ export default function ProfilPage() {
         .filter((id): id is string => !!id);
       allIds.push(...savedIds);
 
+      const localLikeIds = readLocalLikes();
       if (allIds.length > 0) {
         const { data: likeRows } = await supabase
           .from("likes")
@@ -242,10 +278,14 @@ export default function ProfilPage() {
           .eq("user_id", user.id)
           .in("outfit_id", allIds);
         if (!cancelled) {
-          setLikedSet(
-            new Set((likeRows ?? []).map((r) => r.outfit_id as string)),
-          );
+          const merged = new Set<string>([
+            ...((likeRows ?? []).map((r) => r.outfit_id as string)),
+            ...localLikeIds,
+          ]);
+          setLikedSet(merged);
         }
+      } else if (!cancelled) {
+        setLikedSet(localLikeIds);
       }
 
       setProfileLoading(false);

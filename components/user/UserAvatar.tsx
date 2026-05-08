@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface UserAvatarProps {
@@ -20,14 +23,20 @@ const pixelMap = { sm: 32, md: 40, lg: 56, xl: 80 };
 function initials(value: string): string {
   const trimmed = value.trim();
   if (!trimmed) return "?";
-  // Take first letter of up to two whitespace-separated tokens
   const parts = trimmed.split(/\s+/).slice(0, 2);
   return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
 }
 
 export function UserAvatar({ src, alt, size = "md", className }: UserAvatarProps) {
   const trimmed = (src ?? "").trim();
-  const hasImage = trimmed.length > 0;
+  const [errored, setErrored] = useState(false);
+
+  // Reset error when the URL changes (e.g. user uploads a new avatar)
+  useEffect(() => {
+    setErrored(false);
+  }, [trimmed]);
+
+  const hasImage = trimmed.length > 0 && !errored;
   // An empty alt = decorative avatar (the name is rendered next to it).
   // Hide the wrapper from a11y so screen readers don't read the name twice.
   const decorative = alt.trim().length === 0;
@@ -50,6 +59,7 @@ export function UserAvatar({ src, alt, size = "md", className }: UserAvatarProps
           height={pixelMap[size]}
           className="object-cover w-full h-full"
           unoptimized={trimmed.startsWith("http")}
+          onError={() => setErrored(true)}
         />
       ) : (
         <span aria-hidden="true">{initials(alt || "?")}</span>
