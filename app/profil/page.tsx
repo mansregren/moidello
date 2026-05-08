@@ -335,6 +335,12 @@ export default function ProfilPage() {
             >
               Statistik
             </a>
+            <a
+              href="/profil/boards"
+              className="rounded-full border border-border text-white px-5 py-2 text-sm font-medium hover:border-white/30 transition-colors"
+            >
+              Samlingar
+            </a>
           </div>
 
           <div className="mt-6 flex gap-8 border-y border-border py-4">

@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 import type { Outfit } from "@/lib/types";
 import { toggleLike, toggleSave, postComment } from "@/app/actions/engagement";
 import { TrackView } from "@/components/outfit/TrackView";
+import { AddToBoardButton } from "@/components/outfit/AddToBoardButton";
 
 export default function OutfitDetail({
   outfit,
@@ -182,6 +183,12 @@ export default function OutfitDetail({
                   <Share2 className="h-5 w-5" />
                 </IconButton>
               </div>
+
+              {isPersisted && (
+                <div className="mb-8">
+                  <AddToBoardButton outfitId={outfit.id} />
+                </div>
+              )}
 
               <div className="mb-8">
                 <h3 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-4">
