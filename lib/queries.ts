@@ -577,6 +577,7 @@ export interface TaggedItemDetail {
   garment: string;
   isAffiliate: boolean;
   outfitId: string;
+  outfitSlug: string | null;
   outfitImage: string;
   outfitTitle: string;
   /** Tag's pinned x/y on the outfit image, in percent (0-100) */
@@ -605,6 +606,7 @@ interface TaggedItemDetailRow {
   outfit_id: string;
   outfits: {
     id: string;
+    slug: string | null;
     image_url: string;
     title: string;
     profiles: {
@@ -627,7 +629,7 @@ export async function fetchTaggedItemById(
       `id, brand, name, price, currency, buy_url, buy_urls, garment,
        position_x, position_y, is_affiliate, outfit_id,
        outfits(
-         id, image_url, title,
+         id, slug, image_url, title,
          profiles!outfits_user_id_fkey(id, username, display_name, avatar_url)
        )`,
     )
@@ -650,6 +652,7 @@ export async function fetchTaggedItemById(
     garment: r.garment,
     isAffiliate: r.is_affiliate,
     outfitId: r.outfit_id,
+    outfitSlug: r.outfits.slug,
     outfitImage: r.outfits.image_url,
     outfitTitle: r.outfits.title,
     positionX: Number(r.position_x),

@@ -8,6 +8,7 @@ import { UserAvatar } from "../user/UserAvatar";
 import { useEffect, useState, useTransition, MouseEvent } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
+import { outfitPath } from "@/lib/outfit-url";
 import { toggleLike, toggleSave } from "@/app/actions/engagement";
 
 interface OutfitCardProps {
@@ -90,7 +91,7 @@ export function OutfitCard({
   return (
     <div className="group">
       <Link
-        href={`/outfit/${outfit.id}`}
+        href={outfitPath(outfit)}
         aria-label={`${outfit.title} av ${outfit.creator.displayName}, ${outfit.tags.length} taggade plagg`}
       >
         <div

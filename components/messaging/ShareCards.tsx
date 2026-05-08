@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Tag, ExternalLink } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { outfitPathFromParts } from "@/lib/outfit-url";
 
 export interface OutfitShareData {
   outfit_id: string;
@@ -16,6 +17,7 @@ export interface ItemShareData {
 
 interface OutfitPreview {
   id: string;
+  slug: string | null;
   title: string;
   image_url: string;
   tag_count: number;
@@ -51,7 +53,7 @@ export function OutfitShareCard({
       const { data: row } = await supabase
         .from("outfits")
         .select(
-          `id, title, image_url,
+          `id, slug, title, image_url,
            profiles!outfits_user_id_fkey(username, display_name),
            tagged_items(id)`,
         )
@@ -64,6 +66,7 @@ export function OutfitShareCard({
       }
       const r = row as unknown as {
         id: string;
+        slug: string | null;
         title: string;
         image_url: string;
         profiles: { username: string; display_name: string | null } | null;
@@ -71,6 +74,7 @@ export function OutfitShareCard({
       };
       setPreview({
         id: r.id,
+        slug: r.slug,
         title: r.title,
         image_url: r.image_url,
         tag_count: r.tagged_items?.length ?? 0,
@@ -103,7 +107,14 @@ export function OutfitShareCard({
 
   return (
     <ShareCardShell fromMe={fromMe}>
-      <Link href={`/outfit/${preview.id}`} className="block">
+      <Link
+        href={outfitPathFromParts(
+          preview.creator_username,
+          preview.slug,
+          preview.id,
+        )}
+        className="block"
+      >
         <div className="relative aspect-[3/4] bg-background-tertiary">
           <Image
             src={preview.image_url}

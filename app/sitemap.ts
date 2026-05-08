@@ -29,7 +29,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [outfitsRes, profilesRes, brandsRes] = await Promise.all([
     supabase
       .from("outfits")
-      .select("id, updated_at, created_at")
+      .select(
+        `id, slug, updated_at, created_at,
+         profiles!outfits_user_id_fkey(username)`,
+      )
       .eq("is_published", true)
       .order("created_at", { ascending: false })
       .limit(10000),
@@ -41,16 +44,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .select("brand"),
   ]);
 
-  const outfitRoutes: MetadataRoute.Sitemap = (outfitsRes.data ?? []).map((o) => ({
-    url: `${BASE_URL}/outfit/${o.id}`,
-    lastModified: o.updated_at
-      ? new Date(o.updated_at as string)
-      : o.created_at
-        ? new Date(o.created_at as string)
-        : now,
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }));
+  type OutfitRow = {
+    id: string;
+    slug: string | null;
+    updated_at: string | null;
+    created_at: string | null;
+    profiles: { username: string } | null;
+  };
+  const outfitRoutes: MetadataRoute.Sitemap = (
+    (outfitsRes.data ?? []) as unknown as OutfitRow[]
+  ).map((o) => {
+    const username = o.profiles?.username?.toLowerCase();
+    const path =
+      o.slug && username
+        ? `/${username}/${o.slug}`
+        : `/outfit/${o.id}`;
+    return {
+      url: `${BASE_URL}${path}`,
+      lastModified: o.updated_at
+        ? new Date(o.updated_at)
+        : o.created_at
+          ? new Date(o.created_at)
+          : now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    };
+  });
 
   // Skip the trigger-default usernames ("user_xxx") so we don't index
   // half-set-up profiles. Lowercase to match the canonical URL.

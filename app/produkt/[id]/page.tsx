@@ -10,6 +10,7 @@ import { ShareButton } from "@/components/shared/ShareButton";
 import { UserLink } from "@/components/shared/UserLink";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { produktPageJsonLd } from "@/lib/json-ld";
+import { outfitPathFromParts } from "@/lib/outfit-url";
 import { ProduktSaveAndShare } from "./ProduktSaveAndShare";
 
 function isUsableBuyUrl(url: string | undefined): url is string {
@@ -80,13 +81,15 @@ export default async function ProduktPage({
           buyUrl: item.buyUrl,
           outfitImage: item.outfitImage,
           outfitId: item.outfitId,
+          outfitSlug: item.outfitSlug,
           outfitTitle: item.outfitTitle,
+          outfitCreatorUsername: item.creator.username,
         })}
       />
       <main id="main" tabIndex={-1} className="flex-1 pt-6 md:pt-10">
         <Container>
           <Link
-            href={`/outfit/${item.outfitId}`}
+            href={outfitPathFromParts(item.creator.username, item.outfitSlug, item.outfitId)}
             className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -166,7 +169,7 @@ export default async function ProduktPage({
                   Sett i outfit
                 </p>
                 <Link
-                  href={`/outfit/${item.outfitId}`}
+                  href={outfitPathFromParts(item.creator.username, item.outfitSlug, item.outfitId)}
                   aria-label={item.outfitTitle}
                   className="flex items-center gap-3 hover:opacity-90 transition-opacity"
                 >
@@ -224,7 +227,7 @@ export default async function ProduktPage({
               <p className="text-sm text-foreground-muted">
                 Plagget syns hittills bara i{" "}
                 <Link
-                  href={`/outfit/${item.outfitId}`}
+                  href={outfitPathFromParts(item.creator.username, item.outfitSlug, item.outfitId)}
                   className="text-white border-b border-white/30 hover:border-white"
                 >
                   ursprungsoutfiten

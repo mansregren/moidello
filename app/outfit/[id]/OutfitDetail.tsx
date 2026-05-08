@@ -28,6 +28,7 @@ import { ShareButton } from "@/components/shared/ShareButton";
 import { ShareToDmSheet } from "@/components/shared/ShareToDmSheet";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { outfitPageJsonLd } from "@/lib/json-ld";
+import { outfitPath } from "@/lib/outfit-url";
 import { Send } from "lucide-react";
 
 export default function OutfitDetail({
@@ -253,7 +254,7 @@ export default function OutfitDetail({
                   </button>
                 )}
                 <ShareButton
-                  url={`/outfit/${outfit.id}`}
+                  url={outfitPath(outfit)}
                   title={outfit.title}
                   text={outfit.description || `Outfit av ${outfit.creator.displayName}`}
                   label="Dela länk"

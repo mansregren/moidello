@@ -25,6 +25,7 @@ function abs(src: string | null | undefined): string {
 
 interface OutfitRow {
   id: string;
+  slug: string | null;
   title: string;
   description: string | null;
   category: string | null;
@@ -61,7 +62,7 @@ export async function GET() {
     supabase
       .from("outfits")
       .select(
-        `id, title, description, category, image_url,
+        `id, slug, title, description, category, image_url,
          profiles!outfits_user_id_fkey(username, display_name),
          tagged_items(brand, name)`,
       )
@@ -82,7 +83,10 @@ export async function GET() {
 
   for (const o of outfits) {
     if (!o.image_url) continue;
-    const pageUrl = `${SITE_BASE}/outfit/${o.id}`;
+    const username = o.profiles?.username?.toLowerCase();
+    const pagePath =
+      o.slug && username ? `/${username}/${o.slug}` : `/outfit/${o.id}`;
+    const pageUrl = `${SITE_BASE}${pagePath}`;
     const imageUrl = abs(o.image_url);
     const caption = outfitCaption(o);
     urls.push(

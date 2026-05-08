@@ -130,7 +130,12 @@ export function productJsonLd(item: {
 
 /** Combined graph for an outfit detail page. */
 export function outfitPageJsonLd(outfit: Outfit) {
-  const outfitUrl = `/outfit/${outfit.id}`;
+  // Match the canonical URL the layout sets — /<username>/<slug> when
+  // both are present, /outfit/<id> as a fallback for legacy/mock rows.
+  const outfitUrl =
+    outfit.slug && outfit.creator.username
+      ? `/${outfit.creator.username.toLowerCase()}/${outfit.slug}`
+      : `/outfit/${outfit.id}`;
   const graph: object[] = [
     {
       "@type": "ImageObject",
@@ -200,7 +205,11 @@ export function profilePageJsonLd(user: User, outfits: Outfit[]) {
         itemListElement: outfits.slice(0, 50).map((o, i) => ({
           "@type": "ListItem",
           position: i + 1,
-          url: abs(`/outfit/${o.id}`),
+          url: abs(
+            o.slug && o.creator.username
+              ? `/${o.creator.username.toLowerCase()}/${o.slug}`
+              : `/outfit/${o.id}`,
+          ),
           name: o.title,
           image: abs(o.image),
         })),
@@ -219,8 +228,14 @@ export function produktPageJsonLd(item: {
   buyUrl?: string;
   outfitImage: string;
   outfitId: string;
+  outfitSlug?: string | null;
   outfitTitle: string;
+  outfitCreatorUsername?: string;
 }) {
+  const outfitPath =
+    item.outfitSlug && item.outfitCreatorUsername
+      ? `/${item.outfitCreatorUsername.toLowerCase()}/${item.outfitSlug}`
+      : `/outfit/${item.outfitId}`;
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -241,7 +256,7 @@ export function produktPageJsonLd(item: {
             "@type": "ListItem",
             position: 2,
             name: item.outfitTitle,
-            item: abs(`/outfit/${item.outfitId}`),
+            item: abs(outfitPath),
           },
           {
             "@type": "ListItem",
