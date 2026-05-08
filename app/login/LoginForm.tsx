@@ -6,14 +6,13 @@ import { motion } from "framer-motion";
 import { PremiumButton } from "@/components/shared/PremiumButton";
 import { createClient } from "@/lib/supabase/client";
 
-type Phase = "email" | "code";
+type Phase = "email" | "code" | "password";
 
 export default function LoginForm({ initialError }: { initialError?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
-  // If we landed here via a failed magic-link callback, jump straight to the
-  // code-input phase so the user can paste the OTP from the same email.
+  const [password, setPassword] = useState("");
   const [phase, setPhase] = useState<Phase>(initialError ? "code" : "email");
   const [pending, setPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>(
@@ -21,6 +20,22 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
       ? "Inloggningslänken kunde inte verifieras. Skriv 6-siffrig kod nedan istället."
       : "",
   );
+
+  async function navigateAfterSignIn(userId: string) {
+    const supabase = createClient();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", userId)
+      .maybeSingle();
+
+    router.refresh();
+    if (profile?.username?.startsWith("user_")) {
+      router.push("/onboarding");
+    } else {
+      router.push("/upptack");
+    }
+  }
 
   async function handleSendLink(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -67,19 +82,29 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
       return;
     }
 
-    const userId = data.session.user.id;
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("username")
-      .eq("id", userId)
-      .maybeSingle();
+    await navigateAfterSignIn(data.session.user.id);
+  }
 
-    router.refresh();
-    if (profile?.username?.startsWith("user_")) {
-      router.push("/onboarding");
-    } else {
-      router.push("/upptack");
+  async function handlePasswordSignIn(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!email || !password || pending) return;
+
+    setPending(true);
+    setErrorMessage("");
+
+    const supabase = createClient();
+    const { error, data } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error || !data.session) {
+      setPending(false);
+      setErrorMessage(error?.message ?? "Fel e-post eller lösenord.");
+      return;
     }
+
+    await navigateAfterSignIn(data.session.user.id);
   }
 
   return (
@@ -97,7 +122,9 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
           <p className="text-foreground-muted mt-2 text-sm">
             {phase === "code"
               ? `Vi har mailat dig en länk + 6-siffrig kod${email ? ` till ${email}` : ""}.`
-              : "Skriv din e-post — vi skickar en magisk länk."}
+              : phase === "password"
+                ? "Skriv din e-post och lösenord."
+                : "Skriv din e-post — vi skickar en magisk länk."}
           </p>
         </div>
 
@@ -134,6 +161,19 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
             >
               {pending ? "Skickar…" : "Skicka inloggningslänk"}
             </PremiumButton>
+
+            <p className="text-center text-xs text-foreground-subtle pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setPhase("password");
+                  setErrorMessage("");
+                }}
+                className="text-foreground-muted hover:text-white underline"
+              >
+                Logga in med lösenord istället
+              </button>
+            </p>
           </form>
         )}
 
@@ -209,6 +249,75 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 className="text-foreground-muted hover:text-white underline"
               >
                 Använd annan e-post
+              </button>
+            </p>
+          </form>
+        )}
+
+        {phase === "password" && (
+          <form onSubmit={handlePasswordSignIn} className="space-y-4">
+            <div>
+              <label
+                htmlFor="email-pw"
+                className="text-sm font-medium text-foreground-muted block mb-2"
+              >
+                E-post
+              </label>
+              <input
+                id="email-pw"
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="din@email.se"
+                className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="text-sm font-medium text-foreground-muted block mb-2"
+              >
+                Lösenord
+              </label>
+              <input
+                id="password"
+                type="password"
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+              />
+            </div>
+
+            {errorMessage && (
+              <p className="text-sm text-red-400">{errorMessage}</p>
+            )}
+
+            <PremiumButton
+              type="submit"
+              className="w-full mt-2"
+              size="lg"
+              disabled={pending || !email || !password}
+            >
+              {pending ? "Loggar in…" : "Logga in"}
+            </PremiumButton>
+
+            <p className="text-center text-xs text-foreground-subtle pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setPhase("email");
+                  setPassword("");
+                  setErrorMessage("");
+                }}
+                className="text-foreground-muted hover:text-white underline"
+              >
+                Tillbaka till magisk länk
               </button>
             </p>
           </form>
