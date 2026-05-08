@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Anton } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GenderProvider } from "@/lib/gender-context";
 import { ToastProvider } from "@/lib/toast-context";
 import { AuthProvider } from "@/lib/auth-context";
@@ -102,6 +103,7 @@ export default function RootLayout({
           </ToastProvider>
         </AuthProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
