@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Settings, X, Bell, Lock, HelpCircle, Info, LogOut } from "lucide-react";
@@ -10,6 +11,7 @@ import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { outfits, users } from "@/lib/data";
 import { useGender, matchesGenderFilter } from "@/lib/gender-context";
+import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
 type ProfileTab = "outfits" | "saved" | "about";
@@ -17,9 +19,22 @@ type ProfileTab = "outfits" | "saved" | "about";
 const me = users[0]; // Phase 1: demo "current user"
 
 export default function ProfilPage() {
+  const router = useRouter();
   const { gender } = useGender();
+  const { isLoggedIn, loading, signOut } = useAuth();
   const [tab, setTab] = useState<ProfileTab>("outfits");
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !isLoggedIn) {
+      router.push("/login");
+    }
+  }, [loading, isLoggedIn, router]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/");
+  };
 
   const myOutfits = outfits
     .filter((o) => o.creator.id === me.id && matchesGenderFilter(o.gender, gender))
@@ -183,7 +198,12 @@ export default function ProfilPage() {
                   <SettingsRow icon={Lock} label="Konto & sekretess" />
                   <SettingsRow icon={HelpCircle} label="Hjälp" />
                   <SettingsRow icon={Info} label="Om Moidello" />
-                  <SettingsRow icon={LogOut} label="Logga ut" danger />
+                  <SettingsRow
+                    icon={LogOut}
+                    label="Logga ut"
+                    danger
+                    onClick={handleSignOut}
+                  />
                 </ul>
               </motion.div>
             </motion.div>
@@ -260,14 +280,18 @@ function SettingsRow({
   icon: Icon,
   label,
   danger,
+  onClick,
 }: {
   icon: typeof Settings;
   label: string;
   danger?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <li>
       <button
+        type="button"
+        onClick={onClick}
         className={cn(
           "w-full flex items-center gap-3 py-4 text-left transition-colors",
           danger ? "text-red-400 hover:text-red-300" : "text-white hover:text-white/80"
