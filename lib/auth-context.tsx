@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   ReactNode,
 } from "react";
@@ -52,7 +53,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [activePrompt, setActivePrompt] = useState<AuthAction | null>(null);
-  const supabase = createClient();
+  // Memoize so the client identity stays stable; otherwise the useEffect
+  // below re-runs on every render and unmounts the subtree mid-render.
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
