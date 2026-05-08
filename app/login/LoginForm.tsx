@@ -85,6 +85,30 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
     await navigateAfterSignIn(data.session.user.id);
   }
 
+  async function handleGoogleSignIn() {
+    if (pending) return;
+    setPending(true);
+    setErrorMessage("");
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      setPending(false);
+      setErrorMessage(
+        error.message.includes("Provider not enabled")
+          ? "Google-inlogg är inte aktiverat ännu."
+          : error.message,
+      );
+    }
+    // On success the browser is redirected away; no need to setPending(false).
+  }
+
   async function handlePasswordSignIn(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!email || !password || pending) return;
@@ -127,6 +151,26 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 : "Skriv din e-post — vi skickar en magisk länk."}
           </p>
         </div>
+
+        {phase === "email" && (
+          <>
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={pending}
+              className="w-full inline-flex items-center justify-center gap-3 rounded-full bg-white text-black px-5 py-3 text-sm font-medium hover:bg-white/90 transition-colors active:scale-[0.98] disabled:opacity-60"
+            >
+              <GoogleIcon className="h-4 w-4" />
+              Fortsätt med Google
+            </button>
+
+            <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-wider text-foreground-subtle">
+              <span className="flex-1 h-px bg-white/10" />
+              eller
+              <span className="flex-1 h-px bg-white/10" />
+            </div>
+          </>
+        )}
 
         {phase === "email" && (
           <form onSubmit={handleSendLink} className="space-y-4">
@@ -324,5 +368,29 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
         )}
       </div>
     </motion.div>
+  );
+}
+
+function GoogleIcon({ className }: { className?: string }) {
+  // Google "G" mark — color values are the official brand palette.
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <path
+        d="M21.6 12.227c0-.7-.063-1.373-.18-2.018H12v3.818h5.382a4.604 4.604 0 0 1-1.998 3.018v2.51h3.232c1.89-1.745 2.984-4.31 2.984-7.328Z"
+        fill="#4285F4"
+      />
+      <path
+        d="M12 22c2.7 0 4.964-.895 6.616-2.445l-3.232-2.51c-.895.6-2.04.955-3.384.955-2.604 0-4.81-1.76-5.6-4.122H3.073v2.59A9.997 9.997 0 0 0 12 22Z"
+        fill="#34A853"
+      />
+      <path
+        d="M6.4 13.878a5.99 5.99 0 0 1 0-3.755V7.534H3.073a10 10 0 0 0 0 8.933L6.4 13.878Z"
+        fill="#FBBC04"
+      />
+      <path
+        d="M12 5.998c1.47 0 2.787.505 3.823 1.494l2.866-2.866C16.96 2.99 14.696 2 12 2A9.997 9.997 0 0 0 3.073 7.533L6.4 10.123C7.19 7.76 9.397 5.998 12 5.998Z"
+        fill="#EA4335"
+      />
+    </svg>
   );
 }
