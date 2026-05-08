@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useOptimistic, useState, useTransition } from "react";
-import { Heart, Bookmark, Share2, MessageCircle } from "lucide-react";
+import { Heart, Bookmark, MessageCircle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { OutfitTag } from "@/components/outfit/OutfitTag";
@@ -18,6 +18,7 @@ import type { Outfit, Region } from "@/lib/types";
 import { toggleLike, toggleSave, postComment } from "@/app/actions/engagement";
 import { TrackView } from "@/components/outfit/TrackView";
 import { AddToBoardButton } from "@/components/outfit/AddToBoardButton";
+import { ShareButton } from "@/components/shared/ShareButton";
 
 export default function OutfitDetail({
   outfit,
@@ -186,9 +187,13 @@ export default function OutfitDetail({
                   {saveState.count}
                 </span>
 
-                <IconButton size="lg" aria-label="Dela">
-                  <Share2 className="h-5 w-5" />
-                </IconButton>
+                <ShareButton
+                  url={`/outfit/${outfit.id}`}
+                  title={outfit.title}
+                  text={outfit.description || `Outfit av ${outfit.creator.displayName}`}
+                  label="Dela"
+                  variant="outline"
+                />
               </div>
 
               {isPersisted && (

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { LogOut, User as UserIcon, Plus, Bookmark } from "lucide-react";
+import { LogOut, User as UserIcon, Plus, Bookmark, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { useAuth } from "@/lib/auth-context";
@@ -83,6 +83,13 @@ export function UserMenu() {
                 onClick={() => setOpen(false)}
               >
                 Min profil
+              </MenuItem>
+              <MenuItem
+                href="/meddelanden"
+                icon={MessageCircle}
+                onClick={() => setOpen(false)}
+              >
+                Meddelanden
               </MenuItem>
               <MenuItem
                 href="/skapa"

@@ -13,6 +13,14 @@ interface ProfileRow {
   avatar_url: string | null;
   bio: string | null;
   region: string;
+  account_type?: "creator" | "brand" | null;
+  brand_name?: string | null;
+  brand_website?: string | null;
+  instagram?: string | null;
+  tiktok?: string | null;
+  youtube?: string | null;
+  website?: string | null;
+  contact_email?: string | null;
 }
 
 interface ProfileStatsRow {
@@ -76,6 +84,14 @@ function profileToUser(p: ProfileRow, stats?: ProfileStatsRow | null): MoidelloU
     following: stats?.following ?? 0,
     outfitCount: stats?.outfits ?? 0,
     region: p.region,
+    accountType: p.account_type ?? undefined,
+    brandName: p.brand_name ?? undefined,
+    brandWebsite: p.brand_website ?? undefined,
+    instagram: p.instagram ?? undefined,
+    tiktok: p.tiktok ?? undefined,
+    youtube: p.youtube ?? undefined,
+    website: p.website ?? undefined,
+    contactEmail: p.contact_email ?? undefined,
   };
 }
 
@@ -225,7 +241,9 @@ export async function fetchProfileByUsername(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url, bio, region")
+    .select(
+      "id, username, display_name, avatar_url, bio, region, instagram, tiktok, youtube, website, contact_email",
+    )
     .eq("username", username)
     .maybeSingle();
 
@@ -249,7 +267,9 @@ export async function fetchCurrentProfile(): Promise<MoidelloUser | null> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url, bio, region")
+    .select(
+      "id, username, display_name, avatar_url, bio, region, instagram, tiktok, youtube, website, contact_email",
+    )
     .eq("id", user.id)
     .maybeSingle();
 
@@ -316,7 +336,9 @@ export async function fetchTopCreators(limit = 12): Promise<MoidelloUser[]> {
   const ids = stats.map((s) => s.profile_id as string);
   const { data: profiles } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url, bio, region")
+    .select(
+      "id, username, display_name, avatar_url, bio, region, instagram, tiktok, youtube, website, contact_email",
+    )
     .in("id", ids);
 
   const profileMap = new Map(

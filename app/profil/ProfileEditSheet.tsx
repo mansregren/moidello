@@ -29,10 +29,12 @@ const REGIONS = [
 export function ProfileEditSheet({
   open,
   onClose,
+  onSaved,
   profile,
 }: {
   open: boolean;
   onClose: () => void;
+  onSaved?: () => void;
   profile: MoidelloUser;
 }) {
   const [username, setUsername] = useState(profile.username);
@@ -42,6 +44,11 @@ export function ProfileEditSheet({
   const [isBrand, setIsBrand] = useState(profile.accountType === "brand");
   const [brandName, setBrandName] = useState(profile.brandName ?? "");
   const [brandWebsite, setBrandWebsite] = useState(profile.brandWebsite ?? "");
+  const [instagram, setInstagram] = useState(profile.instagram ?? "");
+  const [tiktok, setTiktok] = useState(profile.tiktok ?? "");
+  const [youtube, setYoutube] = useState(profile.youtube ?? "");
+  const [website, setWebsite] = useState(profile.website ?? "");
+  const [contactEmail, setContactEmail] = useState(profile.contactEmail ?? "");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,8 +65,10 @@ export function ProfileEditSheet({
       // Refresh server components so root layout re-fetches profile
       // → header avatar updates immediately.
       router.refresh();
+      // Tell the parent (/profil) to re-fetch its DB-backed state too.
+      onSaved?.();
     }
-  }, [state.ok, onClose, router]);
+  }, [state.ok, onClose, router, onSaved]);
 
   useEffect(() => {
     if (!avatarFile) {
@@ -231,6 +240,62 @@ export function ProfileEditSheet({
                   ))}
                 </select>
               </Field>
+
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-foreground-muted">
+                  Sociala länkar (lämna tomt för att dölja)
+                </p>
+                <Field label="Instagram">
+                  <input
+                    name="instagram"
+                    type="text"
+                    value={instagram}
+                    onChange={(e) => setInstagram(e.target.value)}
+                    placeholder="@dittnamn eller https://instagram.com/..."
+                    className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30"
+                  />
+                </Field>
+                <Field label="TikTok">
+                  <input
+                    name="tiktok"
+                    type="text"
+                    value={tiktok}
+                    onChange={(e) => setTiktok(e.target.value)}
+                    placeholder="@dittnamn"
+                    className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30"
+                  />
+                </Field>
+                <Field label="YouTube">
+                  <input
+                    name="youtube"
+                    type="text"
+                    value={youtube}
+                    onChange={(e) => setYoutube(e.target.value)}
+                    placeholder="@kanalnamn eller URL"
+                    className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30"
+                  />
+                </Field>
+                <Field label="Webbsida">
+                  <input
+                    name="website"
+                    type="text"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    placeholder="dinsida.se"
+                    className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30"
+                  />
+                </Field>
+                <Field label="Kontakt-e-post (valfri, syns publikt)">
+                  <input
+                    name="contact_email"
+                    type="email"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    placeholder="kontakt@dinsida.se"
+                    className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30"
+                  />
+                </Field>
+              </div>
 
               <div className="rounded-xl bg-background-tertiary border border-border p-4 space-y-3">
                 <label className="flex items-start gap-3 cursor-pointer">

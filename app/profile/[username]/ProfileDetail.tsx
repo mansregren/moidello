@@ -7,7 +7,10 @@ import { Globe } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { UserAvatar } from "@/components/user/UserAvatar";
+import { SocialLinks } from "@/components/user/SocialLinks";
+import { MessageButton } from "@/components/user/MessageButton";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
+import { ShareButton } from "@/components/shared/ShareButton";
 import { useAuth } from "@/lib/auth-context";
 import { motion } from "framer-motion";
 import type { Outfit, User as MoidelloUser } from "@/lib/types";
@@ -143,21 +146,35 @@ export default function ProfileDetail({
               </div>
             </div>
 
-            {!isOwnProfile && (
-              <div className="mt-6">
-                <button
-                  type="button"
-                  onClick={handleFollow}
-                  className={`rounded-full px-6 py-2 text-sm font-semibold transition-colors ${
-                    following
-                      ? "border border-border text-white hover:border-white/30"
-                      : "bg-white text-black hover:bg-white/90"
-                  }`}
-                >
-                  {following ? "Följer" : "Följ"}
-                </button>
-              </div>
-            )}
+            <SocialLinks user={user} className="mt-5" />
+
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              {!isOwnProfile && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleFollow}
+                    className={`rounded-full px-6 py-2 text-sm font-semibold transition-colors ${
+                      following
+                        ? "border border-border text-white hover:border-white/30"
+                        : "bg-white text-black hover:bg-white/90"
+                    }`}
+                  >
+                    {following ? "Följer" : "Följ"}
+                  </button>
+                  <MessageButton userId={user.id} />
+                </>
+              )}
+              <ShareButton
+                url={`/profile/${user.username}`}
+                title={`${user.displayName} på Moidello`}
+                text={
+                  user.bio
+                    ? `${user.displayName} — ${user.bio}`
+                    : `Kolla in ${user.displayName} på Moidello`
+                }
+              />
+            </div>
           </motion.div>
 
           <div className="flex justify-center border-b border-border mb-8">

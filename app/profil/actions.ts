@@ -39,6 +39,12 @@ export async function updateProfile(
   const brandName = ((formData.get("brand_name") as string | null) ?? "").trim();
   const brandWebsite = ((formData.get("brand_website") as string | null) ?? "")
     .trim();
+  const instagram = ((formData.get("instagram") as string | null) ?? "").trim();
+  const tiktok = ((formData.get("tiktok") as string | null) ?? "").trim();
+  const youtube = ((formData.get("youtube") as string | null) ?? "").trim();
+  const website = ((formData.get("website") as string | null) ?? "").trim();
+  const contactEmail = ((formData.get("contact_email") as string | null) ?? "")
+    .trim();
   const avatar = formData.get("avatar");
 
   if (!USERNAME_RE.test(username)) {
@@ -105,6 +111,11 @@ export async function updateProfile(
     brand_name: accountType === "brand" ? brandName : null,
     brand_website:
       accountType === "brand" ? (brandWebsite || null) : null,
+    instagram: instagram || null,
+    tiktok: tiktok || null,
+    youtube: youtube || null,
+    website: website || null,
+    contact_email: contactEmail || null,
   };
   if (avatarUrl) fields.avatar_url = avatarUrl;
 

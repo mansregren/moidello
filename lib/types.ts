@@ -18,6 +18,12 @@ export interface User {
   accountType?: AccountType;
   brandName?: string;
   brandWebsite?: string;
+  /** Optional public links — empty/undefined means hidden. */
+  instagram?: string;
+  tiktok?: string;
+  youtube?: string;
+  website?: string;
+  contactEmail?: string;
 }
 
 export type GarmentType =

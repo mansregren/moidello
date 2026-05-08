@@ -22,6 +22,8 @@ import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import type { Outfit, User as MoidelloUser } from "@/lib/types";
 import { ProfileEditSheet } from "./ProfileEditSheet";
+import { ShareButton } from "@/components/shared/ShareButton";
+import { SocialLinks } from "@/components/user/SocialLinks";
 
 type ProfileTab = "outfits" | "saved" | "about";
 
@@ -44,6 +46,7 @@ export default function ProfilPage() {
   const [tab, setTab] = useState<ProfileTab>("outfits");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [profile, setProfile] = useState<MoidelloUser | null>(null);
   const [outfits, setOutfits] = useState<Outfit[]>([]);
   const [savedOutfits, setSavedOutfits] = useState<Outfit[]>([]);
@@ -252,7 +255,7 @@ export default function ProfilPage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, reloadKey]);
 
   const filteredOutfits = useMemo(
     () => outfits.filter((o) => matchesGenderFilter(o.gender, gender)),
@@ -330,6 +333,8 @@ export default function ProfilPage() {
             </p>
           )}
 
+          <SocialLinks user={profile} className="mt-5" />
+
           <div className="mt-5 flex flex-wrap gap-3">
             <button
               type="button"
@@ -338,6 +343,12 @@ export default function ProfilPage() {
             >
               Redigera profil
             </button>
+            <ShareButton
+              url={`/profile/${profile.username}`}
+              title={`${profile.displayName} på Moidello`}
+              text={`Kolla in min profil på Moidello`}
+              label="Dela profil"
+            />
             <a
               href="/profil/statistik"
               className="rounded-full border border-border text-white px-5 py-2 text-sm font-medium hover:border-white/30 transition-colors"
@@ -448,6 +459,7 @@ export default function ProfilPage() {
         <ProfileEditSheet
           open={editOpen}
           onClose={() => setEditOpen(false)}
+          onSaved={() => setReloadKey((k) => k + 1)}
           profile={profile}
         />
 
