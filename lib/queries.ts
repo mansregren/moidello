@@ -143,9 +143,32 @@ function rowToOutfit(row: OutfitRow): Outfit {
 const OUTFIT_COLUMNS = `
   id, user_id, image_url, type, gender, title, description, category, created_at,
   profiles ( id, username, display_name, avatar_url, bio, region ),
-  tagged_items ( id, brand, name, price, currency, buy_url, buy_urls, garment, position_x, position_y, is_affiliate ),
-  outfit_stats ( outfit_id, likes, saves, comments )
+  tagged_items ( id, brand, name, price, currency, buy_url, buy_urls, garment, position_x, position_y, is_affiliate )
 `;
+
+/**
+ * Hydrate Outfit objects with their outfit_stats counts. The view doesn't
+ * expose a foreign-key relationship to outfits in PostgREST's metadata so
+ * embedded selects can fail; fetching it as a separate query is reliable.
+ */
+async function attachOutfitStats(outfits: Outfit[]): Promise<Outfit[]> {
+  if (outfits.length === 0) return outfits;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("outfit_stats")
+    .select("outfit_id, likes, saves, comments")
+    .in("outfit_id", outfits.map((o) => o.id));
+  if (!data) return outfits;
+  const byId = new Map<string, { likes: number; saves: number }>();
+  for (const r of data as Array<{ outfit_id: string; likes: number; saves: number }>) {
+    byId.set(r.outfit_id, { likes: r.likes, saves: r.saves });
+  }
+  return outfits.map((o) => {
+    const s = byId.get(o.id);
+    if (!s) return o;
+    return { ...o, likes: s.likes, saves: s.saves };
+  });
+}
 
 /**
  * Returns published outfits ordered by recency. Empty array if the table
@@ -166,7 +189,8 @@ export async function fetchOutfits(limit = 60): Promise<Outfit[]> {
     return [];
   }
 
-  return ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  return attachOutfitStats(mapped);
 }
 
 export async function fetchOutfitsByUser(userId: string): Promise<Outfit[]> {
@@ -181,7 +205,8 @@ export async function fetchOutfitsByUser(userId: string): Promise<Outfit[]> {
     if (error.code === "42P01") return [];
     return [];
   }
-  return ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  return attachOutfitStats(mapped);
 }
 
 export async function fetchSavedOutfitsByUser(userId: string): Promise<Outfit[]> {
@@ -193,10 +218,11 @@ export async function fetchSavedOutfitsByUser(userId: string): Promise<Outfit[]>
     .order("created_at", { ascending: false });
 
   if (error) return [];
-  return ((data ?? []) as unknown as { outfit: OutfitRow | null }[])
+  const mapped = ((data ?? []) as unknown as { outfit: OutfitRow | null }[])
     .map((r) => r.outfit)
     .filter((o): o is OutfitRow => !!o)
     .map(rowToOutfit);
+  return attachOutfitStats(mapped);
 }
 
 export async function fetchOutfitById(id: string): Promise<Outfit | null> {
@@ -208,7 +234,9 @@ export async function fetchOutfitById(id: string): Promise<Outfit | null> {
     .maybeSingle();
 
   if (error || !data) return null;
-  return rowToOutfit(data as unknown as OutfitRow);
+  const mapped = rowToOutfit(data as unknown as OutfitRow);
+  const [withStats] = await attachOutfitStats([mapped]);
+  return withStats;
 }
 
 export async function fetchOutfitComments(
@@ -376,10 +404,11 @@ export async function fetchTopOutfits(limit = 12): Promise<Outfit[]> {
     (outfitRows as unknown as OutfitRow[]).map((o) => [o.id, o]),
   );
   // Preserve sort order from outfit_stats
-  return statsRows
+  const ordered = statsRows
     .map((r) => byId.get(r.outfit_id as string))
     .filter((o): o is OutfitRow => !!o)
     .map(rowToOutfit);
+  return attachOutfitStats(ordered);
 }
 
 export interface BrandAggregate {
@@ -490,7 +519,8 @@ export async function fetchBrandOutfits(brandName: string): Promise<Outfit[]> {
     .eq("is_published", true)
     .order("created_at", { ascending: false });
 
-  return ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  return attachOutfitStats(mapped);
 }
 
 export async function isFollowing(followeeId: string): Promise<boolean> {
