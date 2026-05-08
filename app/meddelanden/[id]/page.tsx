@@ -44,8 +44,8 @@ export default async function ConversationPage({
     .from("conversations")
     .select(
       `id, user_a, user_b,
-       user_a_profile:profiles!user_a(id, username, display_name, avatar_url),
-       user_b_profile:profiles!user_b(id, username, display_name, avatar_url)`,
+       user_a_profile:profiles!conversations_user_a_fkey(id, username, display_name, avatar_url),
+       user_b_profile:profiles!conversations_user_b_fkey(id, username, display_name, avatar_url)`,
     )
     .eq("id", id)
     .maybeSingle();

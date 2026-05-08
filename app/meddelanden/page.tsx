@@ -58,8 +58,8 @@ export default async function MeddelandenPage() {
     .from("conversations")
     .select(
       `id, user_a, user_b, last_message_at,
-       user_a_profile:profiles!user_a(id, username, display_name, avatar_url),
-       user_b_profile:profiles!user_b(id, username, display_name, avatar_url)`,
+       user_a_profile:profiles!conversations_user_a_fkey(id, username, display_name, avatar_url),
+       user_b_profile:profiles!conversations_user_b_fkey(id, username, display_name, avatar_url)`,
     )
     .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
     .order("last_message_at", { ascending: false });
