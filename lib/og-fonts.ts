@@ -5,11 +5,12 @@
  * on GitHub which always serves TTF.
  */
 
+// Both pulled from fontsource. The google/fonts version of Anton ships
+// a DSIG (digital-signature) table that Satori chokes on with
+// "Cannot read properties of undefined (reading '256')". Fontsource
+// strips DSIG and ships a latin-subset TTF.
 const ANTON_URL =
-  "https://github.com/google/fonts/raw/main/ofl/anton/Anton-Regular.ttf";
-// Static, non-variable Inter — Satori (the engine behind ImageResponse)
-// historically fails on the variable-font shipped in google/fonts, so we
-// pull from fontsource which provides a per-weight TTF.
+  "https://cdn.jsdelivr.net/fontsource/fonts/anton@latest/latin-400-normal.ttf";
 const INTER_REGULAR_URL =
   "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf";
 
