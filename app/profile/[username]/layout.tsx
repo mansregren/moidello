@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { users as mockUsers } from "@/lib/data";
 import { fetchProfileByUsername } from "@/lib/queries";
 
 export async function generateMetadata({
@@ -7,7 +8,9 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
-  const user = await fetchProfileByUsername(username);
+  const user =
+    (await fetchProfileByUsername(username)) ??
+    mockUsers.find((u) => u.username === username);
 
   if (!user) {
     return {

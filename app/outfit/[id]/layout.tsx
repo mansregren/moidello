@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { outfits as mockOutfits } from "@/lib/data";
 import { fetchOutfitById } from "@/lib/queries";
 
 export async function generateMetadata({
@@ -7,7 +8,8 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const outfit = await fetchOutfitById(id);
+  const outfit =
+    (await fetchOutfitById(id)) ?? mockOutfits.find((o) => o.id === id);
 
   if (!outfit) {
     return {
