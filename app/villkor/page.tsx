@@ -16,7 +16,7 @@ export default function VillkorPage() {
               Användarvillkor
             </h1>
             <p className="mt-6 text-sm text-foreground-muted">
-              Senast uppdaterad 6 maj 2026
+              Senast uppdaterad 8 maj 2026
             </p>
           </div>
 
@@ -76,7 +76,25 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
-                5. Affiliate-länkar och marknadsföring
+                5. Licens till uppladdat innehåll
+              </h2>
+              <p>
+                Du behåller äganderätten till ditt innehåll. Genom att ladda
+                upp ger du Moidello rätt att använda, visa och dela det på
+                våra sociala medier och i marknadsföring, med kreditering
+                till din profil. Licensen upphör för framtida användning om
+                du raderar innehållet, men redan publicerat material på
+                sociala medier kan ligga kvar.
+              </p>
+              <p className="mt-4">
+                Du intygar att du har rätt till innehållet och samtycke från
+                personer som syns på bilderna.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+                6. Affiliate-länkar och marknadsföring
               </h2>
               <p>
                 Innehåll som innehåller affiliate-länkar eller annan
@@ -94,7 +112,7 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
-                6. Otillåtet innehåll
+                7. Otillåtet innehåll
               </h2>
               <p>
                 Det är inte tillåtet att publicera innehåll som:
@@ -110,7 +128,7 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
-                7. Moderation
+                8. Moderation
               </h2>
               <p>
                 Moidello förbehåller sig rätten att ta bort innehåll, begränsa
@@ -122,7 +140,7 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
-                8. Immateriella rättigheter
+                9. Immateriella rättigheter
               </h2>
               <p>
                 Moidello, logotyp, varumärken och plattformens design tillhör
@@ -133,7 +151,7 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
-                9. Ansvarsbegränsning
+                10. Ansvarsbegränsning
               </h2>
               <p>
                 Tjänsten tillhandahålls i befintligt skick utan garantier av
@@ -146,7 +164,7 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
-                10. Ändringar
+                11. Ändringar
               </h2>
               <p>
                 Villkoren kan uppdateras. Vid väsentliga ändringar informeras
@@ -157,7 +175,7 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
-                11. Tillämplig lag
+                12. Tillämplig lag
               </h2>
               <p>
                 Svensk lag tillämpas på Villkoren. Tvister avgörs av svensk
@@ -167,7 +185,7 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
-                12. Kontakt
+                13. Kontakt
               </h2>
               <p>
                 Frågor om Villkoren skickas till{" "}

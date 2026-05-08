@@ -6,7 +6,6 @@ import {
   fetchEngagementForViewer,
   isFollowing,
 } from "@/lib/queries";
-import { outfits as mockOutfits } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_REGION } from "@/lib/region";
 import OutfitDetail from "./OutfitDetail";
@@ -20,29 +19,20 @@ export default async function OutfitPage({
 }) {
   const { id } = await params;
 
-  // Real DB rows are uuids; mock fixtures use ids like "1", "2". Fall back
-  // to the mock outfit so seed cards on the home page resolve to a real
-  // detail view while the platform is empty.
-  const dbOutfit = await fetchOutfitById(id);
-  const mockMatch = mockOutfits.find((o) => o.id === id);
-  if (!dbOutfit && !mockMatch) notFound();
-  const outfit = dbOutfit ?? mockMatch!;
+  const outfit = await fetchOutfitById(id);
+  if (!outfit) notFound();
 
   const [allOutfits, comments, engagement, followingCreator] = await Promise.all([
     fetchOutfits(20),
-    dbOutfit ? fetchOutfitComments(outfit.id) : Promise.resolve([]),
-    dbOutfit
-      ? fetchEngagementForViewer([outfit.id])
-      : Promise.resolve({ liked: new Set<string>(), saved: new Set<string>() }),
-    dbOutfit ? isFollowing(outfit.creator.id) : Promise.resolve(false),
+    fetchOutfitComments(outfit.id),
+    fetchEngagementForViewer([outfit.id]),
+    isFollowing(outfit.creator.id),
   ]);
 
-  const similar = (allOutfits.length > 0 ? allOutfits : mockOutfits)
-    .filter((o) => o.id !== outfit.id)
-    .slice(0, 3);
+  const similar = allOutfits.filter((o) => o.id !== outfit.id).slice(0, 3);
 
   const similarEngagement = await fetchEngagementForViewer(
-    similar.filter((o) => /^[0-9a-f-]{36}$/i.test(o.id)).map((o) => o.id),
+    similar.map((o) => o.id),
   );
 
   // Resolve viewer region for region-aware buy URLs
@@ -69,7 +59,7 @@ export default async function OutfitPage({
       initiallyLiked={engagement.liked.has(outfit.id)}
       initiallySaved={engagement.saved.has(outfit.id)}
       initiallyFollowingCreator={followingCreator}
-      isPersisted={!!dbOutfit}
+      isPersisted
       viewerRegion={viewerRegion}
     />
   );

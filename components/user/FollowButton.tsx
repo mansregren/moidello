@@ -4,7 +4,6 @@ import { useEffect, useState, useTransition } from "react";
 import { PremiumButton } from "../shared/PremiumButton";
 import { useAuth } from "@/lib/auth-context";
 import { toggleFollow } from "@/app/actions/engagement";
-import { getLocalFollow, setLocalFollow } from "@/lib/local-engagement";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -27,13 +26,8 @@ export function FollowButton({
   const isPersisted = userId && UUID_RE.test(userId);
 
   useEffect(() => {
-    if (!userId) return;
-    if (isPersisted) {
-      setFollowing(initiallyFollowing);
-    } else {
-      setFollowing(getLocalFollow(userId));
-    }
-  }, [userId, initiallyFollowing, isPersisted]);
+    setFollowing(initiallyFollowing);
+  }, [userId, initiallyFollowing]);
 
   if (isOwnProfile) return null;
 
@@ -44,10 +38,7 @@ export function FollowButton({
     }
     const next = !following;
     setFollowing(next);
-    if (!isPersisted) {
-      if (userId) setLocalFollow(userId, next);
-      return;
-    }
+    if (!isPersisted) return;
     startTransition(async () => {
       const res = await toggleFollow(userId!);
       if (!res.ok) setFollowing(!next);

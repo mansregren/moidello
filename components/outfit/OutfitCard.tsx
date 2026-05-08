@@ -9,12 +9,6 @@ import { useEffect, useState, useTransition, MouseEvent } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { toggleLike, toggleSave } from "@/app/actions/engagement";
-import {
-  getLocalLike,
-  getLocalSave,
-  setLocalLike,
-  setLocalSave,
-} from "@/lib/local-engagement";
 
 interface OutfitCardProps {
   outfit: Outfit;
@@ -46,15 +40,8 @@ export function OutfitCard({
   const [saveCount, setSaveCount] = useState(outfit.saves);
 
   useEffect(() => {
-    if (isPersisted) {
-      setLiked(initiallyLiked);
-      setSaved(initiallySaved);
-    } else {
-      // Seed/mock outfit — read state from localStorage so refreshes
-      // don't reset the heart/bookmark we just toggled.
-      setLiked(getLocalLike(outfit.id));
-      setSaved(getLocalSave(outfit.id));
-    }
+    setLiked(initiallyLiked);
+    setSaved(initiallySaved);
     setLikeCount(outfit.likes);
     setSaveCount(outfit.saves);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -70,14 +57,10 @@ export function OutfitCard({
     const next = !liked;
     setLiked(next);
     setLikeCount((c) => c + (next ? 1 : -1));
-    if (!isPersisted) {
-      setLocalLike(outfit.id, next);
-      return;
-    }
+    if (!isPersisted) return;
     startTransition(async () => {
       const res = await toggleLike(outfit.id);
       if (!res.ok) {
-        // Roll back
         setLiked(!next);
         setLikeCount((c) => c + (next ? -1 : 1));
       }
@@ -94,10 +77,7 @@ export function OutfitCard({
     const next = !saved;
     setSaved(next);
     setSaveCount((c) => c + (next ? 1 : -1));
-    if (!isPersisted) {
-      setLocalSave(outfit.id, next);
-      return;
-    }
+    if (!isPersisted) return;
     startTransition(async () => {
       const res = await toggleSave(outfit.id);
       if (!res.ok) {
