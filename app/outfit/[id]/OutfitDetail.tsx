@@ -263,6 +263,7 @@ export default function OutfitDetail({
                         key={tag.id}
                         item={tag}
                         outfitId={isPersisted ? outfit.id : undefined}
+                        outfitImage={outfit.image}
                         region={viewerRegion}
                         initiallySaved={savedItemIds.includes(tag.id)}
                       />
