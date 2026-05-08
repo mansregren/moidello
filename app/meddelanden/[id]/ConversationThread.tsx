@@ -5,12 +5,22 @@ import { Send } from "lucide-react";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { sendMessage } from "@/app/actions/messaging";
 import { createClient } from "@/lib/supabase/client";
+import {
+  OutfitShareCard,
+  ItemShareCard,
+  type OutfitShareData,
+  type ItemShareData,
+} from "@/components/messaging/ShareCards";
 
-interface Message {
+type ContentType = "text" | "outfit_share" | "item_share";
+
+export interface Message {
   id: string;
   sender_id: string;
   body: string;
   created_at: string;
+  content_type?: ContentType;
+  content_data?: Record<string, unknown> | null;
 }
 
 function formatTime(iso: string): string {
@@ -139,19 +149,35 @@ export function ConversationThread({
                 {!isMine && (
                   <UserAvatar src={otherAvatar} alt={otherName} size="sm" />
                 )}
-                <div
-                  className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
-                    isMine
-                      ? "bg-white text-black rounded-br-sm"
-                      : "bg-background-secondary text-white rounded-bl-sm"
-                  }`}
-                >
-                  <p className="text-sm whitespace-pre-wrap break-words">
-                    {m.body}
-                  </p>
+                <div className="flex flex-col items-end gap-1 max-w-[80%]">
+                  {m.content_type === "outfit_share" && m.content_data && (
+                    <OutfitShareCard
+                      fromMe={isMine}
+                      data={m.content_data as unknown as OutfitShareData}
+                    />
+                  )}
+                  {m.content_type === "item_share" && m.content_data && (
+                    <ItemShareCard
+                      fromMe={isMine}
+                      data={m.content_data as unknown as ItemShareData}
+                    />
+                  )}
+                  {m.body && (
+                    <div
+                      className={`rounded-2xl px-4 py-2.5 ${
+                        isMine
+                          ? "bg-white text-black rounded-br-sm"
+                          : "bg-background-secondary text-white rounded-bl-sm"
+                      } self-${isMine ? "end" : "start"}`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap break-words">
+                        {m.body}
+                      </p>
+                    </div>
+                  )}
                   <p
-                    className={`mt-1 text-[10px] tabular-nums ${
-                      isMine ? "text-black/40" : "text-foreground-subtle"
+                    className={`text-[10px] tabular-nums text-foreground-subtle ${
+                      isMine ? "self-end" : "self-start"
                     }`}
                   >
                     {formatTime(m.created_at)}

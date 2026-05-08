@@ -68,7 +68,9 @@ export default async function ConversationPage({
 
   const { data: msgData } = await supabase
     .from("messages")
-    .select("id, conversation_id, sender_id, body, read_at, created_at")
+    .select(
+      "id, conversation_id, sender_id, body, content_type, content_data, read_at, created_at",
+    )
     .eq("conversation_id", id)
     .order("created_at", { ascending: true });
 
@@ -116,6 +118,8 @@ export default async function ConversationPage({
               sender_id: string;
               body: string;
               created_at: string;
+              content_type?: "text" | "outfit_share" | "item_share";
+              content_data?: Record<string, unknown> | null;
             }>}
             otherAvatar={otherProfile.avatar_url ?? ""}
             otherName={otherProfile.display_name ?? otherProfile.username}

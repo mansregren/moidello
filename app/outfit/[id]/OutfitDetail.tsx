@@ -19,6 +19,8 @@ import { toggleLike, toggleSave, postComment } from "@/app/actions/engagement";
 import { TrackView } from "@/components/outfit/TrackView";
 import { AddToBoardButton } from "@/components/outfit/AddToBoardButton";
 import { ShareButton } from "@/components/shared/ShareButton";
+import { ShareToDmSheet } from "@/components/shared/ShareToDmSheet";
+import { Send } from "lucide-react";
 
 export default function OutfitDetail({
   outfit,
@@ -30,6 +32,7 @@ export default function OutfitDetail({
   initiallyFollowingCreator = false,
   isPersisted,
   viewerRegion,
+  savedItemIds = [],
 }: {
   outfit: Outfit;
   similar: Outfit[];
@@ -40,6 +43,7 @@ export default function OutfitDetail({
   initiallyFollowingCreator?: boolean;
   isPersisted: boolean;
   viewerRegion?: Region;
+  savedItemIds?: string[];
 }) {
   const { isLoggedIn, requireAuth, user } = useAuth();
   const [, startTransition] = useTransition();
@@ -51,6 +55,7 @@ export default function OutfitDetail({
   const [likeCount, setLikeCount] = useState(outfit.likes);
   const [saved, setSaved] = useState(initiallySaved);
   const [saveCount, setSaveCount] = useState(outfit.saves);
+  const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     setLiked(initiallyLiked);
@@ -100,6 +105,15 @@ export default function OutfitDetail({
     <>
       <Header />
       {isPersisted && <TrackView outfitId={outfit.id} />}
+      {isPersisted && (
+        <ShareToDmSheet
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          type="outfit_share"
+          refId={outfit.id}
+          title={outfit.title}
+        />
+      )}
       <main id="main" tabIndex={-1} className="flex-1 pt-20 md:pt-24">
         <Container>
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
@@ -196,6 +210,17 @@ export default function OutfitDetail({
                   {saveCount}
                 </span>
 
+                {isPersisted && (
+                  <button
+                    type="button"
+                    onClick={() => setShareOpen(true)}
+                    aria-label="Dela till meddelande"
+                    className="inline-flex items-center gap-2 rounded-full border border-border text-white px-4 py-2 text-sm font-medium hover:border-white/30 transition-colors"
+                  >
+                    <Send className="h-4 w-4" />
+                    Skicka
+                  </button>
+                )}
                 <ShareButton
                   url={`/outfit/${outfit.id}`}
                   title={outfit.title}
@@ -227,6 +252,7 @@ export default function OutfitDetail({
                         item={tag}
                         outfitId={isPersisted ? outfit.id : undefined}
                         region={viewerRegion}
+                        initiallySaved={savedItemIds.includes(tag.id)}
                       />
                     ))
                   )}

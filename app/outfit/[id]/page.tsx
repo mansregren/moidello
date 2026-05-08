@@ -35,19 +35,33 @@ export default async function OutfitPage({
     similar.map((o) => o.id),
   );
 
-  // Resolve viewer region for region-aware buy URLs
+  // Resolve viewer region for region-aware buy URLs + saved-item state
   const supabase = await createClient();
   const {
     data: { user: viewer },
   } = await supabase.auth.getUser();
   let viewerRegion = DEFAULT_REGION;
+  let savedItemIds: string[] = [];
   if (viewer) {
-    const { data: profileRow } = await supabase
-      .from("profiles")
-      .select("region")
-      .eq("id", viewer.id)
-      .maybeSingle();
+    const [{ data: profileRow }, { data: savedRows }] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("region")
+        .eq("id", viewer.id)
+        .maybeSingle(),
+      supabase
+        .from("saved_items")
+        .select("tagged_item_id")
+        .eq("user_id", viewer.id)
+        .in(
+          "tagged_item_id",
+          outfit.tags.map((t) => t.id),
+        ),
+    ]);
     if (profileRow?.region) viewerRegion = profileRow.region as string;
+    savedItemIds = (savedRows ?? []).map(
+      (r) => r.tagged_item_id as string,
+    );
   }
 
   return (
@@ -61,6 +75,7 @@ export default async function OutfitPage({
       initiallyFollowingCreator={followingCreator}
       isPersisted
       viewerRegion={viewerRegion}
+      savedItemIds={savedItemIds}
     />
   );
 }
