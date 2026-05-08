@@ -19,7 +19,8 @@ export async function generateMetadata({
     };
   }
 
-  const title = `${brand.name} | ${SITE}`;
+  // Root template appends " | Moidello".
+  const title = brand.name;
   const description = brand.isClaimed
     ? `Verifierat märke på ${SITE}. ${brand.outfitCount} ${brand.outfitCount === 1 ? "outfit" : "outfits"} taggade.`
     : `Outfits som taggar ${brand.name} på ${SITE}. ${brand.outfitCount} ${brand.outfitCount === 1 ? "outfit" : "outfits"}.`;

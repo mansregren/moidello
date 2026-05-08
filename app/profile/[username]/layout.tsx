@@ -28,7 +28,8 @@ export async function generateMetadata({
     ? `${user.outfitCount} outfit${user.outfitCount === 1 ? "" : "s"}`
     : "Ny kreatör";
 
-  const title = `${user.displayName} (${handle}) — ${countLabel} | ${SITE}`;
+  // Root layout's metadata.title.template adds " | Moidello"; don't double it.
+  const title = `${user.displayName} (${handle}) — ${countLabel}`;
   const ownBio = user.bio?.trim();
   const description = ownBio
     ? ownBio

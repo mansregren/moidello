@@ -13,6 +13,7 @@ import { UserAvatar } from "@/components/user/UserAvatar";
 import { FollowButton } from "@/components/user/FollowButton";
 import { IconButton } from "@/components/shared/IconButton";
 import { useAuth } from "@/lib/auth-context";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import type { Outfit, Region } from "@/lib/types";
 import {
@@ -155,18 +156,19 @@ export default function OutfitDetail({
               <div className="flex items-center justify-between mb-6">
                 <Link
                   href={`/profile/${outfit.creator.username}`}
-                  className="flex items-center gap-3 group"
+                  aria-label={outfit.creator.displayName}
+                  className="flex items-center gap-3 group min-w-0"
                 >
                   <UserAvatar
                     src={outfit.creator.avatar}
-                    alt={outfit.creator.displayName}
+                    alt=""
                     size="lg"
                   />
-                  <div>
-                    <p className="font-medium text-white group-hover:underline">
+                  <div className="min-w-0">
+                    <p className="font-medium text-white group-hover:underline truncate">
                       {outfit.creator.displayName}
                     </p>
-                    <p className="text-sm text-foreground-subtle">
+                    <p className="text-sm text-foreground-subtle truncate">
                       @{outfit.creator.username}
                     </p>
                   </div>
@@ -184,53 +186,58 @@ export default function OutfitDetail({
                 {outfit.description}
               </p>
 
-              <div className="flex items-center gap-3 mb-8">
-                <IconButton
-                  size="lg"
+              <div className="flex flex-wrap items-center gap-2 mb-8">
+                <button
+                  type="button"
                   onClick={handleLike}
-                  className={liked ? "bg-white/10" : ""}
                   aria-label={liked ? "Ta bort gillning" : "Gilla"}
                   aria-pressed={liked}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+                    liked
+                      ? "bg-white/10 border-white/40 text-white"
+                      : "border-border text-white hover:border-white/30",
+                  )}
                 >
                   <Heart
-                    className={`h-5 w-5 ${liked ? "fill-white text-white" : ""}`}
+                    className={cn("h-4 w-4", liked && "fill-white text-white")}
                   />
-                </IconButton>
-                <span className="text-sm text-foreground-muted mr-2">
-                  {likeCount}
-                </span>
+                  <span className="tabular-nums">{likeCount}</span>
+                </button>
 
-                <IconButton
-                  size="lg"
+                <button
+                  type="button"
                   onClick={handleSave}
-                  className={saved ? "bg-white/10" : ""}
                   aria-label={saved ? "Ta bort sparad" : "Spara"}
                   aria-pressed={saved}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+                    saved
+                      ? "bg-white/10 border-white/40 text-white"
+                      : "border-border text-white hover:border-white/30",
+                  )}
                 >
                   <Bookmark
-                    className={`h-5 w-5 ${saved ? "fill-white text-white" : ""}`}
+                    className={cn("h-4 w-4", saved && "fill-white text-white")}
                   />
-                </IconButton>
-                <span className="text-sm text-foreground-muted mr-2">
-                  {saveCount}
-                </span>
+                  <span className="tabular-nums">{saveCount}</span>
+                </button>
 
                 {isPersisted && (
                   <button
                     type="button"
                     onClick={() => setShareOpen(true)}
-                    aria-label="Dela till meddelande"
                     className="inline-flex items-center gap-2 rounded-full border border-border text-white px-4 py-2 text-sm font-medium hover:border-white/30 transition-colors"
                   >
                     <Send className="h-4 w-4" />
-                    Skicka
+                    Skicka till vän
                   </button>
                 )}
                 <ShareButton
                   url={`/outfit/${outfit.id}`}
                   title={outfit.title}
                   text={outfit.description || `Outfit av ${outfit.creator.displayName}`}
-                  label="Dela"
+                  label="Dela länk"
                   variant="outline"
                 />
               </div>

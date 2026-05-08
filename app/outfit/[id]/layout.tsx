@@ -43,7 +43,9 @@ export async function generateMetadata({
     };
   }
 
-  const title = `${outfit.title} av ${outfit.creator.displayName} | ${SITE}`;
+  // Root layout's metadata.title.template appends " | Moidello" — don't
+  // duplicate the suffix here.
+  const title = `${outfit.title} av ${outfit.creator.displayName}`;
   const description = buildDescription(outfit);
   const canonical = `/outfit/${outfit.id}`;
 
