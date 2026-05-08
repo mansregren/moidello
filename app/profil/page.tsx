@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -25,7 +27,26 @@ import { ProfileEditSheet } from "./ProfileEditSheet";
 import { ShareButton } from "@/components/shared/ShareButton";
 import { SocialLinks } from "@/components/user/SocialLinks";
 
-type ProfileTab = "outfits" | "saved" | "about";
+type ProfileTab = "outfits" | "saved" | "items" | "following" | "followers" | "about";
+
+interface SavedItem {
+  id: string;
+  brand: string;
+  name: string;
+  price: number | null;
+  currency: string | null;
+  buyUrl: string | null;
+  outfitId: string;
+  outfitImage: string;
+}
+
+interface FollowedUser {
+  id: string;
+  username: string;
+  displayName: string;
+  avatarUrl: string | null;
+  outfitCount: number;
+}
 
 interface ProfileRow {
   id: string;
@@ -50,6 +71,9 @@ export default function ProfilPage() {
   const [profile, setProfile] = useState<MoidelloUser | null>(null);
   const [outfits, setOutfits] = useState<Outfit[]>([]);
   const [savedOutfits, setSavedOutfits] = useState<Outfit[]>([]);
+  const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
+  const [following, setFollowing] = useState<FollowedUser[]>([]);
+  const [followers, setFollowers] = useState<FollowedUser[]>([]);
   const [likedSet, setLikedSet] = useState<Set<string>>(new Set());
   const [profileLoading, setProfileLoading] = useState(true);
 
@@ -247,6 +271,104 @@ export default function ProfilPage() {
         }
       }
 
+      // Saved items (per-garment bookmarks)
+      const { data: savedItemRows } = await supabase
+        .from("saved_items")
+        .select(
+          `created_at,
+           tagged_items(id, brand, name, price, currency, buy_url, outfit_id, outfits(image_url))`,
+        )
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (!cancelled && savedItemRows) {
+        type SavedItemJoin = {
+          tagged_items:
+            | {
+                id: string;
+                brand: string;
+                name: string;
+                price: number | null;
+                currency: string | null;
+                buy_url: string | null;
+                outfit_id: string;
+                outfits: { image_url: string } | null;
+              }
+            | null;
+        };
+        setSavedItems(
+          (savedItemRows as unknown as SavedItemJoin[])
+            .map((r) => r.tagged_items)
+            .filter(
+              (t): t is NonNullable<SavedItemJoin["tagged_items"]> => !!t,
+            )
+            .map((t) => ({
+              id: t.id,
+              brand: t.brand,
+              name: t.name,
+              price: t.price,
+              currency: t.currency,
+              buyUrl: t.buy_url,
+              outfitId: t.outfit_id,
+              outfitImage: t.outfits?.image_url ?? "",
+            })),
+        );
+      }
+
+      // Following + followers
+      const [{ data: followingRows }, { data: followerRows }] = await Promise.all([
+        supabase
+          .from("follows")
+          .select(
+            `followee_id,
+             profiles!follows_followee_id_fkey(id, username, display_name, avatar_url)`,
+          )
+          .eq("follower_id", user.id),
+        supabase
+          .from("follows")
+          .select(
+            `follower_id,
+             profiles!follows_follower_id_fkey(id, username, display_name, avatar_url)`,
+          )
+          .eq("followee_id", user.id),
+      ]);
+
+      if (!cancelled) {
+        type FollowJoin = {
+          profiles:
+            | {
+                id: string;
+                username: string;
+                display_name: string | null;
+                avatar_url: string | null;
+              }
+            | null;
+        };
+        const toFollowedUser = (
+          rows: FollowJoin[],
+        ): FollowedUser[] =>
+          rows
+            .map((r) => r.profiles)
+            .filter((p): p is NonNullable<FollowJoin["profiles"]> => !!p)
+            .map((p) => ({
+              id: p.id,
+              username: p.username,
+              displayName: p.display_name ?? p.username,
+              avatarUrl: p.avatar_url,
+              outfitCount: 0,
+            }));
+        setFollowing(
+          toFollowedUser(
+            (followingRows ?? []) as unknown as FollowJoin[],
+          ),
+        );
+        setFollowers(
+          toFollowedUser(
+            (followerRows ?? []) as unknown as FollowJoin[],
+          ),
+        );
+      }
+
       setProfileLoading(false);
     })();
 
@@ -376,7 +498,7 @@ export default function ProfilPage() {
             <Stat label="Följer" value={profile.following} />
           </div>
 
-          <div className="mt-2 flex border-b border-border">
+          <div className="mt-2 flex gap-1 overflow-x-auto border-b border-border scrollbar-hide">
             <ProfileTabButton
               active={tab === "outfits"}
               onClick={() => setTab("outfits")}
@@ -388,6 +510,24 @@ export default function ProfilPage() {
               onClick={() => setTab("saved")}
             >
               Sparade
+            </ProfileTabButton>
+            <ProfileTabButton
+              active={tab === "items"}
+              onClick={() => setTab("items")}
+            >
+              Sparade plagg ({savedItems.length})
+            </ProfileTabButton>
+            <ProfileTabButton
+              active={tab === "following"}
+              onClick={() => setTab("following")}
+            >
+              Följer ({following.length})
+            </ProfileTabButton>
+            <ProfileTabButton
+              active={tab === "followers"}
+              onClick={() => setTab("followers")}
+            >
+              Följare ({followers.length})
             </ProfileTabButton>
             <ProfileTabButton
               active={tab === "about"}
@@ -432,6 +572,27 @@ export default function ProfilPage() {
                     />
                   ) : (
                     <Empty text="Du har inte sparat något än." />
+                  ))}
+
+                {tab === "items" &&
+                  (savedItems.length > 0 ? (
+                    <SavedItemGrid items={savedItems} />
+                  ) : (
+                    <Empty text="Inga sparade plagg än. Tryck bokmärket bredvid ett plagg på en outfit-sida." />
+                  ))}
+
+                {tab === "following" &&
+                  (following.length > 0 ? (
+                    <UserList users={following} />
+                  ) : (
+                    <Empty text="Du följer ingen ännu." />
+                  ))}
+
+                {tab === "followers" &&
+                  (followers.length > 0 ? (
+                    <UserList users={followers} />
+                  ) : (
+                    <Empty text="Inga följare än." />
                   ))}
 
                 {tab === "about" && (
@@ -564,6 +725,75 @@ function Empty({ text }: { text: string }) {
     <div className="py-24 text-center">
       <p className="text-foreground-muted">{text}</p>
     </div>
+  );
+}
+
+function SavedItemGrid({ items }: { items: SavedItem[] }) {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+      {items.map((it) => (
+        <Link
+          key={it.id}
+          href={`/outfit/${it.outfitId}`}
+          className="group rounded-2xl border border-border bg-background-secondary overflow-hidden hover:border-white/20 transition-colors"
+        >
+          <div className="relative aspect-[3/4] bg-background-tertiary">
+            {it.outfitImage && (
+              <Image
+                src={it.outfitImage}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 22vw, 50vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                unoptimized={it.outfitImage.startsWith("http")}
+              />
+            )}
+          </div>
+          <div className="p-3">
+            <p className="text-[10px] uppercase tracking-wider text-foreground-muted truncate">
+              {it.brand}
+            </p>
+            <p className="text-sm font-medium text-white mt-0.5 line-clamp-2">
+              {it.name}
+            </p>
+            {it.price !== null && it.price > 0 && (
+              <p className="text-sm font-semibold text-white mt-1">
+                {it.price.toLocaleString("sv-SE")} {it.currency ?? "SEK"}
+              </p>
+            )}
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+function UserList({ users }: { users: FollowedUser[] }) {
+  return (
+    <ul className="divide-y divide-border rounded-2xl border border-border bg-background-secondary overflow-hidden">
+      {users.map((u) => (
+        <li key={u.id}>
+          <Link
+            href={`/profile/${u.username}`}
+            className="flex items-center gap-3 p-4 hover:bg-white/5 transition-colors"
+          >
+            <UserAvatar
+              src={u.avatarUrl ?? ""}
+              alt={u.displayName}
+              size="md"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">
+                {u.displayName}
+              </p>
+              <p className="text-xs text-foreground-subtle truncate">
+                @{u.username}
+              </p>
+            </div>
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 
