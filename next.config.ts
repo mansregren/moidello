@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { hostname: "images.unsplash.com" },
       { hostname: "i.pravatar.cc" },
+      { hostname: "cqarmynxrewurcbrrftn.supabase.co" },
     ],
   },
 };
