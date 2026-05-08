@@ -1,29 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings, X, Bell, Lock, HelpCircle, Info, LogOut } from "lucide-react";
+import {
+  Settings,
+  X,
+  Bell,
+  Lock,
+  HelpCircle,
+  Info,
+  LogOut,
+} from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { UserAvatar } from "@/components/user/UserAvatar";
-import { outfits, users } from "@/lib/data";
-import { useGender, matchesGenderFilter } from "@/lib/gender-context";
 import { useAuth } from "@/lib/auth-context";
+import { useGender, matchesGenderFilter } from "@/lib/gender-context";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import type { Outfit, User as MoidelloUser } from "@/lib/types";
 
 type ProfileTab = "outfits" | "saved" | "about";
 
-const me = users[0]; // Phase 1: demo "current user"
+interface ProfileRow {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  region: string;
+}
 
 export default function ProfilPage() {
   const router = useRouter();
   const { gender } = useGender();
-  const { isLoggedIn, loading, signOut } = useAuth();
+  const { user, isLoggedIn, loading, signOut } = useAuth();
   const [tab, setTab] = useState<ProfileTab>("outfits");
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [profile, setProfile] = useState<MoidelloUser | null>(null);
+  const [outfits, setOutfits] = useState<Outfit[]>([]);
+  const [savedOutfits, setSavedOutfits] = useState<Outfit[]>([]);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
     if (!loading && !isLoggedIn) {
@@ -31,36 +50,195 @@ export default function ProfilPage() {
     }
   }, [loading, isLoggedIn, router]);
 
+  useEffect(() => {
+    if (!user) return;
+    const supabase = createClient();
+    let cancelled = false;
+
+    (async () => {
+      setProfileLoading(true);
+
+      const [{ data: profileRow }, { data: statsRow }, { data: outfitRows }, { data: saveRows }] =
+        await Promise.all([
+          supabase
+            .from("profiles")
+            .select("id, username, display_name, avatar_url, bio, region")
+            .eq("id", user.id)
+            .maybeSingle(),
+          supabase
+            .from("profile_stats")
+            .select("outfits, followers, following")
+            .eq("profile_id", user.id)
+            .maybeSingle(),
+          supabase
+            .from("outfits")
+            .select(
+              "id, user_id, image_url, type, gender, title, description, category, created_at",
+            )
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("saves")
+            .select(
+              "outfit:outfits(id, user_id, image_url, type, gender, title, description, category, created_at, profiles(id, username, display_name, avatar_url))",
+            )
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false }),
+        ]);
+
+      if (cancelled) return;
+
+      if (profileRow) {
+        const p = profileRow as ProfileRow;
+        setProfile({
+          id: p.id,
+          username: p.username,
+          displayName: p.display_name ?? p.username,
+          avatar: p.avatar_url ?? "",
+          bio: p.bio ?? "",
+          followers: statsRow?.followers ?? 0,
+          following: statsRow?.following ?? 0,
+          outfitCount: statsRow?.outfits ?? 0,
+          region: p.region,
+        });
+      }
+
+      if (outfitRows) {
+        setOutfits(
+          outfitRows.map((o) => ({
+            id: o.id,
+            image: o.image_url,
+            type: o.type as Outfit["type"],
+            gender: o.gender as Outfit["gender"],
+            title: o.title,
+            description: o.description ?? "",
+            creator: profile ?? {
+              id: o.user_id,
+              username: "",
+              displayName: "",
+              avatar: "",
+              bio: "",
+              followers: 0,
+              following: 0,
+              outfitCount: 0,
+            },
+            tags: [],
+            likes: 0,
+            saves: 0,
+            comments: [],
+            category: o.category ?? "",
+            createdAt: o.created_at,
+          })),
+        );
+      }
+
+      if (saveRows) {
+        type SaveJoin = {
+          outfit:
+            | (Outfit & {
+                user_id: string;
+                image_url: string;
+                profiles: ProfileRow | null;
+              })
+            | null;
+        };
+        const rows = saveRows as unknown as SaveJoin[];
+        setSavedOutfits(
+          rows
+            .map((r) => r.outfit)
+            .filter(Boolean)
+            .map((o) => {
+              const out = o as unknown as {
+                id: string;
+                user_id: string;
+                image_url: string;
+                type: Outfit["type"];
+                gender: Outfit["gender"];
+                title: string;
+                description: string | null;
+                category: string | null;
+                created_at: string;
+                profiles: ProfileRow | null;
+              };
+              const creator = out.profiles
+                ? {
+                    id: out.profiles.id,
+                    username: out.profiles.username,
+                    displayName:
+                      out.profiles.display_name ?? out.profiles.username,
+                    avatar: out.profiles.avatar_url ?? "",
+                    bio: out.profiles.bio ?? "",
+                    followers: 0,
+                    following: 0,
+                    outfitCount: 0,
+                  }
+                : {
+                    id: out.user_id,
+                    username: "",
+                    displayName: "",
+                    avatar: "",
+                    bio: "",
+                    followers: 0,
+                    following: 0,
+                    outfitCount: 0,
+                  };
+              return {
+                id: out.id,
+                image: out.image_url,
+                type: out.type,
+                gender: out.gender,
+                title: out.title,
+                description: out.description ?? "",
+                creator,
+                tags: [],
+                likes: 0,
+                saves: 0,
+                comments: [],
+                category: out.category ?? "",
+                createdAt: out.created_at,
+              } satisfies Outfit;
+            }),
+        );
+      }
+
+      setProfileLoading(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const filteredOutfits = useMemo(
+    () => outfits.filter((o) => matchesGenderFilter(o.gender, gender)),
+    [outfits, gender],
+  );
+  const filteredSaved = useMemo(
+    () => savedOutfits.filter((o) => matchesGenderFilter(o.gender, gender)),
+    [savedOutfits, gender],
+  );
+
   const handleSignOut = async () => {
     await signOut();
     router.push("/");
   };
 
-  const myOutfits = outfits
-    .filter((o) => o.creator.id === me.id && matchesGenderFilter(o.gender, gender))
-    .slice(0, 9);
-
-  const savedOutfits = outfits
-    .filter((o) => o.creator.id !== me.id && matchesGenderFilter(o.gender, gender))
-    .slice(0, 6);
+  if (loading || !isLoggedIn || !profile) {
+    return (
+      <>
+        <Header />
+        <main id="main" tabIndex={-1} className="flex-1" />
+      </>
+    );
+  }
 
   return (
     <>
       <Header />
       <main id="main" tabIndex={-1} className="flex-1">
-        {/* Cover */}
-        <div className="relative h-44 md:h-64 overflow-hidden">
-          {me.coverImage && (
-            <Image
-              src={me.coverImage}
-              alt=""
-              fill
-              priority
-              sizes="(min-width: 768px) 100vw, 100vw"
-              className="object-cover"
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-background" />
+        <div className="relative h-44 md:h-64 overflow-hidden bg-background-secondary">
+          <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-black/40 to-background" />
           <button
             onClick={() => setSettingsOpen(true)}
             aria-label="Inställningar"
@@ -71,33 +249,36 @@ export default function ProfilPage() {
         </div>
 
         <Container className="-mt-12 md:-mt-16 relative z-10">
-          {/* Profile header */}
           <div className="flex items-end gap-5">
             <div className="ring-4 ring-background rounded-full">
-              <UserAvatar src={me.avatar} alt={me.displayName} size="lg" />
+              <UserAvatar
+                src={profile.avatar}
+                alt={profile.displayName}
+                size="lg"
+              />
             </div>
             <div className="flex-1 pb-3 min-w-0">
               <h1 className="font-heading text-3xl md:text-5xl uppercase tracking-tight text-white truncate">
-                {me.displayName}
+                {profile.displayName}
               </h1>
               <p className="text-sm text-foreground-muted truncate">
-                @{me.username}
+                @{profile.username}
               </p>
             </div>
           </div>
 
-          <p className="mt-4 text-sm md:text-base text-foreground-muted max-w-2xl">
-            {me.bio}
-          </p>
+          {profile.bio && (
+            <p className="mt-4 text-sm md:text-base text-foreground-muted max-w-2xl">
+              {profile.bio}
+            </p>
+          )}
 
-          {/* Stats */}
           <div className="mt-6 flex gap-8 border-y border-border py-4">
-            <Stat label="Outfits" value={me.outfitCount} />
-            <Stat label="Följare" value={me.followers} />
-            <Stat label="Följer" value={me.following} />
+            <Stat label="Outfits" value={profile.outfitCount} />
+            <Stat label="Följare" value={profile.followers} />
+            <Stat label="Följer" value={profile.following} />
           </div>
 
-          {/* Tabs */}
           <div className="mt-2 flex border-b border-border">
             <ProfileTabButton
               active={tab === "outfits"}
@@ -119,7 +300,6 @@ export default function ProfilPage() {
             </ProfileTabButton>
           </div>
 
-          {/* Tab content */}
           <div className="mt-8">
             <AnimatePresence mode="wait">
               <motion.div
@@ -130,27 +310,34 @@ export default function ProfilPage() {
                 transition={{ duration: 0.25 }}
               >
                 {tab === "outfits" &&
-                  (myOutfits.length > 0 ? (
-                    <OutfitGrid outfits={myOutfits} columns={3} />
+                  (profileLoading ? (
+                    <Empty text="Laddar outfits…" />
+                  ) : filteredOutfits.length > 0 ? (
+                    <OutfitGrid outfits={filteredOutfits} columns={3} />
                   ) : (
-                    <Empty text="Inga outfits ännu" />
+                    <Empty text="Inga outfits ännu — tryck Skapa för att lägga upp din första." />
                   ))}
 
                 {tab === "saved" &&
-                  (savedOutfits.length > 0 ? (
-                    <OutfitGrid outfits={savedOutfits} columns={3} />
+                  (profileLoading ? (
+                    <Empty text="Laddar sparade…" />
+                  ) : filteredSaved.length > 0 ? (
+                    <OutfitGrid outfits={filteredSaved} columns={3} />
                   ) : (
-                    <Empty text="Du har inte sparat något än" />
+                    <Empty text="Du har inte sparat något än." />
                   ))}
 
                 {tab === "about" && (
                   <div className="max-w-2xl space-y-5 text-sm">
-                    <Field label="Namn" value={me.displayName} />
-                    <Field label="Användarnamn" value={`@${me.username}`} />
-                    <Field label="Bio" value={me.bio} />
+                    <Field label="Namn" value={profile.displayName} />
+                    <Field
+                      label="Användarnamn"
+                      value={`@${profile.username}`}
+                    />
+                    {profile.bio && <Field label="Bio" value={profile.bio} />}
                     <Field
                       label="Antal outfits"
-                      value={me.outfitCount.toLocaleString("sv-SE")}
+                      value={profile.outfitCount.toLocaleString("sv-SE")}
                     />
                   </div>
                 )}
@@ -161,7 +348,6 @@ export default function ProfilPage() {
           <div className="py-16" />
         </Container>
 
-        {/* Settings modal */}
         <AnimatePresence>
           {settingsOpen && (
             <motion.div
@@ -229,7 +415,9 @@ function ProfileTabButton({
       aria-current={active ? "page" : undefined}
       className={cn(
         "relative flex-1 sm:flex-none px-4 py-3 text-sm font-medium transition-colors",
-        active ? "text-white" : "text-foreground-subtle hover:text-foreground-muted"
+        active
+          ? "text-white"
+          : "text-foreground-subtle hover:text-foreground-muted",
       )}
     >
       {children}
@@ -294,7 +482,9 @@ function SettingsRow({
         onClick={onClick}
         className={cn(
           "w-full flex items-center gap-3 py-4 text-left transition-colors",
-          danger ? "text-red-400 hover:text-red-300" : "text-white hover:text-white/80"
+          danger
+            ? "text-red-400 hover:text-red-300"
+            : "text-white hover:text-white/80",
         )}
       >
         <Icon className="h-5 w-5" />
@@ -303,3 +493,4 @@ function SettingsRow({
     </li>
   );
 }
+

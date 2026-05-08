@@ -11,6 +11,7 @@ import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useGender } from "@/lib/gender-context";
+import { resizeImageForUpload } from "@/lib/image-resize";
 import { createOutfit, type CreateOutfitState } from "./actions";
 
 interface DemoTag {
@@ -97,9 +98,26 @@ export default function SkapaPage() {
   const updateTag = (id: number, patch: Partial<DemoTag>) =>
     setTags((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = e.target.files?.[0];
-    setImageFile(file ?? null);
+    if (!file) {
+      setImageFile(null);
+      return;
+    }
+    try {
+      const resized = await resizeImageForUpload(file);
+      setImageFile(resized);
+      // Sync the input's FileList so the form submits the resized file.
+      if (fileInputRef.current && resized !== file) {
+        const dt = new DataTransfer();
+        dt.items.add(resized);
+        fileInputRef.current.files = dt.files;
+      }
+    } catch {
+      setImageFile(file);
+    }
   };
 
   const tagsForSubmit = tags

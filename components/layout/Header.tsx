@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Container } from "./Container";
 import { IconButton } from "../shared/IconButton";
 import { GenderToggle } from "../shared/GenderToggle";
+import { UserMenu } from "./UserMenu";
 import { primaryNav, shouldShowAppHeader } from "@/lib/nav";
 import { useAuth, AuthAction } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -125,7 +126,9 @@ export function Header() {
           <IconButton aria-label="Sök" onClick={() => setSearchOpen(true)}>
             <Search className="h-5 w-5" />
           </IconButton>
-          {!isLoggedIn && (
+          {isLoggedIn ? (
+            <UserMenu />
+          ) : (
             <Link
               href="/login"
               className="inline-flex items-center rounded-full bg-white text-black px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-transform active:scale-95 hover:bg-white/90"
