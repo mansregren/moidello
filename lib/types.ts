@@ -1,6 +1,8 @@
 /** ISO 3166-1 alpha-2 country code (e.g. "SE", "NO", "DK"). */
 export type Region = string;
 
+export type AccountType = "creator" | "brand";
+
 export interface User {
   id: string;
   username: string;
@@ -13,6 +15,9 @@ export interface User {
   coverImage?: string;
   /** User's primary market — used to default-suggest store links per region. */
   region?: Region;
+  accountType?: AccountType;
+  brandName?: string;
+  brandWebsite?: string;
 }
 
 export type GarmentType =

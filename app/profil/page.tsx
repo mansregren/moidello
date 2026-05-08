@@ -32,6 +32,9 @@ interface ProfileRow {
   avatar_url: string | null;
   bio: string | null;
   region: string;
+  account_type?: "creator" | "brand";
+  brand_name?: string | null;
+  brand_website?: string | null;
 }
 
 export default function ProfilPage() {
@@ -65,7 +68,9 @@ export default function ProfilPage() {
         await Promise.all([
           supabase
             .from("profiles")
-            .select("id, username, display_name, avatar_url, bio, region")
+            .select(
+              "id, username, display_name, avatar_url, bio, region, account_type, brand_name, brand_website",
+            )
             .eq("id", user.id)
             .maybeSingle(),
           supabase
@@ -107,6 +112,10 @@ export default function ProfilPage() {
             following: statsRow?.following ?? 0,
             outfitCount: statsRow?.outfits ?? 0,
             region: (profileRow as ProfileRow).region,
+            accountType: (profileRow as ProfileRow).account_type ?? "creator",
+            brandName: (profileRow as ProfileRow).brand_name ?? undefined,
+            brandWebsite:
+              (profileRow as ProfileRow).brand_website ?? undefined,
           }
         : {
             id: user.id,
@@ -341,6 +350,14 @@ export default function ProfilPage() {
             >
               Samlingar
             </a>
+            {profile.accountType === "brand" && (
+              <a
+                href="/brand-dashboard"
+                className="rounded-full bg-white text-black px-5 py-2 text-sm font-medium hover:bg-white/90 transition-colors"
+              >
+                Brand-dashboard
+              </a>
+            )}
           </div>
 
           <div className="mt-6 flex gap-8 border-y border-border py-4">

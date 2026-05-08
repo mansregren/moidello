@@ -32,6 +32,13 @@ export async function updateProfile(
   const region =
     ((formData.get("region") as string | null) ?? "SE").trim().toUpperCase() ||
     "SE";
+  const accountType =
+    (formData.get("account_type") as string | null) === "brand"
+      ? "brand"
+      : "creator";
+  const brandName = ((formData.get("brand_name") as string | null) ?? "").trim();
+  const brandWebsite = ((formData.get("brand_website") as string | null) ?? "")
+    .trim();
   const avatar = formData.get("avatar");
 
   if (!USERNAME_RE.test(username)) {
@@ -44,6 +51,13 @@ export async function updateProfile(
 
   if (bio && bio.length > 500) {
     return { fieldErrors: { bio: "För lång bio (max 500 tecken)." } };
+  }
+
+  if (accountType === "brand" && brandName.length === 0) {
+    return { error: "Märkets namn krävs för ett brand-konto." };
+  }
+  if (brandWebsite && !/^https?:\/\//i.test(brandWebsite)) {
+    return { error: "Webbsidan måste börja med http:// eller https://" };
   }
 
   // Username collision check (skip our own row).
@@ -86,6 +100,10 @@ export async function updateProfile(
     display_name: displayName,
     bio,
     region,
+    account_type: accountType,
+    brand_name: accountType === "brand" ? brandName : null,
+    brand_website:
+      accountType === "brand" ? (brandWebsite || null) : null,
   };
   if (avatarUrl) update.avatar_url = avatarUrl;
 

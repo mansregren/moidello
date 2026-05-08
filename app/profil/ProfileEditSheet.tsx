@@ -38,6 +38,9 @@ export function ProfileEditSheet({
   const [displayName, setDisplayName] = useState(profile.displayName);
   const [bio, setBio] = useState(profile.bio);
   const [region, setRegion] = useState(profile.region ?? "SE");
+  const [isBrand, setIsBrand] = useState(profile.accountType === "brand");
+  const [brandName, setBrandName] = useState(profile.brandName ?? "");
+  const [brandWebsite, setBrandWebsite] = useState(profile.brandWebsite ?? "");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -223,6 +226,71 @@ export function ProfileEditSheet({
                   ))}
                 </select>
               </Field>
+
+              <div className="rounded-xl bg-background-tertiary border border-border p-4 space-y-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="account_type"
+                    value="brand"
+                    checked={isBrand}
+                    onChange={(e) => setIsBrand(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-border bg-background-secondary accent-white"
+                  />
+                  <span className="flex-1">
+                    <span className="block text-sm font-medium text-white">
+                      Jag representerar ett märke
+                    </span>
+                    <span className="block text-xs text-foreground-subtle mt-0.5">
+                      Få en brand-dashboard som aggregerar engagemang på outfits
+                      som taggar ditt märke.
+                    </span>
+                  </span>
+                </label>
+
+                {isBrand && (
+                  <div className="space-y-3 pt-2 border-t border-border/60">
+                    <div>
+                      <label
+                        htmlFor="brand-name"
+                        className="text-xs font-medium text-foreground-muted block mb-1.5"
+                      >
+                        Märkets namn
+                      </label>
+                      <input
+                        id="brand-name"
+                        name="brand_name"
+                        type="text"
+                        value={brandName}
+                        onChange={(e) => setBrandName(e.target.value)}
+                        maxLength={80}
+                        placeholder="T.ex. Acne Studios"
+                        className="w-full rounded-lg bg-background-secondary border border-border px-3 py-2 text-sm text-white outline-none focus:border-white/30"
+                      />
+                      <p className="mt-1 text-[11px] text-foreground-subtle">
+                        Måste matcha exakt hur taggar skrivs. Skiftläge ignoreras.
+                      </p>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="brand-website"
+                        className="text-xs font-medium text-foreground-muted block mb-1.5"
+                      >
+                        Webbsida
+                      </label>
+                      <input
+                        id="brand-website"
+                        name="brand_website"
+                        type="url"
+                        value={brandWebsite}
+                        onChange={(e) => setBrandWebsite(e.target.value)}
+                        placeholder="https://…"
+                        className="w-full rounded-lg bg-background-secondary border border-border px-3 py-2 text-sm text-white outline-none focus:border-white/30"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {state.error && (
                 <p className="text-sm text-red-400">{state.error}</p>
