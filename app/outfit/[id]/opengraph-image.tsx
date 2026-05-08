@@ -7,6 +7,18 @@ export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const SITE_BASE = "https://moidello.com";
+
+/**
+ * Satori (the engine behind ImageResponse) cannot resolve relative URLs —
+ * `/images/foo.jpg` 404s when the CDN tries to fetch it. Absolutize first.
+ */
+function absUrl(src: string): string {
+  if (!src) return "";
+  if (src.startsWith("http")) return src;
+  return `${SITE_BASE}${src.startsWith("/") ? src : `/${src}`}`;
+}
+
 /**
  * Dynamic per-outfit alt-text so og:image:alt is descriptive instead of
  * the generic "Outfit på Moidello". Mirrors the auto-description in
@@ -67,7 +79,7 @@ export default async function Image({
         {/* Outfit photo as background */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={outfit.image}
+          src={absUrl(outfit.image)}
           alt=""
           width={1200}
           height={630}
@@ -165,7 +177,7 @@ export default async function Image({
           {outfit.creator.avatar ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={outfit.creator.avatar}
+              src={absUrl(outfit.creator.avatar)}
               alt=""
               width={64}
               height={64}

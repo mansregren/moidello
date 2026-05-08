@@ -8,6 +8,14 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "Plagg på Moidello";
 
+const SITE_BASE = "https://moidello.com";
+
+function absUrl(src: string): string {
+  if (!src) return "";
+  if (src.startsWith("http")) return src;
+  return `${SITE_BASE}${src.startsWith("/") ? src : `/${src}`}`;
+}
+
 export default async function Image({
   params,
 }: {
@@ -58,7 +66,7 @@ export default async function Image({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={item.outfitImage}
+            src={absUrl(item.outfitImage)}
             alt=""
             width={540}
             height={630}
