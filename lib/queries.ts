@@ -243,6 +243,42 @@ export async function fetchOutfitsByUser(
   return attachOutfitStats(mapped, supabase);
 }
 
+/**
+ * Returns recent published outfits from people the given user follows.
+ * Two round-trips: one to read `follows` (cheap with the followee_id index),
+ * one to read the outfits. Empty array when the user follows no-one — caller
+ * is expected to fall back to a "suggested creators" UI in that case.
+ */
+export async function fetchFollowingFeed(
+  viewerId: string,
+  limit = 30,
+): Promise<Outfit[]> {
+  const supabase = await createClient();
+
+  const { data: follows, error: followsError } = await supabase
+    .from("follows")
+    .select("followee_id")
+    .eq("follower_id", viewerId);
+
+  if (followsError) return [];
+  const ids = ((follows ?? []) as Array<{ followee_id: string }>).map(
+    (r) => r.followee_id,
+  );
+  if (ids.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("outfits")
+    .select(OUTFIT_COLUMNS)
+    .in("user_id", ids)
+    .eq("is_published", true)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+  const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  return attachOutfitStats(mapped, supabase);
+}
+
 export async function fetchSavedOutfitsByUser(userId: string): Promise<Outfit[]> {
   const supabase = await createClient();
   const { data, error } = await supabase

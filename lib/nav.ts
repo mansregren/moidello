@@ -1,4 +1,4 @@
-import { Home, Search, Plus, Sparkles, User, type LucideIcon } from "lucide-react";
+import { Home, Search, Plus, Users, User, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   href: string;
@@ -13,7 +13,7 @@ export const primaryNav: NavItem[] = [
   { href: "/", label: "Hem", icon: Home },
   { href: "/upptack", label: "Upptäck", icon: Search },
   { href: "/skapa", label: "Skapa", icon: Plus, primary: true, authAction: "create" },
-  { href: "/trendigt", label: "Trendigt", icon: Sparkles },
+  { href: "/foljer", label: "Följer", icon: Users },
   { href: "/profil", label: "Profil", icon: User, authAction: "profile" },
 ];
 
