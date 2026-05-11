@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { slugify, storageFilename } from "@/lib/slug";
+import { getImpersonationTarget } from "@/lib/admin";
 
 export interface PublishedOutfit {
   id: string;
@@ -44,6 +45,11 @@ export async function createOutfit(
 
   if (!user) return { error: "Du måste logga in först." };
 
+  // If an admin is impersonating someone, write the new outfit under that
+  // user's id. RLS lets admins do this via the policies added in 0026.
+  const impersonation = await getImpersonationTarget();
+  const writerId = impersonation?.targetUserId ?? user.id;
+
   const image = formData.get("image");
   const title = (formData.get("title") as string | null)?.trim();
   const description = ((formData.get("description") as string | null) ?? "").trim();
@@ -74,13 +80,12 @@ export async function createOutfit(
     return { error: "Kunde inte tolka taggar." };
   }
 
-  // Upload image. Path must start with user.id for storage RLS to allow it.
-  // We slugify the title so the stored file is e.g.
-  // "<user_id>/venice-cardigan-a3f9.jpg" instead of an opaque UUID — much
-  // friendlier for image SEO + when files are downloaded.
+  // Upload image. Path lives under the target user (impersonated or self)
+  // so files cluster by the actual owner, not the admin who pasted them.
+  // Storage policy "Admins upload anywhere" makes this writable.
   const ext = image.name.split(".").pop()?.toLowerCase() || "jpg";
   const path = storageFilename({
-    userId: user.id,
+    userId: writerId,
     slug: slugify(title),
     ext,
   });
@@ -112,7 +117,7 @@ export async function createOutfit(
     const { data, error } = await supabase
       .from("outfits")
       .insert({
-        user_id: user.id,
+        user_id: writerId,
         image_url: publicUrl,
         image_path: path,
         title,
@@ -178,14 +183,14 @@ export async function createOutfit(
 
   // Return a success payload so the client can decide whether to stay on
   // /skapa for another upload or navigate to the new outfit. Username is
-  // fetched once so the client can build canonical /<username>/<slug> URLs
-  // without an extra round-trip.
+  // fetched for the writer (impersonated or self) so canonical URLs land
+  // under the actual outfit owner.
   let username: string | null = null;
   if (outfit.slug) {
     const { data: profileRow } = await supabase
       .from("profiles")
       .select("username")
-      .eq("id", user.id)
+      .eq("id", writerId)
       .maybeSingle();
     username = (profileRow?.username as string | undefined)?.toLowerCase() ?? null;
   }

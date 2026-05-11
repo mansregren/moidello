@@ -6,6 +6,7 @@ import { GenderProvider } from "@/lib/gender-context";
 import { ToastProvider } from "@/lib/toast-context";
 import { AuthProvider, type AuthProfile } from "@/lib/auth-context";
 import { AppShell } from "@/components/layout/AppShell";
+import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { siteJsonLd } from "@/lib/json-ld";
 import { createClient } from "@/lib/supabase/server";
@@ -127,6 +128,7 @@ export default async function RootLayout({
         <a href="#main" className="skip-link">
           Hoppa till innehåll
         </a>
+        <ImpersonationBanner />
         <AuthProvider initialUser={user} initialProfile={initialProfile}>
           <ToastProvider>
             <GenderProvider>

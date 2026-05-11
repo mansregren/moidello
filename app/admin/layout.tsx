@@ -24,6 +24,7 @@ export default async function AdminLayout({
         <Container className="max-w-6xl">
           <nav className="flex flex-wrap gap-1 mb-10 border-b border-border">
             <AdminTab href="/admin" label="Översikt" />
+            <AdminTab href="/admin/anvandare" label="Användare" />
             <AdminTab href="/admin/anmalningar" label="Anmälningar" />
           </nav>
           {children}
