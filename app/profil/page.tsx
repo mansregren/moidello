@@ -656,9 +656,13 @@ export default function ProfilPage() {
 
                 <ul className="divide-y divide-border">
                   <SettingsRow icon={Bell} label="Notiser" />
-                  <SettingsRow icon={Lock} label="Konto & sekretess" />
-                  <SettingsRow icon={HelpCircle} label="Hjälp" />
-                  <SettingsRow icon={Info} label="Om Moidello" />
+                  <SettingsRow
+                    icon={Lock}
+                    label="Konto & sekretess"
+                    href="/profil/installningar/konto"
+                  />
+                  <SettingsRow icon={HelpCircle} label="Hjälp" href="/kontakt" />
+                  <SettingsRow icon={Info} label="Om Moidello" href="/om" />
                   <SettingsRow
                     icon={LogOut}
                     label="Logga ut"
@@ -813,24 +817,35 @@ function SettingsRow({
   label,
   danger,
   onClick,
+  href,
 }: {
   icon: typeof Settings;
   label: string;
   danger?: boolean;
   onClick?: () => void;
+  href?: string;
 }) {
+  const classes = cn(
+    "w-full flex items-center gap-3 py-4 text-left transition-colors",
+    danger
+      ? "text-red-400 hover:text-red-300"
+      : "text-white hover:text-white/80",
+  );
+
+  if (href) {
+    return (
+      <li>
+        <Link href={href} className={classes}>
+          <Icon className="h-5 w-5" />
+          <span className="text-sm">{label}</span>
+        </Link>
+      </li>
+    );
+  }
+
   return (
     <li>
-      <button
-        type="button"
-        onClick={onClick}
-        className={cn(
-          "w-full flex items-center gap-3 py-4 text-left transition-colors",
-          danger
-            ? "text-red-400 hover:text-red-300"
-            : "text-white hover:text-white/80",
-        )}
-      >
+      <button type="button" onClick={onClick} className={classes}>
         <Icon className="h-5 w-5" />
         <span className="text-sm">{label}</span>
       </button>
