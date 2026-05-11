@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload, Eye, X, CheckCircle2, Plus } from "lucide-react";
+import { Upload, Eye, X, CheckCircle2, Plus, AlertTriangle, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
@@ -8,16 +8,12 @@ import { Container } from "@/components/layout/Container";
 import { PremiumButton } from "@/components/shared/PremiumButton";
 import { IconButton } from "@/components/shared/IconButton";
 import { motion } from "framer-motion";
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useGender } from "@/lib/gender-context";
 import { resizeImageForUpload } from "@/lib/image-resize";
-import {
-  createOutfit,
-  type CreateOutfitState,
-  type PublishedOutfit,
-} from "./actions";
+import { createOutfit, type PublishedOutfit } from "./actions";
 
 interface DemoTag {
   id: number;
@@ -28,9 +24,21 @@ interface DemoTag {
   url: string;
   garment: string;
   isAffiliate: boolean;
-  /** Per-region overrides: ISO country code → URL. */
   regionUrls: Record<string, string>;
   showRegions: boolean;
+}
+
+interface Draft {
+  id: number;
+  file: File | null;
+  previewUrl: string | null;
+  title: string;
+  description: string;
+  category: string;
+  tags: DemoTag[];
+  status: "draft" | "publishing" | "published" | "error";
+  published?: PublishedOutfit;
+  error?: string;
 }
 
 const REGION_OPTIONS: { code: string; label: string }[] = [
@@ -61,23 +69,40 @@ const CATEGORIES = [
   "Preppy",
 ];
 
-const initialState: CreateOutfitState = {};
+const MAX_DRAFTS = 10;
+
+let nextDraftId = 1;
+function makeDraft(file: File | null = null): Draft {
+  return {
+    id: nextDraftId++,
+    file,
+    previewUrl: file ? URL.createObjectURL(file) : null,
+    title: "",
+    description: "",
+    category: "",
+    tags: [],
+    status: "draft",
+  };
+}
 
 export default function SkapaPage() {
   const router = useRouter();
   const { isLoggedIn, loading } = useAuth();
   const { gender } = useGender();
-  const [tags, setTags] = useState<DemoTag[]>([]);
-  const [previewMode, setPreviewMode] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [published, setPublished] = useState<PublishedOutfit[]>([]);
-  const [lastHandledNonce, setLastHandledNonce] = useState<number | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [state, formAction, pending] = useActionState(createOutfit, initialState);
+  const [drafts, setDrafts] = useState<Draft[]>([makeDraft()]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [previewMode, setPreviewMode] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [topError, setTopError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const addMoreInputRef = useRef<HTMLInputElement>(null);
+
+  // Reset preview mode when switching drafts so a half-edited tag form
+  // doesn't leak over.
+  useEffect(() => {
+    setPreviewMode(false);
+  }, [activeIndex]);
 
   useEffect(() => {
     if (!loading && !isLoggedIn) {
@@ -85,61 +110,154 @@ export default function SkapaPage() {
     }
   }, [loading, isLoggedIn, router]);
 
-  // When a publish succeeds: add it to the session queue and reset the form
-  // so the user can immediately upload the next outfit on the same page.
-  // The nonce guards against re-applying the same success on re-renders.
   useEffect(() => {
-    if (state.success && state.nonce && state.nonce !== lastHandledNonce) {
-      setPublished((prev) => [...prev, state.success!]);
-      setLastHandledNonce(state.nonce);
-      setImageFile(null);
-      setTags([]);
-      setTitle("");
-      setDescription("");
-      setCategory("");
-      setPreviewMode(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+    return () => {
+      // Revoke all object URLs on unmount.
+      for (const d of drafts) {
+        if (d.previewUrl) URL.revokeObjectURL(d.previewUrl);
       }
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [state, lastHandledNonce]);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const imagePreview = useMemo(
-    () => (imageFile ? URL.createObjectURL(imageFile) : null),
-    [imageFile],
+  const active = drafts[activeIndex] ?? drafts[0];
+  const publishedCount = drafts.filter((d) => d.status === "published").length;
+  const pendingDrafts = drafts.filter(
+    (d) => d.status === "draft" || d.status === "error",
   );
+  const canPublish =
+    !publishing &&
+    pendingDrafts.length > 0 &&
+    pendingDrafts.every((d) => d.file && d.title.trim());
 
-  useEffect(() => {
-    if (!imagePreview) return;
-    return () => URL.revokeObjectURL(imagePreview);
-  }, [imagePreview]);
+  const updateActive = (patch: Partial<Draft>) => {
+    setDrafts((prev) =>
+      prev.map((d, i) => (i === activeIndex ? { ...d, ...patch } : d)),
+    );
+  };
+
+  const addFilesToDrafts = async (
+    files: FileList,
+    replaceFirstIfEmpty = false,
+  ) => {
+    setTopError(null);
+    const arr = Array.from(files);
+
+    // Resize in parallel — these run in the browser, no upload yet.
+    const resized = await Promise.all(
+      arr.map(async (f) => {
+        try {
+          return await resizeImageForUpload(f);
+        } catch {
+          return f;
+        }
+      }),
+    );
+
+    setDrafts((prev) => {
+      const next = [...prev];
+      let i = 0;
+
+      // If the only existing draft is an empty placeholder (no file), use
+      // it as the first slot instead of leaving an orphan tab.
+      if (
+        replaceFirstIfEmpty &&
+        next.length === 1 &&
+        next[0].file === null &&
+        i < resized.length
+      ) {
+        if (next[0].previewUrl) URL.revokeObjectURL(next[0].previewUrl);
+        next[0] = {
+          ...next[0],
+          file: resized[i],
+          previewUrl: URL.createObjectURL(resized[i]),
+        };
+        i++;
+      }
+
+      while (i < resized.length && next.length < MAX_DRAFTS) {
+        next.push(makeDraft(resized[i]));
+        i++;
+      }
+
+      if (i < resized.length) {
+        setTopError(`Bara ${MAX_DRAFTS} bilder åt gången.`);
+      }
+      return next;
+    });
+  };
+
+  const handleInitialPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    await addFilesToDrafts(e.target.files, true);
+    setActiveIndex(0);
+    e.target.value = "";
+  };
+
+  const handleAddMore = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const before = drafts.length;
+    await addFilesToDrafts(e.target.files);
+    setActiveIndex(before);
+    e.target.value = "";
+  };
+
+  const removeDraft = (index: number) => {
+    setDrafts((prev) => {
+      const target = prev[index];
+      if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
+      const next = prev.filter((_, i) => i !== index);
+      if (next.length === 0) return [makeDraft()];
+      return next;
+    });
+    setActiveIndex((idx) => {
+      if (drafts.length <= 1) return 0;
+      if (index === idx) return Math.max(0, idx - 1);
+      if (index < idx) return idx - 1;
+      return idx;
+    });
+  };
+
+  const replaceActiveImage = async (file: File) => {
+    try {
+      const resized = await resizeImageForUpload(file);
+      if (active.previewUrl) URL.revokeObjectURL(active.previewUrl);
+      updateActive({
+        file: resized,
+        previewUrl: URL.createObjectURL(resized),
+      });
+    } catch {
+      updateActive({
+        file,
+        previewUrl: URL.createObjectURL(file),
+      });
+    }
+  };
+
+  // ============ Tag manipulation ============
 
   const addTagAt = (xPct: number, yPct: number) => {
-    setTags((prev) => [
-      ...prev,
-      {
-        id: Date.now() + Math.random(),
-        x: xPct,
-        y: yPct,
-        brand: "",
-        name: "",
-        url: "",
-        garment: "Toppar",
-        isAffiliate: false,
-        regionUrls: {},
-        showRegions: false,
-      },
-    ]);
+    const tag: DemoTag = {
+      id: Date.now() + Math.random(),
+      x: xPct,
+      y: yPct,
+      brand: "",
+      name: "",
+      url: "",
+      garment: "Toppar",
+      isAffiliate: false,
+      regionUrls: {},
+      showRegions: false,
+    };
+    updateActive({ tags: [...active.tags, tag] });
   };
 
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (previewMode || !imagePreview) return;
+    if (previewMode || !active.previewUrl) return;
     const target = e.currentTarget;
     const rect = target.getBoundingClientRect();
     const xPct = ((e.clientX - rect.left) / rect.width) * 100;
     const yPct = ((e.clientY - rect.top) / rect.height) * 100;
-    // Clamp to leave a tiny safe-zone at the edges so dots aren't half-cut.
     const clamp = (v: number) => Math.max(2, Math.min(98, v));
     addTagAt(clamp(xPct), clamp(yPct));
   };
@@ -159,7 +277,18 @@ export default function SkapaPage() {
       const xPct = ((ev.clientX - rect.left) / rect.width) * 100;
       const yPct = ((ev.clientY - rect.top) / rect.height) * 100;
       const clamp = (v: number) => Math.max(2, Math.min(98, v));
-      updateTag(tagId, { x: clamp(xPct), y: clamp(yPct) });
+      setDrafts((prev) =>
+        prev.map((d, i) =>
+          i === activeIndex
+            ? {
+                ...d,
+                tags: d.tags.map((t) =>
+                  t.id === tagId ? { ...t, x: clamp(xPct), y: clamp(yPct) } : t,
+                ),
+              }
+            : d,
+        ),
+      );
     };
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
@@ -170,52 +299,85 @@ export default function SkapaPage() {
   };
 
   const removeTag = (id: number) =>
-    setTags((prev) => prev.filter((t) => t.id !== id));
+    updateActive({ tags: active.tags.filter((t) => t.id !== id) });
 
   const updateTag = (id: number, patch: Partial<DemoTag>) =>
-    setTags((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
+    updateActive({
+      tags: active.tags.map((t) => (t.id === id ? { ...t, ...patch } : t)),
+    });
 
-  const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) {
-      setImageFile(null);
-      return;
-    }
-    try {
-      const resized = await resizeImageForUpload(file);
-      setImageFile(resized);
-      // Sync the input's FileList so the form submits the resized file.
-      if (fileInputRef.current && resized !== file) {
-        const dt = new DataTransfer();
-        dt.items.add(resized);
-        fileInputRef.current.files = dt.files;
-      }
-    } catch {
-      setImageFile(file);
-    }
+  const tagsForSubmit = (tags: DemoTag[]) =>
+    tags
+      .filter((t) => t.brand.trim() && t.name.trim())
+      .map((t) => {
+        const regionUrls: Record<string, string> = {};
+        for (const [code, url] of Object.entries(t.regionUrls)) {
+          if (url.trim()) regionUrls[code] = url.trim();
+        }
+        return {
+          brand: t.brand,
+          name: t.name,
+          buyUrl: t.url,
+          buyUrls: Object.keys(regionUrls).length > 0 ? regionUrls : undefined,
+          garment: t.garment,
+          x: t.x,
+          y: t.y,
+          isAffiliate: t.isAffiliate,
+        };
+      });
+
+  // ============ Publish ============
+
+  const setDraftStatus = (index: number, patch: Partial<Draft>) => {
+    setDrafts((prev) =>
+      prev.map((d, i) => (i === index ? { ...d, ...patch } : d)),
+    );
   };
 
-  const tagsForSubmit = tags
-    .filter((t) => t.brand.trim() && t.name.trim())
-    .map((t) => {
-      // Strip empty region URLs so we don't store {SE: ""} blobs
-      const regionUrls: Record<string, string> = {};
-      for (const [code, url] of Object.entries(t.regionUrls)) {
-        if (url.trim()) regionUrls[code] = url.trim();
+  const handlePublishAll = async () => {
+    setTopError(null);
+    setPublishing(true);
+    try {
+      for (let i = 0; i < drafts.length; i++) {
+        const draft = drafts[i];
+        if (draft.status === "published" || !draft.file || !draft.title.trim())
+          continue;
+
+        setDraftStatus(i, { status: "publishing", error: undefined });
+        setActiveIndex(i);
+
+        const fd = new FormData();
+        fd.set("image", draft.file);
+        fd.set("title", draft.title);
+        fd.set("description", draft.description);
+        fd.set("category", draft.category);
+        fd.set("gender", gender);
+        fd.set("tags", JSON.stringify(tagsForSubmit(draft.tags)));
+
+        try {
+          const result = await createOutfit({}, fd);
+          if (result.success) {
+            setDraftStatus(i, {
+              status: "published",
+              published: result.success,
+            });
+          } else {
+            setDraftStatus(i, {
+              status: "error",
+              error: result.error ?? "Okänt fel",
+            });
+          }
+        } catch (e) {
+          setDraftStatus(i, {
+            status: "error",
+            error: e instanceof Error ? e.message : "Något gick fel",
+          });
+        }
       }
-      return {
-        brand: t.brand,
-        name: t.name,
-        buyUrl: t.url,
-        buyUrls: Object.keys(regionUrls).length > 0 ? regionUrls : undefined,
-        garment: t.garment,
-        x: t.x,
-        y: t.y,
-        isAffiliate: t.isAffiliate,
-      };
-    });
+    } finally {
+      setPublishing(false);
+    }
+  };
 
   if (loading || !isLoggedIn) {
     return (
@@ -225,6 +387,9 @@ export default function SkapaPage() {
       </>
     );
   }
+
+  const noImageYet = !active.file;
+  const profileUsername = drafts.find((d) => d.published)?.published?.username;
 
   return (
     <>
@@ -239,95 +404,157 @@ export default function SkapaPage() {
             <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white mb-2">
               Skapa <span className="text-foreground-subtle">Outfit</span>
             </h1>
-            <p className="text-foreground-muted mb-8">
-              Dela din stil med världen. Publicera så många du vill —
-              du stannar kvar på sidan tills du är klar.
+            <p className="text-foreground-muted mb-6">
+              Ladda upp en eller flera bilder. Tagga plagg på varje, publicera
+              allt samtidigt — varje outfit får sin egen URL.
             </p>
           </motion.div>
 
-          {published.length > 0 && (
-            <div className="mb-8 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.05] p-5">
+          {topError && (
+            <div className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/[0.05] p-4 flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
+              <p className="text-sm text-red-300">{topError}</p>
+            </div>
+          )}
+
+          {publishedCount > 0 && (
+            <div className="mb-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.05] p-5">
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-white">
-                    {published.length}{" "}
-                    {published.length === 1 ? "outfit" : "outfits"}{" "}
-                    publicerad{published.length === 1 ? "" : "e"} i den
-                    här sessionen
+                    {publishedCount}{" "}
+                    {publishedCount === 1 ? "outfit" : "outfits"}{" "}
+                    publicerad{publishedCount === 1 ? "" : "e"}
                   </p>
                   <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                    {published.map((p) => (
-                      <li key={p.id}>
-                        <Link
-                          href={p.url}
-                          className="text-xs text-emerald-300 hover:underline"
-                        >
-                          {p.title}
-                        </Link>
-                      </li>
-                    ))}
+                    {drafts
+                      .filter((d) => d.published)
+                      .map((d) => (
+                        <li key={d.id}>
+                          <Link
+                            href={d.published!.url}
+                            className="text-xs text-emerald-300 hover:underline"
+                          >
+                            {d.published!.title}
+                          </Link>
+                        </li>
+                      ))}
                   </ul>
-                  <div className="mt-4 flex flex-wrap items-center gap-3">
-                    <p className="text-xs text-foreground-muted inline-flex items-center gap-1.5">
-                      <Plus className="h-3.5 w-3.5" />
-                      Fyll i formuläret nedan för att publicera nästa
-                    </p>
-                    {published[0]?.username && (
+                  {profileUsername && (
+                    <div className="mt-3">
                       <Link
-                        href={`/profile/${published[0].username}`}
-                        className="text-xs text-white underline hover:text-white/80 ml-auto"
+                        href={`/profile/${profileUsername}`}
+                        className="text-xs text-white underline hover:text-white/80"
                       >
-                        Klar — visa min profil →
+                        Visa min profil →
                       </Link>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           )}
 
-          <form action={formAction} className="grid lg:grid-cols-2 gap-8">
-            <input type="hidden" name="gender" value={gender} />
-            <input
-              type="hidden"
-              name="tags"
-              value={JSON.stringify(tagsForSubmit)}
-            />
+          {/* Tab strip — only show when there are real drafts */}
+          {drafts.some((d) => d.file) && (
+            <div className="mb-6 flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 snap-x">
+              {drafts.map((d, i) => (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => setActiveIndex(i)}
+                  className={`relative h-24 w-20 shrink-0 rounded-xl overflow-hidden border-2 transition-all snap-start ${
+                    i === activeIndex
+                      ? "border-white"
+                      : "border-transparent hover:border-white/30"
+                  }`}
+                >
+                  {d.previewUrl ? (
+                    <Image
+                      src={d.previewUrl}
+                      alt={`Bild ${i + 1}`}
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-background-tertiary flex items-center justify-center text-foreground-subtle text-xs">
+                      Tom
+                    </div>
+                  )}
+                  <span className="absolute top-1 left-1 inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-black/70 text-[10px] font-semibold text-white">
+                    {i + 1}
+                  </span>
+                  {d.status === "published" && (
+                    <CheckCircle2 className="absolute top-1 right-1 h-4 w-4 text-emerald-400 drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
+                  )}
+                  {d.status === "publishing" && (
+                    <Loader2 className="absolute top-1 right-1 h-4 w-4 text-white animate-spin drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
+                  )}
+                  {d.status === "error" && (
+                    <AlertTriangle className="absolute top-1 right-1 h-4 w-4 text-red-400 drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
+                  )}
+                  {drafts.length > 1 && d.status !== "publishing" && (
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeDraft(i);
+                      }}
+                      role="button"
+                      aria-label="Ta bort bild"
+                      className="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-black/70 hover:bg-red-500 flex items-center justify-center transition-colors"
+                    >
+                      <X className="h-3 w-3 text-white" />
+                    </span>
+                  )}
+                </button>
+              ))}
+              {drafts.length < MAX_DRAFTS && (
+                <label
+                  htmlFor="add-more-input"
+                  className="h-24 w-20 shrink-0 rounded-xl border-2 border-dashed border-border bg-background-secondary flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-white/30 transition-colors snap-start"
+                >
+                  <Plus className="h-5 w-5 text-foreground-muted" />
+                  <span className="text-[10px] text-foreground-subtle">
+                    Lägg till
+                  </span>
+                </label>
+              )}
+              <input
+                id="add-more-input"
+                ref={addMoreInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                className="hidden"
+                onChange={handleAddMore}
+              />
+            </div>
+          )}
 
-            {/* File input — always present so the form can submit it.
-                Hidden visually; the upload UI below triggers it. */}
-            <input
-              id="image-input"
-              ref={fileInputRef}
-              name="image"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleFileChange}
-              className="sr-only"
-              required
-            />
-
+          <div className="grid lg:grid-cols-2 gap-8">
             {/* Image upload + tag placement */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              {!imagePreview ? (
+              {noImageYet ? (
                 <label
                   htmlFor="image-input"
                   className="relative aspect-[3/4] rounded-2xl border-2 border-dashed border-border bg-background-secondary flex flex-col items-center justify-center cursor-pointer hover:border-white/30 transition-colors group overflow-hidden"
                 >
                   <Upload className="h-12 w-12 text-foreground-subtle mb-4 group-hover:text-foreground-muted transition-colors" />
                   <p className="text-foreground-muted font-medium">
-                    Dra & släpp din bild
+                    Dra & släpp dina bilder
                   </p>
                   <p className="text-sm text-foreground-subtle mt-1">
-                    eller klicka för att välja
+                    eller klicka för att välja flera
                   </p>
                   <p className="text-xs text-foreground-subtle mt-4">
-                    JPG, PNG, WebP — Max 10MB
+                    JPG, PNG, WebP — Max {MAX_DRAFTS} bilder
                   </p>
                 </label>
               ) : (
@@ -344,7 +571,7 @@ export default function SkapaPage() {
                   }
                 >
                   <Image
-                    src={imagePreview}
+                    src={active.previewUrl!}
                     alt="Förhandsvisning"
                     fill
                     className="object-cover pointer-events-none"
@@ -353,7 +580,7 @@ export default function SkapaPage() {
                     draggable={false}
                   />
 
-                  {!previewMode && tags.length === 0 && (
+                  {!previewMode && active.tags.length === 0 && (
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pointer-events-none">
                       <p className="text-center text-sm font-medium text-white">
                         Klicka på ett plagg för att tagga det
@@ -361,7 +588,7 @@ export default function SkapaPage() {
                     </div>
                   )}
 
-                  {tags.map((tag, i) => (
+                  {active.tags.map((tag, i) => (
                     <div
                       key={tag.id}
                       className="absolute"
@@ -403,13 +630,33 @@ export default function SkapaPage() {
                 </div>
               )}
 
+              <input
+                id="image-input"
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                onChange={handleInitialPick}
+                className="sr-only"
+              />
+
               <div className="mt-4 flex flex-wrap gap-3">
                 <PremiumButton
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={!imageFile}
+                  onClick={() => {
+                    // Replace just the active image
+                    const replaceInput = document.createElement("input");
+                    replaceInput.type = "file";
+                    replaceInput.accept = "image/jpeg,image/png,image/webp";
+                    replaceInput.onchange = (ev) => {
+                      const f = (ev.target as HTMLInputElement).files?.[0];
+                      if (f) replaceActiveImage(f);
+                    };
+                    replaceInput.click();
+                  }}
+                  disabled={!active.file}
                 >
                   <Upload className="h-4 w-4" />
                   Byt bild
@@ -419,28 +666,52 @@ export default function SkapaPage() {
                   variant="glass"
                   size="sm"
                   onClick={() => setPreviewMode((p) => !p)}
-                  disabled={!imageFile}
+                  disabled={!active.file}
                 >
                   <Eye className="h-4 w-4" />
                   {previewMode ? "Redigera" : "Förhandsvisa"}
                 </PremiumButton>
               </div>
-              {imageFile && !previewMode && (
+              {active.file && !previewMode && (
                 <p className="mt-3 text-xs text-foreground-subtle">
-                  Tips: dra prickarna för att flytta dem. {tags.length}{" "}
-                  {tags.length === 1 ? "tagg" : "taggar"} placerad
-                  {tags.length === 1 ? "" : "e"}.
+                  Tips: dra prickarna för att flytta dem. {active.tags.length}{" "}
+                  {active.tags.length === 1 ? "tagg" : "taggar"} placerad
+                  {active.tags.length === 1 ? "" : "e"}.
                 </p>
               )}
             </motion.div>
 
-            {/* Form */}
+            {/* Form for active draft */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="space-y-6"
             >
+              {active.status === "published" && active.published && (
+                <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.05] p-4 flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-white truncate">
+                      Publicerad — {active.published.title}
+                    </p>
+                    <Link
+                      href={active.published.url}
+                      className="text-xs text-emerald-300 hover:underline"
+                    >
+                      Visa outfit →
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {active.status === "error" && active.error && (
+                <div className="rounded-2xl border border-red-500/30 bg-red-500/[0.05] p-4 flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-300">{active.error}</p>
+                </div>
+              )}
+
               <div>
                 <label
                   htmlFor="title"
@@ -450,13 +721,13 @@ export default function SkapaPage() {
                 </label>
                 <input
                   id="title"
-                  name="title"
                   type="text"
                   required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  value={active.title}
+                  onChange={(e) => updateActive({ title: e.target.value })}
                   placeholder="Ge din outfit ett namn..."
-                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+                  disabled={active.status === "published" || publishing}
+                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors disabled:opacity-60"
                 />
               </div>
 
@@ -469,12 +740,14 @@ export default function SkapaPage() {
                 </label>
                 <textarea
                   id="description"
-                  name="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  value={active.description}
+                  onChange={(e) =>
+                    updateActive({ description: e.target.value })
+                  }
                   placeholder="Berätta om din outfit..."
                   rows={4}
-                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors resize-none"
+                  disabled={active.status === "published" || publishing}
+                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors resize-none disabled:opacity-60"
                 />
               </div>
 
@@ -487,10 +760,10 @@ export default function SkapaPage() {
                 </label>
                 <select
                   id="category"
-                  name="category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+                  value={active.category}
+                  onChange={(e) => updateActive({ category: e.target.value })}
+                  disabled={active.status === "published" || publishing}
+                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-foreground-subtle outline-none focus:border-white/30 transition-colors disabled:opacity-60"
                 >
                   <option value="">Välj kategori...</option>
                   {CATEGORIES.map((c) => (
@@ -503,16 +776,16 @@ export default function SkapaPage() {
 
               <div>
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
-                  Taggade plagg ({tags.length})
+                  Taggade plagg ({active.tags.length})
                 </label>
-                {tags.length === 0 ? (
+                {active.tags.length === 0 ? (
                   <p className="text-sm text-foreground-subtle">
                     Klicka direkt på bilden för att placera en tagg på det
                     plagget.
                   </p>
                 ) : (
                   <div className="space-y-3">
-                    {tags.map((tag, i) => (
+                    {active.tags.map((tag, i) => (
                       <div
                         key={tag.id}
                         className="rounded-xl border border-border bg-background-secondary p-4 space-y-3"
@@ -575,7 +848,9 @@ export default function SkapaPage() {
                             type="checkbox"
                             checked={tag.isAffiliate}
                             onChange={(e) =>
-                              updateTag(tag.id, { isAffiliate: e.target.checked })
+                              updateTag(tag.id, {
+                                isAffiliate: e.target.checked,
+                              })
                             }
                             className="mt-0.5 h-4 w-4 rounded border-border bg-background-tertiary accent-white"
                           />
@@ -605,7 +880,10 @@ export default function SkapaPage() {
                               använda standardlänken.
                             </p>
                             {REGION_OPTIONS.map((r) => (
-                              <div key={r.code} className="flex items-center gap-2">
+                              <div
+                                key={r.code}
+                                className="flex items-center gap-2"
+                              >
                                 <span className="w-12 shrink-0 text-[11px] uppercase tracking-wider text-foreground-muted">
                                   {r.code}
                                 </span>
@@ -633,20 +911,33 @@ export default function SkapaPage() {
                 )}
               </div>
 
-              {state.error && (
-                <p className="text-sm text-red-400">{state.error}</p>
-              )}
-
               <PremiumButton
-                type="submit"
+                type="button"
                 size="lg"
                 className="w-full"
-                disabled={pending || !imageFile || !title}
+                disabled={!canPublish}
+                onClick={handlePublishAll}
               >
-                {pending ? "Publicerar…" : "Publicera outfit"}
+                {publishing
+                  ? `Publicerar ${
+                      drafts.findIndex((d) => d.status === "publishing") + 1
+                    } av ${drafts.length}…`
+                  : pendingDrafts.length === 0
+                    ? "Allt publicerat"
+                    : `Publicera ${pendingDrafts.length} ${
+                        pendingDrafts.length === 1 ? "outfit" : "outfits"
+                      }`}
               </PremiumButton>
+
+              {!canPublish &&
+                pendingDrafts.length > 0 &&
+                !publishing && (
+                  <p className="text-xs text-foreground-subtle">
+                    Varje bild behöver en titel innan du kan publicera.
+                  </p>
+                )}
             </motion.div>
-          </form>
+          </div>
 
           <div className="py-16" />
         </Container>
