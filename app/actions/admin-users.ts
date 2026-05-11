@@ -158,6 +158,167 @@ const DUMMY_CREATORS: DummySpec[] = [
   },
 ];
 
+const USERNAME_RE = /^[a-z0-9_]{2,30}$/;
+
+export async function updateUserProfile(
+  userId: string,
+  patch: {
+    username?: string;
+    display_name?: string | null;
+    bio?: string | null;
+    avatar_url?: string | null;
+  },
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+
+  const updates: Record<string, string | null> = {};
+
+  if (patch.username !== undefined) {
+    const u = patch.username.trim().toLowerCase();
+    if (!USERNAME_RE.test(u)) {
+      return {
+        ok: false,
+        error:
+          "Användarnamn måste vara 2–30 tecken, bara a–z, 0–9 och _.",
+      };
+    }
+    const { isReservedUsername } = await import("@/lib/reserved-usernames");
+    if (isReservedUsername(u)) {
+      return { ok: false, error: "Användarnamnet är reserverat." };
+    }
+    updates.username = u;
+  }
+  if (patch.display_name !== undefined) {
+    const d = patch.display_name?.trim() ?? null;
+    updates.display_name = d && d.length > 0 ? d.slice(0, 80) : null;
+  }
+  if (patch.bio !== undefined) {
+    const b = patch.bio?.trim() ?? null;
+    updates.bio = b && b.length > 0 ? b.slice(0, 500) : null;
+  }
+  if (patch.avatar_url !== undefined) {
+    const a = patch.avatar_url?.trim() ?? null;
+    if (a && !/^https?:\/\//i.test(a)) {
+      return { ok: false, error: "Avatar-URL måste börja med http(s)://" };
+    }
+    updates.avatar_url = a && a.length > 0 ? a : null;
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return { ok: true };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update(updates)
+    .eq("id", userId);
+  if (error) {
+    if (error.code === "23505") {
+      return { ok: false, error: "Användarnamnet är upptaget." };
+    }
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath("/admin/anvandare");
+  revalidatePath(`/profile/${updates.username ?? ""}`);
+  return { ok: true };
+}
+
+export async function createDummyCreator(input: {
+  username: string;
+  displayName: string;
+  bio: string;
+  avatarUrl: string;
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+
+  const username = input.username.trim().toLowerCase();
+  if (!USERNAME_RE.test(username)) {
+    return {
+      ok: false,
+      error: "Användarnamn måste vara 2–30 tecken, bara a–z, 0–9 och _.",
+    };
+  }
+  const { isReservedUsername } = await import("@/lib/reserved-usernames");
+  if (isReservedUsername(username)) {
+    return { ok: false, error: "Användarnamnet är reserverat." };
+  }
+
+  const displayName = input.displayName.trim();
+  if (!displayName) return { ok: false, error: "Namn saknas." };
+
+  const avatarUrl = input.avatarUrl.trim();
+  if (avatarUrl && !/^https?:\/\//i.test(avatarUrl)) {
+    return { ok: false, error: "Avatar-URL måste börja med http(s)://" };
+  }
+
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch (e) {
+    return {
+      ok: false,
+      error:
+        e instanceof Error
+          ? e.message
+          : "SUPABASE_SERVICE_ROLE_KEY saknas i Vercel/env.",
+    };
+  }
+
+  // Verify the username isn't already taken before we burn an auth row.
+  const { data: existing } = await admin
+    .from("profiles")
+    .select("id")
+    .eq("username", username)
+    .maybeSingle();
+  if (existing) return { ok: false, error: "Användarnamnet är upptaget." };
+
+  const email = `${username}@demo.moidello.com`;
+  const { data: createdUser, error: authError } =
+    await admin.auth.admin.createUser({
+      email,
+      password: crypto.randomUUID() + "Aa1!",
+      email_confirm: true,
+      user_metadata: {
+        display_name: displayName,
+        avatar_url: avatarUrl || null,
+      },
+    });
+
+  if (authError || !createdUser.user) {
+    return {
+      ok: false,
+      error: authError?.message ?? "Kunde inte skapa konto.",
+    };
+  }
+
+  const { error: profErr } = await admin
+    .from("profiles")
+    .update({
+      username,
+      display_name: displayName,
+      avatar_url: avatarUrl || null,
+      bio: input.bio?.trim() || null,
+      account_type: "creator",
+    })
+    .eq("id", createdUser.user.id);
+
+  if (profErr) {
+    return {
+      ok: false,
+      error: `Profile-uppdatering misslyckades: ${profErr.message}`,
+    };
+  }
+
+  revalidatePath("/admin/anvandare");
+  return { ok: true };
+}
+
 export async function seedDummyCreators(): Promise<{
   ok: true;
   created: number;

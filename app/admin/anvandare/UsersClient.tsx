@@ -11,6 +11,9 @@ import {
   Search,
   Sparkles,
   ExternalLink,
+  Pencil,
+  Plus,
+  X,
 } from "lucide-react";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import {
@@ -18,6 +21,8 @@ import {
   toggleAdmin,
   deleteUserAccount,
   seedDummyCreators,
+  updateUserProfile,
+  createDummyCreator,
 } from "@/app/actions/admin-users";
 
 export interface UserRow {
@@ -48,6 +53,8 @@ export function UsersClient({
   const [busyId, setBusyId] = useState<string | null>(null);
   const [topError, setTopError] = useState<string | null>(null);
   const [seedReport, setSeedReport] = useState<string | null>(null);
+  const [editing, setEditing] = useState<UserRow | null>(null);
+  const [creating, setCreating] = useState(false);
   const [, startTransition] = useTransition();
 
   const submitSearch = (e: React.FormEvent) => {
@@ -130,11 +137,19 @@ export function UsersClient({
         </form>
         <button
           type="button"
-          onClick={handleSeed}
+          onClick={() => setCreating(true)}
           className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2.5 text-sm font-semibold hover:bg-white/90"
         >
+          <Plus className="h-4 w-4" />
+          Ny användare
+        </button>
+        <button
+          type="button"
+          onClick={handleSeed}
+          className="inline-flex items-center gap-2 rounded-full border border-border text-white px-4 py-2.5 text-sm font-semibold hover:border-white/30"
+        >
           <Sparkles className="h-4 w-4" />
-          Seed 8 demo-kreatörer
+          Seed 8 demo
         </button>
       </div>
 
@@ -210,23 +225,28 @@ export function UsersClient({
                     Posta som
                   </button>
                 )}
+                <button
+                  type="button"
+                  disabled={isBusy}
+                  onClick={() => setEditing(u)}
+                  aria-label="Redigera"
+                  className="inline-flex items-center justify-center rounded-full border border-border text-white h-7 w-7 hover:border-white/30 disabled:opacity-50"
+                >
+                  <Pencil className="h-3 w-3" />
+                </button>
                 {!isViewer && (
                   <button
                     type="button"
                     disabled={isBusy}
                     onClick={() => handleToggleAdmin(u.id)}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-border text-white px-3 py-1.5 text-xs hover:border-white/30 disabled:opacity-50"
+                    aria-label={u.is_admin ? "Ta bort admin" : "Gör till admin"}
+                    title={u.is_admin ? "Ta bort admin" : "Gör till admin"}
+                    className="inline-flex items-center justify-center rounded-full border border-border text-white h-7 w-7 hover:border-white/30 disabled:opacity-50"
                   >
                     {u.is_admin ? (
-                      <>
-                        <ShieldOff className="h-3 w-3" />
-                        Ta bort admin
-                      </>
+                      <ShieldOff className="h-3 w-3" />
                     ) : (
-                      <>
-                        <Shield className="h-3 w-3" />
-                        Gör till admin
-                      </>
+                      <Shield className="h-3 w-3" />
                     )}
                   </button>
                 )}
@@ -248,6 +268,269 @@ export function UsersClient({
           );
         })}
       </ul>
+
+      {editing && (
+        <EditUserModal
+          user={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            router.refresh();
+          }}
+        />
+      )}
+
+      {creating && (
+        <CreateUserModal
+          onClose={() => setCreating(false)}
+          onCreated={() => {
+            setCreating(false);
+            router.refresh();
+          }}
+        />
+      )}
     </>
+  );
+}
+
+function EditUserModal({
+  user,
+  onClose,
+  onSaved,
+}: {
+  user: UserRow;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [username, setUsername] = useState(user.username);
+  const [displayName, setDisplayName] = useState(user.display_name ?? "");
+  const [bio, setBio] = useState(user.bio ?? "");
+  const [avatarUrl, setAvatarUrl] = useState(user.avatar_url ?? "");
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    startTransition(async () => {
+      const res = await updateUserProfile(user.id, {
+        username,
+        display_name: displayName,
+        bio,
+        avatar_url: avatarUrl,
+      });
+      if (res.ok) onSaved();
+      else setError(res.error);
+    });
+  };
+
+  return (
+    <Modal title={`Redigera @${user.username}`} onClose={onClose}>
+      <form onSubmit={submit} className="space-y-4">
+        <Field label="Användarnamn">
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30 font-mono"
+          />
+        </Field>
+        <Field label="Visningsnamn">
+          <input
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30"
+          />
+        </Field>
+        <Field label="Bio">
+          <textarea
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            rows={3}
+            maxLength={500}
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30 resize-none"
+          />
+        </Field>
+        <Field label="Avatar-URL">
+          <input
+            type="url"
+            value={avatarUrl}
+            onChange={(e) => setAvatarUrl(e.target.value)}
+            placeholder="https://i.pravatar.cc/300?img=10"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30"
+          />
+        </Field>
+        {error && <p className="text-xs text-red-400">{error}</p>}
+        <div className="flex gap-3 pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 rounded-full border border-border text-white py-2.5 text-sm font-medium hover:border-white/30"
+          >
+            Avbryt
+          </button>
+          <button
+            type="submit"
+            disabled={pending}
+            className="flex-1 rounded-full bg-white text-black py-2.5 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+          >
+            {pending ? "Sparar…" : "Spara"}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+function CreateUserModal({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void;
+  onCreated: () => void;
+}) {
+  const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [bio, setBio] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    startTransition(async () => {
+      const res = await createDummyCreator({
+        username,
+        displayName,
+        bio,
+        avatarUrl,
+      });
+      if (res.ok) onCreated();
+      else setError(res.error);
+    });
+  };
+
+  return (
+    <Modal title="Skapa ny användare" onClose={onClose}>
+      <p className="text-xs text-foreground-subtle mb-4">
+        Skapar ett demo-konto utan inloggning. Krä­ver
+        SUPABASE_SERVICE_ROLE_KEY i Vercel.
+      </p>
+      <form onSubmit={submit} className="space-y-4">
+        <Field label="Användarnamn (a–z, 0–9, _)">
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value.toLowerCase())}
+            required
+            pattern="[a-z0-9_]{2,30}"
+            placeholder="anna_styles"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30 font-mono"
+          />
+        </Field>
+        <Field label="Visningsnamn">
+          <input
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            required
+            placeholder="Anna Styles"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30"
+          />
+        </Field>
+        <Field label="Bio (valfri)">
+          <textarea
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            rows={2}
+            maxLength={500}
+            placeholder="Berätta i en mening."
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30 resize-none"
+          />
+        </Field>
+        <Field label="Avatar-URL (valfri)">
+          <input
+            type="url"
+            value={avatarUrl}
+            onChange={(e) => setAvatarUrl(e.target.value)}
+            placeholder="https://i.pravatar.cc/300?img=20"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30"
+          />
+        </Field>
+        {error && <p className="text-xs text-red-400">{error}</p>}
+        <div className="flex gap-3 pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 rounded-full border border-border text-white py-2.5 text-sm font-medium hover:border-white/30"
+          >
+            Avbryt
+          </button>
+          <button
+            type="submit"
+            disabled={pending}
+            className="flex-1 rounded-full bg-white text-black py-2.5 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+          >
+            {pending ? "Skapar…" : "Skapa"}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+function Modal({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-6"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-3xl bg-background-secondary border border-white/10 p-6 max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-heading text-xl uppercase tracking-tight text-white">
+            {title}
+          </h3>
+          <button
+            onClick={onClose}
+            aria-label="Stäng"
+            className="text-foreground-muted hover:text-white"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="block text-xs uppercase tracking-[0.2em] text-foreground-subtle mb-2">
+        {label}
+      </span>
+      {children}
+    </label>
   );
 }
