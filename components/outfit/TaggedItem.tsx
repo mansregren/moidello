@@ -6,7 +6,6 @@ import { useState, useTransition } from "react";
 import { Bookmark, ExternalLink, Send } from "lucide-react";
 import { TaggedItem as TaggedItemType, Region } from "@/lib/types";
 import { resolveBuyUrl } from "@/lib/region";
-import { recordTagClick } from "@/app/actions/tracking";
 import { toggleSavedItem } from "@/app/actions/saved-items";
 import { ShareToDmSheet } from "@/components/shared/ShareToDmSheet";
 import { UserLink } from "@/components/shared/UserLink";
@@ -15,8 +14,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * Treats `#` and empty strings as missing — those came from seed data
- * placeholders. When the affiliate wrapper /go/[item_id] lands later
- * we'll instead always render the button and route through it.
+ * placeholders. Used to *hide* the Köp button when no real URL exists;
+ * the actual outgoing href routes through /go for click logging.
  */
 function isUsableBuyUrl(url: string | undefined): url is string {
   return !!url && url !== "#" && /^https?:\/\//i.test(url);
@@ -44,11 +43,6 @@ export function TaggedItemCard({
   const [saved, setSaved] = useState(initiallySaved);
   const [shareOpen, setShareOpen] = useState(false);
   const [, startTransition] = useTransition();
-
-  const handleBuyClick = () => {
-    if (!outfitId) return;
-    recordTagClick(item.id, outfitId).catch(() => {});
-  };
 
   const handleToggleSave = () => {
     if (!isLoggedIn) {
@@ -150,13 +144,9 @@ export function TaggedItemCard({
           >
             <Send className="h-4 w-4" />
           </button>
-          {/* TODO(affiliate): swap href for `/go/${item.id}` once the
-              wrapper exists so click logging + per-region affiliate
-              suffixes are applied server-side. */}
           {isUsableBuyUrl(buyUrl) && (
             <UserLink
-              href={buyUrl}
-              onClick={handleBuyClick}
+              href={outfitId ? `/go/${item.id}` : buyUrl}
               aria-label={`Köp ${item.brand} ${item.name}`}
               className="inline-flex items-center gap-1 rounded-full bg-white text-black px-3 py-2 text-xs font-semibold hover:bg-white/90 transition-colors"
             >

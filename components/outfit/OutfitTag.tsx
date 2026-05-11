@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { TaggedItem as TaggedItemType, Region } from "@/lib/types";
 import { resolveBuyUrl } from "@/lib/region";
-import { recordTagClick } from "@/app/actions/tracking";
 
 interface OutfitTagProps {
   tag: TaggedItemType;
@@ -15,13 +14,10 @@ interface OutfitTagProps {
 export function OutfitTag({ tag, outfitId, region }: OutfitTagProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   const buyUrl = resolveBuyUrl(tag, region);
-
-  const handleBuyClick = () => {
-    if (!outfitId) return;
-    recordTagClick(tag.id, outfitId).catch(() => {
-      // Click logging is best-effort.
-    });
-  };
+  // Once persisted, route through /go for server-side click logging +
+  // future per-region affiliate suffixing. Pre-persist (create flow) keep
+  // the direct URL so the preview still works without a DB row.
+  const href = outfitId ? `/go/${tag.id}` : buyUrl;
 
   return (
     <div
@@ -60,12 +56,11 @@ export function OutfitTag({ tag, outfitId, region }: OutfitTagProps) {
               {tag.price.toLocaleString("sv-SE")} {tag.currency}
             </p>
           )}
-          {buyUrl && (
+          {href && (
             <a
-              href={buyUrl}
+              href={href}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={handleBuyClick}
               className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white text-black px-3 py-1.5 text-xs font-medium hover:bg-white/90"
             >
               Köp

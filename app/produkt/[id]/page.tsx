@@ -138,11 +138,9 @@ export default async function ProduktPage({
               )}
 
               <div className="mt-7 flex flex-wrap items-center gap-3">
-                {/* TODO(affiliate): replace href with /go/${item.id}
-                    once the click-tracking wrapper exists. */}
                 {isUsableBuyUrl(item.buyUrl) && (
                   <UserLink
-                    href={item.buyUrl}
+                    href={`/go/${item.id}`}
                     className="inline-flex items-center gap-2 rounded-full bg-white text-black px-6 py-3 text-sm font-semibold hover:bg-white/90 transition-colors"
                   >
                     Köp hos {item.brand}
