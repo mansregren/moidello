@@ -3,14 +3,13 @@ import Link from "next/link";
 import { Search, Bookmark, ShoppingBag, Plus, ArrowRight } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
-import { pickBgs } from "@/lib/session-background";
+import { pickBgs, HERO_POOL } from "@/lib/session-background";
 
 export default async function OmPage() {
-  const [heroBg, parasolBg, harborBg] = await pickBgs([
-    "om-hero",
-    "om-section",
-    "om-stockholm",
-  ]);
+  const [heroBg, parasolBg, harborBg] = await pickBgs(
+    ["om-hero", "om-section", "om-stockholm"],
+    HERO_POOL,
+  );
   return (
     <>
       <Header />

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Header } from "@/components/layout/Header";
-import { pickBg } from "@/lib/session-background";
+import { pickBg, HERO_POOL } from "@/lib/session-background";
 import LoginForm from "./LoginForm";
 
 export default async function LoginPage({
@@ -9,7 +9,7 @@ export default async function LoginPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
-  const bg = await pickBg("login");
+  const bg = await pickBg("login", HERO_POOL);
 
   return (
     <>
