@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useGender } from "@/lib/gender-context";
 import { resizeImageForUpload } from "@/lib/image-resize";
+import { BrandAutocomplete } from "@/components/skapa/BrandAutocomplete";
 import { createOutfit, type PublishedOutfit } from "./actions";
 
 interface DemoTag {
@@ -816,14 +817,18 @@ export default function SkapaPage() {
                             </option>
                           ))}
                         </select>
-                        <input
-                          type="text"
-                          placeholder="Märke (t.ex. Nike)"
-                          value={tag.brand}
-                          onChange={(e) =>
-                            updateTag(tag.id, { brand: e.target.value })
+                        <BrandAutocomplete
+                          brand={tag.brand}
+                          onChangeBrand={(v) =>
+                            updateTag(tag.id, { brand: v })
                           }
-                          className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
+                          onPick={(product) =>
+                            updateTag(tag.id, {
+                              brand: product.brand,
+                              name: product.name,
+                              url: product.buyUrl,
+                            })
+                          }
                         />
                         <input
                           type="text"
