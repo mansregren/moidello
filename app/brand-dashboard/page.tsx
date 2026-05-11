@@ -116,6 +116,15 @@ export default async function BrandDashboardPage() {
         Engagemang på outfits där kreatörer har taggat ditt märke.
       </p>
 
+      <div className="mt-5 flex flex-wrap gap-2">
+        <Link
+          href="/brand-dashboard/import"
+          className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 text-xs font-semibold hover:bg-white/90"
+        >
+          Importera produkter (CSV)
+        </Link>
+      </div>
+
       <section className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <SummaryCard icon={Heart} label="Gillningar" value={totals.likes} />
         <SummaryCard icon={Bookmark} label="Sparade" value={totals.saves} />

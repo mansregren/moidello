@@ -1,15 +1,28 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Globe, Crown, Star, Gem, ShoppingBag, ArrowLeft, BadgeCheck } from "lucide-react";
+import { Globe, Crown, Star, Gem, ShoppingBag, ArrowLeft, BadgeCheck, ExternalLink } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { PremiumButton } from "@/components/shared/PremiumButton";
+import { UserLink } from "@/components/shared/UserLink";
+import { createPublicClient } from "@/lib/supabase/public";
 import {
   fetchBrandsAggregated,
   fetchBrandOutfits,
   fetchEngagementForViewer,
 } from "@/lib/queries";
+
+interface BrandProduct {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number | null;
+  currency: string | null;
+  buy_url: string | null;
+  image_url: string | null;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +51,16 @@ export default async function BrandPage({
     dbOutfits.map((o) => o.id),
   );
 
+  // Fetch the brand's official catalog (uploaded via brand-dashboard/import).
+  const supabase = createPublicClient();
+  const { data: productRows } = await supabase
+    .from("brand_products")
+    .select("id, name, description, price, currency, buy_url, image_url")
+    .ilike("brand_key", dbMatch.name)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
+    .limit(60);
+
   return (
     <BrandShell
       name={dbMatch.name}
@@ -54,6 +77,7 @@ export default async function BrandPage({
       savedIds={Array.from(saved)}
       outfitsCount={dbOutfits.length}
       verified={dbMatch.isClaimed}
+      products={(productRows as BrandProduct[] | null) ?? []}
     />
   );
 }
@@ -69,6 +93,7 @@ function BrandShell({
   savedIds = [],
   outfitsCount,
   verified,
+  products = [],
 }: {
   name: string;
   description: string;
@@ -80,6 +105,7 @@ function BrandShell({
   savedIds?: string[];
   outfitsCount: number;
   verified: boolean;
+  products?: BrandProduct[];
 }) {
   return (
     <>
@@ -149,6 +175,59 @@ function BrandShell({
                 Bli först med att tagga ett plagg från {name}!
               </p>
             </div>
+          )}
+
+          {products.length > 0 && (
+            <section className="mb-20">
+              <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-6">
+                Officiell katalog ({products.length})
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+                {products.map((p) => (
+                  <article
+                    key={p.id}
+                    className="rounded-2xl border border-border bg-background-secondary overflow-hidden flex flex-col"
+                  >
+                    <div className="relative aspect-[3/4] bg-background-tertiary">
+                      {p.image_url ? (
+                        <Image
+                          src={p.image_url}
+                          alt={p.name}
+                          fill
+                          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                          className="object-cover"
+                          unoptimized={p.image_url.startsWith("http")}
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-foreground-subtle text-xs uppercase tracking-wider">
+                          {name}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 flex-1 flex flex-col">
+                      <p className="text-sm text-white line-clamp-2">
+                        {p.name}
+                      </p>
+                      {p.price !== null && p.price > 0 && (
+                        <p className="mt-1 text-sm font-semibold text-white tabular-nums">
+                          {p.price.toLocaleString("sv-SE")}{" "}
+                          {p.currency ?? "SEK"}
+                        </p>
+                      )}
+                      {p.buy_url && (
+                        <UserLink
+                          href={p.buy_url}
+                          className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-white text-black px-3 py-1.5 text-xs font-semibold hover:bg-white/90"
+                        >
+                          Köp
+                          <ExternalLink className="h-3 w-3" />
+                        </UserLink>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
           )}
         </Container>
       </main>
