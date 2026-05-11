@@ -1,25 +1,11 @@
 import { cookies } from "next/headers";
 
 /**
- * Curated hero pool — only images Mans has personally approved for
- * front-of-house use (homepage hero, /om hero, /login). The older seed
- * imagery isn't part of this pool because it shouldn't dominate first
- * impressions.
+ * The 7 original seed images. Used both for hero placements and ambient
+ * rotation. anna/eirik/jerzy/nikola live in /public but are intentionally
+ * not in this pool — drop them in here later if you want them back.
  */
 export const HERO_POOL = [
-  "/images/bg/anna.jpg",
-  "/images/bg/eirik.jpg",
-  "/images/bg/jerzy.jpg",
-  "/images/bg/nikola.jpg",
-] as const;
-
-/**
- * Wider ambient pool for secondary placements (footer, side panels, /om
- * mid-sections). Includes everything in HERO_POOL plus the original
- * seed images so they still see some rotation.
- */
-export const BG_POOL = [
-  ...HERO_POOL,
   "/images/bg/positano.jpg",
   "/images/bg/parasols.jpg",
   "/images/bg/harbor.jpg",
@@ -28,6 +14,8 @@ export const BG_POOL = [
   "/images/bg/boats.jpg",
   "/images/bg/cafe.jpg",
 ] as const;
+
+export const BG_POOL = HERO_POOL;
 
 const FALLBACK = HERO_POOL[0];
 
