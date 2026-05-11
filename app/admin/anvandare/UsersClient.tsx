@@ -14,7 +14,10 @@ import {
   Pencil,
   Plus,
   X,
+  Upload,
 } from "lucide-react";
+import { useRef } from "react";
+import Image from "next/image";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import {
   startImpersonation,
@@ -23,6 +26,7 @@ import {
   seedDummyCreators,
   updateUserProfile,
   createDummyCreator,
+  uploadUserAvatar,
 } from "@/app/actions/admin-users";
 
 export interface UserRow {
@@ -330,6 +334,25 @@ function EditUserModal({
   const [avatarUrl, setAvatarUrl] = useState(user.avatar_url ?? "");
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const avatarFileRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarFile = async (file: File) => {
+    setError(null);
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.set("avatar", file);
+      const res = await uploadUserAvatar(user.id, fd);
+      if (res.ok) {
+        setAvatarUrl(res.url);
+      } else {
+        setError(res.error);
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -375,7 +398,52 @@ function EditUserModal({
             className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30 resize-none"
           />
         </Field>
-        <Field label="Avatar-URL">
+        <Field label="Profilbild">
+          <div className="flex items-center gap-3">
+            <div className="relative h-14 w-14 shrink-0 rounded-full overflow-hidden border border-border bg-background-tertiary">
+              {avatarUrl ? (
+                <Image
+                  src={avatarUrl}
+                  alt=""
+                  fill
+                  sizes="56px"
+                  className="object-cover"
+                  unoptimized={avatarUrl.startsWith("http")}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-foreground-subtle">
+                  ?
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <button
+                type="button"
+                onClick={() => avatarFileRef.current?.click()}
+                disabled={uploading || pending}
+                className="inline-flex items-center gap-2 rounded-full bg-white text-black px-3 py-2 text-xs font-semibold hover:bg-white/90 disabled:opacity-60"
+              >
+                <Upload className="h-3 w-3" />
+                {uploading ? "Laddar upp…" : "Välj bild"}
+              </button>
+              <p className="text-[11px] text-foreground-subtle mt-1.5">
+                JPG/PNG/WebP, max 5 MB
+              </p>
+              <input
+                ref={avatarFileRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleAvatarFile(f);
+                  e.target.value = "";
+                }}
+              />
+            </div>
+          </div>
+        </Field>
+        <Field label="Eller klistra in URL">
           <input
             type="url"
             value={avatarUrl}
