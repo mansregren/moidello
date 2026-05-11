@@ -1,11 +1,22 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { slugify, storageFilename } from "@/lib/slug";
 
+export interface PublishedOutfit {
+  id: string;
+  slug: string | null;
+  title: string;
+  username: string | null;
+  url: string;
+}
+
 export interface CreateOutfitState {
   error?: string;
+  success?: PublishedOutfit;
+  /** Bumped on every successful publish so the client can reset the form
+   *  even when a user publishes two outfits in a row with the same title. */
+  nonce?: number;
 }
 
 interface TagInput {
@@ -165,20 +176,33 @@ export async function createOutfit(
     }
   }
 
-  // Redirect to the new /<username>/<slug> URL when we have a slug,
-  // fall back to /outfit/<uuid> (which 301s to the canonical URL via
-  // the existing route).
+  // Return a success payload so the client can decide whether to stay on
+  // /skapa for another upload or navigate to the new outfit. Username is
+  // fetched once so the client can build canonical /<username>/<slug> URLs
+  // without an extra round-trip.
+  let username: string | null = null;
   if (outfit.slug) {
     const { data: profileRow } = await supabase
       .from("profiles")
       .select("username")
       .eq("id", user.id)
       .maybeSingle();
-    const username = profileRow?.username as string | undefined;
-    if (username) {
-      redirect(`/${username.toLowerCase()}/${outfit.slug}`);
-    }
+    username = (profileRow?.username as string | undefined)?.toLowerCase() ?? null;
   }
 
-  redirect(`/outfit/${outfit.id}`);
+  const url =
+    username && outfit.slug
+      ? `/${username}/${outfit.slug}`
+      : `/outfit/${outfit.id}`;
+
+  return {
+    success: {
+      id: outfit.id,
+      slug: outfit.slug,
+      title,
+      username,
+      url,
+    },
+    nonce: Date.now(),
+  };
 }

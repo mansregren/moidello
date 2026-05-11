@@ -1,7 +1,8 @@
 "use client";
 
-import { Upload, Eye, X } from "lucide-react";
+import { Upload, Eye, X, CheckCircle2, Plus } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { PremiumButton } from "@/components/shared/PremiumButton";
@@ -12,7 +13,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useGender } from "@/lib/gender-context";
 import { resizeImageForUpload } from "@/lib/image-resize";
-import { createOutfit, type CreateOutfitState } from "./actions";
+import {
+  createOutfit,
+  type CreateOutfitState,
+  type PublishedOutfit,
+} from "./actions";
 
 interface DemoTag {
   id: number;
@@ -68,6 +73,8 @@ export default function SkapaPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
+  const [published, setPublished] = useState<PublishedOutfit[]>([]);
+  const [lastHandledNonce, setLastHandledNonce] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [state, formAction, pending] = useActionState(createOutfit, initialState);
@@ -77,6 +84,26 @@ export default function SkapaPage() {
       router.push("/login");
     }
   }, [loading, isLoggedIn, router]);
+
+  // When a publish succeeds: add it to the session queue and reset the form
+  // so the user can immediately upload the next outfit on the same page.
+  // The nonce guards against re-applying the same success on re-renders.
+  useEffect(() => {
+    if (state.success && state.nonce && state.nonce !== lastHandledNonce) {
+      setPublished((prev) => [...prev, state.success!]);
+      setLastHandledNonce(state.nonce);
+      setImageFile(null);
+      setTags([]);
+      setTitle("");
+      setDescription("");
+      setCategory("");
+      setPreviewMode(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [state, lastHandledNonce]);
 
   const imagePreview = useMemo(
     () => (imageFile ? URL.createObjectURL(imageFile) : null),
@@ -212,20 +239,53 @@ export default function SkapaPage() {
             <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white mb-2">
               Skapa <span className="text-foreground-subtle">Outfit</span>
             </h1>
-            <p className="text-foreground-muted mb-3">
-              Dela din stil med världen
-            </p>
-            <p className="text-sm text-foreground-subtle mb-8">
-              Eller{" "}
-              <a
-                href="/skapa/flera"
-                className="text-white underline hover:text-white/80"
-              >
-                ladda upp flera bilder samtidigt
-              </a>
-              .
+            <p className="text-foreground-muted mb-8">
+              Dela din stil med världen. Publicera så många du vill —
+              du stannar kvar på sidan tills du är klar.
             </p>
           </motion.div>
+
+          {published.length > 0 && (
+            <div className="mb-8 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.05] p-5">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white">
+                    {published.length}{" "}
+                    {published.length === 1 ? "outfit" : "outfits"}{" "}
+                    publicerad{published.length === 1 ? "" : "e"} i den
+                    här sessionen
+                  </p>
+                  <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                    {published.map((p) => (
+                      <li key={p.id}>
+                        <Link
+                          href={p.url}
+                          className="text-xs text-emerald-300 hover:underline"
+                        >
+                          {p.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <p className="text-xs text-foreground-muted inline-flex items-center gap-1.5">
+                      <Plus className="h-3.5 w-3.5" />
+                      Fyll i formuläret nedan för att publicera nästa
+                    </p>
+                    {published[0]?.username && (
+                      <Link
+                        href={`/profile/${published[0].username}`}
+                        className="text-xs text-white underline hover:text-white/80 ml-auto"
+                      >
+                        Klar — visa min profil →
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <form action={formAction} className="grid lg:grid-cols-2 gap-8">
             <input type="hidden" name="gender" value={gender} />
