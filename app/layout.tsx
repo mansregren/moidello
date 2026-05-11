@@ -7,6 +7,7 @@ import { ToastProvider } from "@/lib/toast-context";
 import { AuthProvider, type AuthProfile } from "@/lib/auth-context";
 import { AppShell } from "@/components/layout/AppShell";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
+import { CookieBanner } from "@/components/layout/CookieBanner";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { pickBg } from "@/lib/session-background";
 import { siteJsonLd } from "@/lib/json-ld";
@@ -139,6 +140,7 @@ export default async function RootLayout({
             </GenderProvider>
           </ToastProvider>
         </AuthProvider>
+        <CookieBanner />
         <Analytics />
         <SpeedInsights />
       </body>
