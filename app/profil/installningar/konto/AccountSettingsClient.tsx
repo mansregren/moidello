@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Download, Trash2, AlertTriangle } from "lucide-react";
 import { exportMyData, deleteMyAccount } from "@/app/actions/account";
+import { PushToggle } from "@/components/settings/PushToggle";
 
 export function AccountSettingsClient({ username }: { username: string }) {
   const [pending, startTransition] = useTransition();
@@ -46,6 +47,8 @@ export function AccountSettingsClient({ username }: { username: string }) {
 
   return (
     <div className="mt-12 space-y-6">
+      <PushToggle />
+
       <section className="rounded-2xl border border-border bg-background-secondary p-6 md:p-8">
         <div className="flex items-start gap-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black">
