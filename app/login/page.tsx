@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Header } from "@/components/layout/Header";
+import { pickBg } from "@/lib/session-background";
 import LoginForm from "./LoginForm";
 
 export default async function LoginPage({
@@ -8,6 +9,7 @@ export default async function LoginPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
+  const bg = await pickBg("login");
 
   return (
     <>
@@ -19,7 +21,7 @@ export default async function LoginPage({
       >
         <div className="absolute inset-0">
           <Image
-            src="/images/bg/riviera.jpg"
+            src={bg}
             alt=""
             fill
             priority

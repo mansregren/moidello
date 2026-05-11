@@ -42,11 +42,15 @@ export default function HomeClient({
   creators,
   likedIds = [],
   savedIds = [],
+  heroBg = "/images/bg/positano.jpg",
+  lifestyleBg = "/images/bg/parasols.jpg",
 }: {
   outfits: Outfit[];
   creators: User[];
   likedIds?: string[];
   savedIds?: string[];
+  heroBg?: string;
+  lifestyleBg?: string;
 }) {
   const { gender } = useGender();
   const liked = useMemo(() => new Set(likedIds), [likedIds]);
@@ -73,7 +77,7 @@ export default function HomeClient({
         <section className="relative">
           <div className="relative h-[44vh] md:h-[60vh] min-h-[320px] overflow-hidden">
             <Image
-              src="/images/bg/positano.jpg"
+              src={heroBg}
               alt=""
               fill
               className="object-cover"
@@ -190,7 +194,7 @@ export default function HomeClient({
             className="relative -mx-6 md:-mx-12 h-[40vh] md:h-[50vh] overflow-hidden"
           >
             <Image
-              src="/images/bg/parasols.jpg"
+              src={lifestyleBg}
               alt=""
               fill
               className="object-cover"

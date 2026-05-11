@@ -8,6 +8,7 @@ import { AuthProvider, type AuthProfile } from "@/lib/auth-context";
 import { AppShell } from "@/components/layout/AppShell";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { pickBg } from "@/lib/session-background";
 import { siteJsonLd } from "@/lib/json-ld";
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
@@ -116,6 +117,8 @@ export default async function RootLayout({
     }
   }
 
+  const footerBg = await pickBg("footer");
+
   return (
     <html
       lang="sv"
@@ -132,7 +135,7 @@ export default async function RootLayout({
         <AuthProvider initialUser={user} initialProfile={initialProfile}>
           <ToastProvider>
             <GenderProvider>
-              <AppShell>{children}</AppShell>
+              <AppShell footerBg={footerBg}>{children}</AppShell>
             </GenderProvider>
           </ToastProvider>
         </AuthProvider>

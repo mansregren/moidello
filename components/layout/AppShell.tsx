@@ -7,7 +7,13 @@ import { Footer } from "./Footer";
 import { shouldShowAppNav, shouldShowFooter } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  footerBg,
+}: {
+  children: ReactNode;
+  footerBg?: string;
+}) {
   const pathname = usePathname();
   const showNav = shouldShowAppNav(pathname);
   const showFooter = shouldShowFooter(pathname);
@@ -21,7 +27,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
       >
         {children}
-        {showFooter && <Footer />}
+        {showFooter && <Footer bg={footerBg} />}
       </div>
       {showNav && <FloatingBottomNav />}
     </>

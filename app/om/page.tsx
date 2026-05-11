@@ -3,8 +3,14 @@ import Link from "next/link";
 import { Search, Bookmark, ShoppingBag, Plus, ArrowRight } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
+import { pickBgs } from "@/lib/session-background";
 
-export default function OmPage() {
+export default async function OmPage() {
+  const [heroBg, parasolBg, harborBg] = await pickBgs([
+    "om-hero",
+    "om-section",
+    "om-stockholm",
+  ]);
   return (
     <>
       <Header />
@@ -13,7 +19,7 @@ export default function OmPage() {
         <section className="relative">
           <div className="relative h-[58vh] md:h-[72vh] min-h-[420px] overflow-hidden">
             <Image
-              src="/images/bg/positano.jpg"
+              src={heroBg}
               alt=""
               fill
               priority
@@ -64,7 +70,7 @@ export default function OmPage() {
         <section className="relative">
           <div className="absolute inset-0">
             <Image
-              src="/images/bg/parasols.jpg"
+              src={parasolBg}
               alt=""
               fill
               sizes="100vw"
@@ -135,7 +141,7 @@ export default function OmPage() {
         <section className="relative border-t border-border">
           <div className="absolute inset-0">
             <Image
-              src="/images/bg/harbor.jpg"
+              src={harborBg}
               alt=""
               fill
               sizes="100vw"

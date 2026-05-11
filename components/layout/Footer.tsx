@@ -19,13 +19,15 @@ const footerLinks = {
   ],
 };
 
-export function Footer() {
+export function Footer({
+  bg = "/images/bg/harbor.jpg",
+}: { bg?: string }) {
   const year = new Date().getFullYear();
 
   return (
     <footer className="relative border-t border-border overflow-hidden">
       <div className="absolute inset-0">
-        <Image src="/images/bg/harbor.jpg" alt="" fill className="object-cover" />
+        <Image src={bg} alt="" fill className="object-cover" />
         <div className="absolute inset-0 bg-black/85" />
       </div>
       <Container className="relative z-10 py-16 md:py-24">

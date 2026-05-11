@@ -3,14 +3,16 @@ import {
   fetchTopCreators,
   fetchEngagementForViewer,
 } from "@/lib/queries";
+import { pickBgs } from "@/lib/session-background";
 import HomeClient from "./HomeClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [outfits, creators] = await Promise.all([
+  const [outfits, creators, [heroBg, lifestyleBg]] = await Promise.all([
     fetchOutfits(12),
     fetchTopCreators(6),
+    pickBgs(["home-hero", "home-lifestyle"]),
   ]);
 
   const { liked, saved } = await fetchEngagementForViewer(
@@ -23,6 +25,8 @@ export default async function HomePage() {
       creators={creators}
       likedIds={Array.from(liked)}
       savedIds={Array.from(saved)}
+      heroBg={heroBg}
+      lifestyleBg={lifestyleBg}
     />
   );
 }
