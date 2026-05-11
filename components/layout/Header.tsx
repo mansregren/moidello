@@ -145,24 +145,33 @@ export function Header() {
         {/* Search expansion */}
         <AnimatePresence initial={false}>
           {searchOpen && (
-            <motion.div
+            <motion.form
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="absolute inset-0 flex items-center bg-black/95 backdrop-blur-xl px-4 md:px-6 z-10"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const q = searchInputRef.current?.value.trim();
+                if (q) {
+                  router.push(`/sok?q=${encodeURIComponent(q)}`);
+                  setSearchOpen(false);
+                }
+              }}
             >
               <Search className="h-5 w-5 text-foreground-muted shrink-0" />
               <input
                 ref={searchInputRef}
                 type="search"
+                name="q"
                 placeholder="Sök outfits, märken, kreatörer…"
                 className="flex-1 bg-transparent border-0 outline-none px-3 text-base text-white placeholder:text-foreground-subtle"
               />
               <IconButton aria-label="Stäng sök" onClick={() => setSearchOpen(false)}>
                 <X className="h-5 w-5" />
               </IconButton>
-            </motion.div>
+            </motion.form>
           )}
         </AnimatePresence>
       </Container>
