@@ -212,8 +212,18 @@ export default function SkapaPage() {
             <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white mb-2">
               Skapa <span className="text-foreground-subtle">Outfit</span>
             </h1>
-            <p className="text-foreground-muted mb-8">
+            <p className="text-foreground-muted mb-3">
               Dela din stil med världen
+            </p>
+            <p className="text-sm text-foreground-subtle mb-8">
+              Eller{" "}
+              <a
+                href="/skapa/flera"
+                className="text-white underline hover:text-white/80"
+              >
+                ladda upp flera bilder samtidigt
+              </a>
+              .
             </p>
           </motion.div>
 
