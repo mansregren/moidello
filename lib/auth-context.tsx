@@ -11,7 +11,7 @@ import {
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { X, Heart, Bookmark, UserPlus, Plus, User } from "lucide-react";
+import { X, Heart, Bookmark, UserPlus, Plus, User, Flag } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 
@@ -21,7 +21,8 @@ export type AuthAction =
   | "follow"
   | "create"
   | "profile"
-  | "comment";
+  | "comment"
+  | "report";
 
 export interface AuthProfile {
   username: string;
@@ -36,6 +37,7 @@ const PROMPTS: Record<AuthAction, { title: string; icon: typeof Heart }> = {
   create: { title: "Skapa konto för att lägga upp outfits", icon: Plus },
   profile: { title: "Logga in för att se din profil", icon: User },
   comment: { title: "Skapa konto för att kommentera", icon: Heart },
+  report: { title: "Logga in för att rapportera", icon: Flag },
 };
 
 interface AuthContextValue {

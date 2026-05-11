@@ -12,6 +12,7 @@ import { MessageButton } from "@/components/user/MessageButton";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { FollowersList } from "@/components/user/FollowersList";
 import { ShareButton } from "@/components/shared/ShareButton";
+import { ReportButton } from "@/components/shared/ReportButton";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { profilePageJsonLd } from "@/lib/json-ld";
 import { useAuth } from "@/lib/auth-context";
@@ -193,6 +194,9 @@ export default function ProfileDetail({
                     : `Kolla in ${user.displayName} på Moidello`
                 }
               />
+              {!isOwnProfile && (
+                <ReportButton targetType="profile" targetId={user.id} />
+              )}
             </div>
           </motion.div>
 

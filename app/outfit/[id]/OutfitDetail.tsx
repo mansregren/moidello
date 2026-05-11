@@ -26,6 +26,7 @@ import { TrackView } from "@/components/outfit/TrackView";
 import { AddToBoardButton } from "@/components/outfit/AddToBoardButton";
 import { ShareButton } from "@/components/shared/ShareButton";
 import { ShareToDmSheet } from "@/components/shared/ShareToDmSheet";
+import { ReportButton } from "@/components/shared/ReportButton";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { outfitPageJsonLd } from "@/lib/json-ld";
 import { outfitPath } from "@/lib/outfit-url";
@@ -260,6 +261,9 @@ export default function OutfitDetail({
                   label="Dela länk"
                   variant="outline"
                 />
+                {isPersisted && user?.id !== outfit.creator.id && (
+                  <ReportButton targetType="outfit" targetId={outfit.id} />
+                )}
               </div>
 
               {isPersisted && (
@@ -390,6 +394,8 @@ function CommentsSection({
           const canDelete =
             viewerId !== null &&
             (viewerId === comment.user.id || viewerId === outfitOwnerId);
+          const canReport =
+            viewerId !== null && viewerId !== comment.user.id;
           return (
             <div key={comment.id} className="flex gap-3 group">
               <UserAvatar
@@ -404,12 +410,21 @@ function CommentsSection({
                   </span>{" "}
                   <span className="text-foreground-muted">{comment.text}</span>
                 </p>
-                <p className="text-xs text-foreground-subtle mt-1">
-                  {new Date(comment.createdAt).toLocaleString("sv-SE", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  })}
-                </p>
+                <div className="flex items-center gap-3 mt-1">
+                  <p className="text-xs text-foreground-subtle">
+                    {new Date(comment.createdAt).toLocaleString("sv-SE", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
+                  </p>
+                  {canReport && (
+                    <ReportButton
+                      targetType="comment"
+                      targetId={comment.id}
+                      variant="menuitem"
+                    />
+                  )}
+                </div>
               </div>
               {canDelete && (
                 <button
