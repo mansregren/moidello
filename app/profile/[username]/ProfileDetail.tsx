@@ -10,6 +10,7 @@ import { UserAvatar } from "@/components/user/UserAvatar";
 import { SocialLinks } from "@/components/user/SocialLinks";
 import { MessageButton } from "@/components/user/MessageButton";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
+import { FollowersList } from "@/components/user/FollowersList";
 import { ShareButton } from "@/components/shared/ShareButton";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { profilePageJsonLd } from "@/lib/json-ld";
@@ -47,9 +48,9 @@ export default function ProfileDetail({
   publicBoards?: PublicBoardSummary[];
 }) {
   const { user: viewer, isLoggedIn, requireAuth } = useAuth();
-  const [activeTab, setActiveTab] = useState<"outfits" | "boards" | "about">(
-    "outfits",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "outfits" | "boards" | "followers" | "following" | "about"
+  >("outfits");
   const [following, setFollowing] = useState(initiallyFollowing);
   useEffect(() => {
     setFollowing(initiallyFollowing);
@@ -75,7 +76,7 @@ export default function ProfileDetail({
   };
 
   const tabs: Array<{
-    key: "outfits" | "boards" | "about";
+    key: "outfits" | "boards" | "followers" | "following" | "about";
     label: string;
     count?: number;
   }> = [
@@ -83,6 +84,8 @@ export default function ProfileDetail({
     ...(publicBoards.length > 0
       ? [{ key: "boards" as const, label: "Samlingar", count: publicBoards.length }]
       : []),
+    { key: "followers", label: "Följare", count: user.followers },
+    { key: "following", label: "Följer", count: user.following },
     { key: "about", label: "Om" },
   ];
 
@@ -130,24 +133,36 @@ export default function ProfileDetail({
             )}
 
             <div className="flex items-center gap-8 mt-6">
-              <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setActiveTab("followers")}
+                className="text-center rounded-md px-1 -mx-1 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              >
                 <p className="text-lg font-semibold text-white">
                   {formatNumber(user.followers)}
                 </p>
                 <p className="text-xs text-foreground-subtle">Följare</p>
-              </div>
-              <div className="text-center">
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("following")}
+                className="text-center rounded-md px-1 -mx-1 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              >
                 <p className="text-lg font-semibold text-white">
                   {formatNumber(user.following)}
                 </p>
                 <p className="text-xs text-foreground-subtle">Följer</p>
-              </div>
-              <div className="text-center">
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("outfits")}
+                className="text-center rounded-md px-1 -mx-1 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              >
                 <p className="text-lg font-semibold text-white">
                   {user.outfitCount}
                 </p>
                 <p className="text-xs text-foreground-subtle">Outfits</p>
-              </div>
+              </button>
             </div>
 
             <SocialLinks user={user} className="mt-5" />
@@ -264,6 +279,12 @@ export default function ProfileDetail({
                   </Link>
                 ))}
               </div>
+            )}
+            {activeTab === "followers" && (
+              <FollowersList profileId={user.id} mode="followers" />
+            )}
+            {activeTab === "following" && (
+              <FollowersList profileId={user.id} mode="following" />
             )}
             {activeTab === "about" && (
               <div className="max-w-md mx-auto text-center">
