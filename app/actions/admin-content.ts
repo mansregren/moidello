@@ -1,0 +1,199 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+import { isCurrentUserAdmin } from "@/lib/admin";
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function updateOutfit(
+  outfitId: string,
+  patch: {
+    title?: string;
+    description?: string | null;
+    category?: string | null;
+    gender?: "dam" | "herr";
+    is_published?: boolean;
+  },
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+  if (!UUID_RE.test(outfitId)) {
+    return { ok: false, error: "Ogiltigt id." };
+  }
+
+  const updates: Record<string, string | boolean | null> = {};
+  if (patch.title !== undefined) {
+    const t = patch.title.trim();
+    if (!t) return { ok: false, error: "Titel får inte vara tom." };
+    updates.title = t.slice(0, 200);
+  }
+  if (patch.description !== undefined) {
+    const d = patch.description?.trim() ?? null;
+    updates.description = d && d.length > 0 ? d.slice(0, 2000) : null;
+  }
+  if (patch.category !== undefined) {
+    const c = patch.category?.trim() ?? null;
+    updates.category = c && c.length > 0 ? c : null;
+  }
+  if (patch.gender !== undefined) {
+    if (patch.gender !== "dam" && patch.gender !== "herr") {
+      return { ok: false, error: "Ogiltigt kön." };
+    }
+    updates.gender = patch.gender;
+  }
+  if (patch.is_published !== undefined) {
+    updates.is_published = patch.is_published;
+  }
+
+  if (Object.keys(updates).length === 0) return { ok: true };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("outfits")
+    .update(updates)
+    .eq("id", outfitId);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/inlagg");
+  revalidatePath(`/admin/inlagg/${outfitId}`);
+  revalidatePath(`/outfit/${outfitId}`);
+  return { ok: true };
+}
+
+export async function deleteOutfit(
+  outfitId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+  if (!UUID_RE.test(outfitId)) {
+    return { ok: false, error: "Ogiltigt id." };
+  }
+
+  const supabase = await createClient();
+
+  // Best-effort: remove the storage object too. Fail-open if it errors.
+  const { data: row } = await supabase
+    .from("outfits")
+    .select("image_path")
+    .eq("id", outfitId)
+    .maybeSingle();
+  if (row?.image_path) {
+    await supabase.storage
+      .from("outfits")
+      .remove([row.image_path as string]);
+  }
+
+  const { error } = await supabase
+    .from("outfits")
+    .delete()
+    .eq("id", outfitId);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/inlagg");
+  return { ok: true };
+}
+
+export async function updateTaggedItem(
+  tagId: string,
+  patch: {
+    brand?: string;
+    name?: string;
+    buy_url?: string | null;
+    price?: number | null;
+    currency?: string | null;
+    garment?: string;
+    is_affiliate?: boolean;
+  },
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+  if (!UUID_RE.test(tagId)) return { ok: false, error: "Ogiltigt id." };
+
+  const updates: Record<string, string | number | boolean | null> = {};
+  if (patch.brand !== undefined) {
+    const b = patch.brand.trim();
+    if (!b) return { ok: false, error: "Märke får inte vara tomt." };
+    updates.brand = b.slice(0, 80);
+  }
+  if (patch.name !== undefined) {
+    const n = patch.name.trim();
+    if (!n) return { ok: false, error: "Namn får inte vara tomt." };
+    updates.name = n.slice(0, 200);
+  }
+  if (patch.buy_url !== undefined) {
+    const u = patch.buy_url?.trim() ?? null;
+    if (u && !/^https?:\/\//i.test(u)) {
+      return { ok: false, error: "URL måste börja med http(s)://" };
+    }
+    updates.buy_url = u && u.length > 0 ? u : null;
+  }
+  if (patch.price !== undefined) {
+    if (patch.price === null) {
+      updates.price = null;
+    } else {
+      const p = Number(patch.price);
+      if (!Number.isFinite(p) || p < 0) {
+        return { ok: false, error: "Ogiltigt pris." };
+      }
+      updates.price = p;
+    }
+  }
+  if (patch.currency !== undefined) {
+    const c = patch.currency?.trim().toUpperCase() ?? null;
+    updates.currency = c && c.length > 0 ? c.slice(0, 8) : null;
+  }
+  if (patch.garment !== undefined) {
+    updates.garment = patch.garment.slice(0, 40);
+  }
+  if (patch.is_affiliate !== undefined) {
+    updates.is_affiliate = patch.is_affiliate;
+  }
+
+  if (Object.keys(updates).length === 0) return { ok: true };
+
+  const supabase = await createClient();
+  const { data: row, error } = await supabase
+    .from("tagged_items")
+    .update(updates)
+    .eq("id", tagId)
+    .select("outfit_id")
+    .maybeSingle();
+  if (error) return { ok: false, error: error.message };
+
+  if (row?.outfit_id) {
+    revalidatePath(`/admin/inlagg/${row.outfit_id}`);
+  }
+  return { ok: true };
+}
+
+export async function deleteTaggedItem(
+  tagId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+  if (!UUID_RE.test(tagId)) return { ok: false, error: "Ogiltigt id." };
+
+  const supabase = await createClient();
+  const { data: row } = await supabase
+    .from("tagged_items")
+    .select("outfit_id")
+    .eq("id", tagId)
+    .maybeSingle();
+
+  const { error } = await supabase
+    .from("tagged_items")
+    .delete()
+    .eq("id", tagId);
+  if (error) return { ok: false, error: error.message };
+
+  if (row?.outfit_id) {
+    revalidatePath(`/admin/inlagg/${row.outfit_id}`);
+  }
+  return { ok: true };
+}
