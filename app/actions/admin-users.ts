@@ -167,6 +167,14 @@ export async function updateUserProfile(
     display_name?: string | null;
     bio?: string | null;
     avatar_url?: string | null;
+    region?: string | null;
+    instagram?: string | null;
+    tiktok?: string | null;
+    youtube?: string | null;
+    website?: string | null;
+    brand_name?: string | null;
+    brand_website?: string | null;
+    account_type?: "creator" | "brand" | null;
   },
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
@@ -205,6 +213,28 @@ export async function updateUserProfile(
     }
     updates.avatar_url = a && a.length > 0 ? a : null;
   }
+  if (patch.region !== undefined) {
+    const r = patch.region?.trim().toUpperCase() ?? null;
+    updates.region = r && r.length > 0 ? r.slice(0, 8) : null;
+  }
+  for (const key of [
+    "instagram",
+    "tiktok",
+    "youtube",
+    "website",
+    "brand_name",
+    "brand_website",
+  ] as const) {
+    if (patch[key] !== undefined) {
+      const v = patch[key]?.trim() ?? null;
+      updates[key] = v && v.length > 0 ? v : null;
+    }
+  }
+  if (patch.account_type !== undefined) {
+    if (patch.account_type === "creator" || patch.account_type === "brand") {
+      updates.account_type = patch.account_type;
+    }
+  }
 
   if (Object.keys(updates).length === 0) {
     return { ok: true };
@@ -223,8 +253,70 @@ export async function updateUserProfile(
   }
 
   revalidatePath("/admin/anvandare");
-  revalidatePath(`/profile/${updates.username ?? ""}`);
+  revalidatePath(`/admin/anvandare/${userId}`);
+  if (updates.username) revalidatePath(`/profile/${updates.username}`);
   return { ok: true };
+}
+
+const ACCEPTED_AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
+
+export async function uploadUserAvatar(
+  userId: string,
+  formData: FormData,
+): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+
+  const file = formData.get("avatar");
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false, error: "Välj en bild." };
+  }
+  if (!ACCEPTED_AVATAR_TYPES.includes(file.type)) {
+    return { ok: false, error: "Bilden måste vara JPG, PNG eller WebP." };
+  }
+  if (file.size > MAX_AVATAR_BYTES) {
+    return { ok: false, error: "Bilden är för stor (max 5 MB)." };
+  }
+
+  const supabase = await createClient();
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  // Path lives under the target user's folder so the file is owned by them.
+  // Admin storage policy from 0027 allows the write.
+  const path = `${userId}/avatar-${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("avatars")
+    .upload(path, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (uploadError) {
+    return {
+      ok: false,
+      error: `Uppladdning misslyckades: ${uploadError.message}`,
+    };
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("avatars").getPublicUrl(path);
+
+  const { error: profErr } = await supabase
+    .from("profiles")
+    .update({ avatar_url: publicUrl })
+    .eq("id", userId);
+
+  if (profErr) {
+    await supabase.storage.from("avatars").remove([path]);
+    return { ok: false, error: profErr.message };
+  }
+
+  revalidatePath("/admin/anvandare");
+  revalidatePath(`/admin/anvandare/${userId}`);
+  return { ok: true, url: publicUrl };
 }
 
 export async function createDummyCreator(input: {
@@ -305,6 +397,7 @@ export async function createDummyCreator(input: {
       avatar_url: avatarUrl || null,
       bio: input.bio?.trim() || null,
       account_type: "creator",
+      is_demo: true,
     })
     .eq("id", createdUser.user.id);
 
@@ -393,6 +486,7 @@ export async function seedDummyCreators(): Promise<{
         avatar_url: spec.avatarUrl,
         bio: spec.bio,
         account_type: "creator",
+        is_demo: true,
       })
       .eq("id", created_user.user.id);
 

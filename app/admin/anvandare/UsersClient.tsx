@@ -34,6 +34,7 @@ export interface UserRow {
   account_type: "creator" | "brand" | null;
   brand_name: string | null;
   is_admin: boolean;
+  is_demo?: boolean;
   created_at: string;
 }
 
@@ -42,11 +43,13 @@ export function UsersClient({
   outfitCounts,
   viewerId,
   initialQuery,
+  currentFilter: _currentFilter,
 }: {
   users: UserRow[];
   outfitCounts: Record<string, number>;
   viewerId: string | null;
   initialQuery: string;
+  currentFilter?: string;
 }) {
   const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
@@ -59,8 +62,12 @@ export function UsersClient({
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const qs = query.trim() ? `?q=${encodeURIComponent(query.trim())}` : "";
-    router.push(`/admin/anvandare${qs}`);
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
+    if (_currentFilter && _currentFilter !== "all")
+      params.set("filter", _currentFilter);
+    const qs = params.toString();
+    router.push(`/admin/anvandare${qs ? "?" + qs : ""}`);
   };
 
   const handleImpersonate = (uid: string) => {
@@ -175,23 +182,33 @@ export function UsersClient({
               key={u.id}
               className="rounded-2xl border border-border bg-background-secondary p-4 flex items-center gap-4"
             >
-              <UserAvatar
-                src={u.avatar_url ?? ""}
-                alt={u.display_name ?? u.username}
-                size="md"
-              />
+              <Link
+                href={`/admin/anvandare/${u.id}`}
+                className="shrink-0"
+                aria-label={`Hantera ${u.display_name ?? u.username}`}
+              >
+                <UserAvatar
+                  src={u.avatar_url ?? ""}
+                  alt={u.display_name ?? u.username}
+                  size="md"
+                />
+              </Link>
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <Link
-                    href={`/profile/${u.username}`}
-                    className="text-sm font-medium text-white hover:underline truncate inline-flex items-center gap-1"
+                    href={`/admin/anvandare/${u.id}`}
+                    className="text-sm font-medium text-white hover:underline truncate"
                   >
                     {u.display_name ?? u.username}
-                    <ExternalLink className="h-3 w-3 text-foreground-subtle" />
                   </Link>
-                  <span className="text-xs text-foreground-subtle">
+                  <Link
+                    href={`/profile/${u.username}`}
+                    target="_blank"
+                    className="text-xs text-foreground-subtle hover:text-white inline-flex items-center gap-1"
+                  >
                     @{u.username}
-                  </span>
+                    <ExternalLink className="h-3 w-3" />
+                  </Link>
                   {u.account_type === "brand" && (
                     <span className="inline-flex rounded-full bg-white/10 text-white px-2 py-0.5 text-[10px] uppercase tracking-wider">
                       Märke
@@ -200,6 +217,11 @@ export function UsersClient({
                   {u.is_admin && (
                     <span className="inline-flex rounded-full bg-emerald-500/20 text-emerald-300 px-2 py-0.5 text-[10px] uppercase tracking-wider">
                       Admin
+                    </span>
+                  )}
+                  {u.is_demo && (
+                    <span className="inline-flex rounded-full bg-amber-500/20 text-amber-300 px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                      Demo
                     </span>
                   )}
                   {isViewer && (
