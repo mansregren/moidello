@@ -6,41 +6,102 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Aktuell status
 
-Senast uppdaterad: 2026-05-09
+Senast uppdaterad: 2026-05-11 (stor session — 26 commits, ~10k rader)
 
-### Senast deployat (commit-hashar på `main`)
+### Sessionens leveranser (alla på `main`, deployat via Vercel)
 
-- `45a90d2` — **OG-bild-fix.** Anton-fonten bytt från `github.com/google/fonts` (170 KB, ships en DSIG-tabell som kraschar Satori) till fontsource (25 KB, latin-subset, ingen DSIG). `Cannot read properties of undefined (reading '256')` är borta. Påverkar alla `/.../opengraph-image`-routes (outfit, produkt, profil) → social-media-delning visar nu rätt förhandsbild.
-- `a319cbd` — **DM-fix.** `markConversationRead` flyttad från server-render i `app/meddelanden/[id]/page.tsx` till klient-mount-`useEffect` i `ConversationThread.tsx`. Next 16 förbjuder `revalidatePath` under render — det som gav digest `2591544316@E7` och vänner i Vercel runtime-logs. Funktionellt identiskt: inkorgens unread-count uppdateras fortfarande efter att en tråd öppnats.
-- `9f3a13b` → `45a90d2` — **URL-refactor 3a–3d.** Outfit-URL flyttad från `/outfit/<uuid>` till `/<username>/<slug>`:
-  - 3a (`d3..`-serien): `outfits.slug`-kolumn + unique-index `(user_id, slug)` + backfill av seed-outfits + `slugify`+retry-on-23505 i `/skapa`-action.
-  - 3b: `app/[username]/[slug]/page.tsx` + layout + opengraph-image, `RESERVED_USERNAMES`-set blockerar systemnamn (`meddelanden`, `profil`, `om`, …) från att ta över route-trädet.
-  - 3c: `permanentRedirect` (308) i `app/outfit/[id]/page.tsx` när slug+username finns på outfiten — ingen länk i det vilda går sönder.
-  - 3d: alla interna länkar (`OutfitCard`, `OutfitDetail` ShareButton, `ShareCards`, `ProduktPage` × 3, sitemap.xml, sitemap-images.xml, JSON-LD-builders) använder `outfitPath()`/`outfitPathFromParts()`. Sitemap emitterar 19 outfits på den nya formen, 0 legacy-rader.
-- **SEO-paketet (commits 1–7)** — komplett. Sitemap, image sitemap, JSON-LD (Organization + WebSite SearchAction + Person + Product + BreadcrumbList + ItemList), `noindex` på privata sidor, UGC-länkpolicy, Search Console-meta. Detaljer i git-loggen från sessionen 2026-05-08.
+**Säkerhet + databas:**
+- `bc5d3fc` — Switch 5 SECURITY DEFINER views to invoker (Supabase Advisor CRITICAL × 5 fixade). Bevarad public save-count via ny `outfit_save_counts`-tabell + trigger. Brand-dashboard via scoped tag_clicks-RLS istället för definer-bypass.
 
-### Att verifiera när användaren är tillbaka
+**Sociala features:**
+- `db7c8ec` — Följer/Följare som riktiga tabs på profilsidor (räknen nu klickbara, hela listor med FollowButton per rad).
+- `44245c9` — `/go/[itemId]` server-side click-tracking wrapper. Alla Köp-knappar routar genom den nu; recordTagClick borttaget från klient.
+- `70d713e` — Rapportera-funktion. `reports`-tabell, modal med 7 svenska anledningar, entry points på outfits/kommentarer/profiler. RLS: reporter-only read.
+- `1a48a30` — Konto-radera + dataexport (GDPR). `/profil/installningar/konto` med JSON-dump + typed-confirmation-delete (cascade).
+- `2908d49` — Global sök `/sok` över profiler/märken/outfits via Header-fältet.
+- `ad0e22c` — Push notifications infrastruktur: `push_subscriptions`-tabell, `/sw.js`, PushToggle, `/api/push/notify` med X-Push-Secret. Auto-leverans behöver Database Webhook eller pg_net-trigger (ej aktiverat).
 
-- **End-to-end DM-test A→B→A i prod** (Mans har inte testat ännu efter `a319cbd`):
-  1. Logga in som A → `/profile/<B>` → "Skicka meddelande" → ska landa på `/meddelanden/<uuid>`, inte felkod.
-  2. Skicka `test A→B 1`. Logga in som B i inkognito → `/meddelanden` ska visa A med unread-badge.
-  3. B öppnar tråden → meddelandet syns, badge försvinner. Svara `test B→A 1`.
-  4. Tillbaka som A → refresh `/meddelanden` → B har unread-badge → läs.
-- **OG-bild-preview** efter `45a90d2`: klistra `https://moidello.com/<username>/<slug>` (t.ex. `/emmastyle/venice-cardigan`) och en `/profile/<username>` i iMessage + WhatsApp. Förhandsbilden ska visas som 1200×630 PNG, inte miss-fail'a till generisk Moidello-text-fallback eller saknas helt.
+**Skapa-flow:**
+- `14eb340` → `8a3c8cf` → `4d15d08` — Multi-image-upload på `/skapa`. Tabb-rad högst upp med thumbnails, drag-and-drop flera bilder, tagga per bild, publicera alla i sekvens (en createOutfit per bild så body-limit aldrig slår till). Varje outfit får egen `/<username>/<slug>`-URL.
+- `26af855` — Brand-product autocomplete i tag-formen. När du skriver märke söks `brand_products` och klick på träff fyller brand/namn/buy_url på en gång.
 
-### Nästa stora bitar i kö (prioordning)
+**Märken:**
+- `7af2860` — Bulk CSV-import för märken. `brand_products`-tabell (RLS: aktiva rader publika, owner full CRUD), `/brand-dashboard/import` med inline CSV-parser (kvotade fält stöds, max 500 rader). Katalog visas under "Officiell katalog" på `/brand/[slug]`.
 
-1. **Bulk-upload för märken.** Gratis funktion. Infrastruktur som förbereder för annonser/sponsring senare, men inga betal-flöden i denna iteration. Behöver datamodellsdiskussion innan kod (CSV vs admin-UI vs API, item-validation, brand-claim-flöde).
-2. **Spara enskilda plagg + Följer/Följare-tabar + radera kommentarer + dela outfits/plagg via meddelande.** Sista bit:en (dela via meddelande) finns redan delvis — `OutfitShareCard`/`ItemShareCard` i `components/messaging/ShareCards.tsx` renderar redan share-payloads, behöver bara entry-points i UI.
-3. **Eventuell "Om Moidello"-sida / kontaktsida-uppdatering.** `/om` och `/kontakt` finns men kan behöva editorial pass.
+**Navigation:**
+- `adec89d` — `/foljer`-route ersätter `/trendigt` i nav. Tre lägen: feed från följda, förslag på kreatörer (om noll följs), förslag (utloggad). `/trendigt`-routen lever kvar orörd för senare comeback.
 
-### Öppna frågor / beslut väntande från användaren
+**Admin-panel (12 sub-features):**
+- `6dbefe7` — `/admin` dashboard + `/admin/anmalningar` queue. `is_admin` på profiles, founding-email seedad. RLS-policies för admin-läsning av reports + update. Externa länkar till Vercel/Search Console/Supabase.
+- `c63ff66` → `9265231` → `0eb5f0e` → `60a23e6` — User mgmt: lista med filter (Riktiga/Demo/Märken/Admins), impersonate via cookie+RLS (admin posts som annan user via `/skapa`, banner högst upp, återgå-knapp), seed 8 demo-kreatörer, ny användare via service-role, edit-modal med file-upload-avatar, per-user detalj-sida `/admin/anvandare/[id]` med 8-card stats grid + edit-form (region/socials/brand).
+- `a1e8e42` — Inläggs-hantering: `/admin/inlagg` (sortbar på views/likes/saves/clicks/comments/date), per-outfit workbench `/admin/inlagg/[id]` med stats + edit + tag-redigering + per-tag click count + radera.
+- `1073ba8` — `/admin/statistik` med 4 sparkline-kort (30d), top-10 outfits per metrik, top-10 kreatörer/märken.
 
-- Inga öppna i nuläget. Bulk-upload-bitens datamodell är nästa diskussionspunkt när Mans återupptar.
+**UX-polish:**
+- `03a489b` → `98c98d7` → `21d5ba7` — Background-rotation per session via cookie-seed (sätts i proxy.ts), `HERO_POOL` med 7 ursprungliga seed-bilder för front-of-house. Lägger 4 unsplash-bilder i `/public` men inte i poolen.
+- `fdcc2e9` — Cookie consent-banner bottom-right, 1-årig consent-cookie, länkar till `/integritet`.
 
-### Aktiva tasks
+**E-post:**
+- `6a45bcb` — Resend SDK + `lib/email/{client,templates}.ts` (welcome/follower/comment/message). `/api/email/notify`-webhook mirror av push-routen (samma payload-shape så en Supabase webhook kan trigga båda). Fail-soft när RESEND_API_KEY saknas.
 
-Inga öppna — allt avklarat per 2026-05-09 00:30.
+### Migrations 0021–0027 (alla applyade i prod)
+
+- 0021 security_invoker_views + outfit_save_counts
+- 0022 reports
+- 0023 push_subscriptions
+- 0024 brand_products
+- 0025 admin (is_admin på profiles + seed Mans)
+- 0026 admin_impersonation (RLS för impersonation + storage)
+- 0027 admin_user_detail (is_demo + avatar admin storage)
+
+### Att verifiera när användaren testar i prod
+
+1. **DM E2E A→B→A** — kvar från förra sessionen, fortfarande inte verifierat.
+2. **OG-bild preview** — kvar från förra sessionen, fortfarande inte verifierat.
+3. **Admin v2 features** — Mans har just satt SUPABASE_SERVICE_ROLE_KEY i Vercel. Testa:
+   - Seed 8 demo-kreatörer-knappen
+   - Skapa ny användare via modalen
+   - Radera ett konto
+   - Impersonera och posta en outfit → kolla banner + att outfit hamnar hos rätt user
+4. **Background rotation** — öppna i inkognito två gånger, ska få olika bilder.
+5. **Cookie banner** — radera consent-cookie, ladda om, banner ska komma tillbaka.
+
+### Env vars Mans måste sätta för full funktionalitet
+
+I Vercel Project Settings → Environment Variables (alla tre miljöer) + `.env.local`:
+
+| Variabel | För | Status |
+|---|---|---|
+| `SUPABASE_SERVICE_ROLE_KEY` | Admin user create/delete + push send | ✅ Satt 2026-05-11 |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Push-prenumeration i klient | ⏳ Saknas. Genereras med `npx web-push generate-vapid-keys` |
+| `VAPID_PRIVATE_KEY` | Push-leverans server-side | ⏳ Saknas. Från samma kommando |
+| `VAPID_SUBJECT` | Web Push contact | ⏳ Saknas. `mailto:hello@moidello.com` |
+| `PUSH_WEBHOOK_SECRET` | Auth för `/api/push/notify` + `/api/email/notify` | ⏳ Saknas. Random hex-sträng |
+| `RESEND_API_KEY` | Transactional email via Resend | ⏳ Saknas. Skapa konto + verifiera moidello.com-domän |
+| `MOIDELLO_EMAIL_FROM` | From-adress | Valfri. Default: `Moidello <hello@moidello.com>` |
+
+### Push + email auto-leverans (slutsteget, behöver Mans-input)
+
+Båda webhooks är klara på vår sida (`/api/push/notify`, `/api/email/notify`). Saknas: en trigger som anropar dem när rad inserts:as i `notifications`-tabellen. Två vägar:
+
+1. **Supabase Database Webhook** (Supabase Dashboard → Database → Webhooks) — pekar på Vercel-URL:erna, lägg `X-Push-Secret`-header. Custom payload-mapping krävs för att översätta `record.{user_id, type, actor_id, ...}` till våra shapes.
+2. **pg_net.http_post i triggerfunktionerna `notify_on_*`** i 0010 — kräver lagrad secret i Vault och http_post-anrop. Mer kontroll, mer SQL.
+
+### Nästa stora bitar i kö
+
+1. **Push/email auto-leverans** — när Mans satt VAPID + Resend + valt webhook eller pg_net.
+2. **Activity feed på `/`** — för inloggade som följer någon, visa senaste från följda högt upp på hemsidan.
+3. **Outfit-edit med drag-position i admin** — tag-pinning kan flyttas i `/skapa` men inte i `/admin/inlagg/[id]`. Kopiera positionsdragget dit.
+4. **2FA i auth-settings** — Supabase stödjer det, UI-arbete i `/profil/installningar`.
+5. **Trendigt återinförd när det finns aktivitet** — `/trendigt`-routen lever kvar; lägg tillbaka i `lib/nav.ts` när rankings är meningsfulla.
+
+### Notiser inom appen
+
+`notifications`-tabellen får triggers från likes/follows/comments (migration 0010). Det betyder att in-app-bell fungerar redan. **Push** och **email** ovanpå det är vad som ännu inte triggrar — det är den sista pluggen för full notification-stack.
+
+### UGC-länksäkerhet
+
+Alla utgående länkar som innehåller eller pekar mot användar-genererat innehåll (köp-länkar i taggade plagg, sociala media-länkar i bios, kommentarer som länkar) ska wrappas i `<UserLink>` (`components/shared/UserLink.tsx`). Komponenten sätter automatiskt `rel="ugc nofollow noopener noreferrer"` + `target="_blank"`. Använd inte rå `<a target="_blank" href="...">` för UGC-länkar.
 
 
 
