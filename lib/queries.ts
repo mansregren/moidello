@@ -67,6 +67,7 @@ interface OutfitRow {
   description: string | null;
   category: string | null;
   created_at: string;
+  is_hidden?: boolean;
   profiles: ProfileRow | null;
   tagged_items: TaggedItemRow[];
   outfit_stats?: OutfitStatsRow | null;
@@ -158,6 +159,7 @@ function rowToOutfit(row: OutfitRow): Outfit {
     comments: [],
     category: row.category ?? "",
     createdAt: row.created_at,
+    isHidden: !!row.is_hidden,
   };
 }
 
@@ -166,7 +168,7 @@ function rowToOutfit(row: OutfitRow): Outfit {
 // the !fkey hint. Comments on the outfit detail page get a similar
 // hint when fetched separately.
 const OUTFIT_COLUMNS = `
-  id, slug, user_id, image_url, type, gender, title, description, category, created_at,
+  id, slug, user_id, image_url, type, gender, title, description, category, created_at, is_hidden,
   profiles!outfits_user_id_fkey ( id, username, display_name, avatar_url, bio, region ),
   tagged_items ( id, brand, name, price, currency, buy_url, buy_urls, garment, position_x, position_y, is_affiliate )
 `;

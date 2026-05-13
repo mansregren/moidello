@@ -374,6 +374,8 @@ export function TagsEditor({
         buy_url: tag.buy_url,
         price: tag.price,
         currency: tag.currency,
+        color: tag.color ?? null,
+        image_url: tag.image_url ?? null,
         garment: tag.garment,
         is_affiliate: tag.is_affiliate,
       });
@@ -384,7 +386,13 @@ export function TagsEditor({
   };
 
   const removeTag = (id: string) => {
-    if (!confirm("Ta bort den här taggen?")) return;
+    const tag = tags.find((t) => t.id === id);
+    if (
+      !confirm(
+        `Radera plagg-tag${tag ? ` "${tag.brand} ${tag.name}"` : ""} permanent? Detta kan inte ångras.`,
+      )
+    )
+      return;
     setError(null);
     setBusyId(id);
     startTransition(async () => {
@@ -396,6 +404,39 @@ export function TagsEditor({
         setError(res.error);
       }
     });
+  };
+
+  // When the admin pastes a new URL into a tag's buy_url field, re-fetch
+  // preview meta from our endpoint so price/brand/image refresh.
+  const refetchFromUrl = async (tagId: string, url: string) => {
+    if (!/^https?:\/\//i.test(url)) return;
+    setBusyId(tagId);
+    try {
+      const res = await fetch("/api/admin/items/preview-from-url", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as {
+        brand?: string | null;
+        product_name?: string | null;
+        price?: number | null;
+        currency?: string | null;
+        color?: string | null;
+        image_url?: string | null;
+      };
+      patch(tagId, {
+        brand: data.brand || tags.find((t) => t.id === tagId)?.brand || "",
+        name: data.product_name || tags.find((t) => t.id === tagId)?.name || "",
+        price: data.price ?? null,
+        currency: data.currency ?? "SEK",
+        color: data.color ?? null,
+        image_url: data.image_url ?? null,
+      });
+    } finally {
+      setBusyId(null);
+    }
   };
 
   return (
@@ -435,43 +476,78 @@ export function TagsEditor({
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-[80px_1fr] gap-3">
+              <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-background border border-border">
+                {t.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={t.image_url}
+                    alt={t.name}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-[10px] text-foreground-subtle">
+                    Ingen bild
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    placeholder="Märke"
+                    value={t.brand}
+                    onChange={(e) => patch(t.id, { brand: e.target.value })}
+                    className={INPUT}
+                  />
+                  <select
+                    value={t.garment}
+                    onChange={(e) => patch(t.id, { garment: e.target.value })}
+                    className={INPUT}
+                  >
+                    {GARMENTS.map((g) => (
+                      <option key={g} value={g}>
+                        {g}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Plaggnamn"
+                  value={t.name}
+                  onChange={(e) => patch(t.id, { name: e.target.value })}
+                  className={INPUT}
+                />
+              </div>
+            </div>
+
+            <div className="relative">
               <input
-                type="text"
-                placeholder="Märke"
-                value={t.brand}
-                onChange={(e) => patch(t.id, { brand: e.target.value })}
+                type="url"
+                placeholder="Köp-URL — klistra in för att uppdatera meta"
+                value={t.buy_url ?? ""}
+                onChange={(e) =>
+                  patch(t.id, { buy_url: e.target.value || null })
+                }
+                onPaste={(e) => {
+                  const pasted = e.clipboardData.getData("text").trim();
+                  if (pasted && /^https?:\/\//i.test(pasted)) {
+                    e.preventDefault();
+                    patch(t.id, { buy_url: pasted });
+                    refetchFromUrl(t.id, pasted);
+                  }
+                }}
                 className={INPUT}
               />
-              <select
-                value={t.garment}
-                onChange={(e) => patch(t.id, { garment: e.target.value })}
-                className={INPUT}
-              >
-                {GARMENTS.map((g) => (
-                  <option key={g} value={g}>
-                    {g}
-                  </option>
-                ))}
-              </select>
+              {busyId === t.id && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[10px] text-foreground-muted">
+                  Hämtar…
+                </span>
+              )}
             </div>
-            <input
-              type="text"
-              placeholder="Plaggnamn"
-              value={t.name}
-              onChange={(e) => patch(t.id, { name: e.target.value })}
-              className={INPUT}
-            />
-            <input
-              type="url"
-              placeholder="Köp-URL"
-              value={t.buy_url ?? ""}
-              onChange={(e) =>
-                patch(t.id, { buy_url: e.target.value || null })
-              }
-              className={INPUT}
-            />
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <input
                 type="number"
                 placeholder="Pris"
@@ -496,7 +572,25 @@ export function TagsEditor({
                 }
                 className={INPUT}
               />
+              <input
+                type="text"
+                placeholder="Färg"
+                value={t.color ?? ""}
+                onChange={(e) =>
+                  patch(t.id, { color: e.target.value || null })
+                }
+                className={INPUT}
+              />
             </div>
+            <input
+              type="url"
+              placeholder="Bild-URL"
+              value={t.image_url ?? ""}
+              onChange={(e) =>
+                patch(t.id, { image_url: e.target.value || null })
+              }
+              className={INPUT}
+            />
             <label className="flex items-center gap-2.5 cursor-pointer">
               <input
                 type="checkbox"

@@ -30,6 +30,7 @@ import { ReportButton } from "@/components/shared/ReportButton";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { outfitPageJsonLd } from "@/lib/json-ld";
 import { outfitPath } from "@/lib/outfit-url";
+import { OutfitOwnerActions } from "@/components/outfit/OutfitOwnerActions";
 import { Send } from "lucide-react";
 
 export default function OutfitDetail({
@@ -43,6 +44,7 @@ export default function OutfitDetail({
   isPersisted,
   viewerRegion,
   savedItemIds = [],
+  viewerIsAdmin = false,
 }: {
   outfit: Outfit;
   similar: Outfit[];
@@ -54,6 +56,7 @@ export default function OutfitDetail({
   isPersisted: boolean;
   viewerRegion?: Region;
   savedItemIds?: string[];
+  viewerIsAdmin?: boolean;
 }) {
   const { isLoggedIn, requireAuth, user } = useAuth();
   const [, startTransition] = useTransition();
@@ -203,6 +206,18 @@ export default function OutfitDetail({
               <h1 className="font-heading text-[32px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-white mb-4">
                 {outfit.title}
               </h1>
+
+              {isPersisted && (user?.id === outfit.creator.id || viewerIsAdmin) && (
+                <div className="mb-5">
+                  <OutfitOwnerActions
+                    outfitId={outfit.id}
+                    isHidden={!!outfit.isHidden}
+                    isAdmin={viewerIsAdmin}
+                    editHref={viewerIsAdmin ? `/admin/inlagg/${outfit.id}` : `/profil/inlagg/${outfit.id}`}
+                  />
+                </div>
+              )}
+
               <p className="text-foreground-muted mb-8">
                 {outfit.description}
               </p>

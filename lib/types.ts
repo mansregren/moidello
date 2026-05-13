@@ -87,6 +87,9 @@ export interface Outfit {
   comments: Comment[];
   category: string;
   createdAt: string;
+  /** Owner has hidden the post — gone from public feeds but visible to
+   *  the owner so they can re-publish. */
+  isHidden?: boolean;
 }
 
 export interface Brand {

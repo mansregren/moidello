@@ -8,6 +8,7 @@ import {
 } from "@/lib/queries";
 import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_REGION } from "@/lib/region";
+import { isCurrentUserAdmin } from "@/lib/admin";
 import OutfitDetail from "./OutfitDetail";
 
 export const dynamic = "force-dynamic";
@@ -74,6 +75,8 @@ export default async function OutfitPage({
     );
   }
 
+  const viewerIsAdmin = await isCurrentUserAdmin();
+
   return (
     <OutfitDetail
       outfit={{ ...outfit, comments }}
@@ -86,6 +89,7 @@ export default async function OutfitPage({
       isPersisted
       viewerRegion={viewerRegion}
       savedItemIds={savedItemIds}
+      viewerIsAdmin={viewerIsAdmin}
     />
   );
 }
