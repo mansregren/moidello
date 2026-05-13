@@ -4,6 +4,13 @@ import { Eye, Heart, Bookmark, MousePointerClick, MessageCircle } from "lucide-r
 import { createClient } from "@/lib/supabase/server";
 import { PublishToggle } from "./PublishToggle";
 import { BulkSeedButton } from "./BulkSeedButton";
+import {
+  SelectionProvider,
+  SelectCheckbox,
+  SelectAllToggle,
+  BulkActionBar,
+} from "./BulkActionToolbar";
+import { UserFilterSelect } from "./UserFilterSelect";
 
 export const dynamic = "force-dynamic";
 
@@ -38,9 +45,19 @@ interface ProfileLite {
 export default async function AdminInlaggPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: string; q?: string; status?: string }>;
+  searchParams: Promise<{
+    sort?: string;
+    q?: string;
+    status?: string;
+    user_id?: string;
+  }>;
 }) {
-  const { sort: rawSort, q, status: rawStatus } = await searchParams;
+  const {
+    sort: rawSort,
+    q,
+    status: rawStatus,
+    user_id: filterUserId,
+  } = await searchParams;
   const sort: Sort = SORTS.includes(rawSort as Sort)
     ? (rawSort as Sort)
     : "created_at";
@@ -66,6 +83,9 @@ export default async function AdminInlaggPage({
     query = query.eq("outfits.is_published", true);
   } else if (status === "drafts") {
     query = query.eq("outfits.is_published", false);
+  }
+  if (filterUserId && /^[0-9a-f-]{36}$/i.test(filterUserId)) {
+    query = query.eq("user_id", filterUserId);
   }
 
   const { data: rows } = await query;
@@ -167,23 +187,44 @@ export default async function AdminInlaggPage({
         <SortPill s="comments" label="Mest kommentarer" current={sort} q={q} status={status} />
       </nav>
 
-      <ul className="mt-8 space-y-2">
-        {outfits.length === 0 && (
-          <p className="text-sm text-foreground-subtle">
-            Inga inlägg matchar.
-          </p>
+      <nav className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-xs text-foreground-subtle">Användare:</span>
+        <UserFilterSelect
+          users={seedUserOptions}
+          current={filterUserId ?? null}
+        />
+      </nav>
+
+      <SelectionProvider>
+        <BulkActionBar users={seedUserOptions} />
+
+        {outfits.length > 0 && (
+          <div className="mt-6 flex items-center justify-between">
+            <SelectAllToggle ids={outfits.map((o) => o.outfit_id)} />
+            <span className="text-xs text-foreground-subtle">
+              {outfits.length} rader
+            </span>
+          </div>
         )}
-        {outfits.map((o) => {
-          const creator = profileMap.get(o.user_id);
-          return (
-            <li
-              key={o.outfit_id}
-              className="flex items-center gap-4 p-3 rounded-2xl border border-border bg-background-secondary hover:border-white/30 transition-colors"
-            >
-              <Link
-                href={`/admin/inlagg/${o.outfit_id}`}
-                className="flex items-center gap-4 flex-1 min-w-0"
+
+        <ul className="mt-3 space-y-2">
+          {outfits.length === 0 && (
+            <p className="text-sm text-foreground-subtle">
+              Inga inlägg matchar.
+            </p>
+          )}
+          {outfits.map((o) => {
+            const creator = profileMap.get(o.user_id);
+            return (
+              <li
+                key={o.outfit_id}
+                className="flex items-center gap-3 p-3 rounded-2xl border border-border bg-background-secondary hover:border-white/30 transition-colors"
               >
+                <SelectCheckbox outfitId={o.outfit_id} />
+                <Link
+                  href={`/admin/inlagg/${o.outfit_id}`}
+                  className="flex items-center gap-4 flex-1 min-w-0"
+                >
                 <div className="relative h-20 w-16 shrink-0 rounded-lg overflow-hidden bg-background-tertiary">
                   <Image
                     src={o.image_url}
@@ -222,16 +263,17 @@ export default async function AdminInlaggPage({
                   <StatPill icon={MessageCircle} value={o.comments} />
                 </div>
               </Link>
-              <div className="shrink-0">
-                <PublishToggle
-                  outfitId={o.outfit_id}
-                  initialPublished={o.is_published}
-                />
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+                <div className="shrink-0">
+                  <PublishToggle
+                    outfitId={o.outfit_id}
+                    initialPublished={o.is_published}
+                  />
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </SelectionProvider>
     </>
   );
 }

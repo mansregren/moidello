@@ -7,6 +7,8 @@ import { isCurrentUserAdmin } from "@/lib/admin";
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+const MAX_BULK = 100;
+
 export async function updateOutfit(
   outfitId: string,
   patch: {
@@ -212,6 +214,81 @@ export async function updateTaggedItem(
     revalidatePath(`/admin/inlagg/${row.outfit_id}`);
   }
   return { ok: true };
+}
+
+export async function bulkPublishOutfits(
+  outfitIds: string[],
+  publish: boolean,
+): Promise<{ ok: true; count: number } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+  const valid = outfitIds.filter((id) => UUID_RE.test(id)).slice(0, MAX_BULK);
+  if (valid.length === 0) return { ok: false, error: "Inga giltiga ID." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("outfits")
+    .update({ is_published: publish, scheduled_for: null })
+    .in("id", valid);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/inlagg");
+  return { ok: true, count: valid.length };
+}
+
+export async function bulkDeleteOutfits(
+  outfitIds: string[],
+): Promise<{ ok: true; count: number } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+  const valid = outfitIds.filter((id) => UUID_RE.test(id)).slice(0, MAX_BULK);
+  if (valid.length === 0) return { ok: false, error: "Inga giltiga ID." };
+
+  const supabase = await createClient();
+
+  // Best-effort storage cleanup so we don't leak blobs.
+  const { data: rows } = await supabase
+    .from("outfits")
+    .select("image_path")
+    .in("id", valid);
+  const paths = ((rows ?? []) as Array<{ image_path: string | null }>)
+    .map((r) => r.image_path)
+    .filter((p): p is string => !!p);
+  if (paths.length > 0) {
+    await supabase.storage.from("outfits").remove(paths);
+  }
+
+  const { error } = await supabase.from("outfits").delete().in("id", valid);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/inlagg");
+  return { ok: true, count: valid.length };
+}
+
+export async function bulkReassignOutfits(
+  outfitIds: string[],
+  newUserId: string,
+): Promise<{ ok: true; count: number } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+  if (!UUID_RE.test(newUserId)) {
+    return { ok: false, error: "Ogiltig mål-användare." };
+  }
+  const valid = outfitIds.filter((id) => UUID_RE.test(id)).slice(0, MAX_BULK);
+  if (valid.length === 0) return { ok: false, error: "Inga giltiga ID." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("outfits")
+    .update({ user_id: newUserId })
+    .in("id", valid);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/inlagg");
+  return { ok: true, count: valid.length };
 }
 
 export async function updateTaggedItemPosition(
