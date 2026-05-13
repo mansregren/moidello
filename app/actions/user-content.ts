@@ -81,6 +81,52 @@ export async function softDeleteOutfit(
   return { ok: true };
 }
 
+/**
+ * Owner-editable subset of outfit fields. SEO-meta, scheduling, gender and
+ * publishing are admin-only (live on /admin/inlagg/[id]); this updates the
+ * fields a regular user controls from /profil/inlagg/[id].
+ */
+export async function updateOwnOutfit(
+  outfitId: string,
+  patch: {
+    title?: string;
+    description?: string | null;
+    category?: string | null;
+  },
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const gate = await gateOwnerOrAdmin(outfitId);
+  if (!gate.ok) return gate;
+
+  const updates: Record<string, string | null> = {};
+  if (patch.title !== undefined) {
+    const t = patch.title.trim();
+    if (!t) return { ok: false, error: "Titel får inte vara tom." };
+    updates.title = t.slice(0, 200);
+  }
+  if (patch.description !== undefined) {
+    const d = patch.description?.trim() ?? null;
+    updates.description = d && d.length > 0 ? d.slice(0, 2000) : null;
+  }
+  if (patch.category !== undefined) {
+    const c = patch.category?.trim() ?? null;
+    updates.category = c && c.length > 0 ? c : null;
+  }
+
+  if (Object.keys(updates).length === 0) return { ok: true };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("outfits")
+    .update(updates)
+    .eq("id", outfitId);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/outfit/${outfitId}`);
+  revalidatePath(`/profil/inlagg/${outfitId}`);
+  revalidatePath("/profil");
+  return { ok: true };
+}
+
 export async function restoreOutfit(
   outfitId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {

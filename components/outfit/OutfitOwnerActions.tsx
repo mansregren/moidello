@@ -64,15 +64,13 @@ export function OutfitOwnerActions({
         </span>
       )}
 
-      {isAdmin && (
-        <Link
-          href={editHref}
-          className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 px-3 py-1.5 text-xs"
-        >
-          <Edit className="h-3 w-3" />
-          Redigera
-        </Link>
-      )}
+      <Link
+        href={editHref}
+        className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 px-3 py-1.5 text-xs"
+      >
+        <Edit className="h-3 w-3" />
+        Redigera
+      </Link>
 
       <button
         type="button"

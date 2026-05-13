@@ -459,7 +459,8 @@ export function TagsEditor({
         {tags.map((t) => (
           <li
             key={t.id}
-            className="rounded-xl border border-border bg-background-tertiary p-4 space-y-3"
+            id={`tag-card-${t.id}`}
+            className="rounded-xl border border-border bg-background-tertiary p-4 space-y-3 transition-colors focus-within:border-white/40 focus-within:bg-background-tertiary/80 hover:border-white/20 scroll-mt-24"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] uppercase tracking-wider text-foreground-subtle">
@@ -656,13 +657,42 @@ export function TagPositionEditor({
     setDirty(new Set());
   }, [initialTags]);
 
-  const startDrag = (e: React.PointerEvent<HTMLDivElement>, tagId: string) => {
+  // Pointer-down on a pin opens either a click (focus matching tag card) or a
+  // drag (move the pin) depending on movement distance. Threshold is in px,
+  // measured from initial pointer position — under it = click, over it = drag.
+  const CLICK_THRESHOLD_PX = 5;
+
+  const focusTagCard = (tagId: string) => {
+    const el = document.getElementById(`tag-card-${tagId}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    // Wait a frame for the scroll to settle so focus doesn't fight it.
+    requestAnimationFrame(() => {
+      const firstInput = el.querySelector<HTMLInputElement | HTMLSelectElement>(
+        "input, select, textarea",
+      );
+      firstInput?.focus();
+    });
+  };
+
+  const startPointer = (
+    e: React.PointerEvent<HTMLDivElement>,
+    tagId: string,
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     const container = containerRef.current;
     if (!container) return;
 
+    const startX = e.clientX;
+    const startY = e.clientY;
+    let dragging = false;
+
     const onMove = (ev: PointerEvent) => {
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+      if (!dragging && Math.hypot(dx, dy) < CLICK_THRESHOLD_PX) return;
+      dragging = true;
       // Re-read the rect each frame so scroll/resize during the drag
       // doesn't snap the dot to a stale position.
       const rect = container.getBoundingClientRect();
@@ -684,6 +714,7 @@ export function TagPositionEditor({
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
+      if (!dragging) focusTagCard(tagId);
     };
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
@@ -752,9 +783,9 @@ export function TagPositionEditor({
               style={{ left: `${tag.x}%`, top: `${tag.y}%` }}
             >
               <div
-                onPointerDown={(e) => startDrag(e, tag.id)}
-                className="cursor-grab active:cursor-grabbing"
-                title={`${tag.brand || "(utan märke)"} — ${tag.garment}`}
+                onPointerDown={(e) => startPointer(e, tag.id)}
+                className="cursor-pointer active:cursor-grabbing"
+                title={`${tag.brand || "(utan märke)"} — klick = redigera, drag = flytta`}
               >
                 <span
                   className={`absolute inset-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full ${

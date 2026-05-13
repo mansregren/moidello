@@ -13,6 +13,8 @@ import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { FollowersList } from "@/components/user/FollowersList";
 import { ShareButton } from "@/components/shared/ShareButton";
 import { ReportButton } from "@/components/shared/ReportButton";
+import { OutfitCard } from "@/components/outfit/OutfitCard";
+import { OutfitOwnerActions } from "@/components/outfit/OutfitOwnerActions";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { profilePageJsonLd } from "@/lib/json-ld";
 import { useAuth } from "@/lib/auth-context";
@@ -236,7 +238,32 @@ export default function ProfileDetail({
           >
             {activeTab === "outfits" &&
               (outfits.length > 0 ? (
-                <OutfitGrid outfits={outfits} columns={3} liked={liked} saved={saved} />
+                isOwnProfile ? (
+                  <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-3">
+                    {outfits.map((outfit) => (
+                      <div key={outfit.id} className="space-y-2">
+                        <OutfitCard
+                          outfit={outfit}
+                          initiallyLiked={liked.has(outfit.id)}
+                          initiallySaved={saved.has(outfit.id)}
+                        />
+                        <OutfitOwnerActions
+                          outfitId={outfit.id}
+                          isHidden={!!outfit.isHidden}
+                          isAdmin={false}
+                          editHref={`/profil/inlagg/${outfit.id}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <OutfitGrid
+                    outfits={outfits}
+                    columns={3}
+                    liked={liked}
+                    saved={saved}
+                  />
+                )
               ) : (
                 <p className="py-16 text-center text-foreground-muted">
                   Inga outfits ännu.
