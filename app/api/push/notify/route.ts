@@ -5,8 +5,10 @@
 // Authenticates with a shared secret in the X-Push-Secret header so the
 // route can't be abused as a free push-spam relay.
 //
-// Body shape:
-//   { user_id: string, title: string, body: string, url?: string, tag?: string }
+// Body shape (mirrors /api/email/notify so a single trigger payload fits both):
+//   { user_id, kind: "like" | "follow" | "comment" | "message",
+//     actor_id?, outfit_id?, comment_id? }
+// The route resolves human-readable title/body server-side.
 
 import { NextResponse } from "next/server";
 import webpush from "web-push";
@@ -19,12 +21,14 @@ interface SubRow {
   auth: string;
 }
 
+type Kind = "like" | "follow" | "comment" | "message";
+
 interface NotifyBody {
   user_id: string;
-  title: string;
-  body: string;
-  url?: string;
-  tag?: string;
+  kind: Kind;
+  actor_id?: string;
+  outfit_id?: string;
+  comment_id?: string;
 }
 
 export async function POST(request: Request) {
@@ -62,18 +66,103 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Bad JSON" }, { status: 400 });
   }
 
-  if (!payload.user_id || !payload.title) {
+  if (!payload.user_id || !payload.kind) {
     return NextResponse.json(
       { ok: false, error: "Missing fields" },
       { status: 400 },
     );
   }
 
-  // Service-role client bypasses RLS so we can read subscriptions for any
-  // user without an active session — required for server-triggered push.
   const admin = createClient(supabaseUrl, serviceRole, {
     auth: { persistSession: false },
   });
+
+  // Resolve actor name for the title — required for all kinds.
+  let actorName: string | null = null;
+  let actorUsername: string | null = null;
+  if (payload.actor_id) {
+    const { data } = await admin
+      .from("profiles")
+      .select("display_name, username")
+      .eq("id", payload.actor_id)
+      .maybeSingle();
+    if (data) {
+      actorName =
+        (data.display_name as string | null) ??
+        (data.username as string | null);
+      actorUsername = data.username as string | null;
+    }
+  }
+  if (!actorName) {
+    return NextResponse.json({ ok: true, sent: 0, reason: "no actor" });
+  }
+
+  // Resolve outfit URL when relevant.
+  let outfitUrl: string | null = null;
+  let outfitTitle: string | null = null;
+  if (payload.outfit_id) {
+    const { data: outfit } = await admin
+      .from("outfits")
+      .select("title, slug, user_id, profiles:user_id(username)")
+      .eq("id", payload.outfit_id)
+      .maybeSingle();
+    if (outfit) {
+      const username =
+        (outfit.profiles as unknown as { username: string } | null)
+          ?.username ?? "";
+      outfitUrl = outfit.slug
+        ? `/${username}/${outfit.slug}`
+        : `/outfit/${payload.outfit_id}`;
+      outfitTitle = (outfit.title as string) ?? null;
+    }
+  }
+
+  let title: string;
+  let body: string;
+  let url: string;
+  let tag: string;
+
+  switch (payload.kind) {
+    case "like":
+      title = `${actorName} gillade din outfit`;
+      body = outfitTitle ?? "Klicka för att se";
+      url = outfitUrl ?? "/";
+      tag = `like:${payload.outfit_id}`;
+      break;
+    case "follow":
+      title = `${actorName} följer dig nu`;
+      body = "Tryck för att se profilen";
+      url = actorUsername ? `/profile/${actorUsername}` : "/";
+      tag = `follow:${payload.actor_id}`;
+      break;
+    case "comment": {
+      let snippet = "";
+      if (payload.comment_id) {
+        const { data: comment } = await admin
+          .from("comments")
+          .select("body")
+          .eq("id", payload.comment_id)
+          .maybeSingle();
+        snippet = (comment?.body as string | undefined) ?? "";
+      }
+      title = `${actorName} kommenterade`;
+      body = snippet ? snippet.slice(0, 120) : (outfitTitle ?? "Ny kommentar");
+      url = outfitUrl ?? "/";
+      tag = `comment:${payload.comment_id ?? payload.outfit_id}`;
+      break;
+    }
+    case "message":
+      title = `${actorName} skickade ett meddelande`;
+      body = "Tryck för att läsa";
+      url = "/meddelanden";
+      tag = `message:${payload.actor_id}`;
+      break;
+    default:
+      return NextResponse.json(
+        { ok: false, error: "Unknown kind" },
+        { status: 400 },
+      );
+  }
 
   const { data: subs } = await admin
     .from("push_subscriptions")
@@ -85,12 +174,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, sent: 0 });
   }
 
-  const body = JSON.stringify({
-    title: payload.title,
-    body: payload.body,
-    url: payload.url ?? "/",
-    tag: payload.tag,
-  });
+  const pushBody = JSON.stringify({ title, body, url, tag });
 
   let sent = 0;
   await Promise.all(
@@ -101,12 +185,11 @@ export async function POST(request: Request) {
             endpoint: sub.endpoint,
             keys: { p256dh: sub.p256dh, auth: sub.auth },
           },
-          body,
+          pushBody,
         );
         sent++;
       } catch (err: unknown) {
         const e = err as { statusCode?: number };
-        // 404/410 = endpoint dead, drop it so we don't keep retrying.
         if (e.statusCode === 404 || e.statusCode === 410) {
           await admin
             .from("push_subscriptions")
