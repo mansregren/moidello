@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Download, Trash2, AlertTriangle } from "lucide-react";
 import { exportMyData, deleteMyAccount } from "@/app/actions/account";
 import { PushToggle } from "@/components/settings/PushToggle";
+import { TwoFactorSettings } from "@/components/settings/TwoFactorSettings";
 
 export function AccountSettingsClient({ username }: { username: string }) {
   const [pending, startTransition] = useTransition();
@@ -48,6 +49,8 @@ export function AccountSettingsClient({ username }: { username: string }) {
   return (
     <div className="mt-12 space-y-6">
       <PushToggle />
+
+      <TwoFactorSettings />
 
       <section className="rounded-2xl border border-border bg-background-secondary p-6 md:p-8">
         <div className="flex items-start gap-4">
