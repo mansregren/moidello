@@ -6,11 +6,15 @@ import { openGraphFallback } from "./openGraphFallback";
 const ID = "nelly";
 const SUPPORTED: Locale[] = ["se", "no", "dk", "fi"];
 
+// Note: returns whatever 2-letter prefix the URL has, regardless of
+// whether it's in SUPPORTED. The bug from johnhenric (c3ded66) was
+// gating this on SUPPORTED → unknown locales like /en/ fell through
+// to the prepend branch in rewriteForLocale, producing /se/en/foo.
+// The rewrite logic only needs to know WHAT segment to swap; SUPPORTED
+// is a separate concern for the rewrite *target*.
 function pathSegment(pathname: string): string | null {
   const m = pathname.match(/^\/([a-z]{2})(\/|$)/i);
-  if (!m) return null;
-  const code = m[1].toLowerCase();
-  return SUPPORTED.includes(code as Locale) ? code : null;
+  return m?.[1]?.toLowerCase() ?? null;
 }
 
 function currencyForLocale(locale: Locale | null): string | null {

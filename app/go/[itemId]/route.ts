@@ -103,10 +103,34 @@ export async function GET(
       const targetLocale = countryToLocale(country);
       if (retailer.supportedLocales.includes(targetLocale)) {
         try {
-          const rewritten = retailer.rewriteForLocale(new URL(target), targetLocale);
+          const before = new URL(target);
+          const sourceLocale = retailer.detectLocale(before);
+          const rewritten = retailer.rewriteForLocale(before, targetLocale);
+          // Catch silent rewrite failures: if the source URL was on a
+          // different locale than the target but the result is unchanged,
+          // something is off (likely an unrecognised segment that should
+          // have been swapped — see johnhenric/nelly prepend-bug audit
+          // 2026-05-13). Log instead of failing loudly so the user still
+          // gets a redirect; we just want monitoring signal.
+          if (
+            sourceLocale &&
+            sourceLocale !== targetLocale &&
+            rewritten.toString() === before.toString()
+          ) {
+            console.warn(
+              `[go] rewriteForLocale no-op despite locale mismatch: ` +
+                `retailer=${retailer.id} sourceLocale=${sourceLocale} ` +
+                `targetLocale=${targetLocale} url=${before.toString()}`,
+            );
+          }
           target = rewritten.toString();
-        } catch {
-          // Bad URL — fall through to original target.
+        } catch (err) {
+          // Bad URL or retailer threw — fall through to original target,
+          // but log so we don't lose track of broken modules.
+          console.warn(
+            `[go] rewriteForLocale threw: retailer=${retailer.id} ` +
+              `target=${targetLocale} err=${err instanceof Error ? err.message : String(err)}`,
+          );
         }
       }
     }
