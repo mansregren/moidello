@@ -3,6 +3,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isReservedUsername } from "@/lib/reserved-usernames";
+import { sendEmail } from "@/lib/email/client";
+import { welcomeEmail } from "@/lib/email/templates";
 
 export interface OnboardingState {
   error?: string;
@@ -79,6 +81,20 @@ export async function completeOnboarding(
         .filter((id) => id !== user.id)
         .map((id) => ({ follower_id: user.id, followee_id: id })),
     );
+  }
+
+  // Best-effort welcome email. Fail-soft — onboarding completes either way.
+  if (user.email) {
+    const tpl = welcomeEmail({
+      displayName: displayName ?? username,
+      username,
+    });
+    await sendEmail({
+      to: user.email,
+      subject: tpl.subject,
+      html: tpl.html,
+      text: tpl.text,
+    }).catch(() => {});
   }
 
   redirect("/upptack");
