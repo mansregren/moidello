@@ -68,34 +68,50 @@ export default async function AdminInlaggPage({
   const supabase = await createClient();
 
   // outfit_engagement is a SECURITY INVOKER view; with the admin SELECT
-  // policy added in 0029, admins now see every outfit (incl. drafts from
-  // demo users) through it. We join is_published from the underlying
-  // outfits table because the view doesn't expose it.
-  let query = supabase
+  // policy added in 0029, admins see every outfit (incl. drafts from demo
+  // users) through it. The view doesn't expose is_published, and an
+  // `outfits!inner` join silently fails because views have no FK metadata,
+  // so we read is_published via a separate round-trip on the base table.
+  let engagementQuery = supabase
     .from("outfit_engagement")
     .select(
-      "outfit_id, title, image_url, user_id, created_at, views, unique_views, likes, saves, comments, clicks, outfits!inner(is_published)",
+      "outfit_id, title, image_url, user_id, created_at, views, unique_views, likes, saves, comments, clicks",
     )
     .order(sort, { ascending: false })
     .limit(500);
 
-  if (status === "published") {
-    query = query.eq("outfits.is_published", true);
-  } else if (status === "drafts") {
-    query = query.eq("outfits.is_published", false);
-  }
   if (filterUserId && /^[0-9a-f-]{36}$/i.test(filterUserId)) {
-    query = query.eq("user_id", filterUserId);
+    engagementQuery = engagementQuery.eq("user_id", filterUserId);
   }
 
-  const { data: rows } = await query;
+  const { data: engagementRows } = await engagementQuery;
+  const engagement = (engagementRows ?? []) as unknown as Array<
+    Omit<OutfitRow, "is_published">
+  >;
 
-  let outfits = ((rows ?? []) as unknown as Array<
-    Omit<OutfitRow, "is_published"> & { outfits: { is_published: boolean } }
-  >).map((r) => ({
+  // Fetch publish status for the page of outfits we got back.
+  const ids = engagement.map((r) => r.outfit_id);
+  const publishMap = new Map<string, boolean>();
+  if (ids.length > 0) {
+    const { data: pubRows } = await supabase
+      .from("outfits")
+      .select("id, is_published")
+      .in("id", ids);
+    for (const r of (pubRows ?? []) as Array<{ id: string; is_published: boolean }>) {
+      publishMap.set(r.id, !!r.is_published);
+    }
+  }
+
+  let outfits: OutfitRow[] = engagement.map((r) => ({
     ...r,
-    is_published: r.outfits?.is_published ?? true,
-  })) as OutfitRow[];
+    is_published: publishMap.get(r.outfit_id) ?? true,
+  }));
+
+  if (status === "published") {
+    outfits = outfits.filter((o) => o.is_published);
+  } else if (status === "drafts") {
+    outfits = outfits.filter((o) => !o.is_published);
+  }
 
   // Optional title search filters client-side over what we already pulled.
   if (q?.trim()) {
