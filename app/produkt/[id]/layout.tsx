@@ -28,11 +28,22 @@ export async function generateMetadata({
   const description = `${item.brand} ${item.name}. ${priceLabel}Se hur det stylas på ${SITE}.`;
   const canonical = `/produkt/${item.id}`;
 
+  // Thin-content guard: noindex if we don't have enough signal (no buy URL,
+  // no price, or barely a name) — these pages won't rank and dilute the
+  // site's SERP quality.
+  const isThin =
+    !item.buyUrl ||
+    item.price <= 0 ||
+    !item.name?.trim() ||
+    item.name.trim().length < 3;
+
   return {
     title,
     description,
     alternates: { canonical },
-    robots: { index: true, follow: true },
+    robots: isThin
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
     openGraph: {
       title: `${item.brand} ${item.name} på ${SITE}`,
       description,
