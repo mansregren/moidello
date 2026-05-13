@@ -14,7 +14,7 @@ import {
 import { Container } from "@/components/layout/Container";
 import { createClient } from "@/lib/supabase/server";
 import { UserDetailClient, type FullUserRow } from "./UserDetailClient";
-import { outfitPathFromParts } from "@/lib/outfit-url";
+import { OutfitAdminCard } from "./OutfitAdminCard";
 
 export const dynamic = "force-dynamic";
 
@@ -196,11 +196,17 @@ export default async function AdminUserDetailPage({
       {/* Edit form (client) */}
       <UserDetailClient user={user} />
 
-      {/* Outfit grid */}
+      {/* Outfit grid — each card has inline publish + delete actions */}
       <section className="mt-14">
-        <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white mb-5">
-          Inlägg ({outfits.length})
-        </h2>
+        <div className="flex items-end justify-between mb-5 gap-3">
+          <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white">
+            Inlägg ({outfits.length})
+          </h2>
+          <p className="text-xs text-foreground-subtle">
+            {outfits.filter((o) => !o.is_published).length} utkast,{" "}
+            {outfits.filter((o) => o.is_published).length} publicerade
+          </p>
+        </div>
         {outfits.length === 0 ? (
           <p className="text-sm text-foreground-subtle">
             Inga inlägg ännu.
@@ -208,39 +214,7 @@ export default async function AdminUserDetailPage({
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
             {outfits.map((o) => (
-              <Link
-                key={o.id}
-                href={`/admin/inlagg/${o.id}`}
-                className="group block"
-              >
-                <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-background-tertiary">
-                  <Image
-                    src={o.image_url}
-                    alt={o.title}
-                    fill
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                    unoptimized={o.image_url.startsWith("http")}
-                  />
-                  {!o.is_published && (
-                    <span className="absolute top-2 left-2 inline-flex rounded-full bg-amber-500/80 text-black px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold">
-                      Utkast
-                    </span>
-                  )}
-                </div>
-                <p className="mt-2 text-sm text-white truncate">{o.title}</p>
-                <p className="text-xs text-foreground-subtle">
-                  {new Date(o.created_at).toLocaleDateString("sv-SE")}
-                  {" · "}
-                  <Link
-                    href={outfitPathFromParts(user.username, o.slug, o.id)}
-                    target="_blank"
-                    className="hover:text-white"
-                  >
-                    publik →
-                  </Link>
-                </p>
-              </Link>
+              <OutfitAdminCard key={o.id} outfit={o} username={user.username} />
             ))}
           </div>
         )}
