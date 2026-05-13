@@ -151,7 +151,19 @@ export function openGraphFallback(
       ogProp("product:price:currency") ?? ogProp("og:price:currency") ?? null;
   }
 
-  // 3. Normalise the image to an absolute URL if it came back relative.
+  // 3. Last-resort price fallback. Many small shops don't expose JSON-LD or
+  // OG meta but render the price as plain HTML with a "price"-style class
+  // or data-attribute. Scrape conservatively — first hit wins, and we mark
+  // it inferred so admin can sanity-check before saving.
+  if (out.price == null) {
+    const inferred = inferPriceFromHtml(html);
+    if (inferred) {
+      out.price = inferred.price;
+      if (!out.currency) out.currency = inferred.currency;
+    }
+  }
+
+  // 4. Normalise the image to an absolute URL if it came back relative.
   if (out.image_url && !/^https?:\/\//i.test(out.image_url)) {
     try {
       out.image_url = new URL(out.image_url, url).toString();
@@ -160,11 +172,101 @@ export function openGraphFallback(
     }
   }
 
-  // 4. Brand is sometimes 'Site Name | Product Name' on smaller shops —
+  // 5. Brand is sometimes 'Site Name | Product Name' on smaller shops —
   // strip a trailing pipe-suffix so we don't leak it as a brand name.
   if (out.brand && out.brand.includes("|")) {
     out.brand = out.brand.split("|")[0].trim();
   }
 
   return out;
+}
+
+/**
+ * Heuristic regex-based price extractor. Used only when JSON-LD + OG fail.
+ * Looks at three patterns in order of confidence:
+ *   1. data-price=... attribute (most reliable)
+ *   2. class="price" / class="...price..." element content
+ *   3. Free-text "1 295 kr" / "1295 SEK" pattern in HTML
+ * Returns null if nothing convincing found.
+ */
+function inferPriceFromHtml(
+  html: string,
+): { price: number; currency: string | null } | null {
+  // 1. data-price="1295" or data-price="1295.00"
+  const dataPriceMatch = html.match(
+    /data-price\s*=\s*["']?([\d]+(?:[.,][\d]{1,2})?)["']?/i,
+  );
+  if (dataPriceMatch) {
+    const n = parsePriceString(dataPriceMatch[1]);
+    if (n !== null) return { price: n, currency: null };
+  }
+
+  // 2. <span class="...price..."> or <div class="...price..."> with a number
+  const classPriceMatch = html.match(
+    /<[^>]*class\s*=\s*["'][^"']*price[^"']*["'][^>]*>([^<]{1,40})<\/[^>]+>/i,
+  );
+  if (classPriceMatch) {
+    const cur = currencyFromString(classPriceMatch[1]);
+    const n = parsePriceString(classPriceMatch[1]);
+    if (n !== null) return { price: n, currency: cur };
+  }
+
+  // 3. Free text pattern: "1 295 kr", "1.295,00 SEK", "€199", "$249.99"
+  const freeMatch = html.match(
+    /\b(\d{1,3}(?:[\s.,]\d{3})*(?:[.,]\d{1,2})?)\s*(kr|sek|nok|dkk|eur|€|gbp|£|usd|\$)\b/i,
+  ) ?? html.match(/(€|£|\$)\s*(\d{1,3}(?:[\s.,]\d{3})*(?:[.,]\d{1,2})?)/i);
+  if (freeMatch) {
+    const raw = freeMatch[1].toLowerCase().match(/^\d/)
+      ? freeMatch[1]
+      : freeMatch[2];
+    const sym = freeMatch[1].toLowerCase().match(/^\d/)
+      ? freeMatch[2]
+      : freeMatch[1];
+    const n = parsePriceString(raw);
+    const cur = currencyFromString(sym);
+    if (n !== null) return { price: n, currency: cur };
+  }
+
+  return null;
+}
+
+function parsePriceString(raw: string): number | null {
+  // Strip currency symbols + non-numeric padding, then handle "1.295,00" and
+  // "1,295.00" by detecting which separator comes last (= decimal).
+  let s = raw.replace(/[^\d.,\s]/g, "").trim().replace(/\s+/g, "");
+  const lastDot = s.lastIndexOf(".");
+  const lastComma = s.lastIndexOf(",");
+  if (lastDot >= 0 && lastComma >= 0) {
+    if (lastComma > lastDot) {
+      // European: "1.295,00" → "1295.00"
+      s = s.replace(/\./g, "").replace(",", ".");
+    } else {
+      // US: "1,295.00" → "1295.00"
+      s = s.replace(/,/g, "");
+    }
+  } else if (lastComma >= 0) {
+    // Only comma — Swedish "1295,00" or thousands "1,295"
+    const tail = s.slice(lastComma + 1);
+    if (tail.length === 2) s = s.replace(",", ".");
+    else s = s.replace(/,/g, "");
+  } else {
+    // Only dots or only digits — treat dot as thousands if 3 digits follow
+    const tail = s.slice(lastDot + 1);
+    if (lastDot >= 0 && tail.length === 3) s = s.replace(/\./g, "");
+  }
+  const n = Number(s);
+  if (!Number.isFinite(n) || n <= 0 || n > 1_000_000) return null;
+  return n;
+}
+
+function currencyFromString(s: string): string | null {
+  const lower = s.toLowerCase();
+  if (lower.includes("sek") || lower.includes("kr")) return "SEK";
+  if (lower.includes("nok")) return "NOK";
+  if (lower.includes("dkk")) return "DKK";
+  if (lower.includes("eur") || lower.includes("€")) return "EUR";
+  if (lower.includes("gbp") || lower.includes("£")) return "GBP";
+  if (lower.includes("usd") || lower.includes("$")) return "USD";
+  if (lower.includes("chf")) return "CHF";
+  return null;
 }

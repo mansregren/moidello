@@ -38,53 +38,11 @@ function makeStub(cfg: StubConfig): Retailer {
   };
 }
 
-export const nakd = makeStub({
-  id: "nakd",
-  name: "NA-KD",
-  domains: ["na-kd.com"],
-  fixedBrand: "NA-KD",
-});
-
-export const nelly = makeStub({
-  id: "nelly",
-  name: "Nelly",
-  domains: ["nelly.com"],
-  fixedBrand: "Nelly",
-});
-
-export const cos = makeStub({
-  id: "cos",
-  name: "COS",
-  domains: ["cos.com"],
-  fixedBrand: "COS",
-});
-
-export const arket = makeStub({
-  id: "arket",
-  name: "ARKET",
-  domains: ["arket.com"],
-  fixedBrand: "ARKET",
-});
-
-export const hm = makeStub({
-  id: "hm",
-  name: "H&M",
-  domains: ["hm.com", "www2.hm.com"],
-  fixedBrand: "H&M",
-});
-
 export const acnestudios = makeStub({
   id: "acnestudios",
   name: "Acne Studios",
   domains: ["acnestudios.com"],
   fixedBrand: "Acne Studios",
-});
-
-export const filippak = makeStub({
-  id: "filippak",
-  name: "Filippa K",
-  domains: ["filippa-k.com"],
-  fixedBrand: "Filippa K",
 });
 
 export const toteme = makeStub({

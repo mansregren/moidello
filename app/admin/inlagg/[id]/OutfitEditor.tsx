@@ -378,6 +378,8 @@ export function TagsEditor({
         image_url: tag.image_url ?? null,
         garment: tag.garment,
         is_affiliate: tag.is_affiliate,
+        retailer: tag.retailer ?? null,
+        retailer_locale: tag.retailer_locale ?? null,
       });
       setBusyId(null);
       if (!res.ok) setError(res.error);
@@ -407,7 +409,9 @@ export function TagsEditor({
   };
 
   // When the admin pastes a new URL into a tag's buy_url field, re-fetch
-  // preview meta from our endpoint so price/brand/image refresh.
+  // preview meta from our endpoint so price/brand/image AND retailer refresh.
+  // Retailer + locale are critical for geo-redirect in /go to actually
+  // rewrite — without them the /go route falls through and 302s the raw URL.
   const refetchFromUrl = async (tagId: string, url: string) => {
     if (!/^https?:\/\//i.test(url)) return;
     setBusyId(tagId);
@@ -425,6 +429,8 @@ export function TagsEditor({
         currency?: string | null;
         color?: string | null;
         image_url?: string | null;
+        retailer?: string | null;
+        retailer_locale?: string | null;
       };
       patch(tagId, {
         brand: data.brand || tags.find((t) => t.id === tagId)?.brand || "",
@@ -433,6 +439,8 @@ export function TagsEditor({
         currency: data.currency ?? "SEK",
         color: data.color ?? null,
         image_url: data.image_url ?? null,
+        retailer: data.retailer ?? null,
+        retailer_locale: data.retailer_locale ?? null,
       });
     } finally {
       setBusyId(null);

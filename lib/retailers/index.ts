@@ -8,14 +8,14 @@ import type { Retailer } from "./types";
 import { johnhenric } from "./johnhenric";
 import { zalando } from "./zalando";
 import { stories } from "./stories";
+import { hm } from "./hm";
+import { cos } from "./cos";
+import { arket } from "./arket";
+import { nakd } from "./nakd";
+import { nelly } from "./nelly";
+import { filippak } from "./filippak";
 import {
-  nakd,
-  nelly,
-  cos,
-  arket,
-  hm,
   acnestudios,
-  filippak,
   toteme,
   ganni,
   sezane,
@@ -26,13 +26,13 @@ const RETAILERS: Retailer[] = [
   johnhenric,
   zalando,
   stories,
-  nakd,
-  nelly,
+  hm,
   cos,
   arket,
-  hm,
-  acnestudios,
+  nakd,
+  nelly,
   filippak,
+  acnestudios,
   toteme,
   ganni,
   sezane,

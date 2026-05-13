@@ -221,6 +221,8 @@ export async function updateTaggedItem(
     image_url?: string | null;
     garment?: string;
     is_affiliate?: boolean;
+    retailer?: string | null;
+    retailer_locale?: string | null;
   },
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
@@ -274,6 +276,14 @@ export async function updateTaggedItem(
   }
   if (patch.is_affiliate !== undefined) {
     updates.is_affiliate = patch.is_affiliate;
+  }
+  if (patch.retailer !== undefined) {
+    const r = patch.retailer?.trim() ?? null;
+    updates.retailer = r && r.length > 0 ? r.slice(0, 64) : null;
+  }
+  if (patch.retailer_locale !== undefined) {
+    const l = patch.retailer_locale?.trim() ?? null;
+    updates.retailer_locale = l && l.length > 0 ? l.slice(0, 8) : null;
   }
 
   if (Object.keys(updates).length === 0) return { ok: true };
