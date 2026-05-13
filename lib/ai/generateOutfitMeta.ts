@@ -61,6 +61,50 @@ function getClient(): Anthropic {
   return new Anthropic({ apiKey });
 }
 
+type SupportedMedia = "image/jpeg" | "image/png" | "image/webp" | "image/gif";
+
+/**
+ * Inspect the leading bytes of a buffer to determine the actual image
+ * format. Supabase storage returns content-type based on filename
+ * extension, which sometimes lies (a `.png` file may actually be webp).
+ * Claude's vision API rejects payloads where the declared media-type
+ * mismatches the binary, so we sniff instead of trusting the header.
+ */
+function sniffMediaType(buf: Uint8Array): SupportedMedia | null {
+  if (buf.length < 12) return null;
+  // PNG: 89 50 4E 47 0D 0A 1A 0A
+  if (
+    buf[0] === 0x89 &&
+    buf[1] === 0x50 &&
+    buf[2] === 0x4e &&
+    buf[3] === 0x47
+  )
+    return "image/png";
+  // JPEG: FF D8 FF
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return "image/jpeg";
+  // GIF: 47 49 46 38 ('GIF8')
+  if (
+    buf[0] === 0x47 &&
+    buf[1] === 0x49 &&
+    buf[2] === 0x46 &&
+    buf[3] === 0x38
+  )
+    return "image/gif";
+  // WebP: 'RIFF'....'WEBP'
+  if (
+    buf[0] === 0x52 &&
+    buf[1] === 0x49 &&
+    buf[2] === 0x46 &&
+    buf[3] === 0x46 &&
+    buf[8] === 0x57 &&
+    buf[9] === 0x45 &&
+    buf[10] === 0x42 &&
+    buf[11] === 0x50
+  )
+    return "image/webp";
+  return null;
+}
+
 /**
  * Fetch the image and return its base64 + media-type. Claude's vision
  * input accepts either a URL or a base64 inline payload — we use inline
@@ -70,21 +114,24 @@ function getClient(): Anthropic {
  */
 async function fetchImageAsBase64(
   imageUrl: string,
-): Promise<{ base64: string; mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif" }> {
+): Promise<{ base64: string; mediaType: SupportedMedia }> {
   const res = await fetch(imageUrl);
   if (!res.ok) {
     throw new Error(`Kunde inte hämta bilden (${res.status})`);
   }
-  const contentType = (res.headers.get("content-type") ?? "image/jpeg").toLowerCase();
-  let mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif" =
-    "image/jpeg";
-  if (contentType.includes("png")) mediaType = "image/png";
-  else if (contentType.includes("webp")) mediaType = "image/webp";
-  else if (contentType.includes("gif")) mediaType = "image/gif";
 
   const arrayBuffer = await res.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+
+  const sniffed = sniffMediaType(bytes);
+  if (!sniffed) {
+    throw new Error(
+      "Bilden är inte i ett format Claude kan läsa (JPEG/PNG/WebP/GIF).",
+    );
+  }
+
   const base64 = Buffer.from(arrayBuffer).toString("base64");
-  return { base64, mediaType };
+  return { base64, mediaType: sniffed };
 }
 
 function validateMeta(raw: unknown): OutfitMeta {
