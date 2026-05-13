@@ -142,6 +142,73 @@ export async function deleteOutfit(
   return { ok: true };
 }
 
+export async function addTaggedItem(
+  outfitId: string,
+  data: {
+    brand: string;
+    name: string;
+    buy_url: string;
+    price?: number | null;
+    currency?: string | null;
+    color?: string | null;
+    image_url?: string | null;
+    retailer?: string | null;
+    retailer_locale?: string | null;
+    is_affiliate?: boolean;
+    affiliate_network?: string | null;
+    garment?: string;
+    cached_metadata?: Record<string, unknown> | null;
+  },
+): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+  if (!UUID_RE.test(outfitId)) {
+    return { ok: false, error: "Ogiltigt outfit-id." };
+  }
+  const brand = data.brand.trim();
+  const name = data.name.trim();
+  const buyUrl = data.buy_url.trim();
+  if (!brand || !name) {
+    return { ok: false, error: "Märke och plaggnamn måste fyllas i." };
+  }
+  if (!/^https?:\/\//i.test(buyUrl)) {
+    return { ok: false, error: "Köp-URL måste börja med http(s)://" };
+  }
+
+  const supabase = await createClient();
+  const { data: row, error } = await supabase
+    .from("tagged_items")
+    .insert({
+      outfit_id: outfitId,
+      brand: brand.slice(0, 80),
+      name: name.slice(0, 200),
+      buy_url: buyUrl.slice(0, 2000),
+      price: data.price ?? null,
+      currency: (data.currency ?? "SEK").toUpperCase().slice(0, 8),
+      color: data.color?.trim().slice(0, 40) || null,
+      image_url: data.image_url?.trim().slice(0, 1000) || null,
+      retailer: data.retailer?.trim().slice(0, 64) || null,
+      retailer_locale: data.retailer_locale?.trim().slice(0, 8) || null,
+      is_affiliate: !!data.is_affiliate,
+      affiliate_network:
+        data.affiliate_network?.trim().slice(0, 32) || null,
+      garment: data.garment?.slice(0, 40) || "Toppar",
+      cached_metadata: data.cached_metadata ?? null,
+      last_fetched_at: new Date().toISOString(),
+      // Required NOT NULL legacy columns:
+      position_x: 50,
+      position_y: 50,
+    })
+    .select("id")
+    .single();
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/admin/inlagg/${outfitId}`);
+  revalidatePath(`/outfit/${outfitId}`);
+  return { ok: true, id: row.id as string };
+}
+
 export async function updateTaggedItem(
   tagId: string,
   patch: {
@@ -150,6 +217,8 @@ export async function updateTaggedItem(
     buy_url?: string | null;
     price?: number | null;
     currency?: string | null;
+    color?: string | null;
+    image_url?: string | null;
     garment?: string;
     is_affiliate?: boolean;
   },
@@ -191,6 +260,14 @@ export async function updateTaggedItem(
   if (patch.currency !== undefined) {
     const c = patch.currency?.trim().toUpperCase() ?? null;
     updates.currency = c && c.length > 0 ? c.slice(0, 8) : null;
+  }
+  if (patch.color !== undefined) {
+    const c = patch.color?.trim() ?? null;
+    updates.color = c && c.length > 0 ? c.slice(0, 40) : null;
+  }
+  if (patch.image_url !== undefined) {
+    const u = patch.image_url?.trim() ?? null;
+    updates.image_url = u && u.length > 0 ? u.slice(0, 1000) : null;
   }
   if (patch.garment !== undefined) {
     updates.garment = patch.garment.slice(0, 40);

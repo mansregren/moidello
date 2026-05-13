@@ -42,6 +42,10 @@ export interface TagForm {
   currency: string | null;
   garment: string;
   is_affiliate: boolean;
+  color?: string | null;
+  image_url?: string | null;
+  retailer?: string | null;
+  retailer_locale?: string | null;
   click_count?: number;
 }
 
@@ -416,11 +420,16 @@ export function TagsEditor({
             key={t.id}
             className="rounded-xl border border-border bg-background-tertiary p-4 space-y-3"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] uppercase tracking-wider text-foreground-subtle">
                 {t.garment}
               </span>
-              <span className="inline-flex items-center gap-1 text-[11px] text-foreground-muted">
+              <TagStatusBadge
+                isAffiliate={t.is_affiliate}
+                retailer={t.retailer ?? null}
+                locale={t.retailer_locale ?? null}
+              />
+              <span className="inline-flex items-center gap-1 text-[11px] text-foreground-muted ml-auto">
                 <MousePointerClick className="h-3 w-3" />
                 {(t.click_count ?? 0).toLocaleString("sv-SE")} klick
               </span>
@@ -715,6 +724,45 @@ export function TagPositionEditor({
 
       {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
+  );
+}
+
+function TagStatusBadge({
+  isAffiliate,
+  retailer,
+  locale,
+}: {
+  isAffiliate: boolean;
+  retailer: string | null;
+  locale: string | null;
+}) {
+  if (isAffiliate) {
+    return (
+      <span
+        title="Affiliate-länk — pass-through, ingen rewrite"
+        className="rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-300 px-2 py-0.5 text-[10px]"
+      >
+        Affiliate
+      </span>
+    );
+  }
+  if (retailer) {
+    return (
+      <span
+        title={`Geo-anpassas automatiskt (${locale ?? "?"})`}
+        className="rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 px-2 py-0.5 text-[10px]"
+      >
+        {retailer} {locale ? `· ${locale}` : ""}
+      </span>
+    );
+  }
+  return (
+    <span
+      title="Okänd retailer — länken skickas som-den-är"
+      className="rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 text-[10px]"
+    >
+      Okänd
+    </span>
   );
 }
 

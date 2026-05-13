@@ -21,6 +21,7 @@ import {
   type TagForm,
   type TagPosition,
 } from "./OutfitEditor";
+import { PasteTagForm } from "./PasteTagForm";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +52,7 @@ export default async function AdminOutfitDetailPage({
   const { data: tags } = await supabase
     .from("tagged_items")
     .select(
-      "id, brand, name, buy_url, price, currency, garment, is_affiliate, position_x, position_y",
+      "id, brand, name, buy_url, price, currency, garment, is_affiliate, color, image_url, retailer, retailer_locale, position_x, position_y",
     )
     .eq("outfit_id", id)
     .order("garment", { ascending: true });
@@ -207,6 +208,7 @@ export default async function AdminOutfitDetailPage({
 
         <div className="space-y-8">
           <OutfitEditor outfit={outfitForm} />
+          <PasteTagForm outfitId={outfit.id as string} />
           <TagsEditor outfitId={outfit.id as string} tags={tagsForm} />
         </div>
       </div>

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies, headers } from "next/headers";
 import crypto from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
+import { getRetailerById } from "@/lib/retailers";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -12,11 +13,22 @@ const VIEWER_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 type Region = "SE" | "NO" | "DK" | "FI" | "DE" | "GB" | "US";
 const DEFAULT_REGION: Region = "SE";
 
-function resolveRegion(): Region {
-  // Keep simple for now — could later read Vercel's x-vercel-ip-country header
-  // or a user-preference cookie. Falls back to SE since this is a Swedish
-  // platform.
+/**
+ * Visitor country from Vercel's x-vercel-ip-country header (ISO2). Falls
+ * back to Accept-Language's primary tag, then SE as the platform default.
+ */
+function resolveCountry(hdrs: Headers): string {
+  const cc = hdrs.get("x-vercel-ip-country");
+  if (cc && /^[A-Z]{2}$/.test(cc)) return cc;
+  const accept = hdrs.get("accept-language") ?? "";
+  const m = accept.match(/^[a-z]{2,3}-([A-Z]{2})/);
+  if (m) return m[1];
   return DEFAULT_REGION;
+}
+
+/** Map ISO2 → our retailer-locale convention (lowercase ISO2 we use across retailer modules). */
+function countryToLocale(country: string): string {
+  return country.toLowerCase();
 }
 
 function pickBuyUrl(
@@ -54,16 +66,25 @@ export async function GET(
 
   const { data: item } = await supabase
     .from("tagged_items")
-    .select("id, buy_url, buy_urls, outfit_id")
+    .select(
+      "id, buy_url, buy_urls, outfit_id, is_affiliate, retailer, is_active",
+    )
     .eq("id", itemId)
     .maybeSingle();
 
-  if (!item) {
+  if (!item || (item as { is_active?: boolean }).is_active === false) {
     return new NextResponse("Not found", { status: 404 });
   }
 
-  const region = resolveRegion();
-  const target = pickBuyUrl(
+  const hdrs = await headers();
+  const country = resolveCountry(hdrs);
+  const region = (
+    ["SE", "NO", "DK", "FI", "DE", "GB", "US"].includes(country)
+      ? country
+      : DEFAULT_REGION
+  ) as Region;
+
+  let target = pickBuyUrl(
     (item.buy_url as string | null) ?? null,
     (item.buy_urls as Record<string, string> | null) ?? null,
     region,
@@ -73,11 +94,29 @@ export async function GET(
     return new NextResponse("No buy link", { status: 404 });
   }
 
+  // Geo-rewrite when we have a retailer module that supports the visitor's
+  // locale — but NEVER for affiliate links. The creator's tracking depends
+  // on the exact path/query, so we pass those through untouched.
+  if (!item.is_affiliate && item.retailer) {
+    const retailer = getRetailerById(item.retailer as string);
+    if (retailer) {
+      const targetLocale = countryToLocale(country);
+      if (retailer.supportedLocales.includes(targetLocale)) {
+        try {
+          const rewritten = retailer.rewriteForLocale(new URL(target), targetLocale);
+          target = rewritten.toString();
+        } catch {
+          // Bad URL — fall through to original target.
+        }
+      }
+    }
+  }
+
   // Log the click best-effort. Skip bots (social preview crawlers, search
   // engines) so creator dashboards aren't inflated by metadata fetches, and
   // skip self-clicks from the outfit owner.
-  const hdrs = await headers();
   const userAgent = hdrs.get("user-agent") ?? "";
+  const referrer = hdrs.get("referer");
 
   if (!isBot(userAgent)) {
     const {
@@ -111,9 +150,20 @@ export async function GET(
         outfit_id: item.outfit_id,
         viewer_token: viewerToken,
         user_id: user?.id ?? null,
+        visitor_country: country,
+        referrer: referrer ? referrer.slice(0, 500) : null,
+        user_agent: userAgent ? userAgent.slice(0, 500) : null,
       });
     }
   }
 
-  return NextResponse.redirect(target, { status: 302 });
+  // Geo-aware redirects must never be CDN-cached — same item_id can
+  // resolve to different URLs depending on visitor's country.
+  return new NextResponse(null, {
+    status: 302,
+    headers: {
+      location: target,
+      "cache-control": "no-store",
+    },
+  });
 }
