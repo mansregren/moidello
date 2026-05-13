@@ -8,11 +8,24 @@ const DOMAIN = "johnhenric.com";
 // the visitor's country. INT is the international fallback.
 const SUPPORTED: Locale[] = ["se", "no", "dk", "fi", "de", "fr", "es", "nl", "int"];
 
+// Detection set is wider than SUPPORTED — we need to RECOGNISE locale
+// segments John Henric uses but that we don't rewrite TO (gb/uk/en/eu
+// all hit the international/English version). Without this, /gb/foo
+// gets prepended with /se/ instead of replaced -> /se/gb/foo, which
+// 404s on the retailer. Bug from 2026-05-13 user report.
+const DETECTABLE_LOCALES = new Set<string>([
+  ...SUPPORTED,
+  "gb",
+  "uk",
+  "en",
+  "eu",
+]);
+
 function localeFromPath(pathname: string): Locale | null {
   const m = pathname.match(/^\/([a-z]{2,3})(\/|$)/i);
   if (!m) return null;
   const code = m[1].toLowerCase();
-  return SUPPORTED.includes(code as Locale) ? (code as Locale) : null;
+  return DETECTABLE_LOCALES.has(code) ? (code as Locale) : null;
 }
 
 export const johnhenric: Retailer = {
