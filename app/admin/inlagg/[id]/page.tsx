@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -17,8 +16,10 @@ import { outfitPathFromParts } from "@/lib/outfit-url";
 import {
   OutfitEditor,
   TagsEditor,
+  TagPositionEditor,
   type OutfitForm,
   type TagForm,
+  type TagPosition,
 } from "./OutfitEditor";
 
 export const dynamic = "force-dynamic";
@@ -50,7 +51,7 @@ export default async function AdminOutfitDetailPage({
   const { data: tags } = await supabase
     .from("tagged_items")
     .select(
-      "id, brand, name, buy_url, price, currency, garment, is_affiliate",
+      "id, brand, name, buy_url, price, currency, garment, is_affiliate, position_x, position_y",
     )
     .eq("outfit_id", id)
     .order("garment", { ascending: true });
@@ -81,9 +82,26 @@ export default async function AdminOutfitDetailPage({
     is_published: !!outfit.is_published,
   };
 
-  const tagsForm: TagForm[] = ((tags ?? []) as Array<TagForm>).map((t) => ({
-    ...t,
+  const tagRows = (tags ?? []) as Array<
+    TagForm & { position_x: number; position_y: number }
+  >;
+  const tagsForm: TagForm[] = tagRows.map((t) => ({
+    id: t.id,
+    brand: t.brand,
+    name: t.name,
+    buy_url: t.buy_url,
+    price: t.price,
+    currency: t.currency,
+    garment: t.garment,
+    is_affiliate: t.is_affiliate,
     click_count: tagClickCount.get(t.id) ?? 0,
+  }));
+  const tagPositions: TagPosition[] = tagRows.map((t) => ({
+    id: t.id,
+    brand: t.brand,
+    garment: t.garment,
+    x: Number(t.position_x),
+    y: Number(t.position_y),
   }));
 
   const created = new Date(outfit.created_at as string).toLocaleString(
@@ -111,22 +129,12 @@ export default async function AdminOutfitDetailPage({
 
       <div className="grid lg:grid-cols-2 gap-8">
         <div>
-          <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-background-tertiary">
-            <Image
-              src={outfit.image_url as string}
-              alt={outfit.title as string}
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-              priority
-              unoptimized={(outfit.image_url as string).startsWith("http")}
-            />
-            {!outfit.is_published && (
-              <span className="absolute top-3 left-3 inline-flex rounded-full bg-amber-500/90 text-black px-3 py-1 text-xs uppercase tracking-wider font-semibold">
-                Utkast
-              </span>
-            )}
-          </div>
+          <TagPositionEditor
+            imageUrl={outfit.image_url as string}
+            title={outfit.title as string}
+            isPublished={!!outfit.is_published}
+            tags={tagPositions}
+          />
 
           {creator && (
             <Link

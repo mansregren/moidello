@@ -171,6 +171,40 @@ export async function updateTaggedItem(
   return { ok: true };
 }
 
+export async function updateTaggedItemPosition(
+  tagId: string,
+  x: number,
+  y: number,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+  if (!UUID_RE.test(tagId)) return { ok: false, error: "Ogiltigt id." };
+
+  const clamp = (v: number) =>
+    Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : null;
+  const px = clamp(x);
+  const py = clamp(y);
+  if (px === null || py === null) {
+    return { ok: false, error: "Ogiltig position." };
+  }
+
+  const supabase = await createClient();
+  const { data: row, error } = await supabase
+    .from("tagged_items")
+    .update({ position_x: px, position_y: py })
+    .eq("id", tagId)
+    .select("outfit_id")
+    .maybeSingle();
+  if (error) return { ok: false, error: error.message };
+
+  if (row?.outfit_id) {
+    revalidatePath(`/admin/inlagg/${row.outfit_id}`);
+    revalidatePath(`/outfit/${row.outfit_id}`);
+  }
+  return { ok: true };
+}
+
 export async function deleteTaggedItem(
   tagId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {

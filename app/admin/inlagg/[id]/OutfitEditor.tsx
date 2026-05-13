@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Save, Trash2, MousePointerClick } from "lucide-react";
+import { Save, Trash2, MousePointerClick, Check, Loader2 } from "lucide-react";
 import {
   updateOutfit,
   deleteOutfit,
   updateTaggedItem,
+  updateTaggedItemPosition,
   deleteTaggedItem,
 } from "@/app/actions/admin-content";
 
@@ -17,6 +19,14 @@ export interface OutfitForm {
   category: string;
   gender: "dam" | "herr";
   is_published: boolean;
+}
+
+export interface TagPosition {
+  id: string;
+  brand: string;
+  garment: string;
+  x: number;
+  y: number;
 }
 
 export interface TagForm {
@@ -248,8 +258,8 @@ export function TagsEditor({
         Taggade plagg ({tags.length})
       </h2>
       <p className="text-xs text-foreground-subtle mb-5">
-        Ändringar sparas per plagg. Positionspunkten på bilden kan inte
-        flyttas härifrån — använd /skapa-flödet för det.
+        Ändringar sparas per plagg. Dra punkterna på bilden ovan för att
+        flytta tag-positioner.
       </p>
 
       {error && <p className="text-xs text-red-400 mb-4">{error}</p>}
@@ -373,6 +383,194 @@ export function TagsEditor({
         ))}
       </ul>
     </section>
+  );
+}
+
+export function TagPositionEditor({
+  imageUrl,
+  title,
+  isPublished,
+  tags: initialTags,
+}: {
+  imageUrl: string;
+  title: string;
+  isPublished: boolean;
+  tags: TagPosition[];
+}) {
+  const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [tags, setTags] = useState(initialTags);
+  const [dirty, setDirty] = useState<Set<string>>(new Set());
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [justSavedId, setJustSavedId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Reset state if server data changes after a router.refresh()
+  useEffect(() => {
+    setTags(initialTags);
+    setDirty(new Set());
+  }, [initialTags]);
+
+  const startDrag = (e: React.PointerEvent<HTMLDivElement>, tagId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+
+    const onMove = (ev: PointerEvent) => {
+      const xPct = ((ev.clientX - rect.left) / rect.width) * 100;
+      const yPct = ((ev.clientY - rect.top) / rect.height) * 100;
+      const clamp = (v: number) => Math.max(2, Math.min(98, v));
+      setTags((prev) =>
+        prev.map((t) =>
+          t.id === tagId ? { ...t, x: clamp(xPct), y: clamp(yPct) } : t,
+        ),
+      );
+      setDirty((prev) => {
+        if (prev.has(tagId)) return prev;
+        const next = new Set(prev);
+        next.add(tagId);
+        return next;
+      });
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  };
+
+  const save = async (tagId: string) => {
+    const tag = tags.find((t) => t.id === tagId);
+    if (!tag) return;
+    setError(null);
+    setSavingId(tagId);
+    const res = await updateTaggedItemPosition(tag.id, tag.x, tag.y);
+    setSavingId(null);
+    if (res.ok) {
+      setDirty((prev) => {
+        const next = new Set(prev);
+        next.delete(tagId);
+        return next;
+      });
+      setJustSavedId(tagId);
+      setTimeout(() => setJustSavedId((id) => (id === tagId ? null : id)), 1500);
+      router.refresh();
+    } else {
+      setError(res.error);
+    }
+  };
+
+  const saveAll = async () => {
+    const ids = Array.from(dirty);
+    if (ids.length === 0) return;
+    for (const id of ids) {
+      await save(id);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div
+        ref={containerRef}
+        className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-background-tertiary select-none touch-none"
+      >
+        <Image
+          src={imageUrl}
+          alt={title}
+          fill
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          className="object-cover pointer-events-none"
+          priority
+          unoptimized={imageUrl.startsWith("http")}
+          draggable={false}
+        />
+
+        {!isPublished && (
+          <span className="absolute top-3 left-3 inline-flex rounded-full bg-amber-500/90 text-black px-3 py-1 text-xs uppercase tracking-wider font-semibold pointer-events-none">
+            Utkast
+          </span>
+        )}
+
+        {tags.map((tag, i) => {
+          const isDirty = dirty.has(tag.id);
+          const isSaving = savingId === tag.id;
+          const isSaved = justSavedId === tag.id;
+          return (
+            <div
+              key={tag.id}
+              className="absolute"
+              style={{ left: `${tag.x}%`, top: `${tag.y}%` }}
+            >
+              <div
+                onPointerDown={(e) => startDrag(e, tag.id)}
+                className="cursor-grab active:cursor-grabbing"
+                title={`${tag.brand || "(utan märke)"} — ${tag.garment}`}
+              >
+                <span
+                  className={`absolute inset-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full ${
+                    isDirty ? "bg-amber-300/50" : "bg-white/40"
+                  } animate-ping`}
+                />
+                <span
+                  className={`absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] ${
+                    isDirty ? "bg-amber-300" : "bg-white"
+                  }`}
+                />
+              </div>
+              <div className="absolute left-3 top-3 flex items-center gap-1 whitespace-nowrap rounded-full bg-black/80 px-2 py-0.5 text-[10px] font-medium text-white shadow-lg backdrop-blur-sm">
+                <span>#{i + 1}</span>
+                <span className="text-white/60">·</span>
+                <span className="truncate max-w-[8rem]">
+                  {tag.brand || "(utan märke)"}
+                </span>
+                {isDirty && (
+                  <button
+                    type="button"
+                    onClick={() => save(tag.id)}
+                    disabled={isSaving}
+                    className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-300 text-black px-2 py-0.5 text-[10px] font-semibold hover:bg-amber-200 disabled:opacity-60"
+                  >
+                    {isSaving ? (
+                      <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                    ) : (
+                      <Save className="h-2.5 w-2.5" />
+                    )}
+                    Spara
+                  </button>
+                )}
+                {isSaved && !isDirty && (
+                  <span className="ml-1 inline-flex items-center gap-1 text-emerald-300">
+                    <Check className="h-2.5 w-2.5" />
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex items-center justify-between text-xs">
+        <p className="text-foreground-subtle">
+          Dra punkterna för att flytta tag-positioner. Ändringar sparas per punkt.
+        </p>
+        {dirty.size > 0 && (
+          <button
+            type="button"
+            onClick={saveAll}
+            disabled={savingId !== null}
+            className="inline-flex items-center gap-1.5 rounded-full bg-amber-300 text-black px-3 py-1.5 text-xs font-semibold hover:bg-amber-200 disabled:opacity-60"
+          >
+            <Save className="h-3 w-3" />
+            Spara alla ({dirty.size})
+          </button>
+        )}
+      </div>
+
+      {error && <p className="text-xs text-red-400">{error}</p>}
+    </div>
   );
 }
 
