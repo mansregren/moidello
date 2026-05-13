@@ -39,6 +39,7 @@ const CATEGORY_COVER: Record<string, string> = {
 
 export default function HomeClient({
   outfits,
+  following = [],
   creators,
   likedIds = [],
   savedIds = [],
@@ -46,6 +47,7 @@ export default function HomeClient({
   lifestyleBg = "/images/bg/parasols.jpg",
 }: {
   outfits: Outfit[];
+  following?: Outfit[];
   creators: User[];
   likedIds?: string[];
   savedIds?: string[];
@@ -63,6 +65,14 @@ export default function HomeClient({
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
     .slice(0, 6);
+
+  const followingVisible = useMemo(
+    () =>
+      following
+        .filter((o) => matchesGenderFilter(o.gender, gender))
+        .slice(0, 6),
+    [following, gender],
+  );
 
   const categoryImage = (cat: string): string => {
     const match = visible.find((o) => o.category === cat);
@@ -120,6 +130,21 @@ export default function HomeClient({
         </section>
 
         <Container className="space-y-14 pt-10 md:pt-14">
+          {followingVisible.length > 0 && (
+            <Section
+              title="Från dina följda"
+              href="/foljer"
+              seeAllLabel="Hela flödet"
+            >
+              <OutfitGrid
+                outfits={followingVisible}
+                columns={3}
+                liked={liked}
+                saved={saved}
+              />
+            </Section>
+          )}
+
           <Section
             title="Bläddra kategorier"
             href="/upptack"
