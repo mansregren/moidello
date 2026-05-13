@@ -16,9 +16,13 @@ export interface OutfitForm {
   id: string;
   title: string;
   description: string;
+  meta_description: string;
+  keywords: string[];
+  alt_text: string;
   category: string;
   gender: "dam" | "herr";
   is_published: boolean;
+  scheduled_for: string | null;
 }
 
 export interface TagPosition {
@@ -81,9 +85,13 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
       const res = await updateOutfit(outfit.id, {
         title: form.title,
         description: form.description || null,
+        meta_description: form.meta_description || null,
+        keywords: form.keywords,
+        alt_text: form.alt_text || null,
         category: form.category || null,
         gender: form.gender,
         is_published: form.is_published,
+        scheduled_for: form.scheduled_for,
       });
       if (res.ok) {
         setSuccess("Sparat.");
@@ -93,6 +101,16 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
       }
     });
   };
+
+  const addKeyword = (k: string) => {
+    const cleaned = k.trim().toLowerCase();
+    if (!cleaned) return;
+    if (form.keywords.includes(cleaned)) return;
+    if (form.keywords.length >= 10) return;
+    setForm({ ...form, keywords: [...form.keywords, cleaned] });
+  };
+  const removeKeyword = (k: string) =>
+    setForm({ ...form, keywords: form.keywords.filter((x) => x !== k) });
 
   const handleDelete = () => {
     if (
@@ -130,8 +148,83 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
             onChange={(e) =>
               setForm({ ...form, description: e.target.value })
             }
-            rows={4}
+            rows={3}
             maxLength={2000}
+            className={`${INPUT} resize-none`}
+          />
+        </Field>
+
+        <Field
+          label={`Meta-description (SEO) · ${form.meta_description.length}/160`}
+        >
+          <textarea
+            value={form.meta_description}
+            onChange={(e) =>
+              setForm({ ...form, meta_description: e.target.value })
+            }
+            rows={2}
+            maxLength={200}
+            placeholder="140–155 tecken, svenska. Visas i Google."
+            className={`${INPUT} resize-none`}
+          />
+        </Field>
+
+        <Field
+          label={`Keywords (${form.keywords.length}/10)`}
+        >
+          <div className="flex flex-wrap gap-1.5 p-2 rounded-xl bg-background-tertiary border border-border min-h-[44px]">
+            {form.keywords.map((k) => (
+              <span
+                key={k}
+                className="inline-flex items-center gap-1 rounded-full bg-white/10 text-white px-2 py-0.5 text-xs"
+              >
+                {k}
+                <button
+                  type="button"
+                  onClick={() => removeKeyword(k)}
+                  className="text-white/60 hover:text-white"
+                  aria-label={`Ta bort ${k}`}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+            <input
+              type="text"
+              placeholder={
+                form.keywords.length >= 10
+                  ? "Max 10 keywords"
+                  : "Skriv + Enter"
+              }
+              disabled={form.keywords.length >= 10}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === ",") {
+                  e.preventDefault();
+                  const v = (e.target as HTMLInputElement).value;
+                  addKeyword(v);
+                  (e.target as HTMLInputElement).value = "";
+                }
+              }}
+              onBlur={(e) => {
+                if (e.target.value.trim()) {
+                  addKeyword(e.target.value);
+                  e.target.value = "";
+                }
+              }}
+              className="flex-1 min-w-[120px] bg-transparent text-sm text-white placeholder:text-foreground-subtle outline-none"
+            />
+          </div>
+        </Field>
+
+        <Field label="Alt-text (Google Images + tillgänglighet)">
+          <textarea
+            value={form.alt_text}
+            onChange={(e) =>
+              setForm({ ...form, alt_text: e.target.value })
+            }
+            rows={2}
+            maxLength={400}
+            placeholder="Svenska, beskrivande mening. Plaggtyp + färg."
             className={`${INPUT} resize-none`}
           />
         </Field>
@@ -163,17 +256,66 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
             </select>
           </Field>
         </div>
-        <label className="flex items-center gap-2.5 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={form.is_published}
-            onChange={(e) =>
-              setForm({ ...form, is_published: e.target.checked })
-            }
-            className="h-4 w-4 rounded border-border bg-background-tertiary accent-white"
-          />
-          <span className="text-sm text-white">Publicerad</span>
-        </label>
+        <Field label="Status">
+          <div className="flex flex-wrap gap-2">
+            <StatusButton
+              active={!form.is_published && !form.scheduled_for}
+              onClick={() =>
+                setForm({ ...form, is_published: false, scheduled_for: null })
+              }
+              label="Utkast"
+              tone="amber"
+            />
+            <StatusButton
+              active={!form.is_published && !!form.scheduled_for}
+              onClick={() =>
+                setForm({
+                  ...form,
+                  is_published: false,
+                  scheduled_for:
+                    form.scheduled_for ??
+                    new Date(Date.now() + 86400000).toISOString(),
+                })
+              }
+              label="Schemalagd"
+              tone="blue"
+            />
+            <StatusButton
+              active={form.is_published}
+              onClick={() =>
+                setForm({ ...form, is_published: true, scheduled_for: null })
+              }
+              label="Publicerad"
+              tone="emerald"
+            />
+          </div>
+        </Field>
+
+        {!form.is_published && !!form.scheduled_for && (
+          <Field label="Schemalagd publicering">
+            <input
+              type="datetime-local"
+              value={
+                form.scheduled_for
+                  ? new Date(form.scheduled_for).toISOString().slice(0, 16)
+                  : ""
+              }
+              onChange={(e) => {
+                const v = e.target.value;
+                setForm({
+                  ...form,
+                  scheduled_for: v ? new Date(v).toISOString() : null,
+                });
+              }}
+              className={INPUT}
+            />
+            <p className="mt-1 text-[11px] text-foreground-subtle">
+              OBS: Schemaläggnings-jobbet körs inte automatiskt än —
+              cron-tasken är inte aktiverad. Tills dess publiceras posten
+              först när admin trycker Publicerad manuellt.
+            </p>
+          </Field>
+        )}
 
         {error && <p className="text-xs text-red-400">{error}</p>}
         {success && <p className="text-xs text-emerald-300">{success}</p>}
@@ -573,6 +715,45 @@ export function TagPositionEditor({
 
       {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
+  );
+}
+
+function StatusButton({
+  active,
+  onClick,
+  label,
+  tone,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  tone: "amber" | "blue" | "emerald";
+}) {
+  const tones: Record<string, { active: string; idle: string }> = {
+    amber: {
+      active: "bg-amber-500 text-black border-amber-500",
+      idle: "border-amber-500/30 text-amber-300 hover:bg-amber-500/10",
+    },
+    blue: {
+      active: "bg-blue-500 text-white border-blue-500",
+      idle: "border-blue-500/30 text-blue-300 hover:bg-blue-500/10",
+    },
+    emerald: {
+      active: "bg-emerald-500 text-black border-emerald-500",
+      idle: "border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/10",
+    },
+  };
+  const c = tones[tone];
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center rounded-full border px-4 py-1.5 text-xs font-semibold transition-colors ${
+        active ? c.active : c.idle
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 

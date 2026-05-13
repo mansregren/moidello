@@ -12,9 +12,13 @@ export async function updateOutfit(
   patch: {
     title?: string;
     description?: string | null;
+    meta_description?: string | null;
+    keywords?: string[] | null;
+    alt_text?: string | null;
     category?: string | null;
     gender?: "dam" | "herr";
     is_published?: boolean;
+    scheduled_for?: string | null;
   },
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
@@ -24,7 +28,10 @@ export async function updateOutfit(
     return { ok: false, error: "Ogiltigt id." };
   }
 
-  const updates: Record<string, string | boolean | null> = {};
+  const updates: Record<
+    string,
+    string | string[] | boolean | null
+  > = {};
   if (patch.title !== undefined) {
     const t = patch.title.trim();
     if (!t) return { ok: false, error: "Titel får inte vara tom." };
@@ -33,6 +40,31 @@ export async function updateOutfit(
   if (patch.description !== undefined) {
     const d = patch.description?.trim() ?? null;
     updates.description = d && d.length > 0 ? d.slice(0, 2000) : null;
+  }
+  if (patch.meta_description !== undefined) {
+    const m = patch.meta_description?.trim() ?? null;
+    if (m && m.length > 200) {
+      return { ok: false, error: "Meta-description max 200 tecken." };
+    }
+    updates.meta_description = m && m.length > 0 ? m : null;
+  }
+  if (patch.keywords !== undefined) {
+    if (patch.keywords === null) {
+      updates.keywords = null;
+    } else {
+      const cleaned = patch.keywords
+        .map((k) => k.trim().toLowerCase())
+        .filter((k) => k.length > 0)
+        .slice(0, 10);
+      updates.keywords = cleaned.length > 0 ? cleaned : null;
+    }
+  }
+  if (patch.alt_text !== undefined) {
+    const a = patch.alt_text?.trim() ?? null;
+    if (a && a.length > 400) {
+      return { ok: false, error: "Alt-text max 400 tecken." };
+    }
+    updates.alt_text = a && a.length > 0 ? a : null;
   }
   if (patch.category !== undefined) {
     const c = patch.category?.trim() ?? null;
@@ -46,6 +78,17 @@ export async function updateOutfit(
   }
   if (patch.is_published !== undefined) {
     updates.is_published = patch.is_published;
+  }
+  if (patch.scheduled_for !== undefined) {
+    if (patch.scheduled_for === null) {
+      updates.scheduled_for = null;
+    } else {
+      const d = new Date(patch.scheduled_for);
+      if (Number.isNaN(d.getTime())) {
+        return { ok: false, error: "Ogiltigt schemaläggnings-datum." };
+      }
+      updates.scheduled_for = d.toISOString();
+    }
   }
 
   if (Object.keys(updates).length === 0) return { ok: true };

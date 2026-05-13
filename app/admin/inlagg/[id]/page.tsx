@@ -35,7 +35,7 @@ export default async function AdminOutfitDetailPage({
   const { data: outfit } = await supabase
     .from("outfits")
     .select(
-      "id, slug, user_id, title, description, category, gender, is_published, image_url, image_path, created_at",
+      "id, slug, user_id, title, description, meta_description, keywords, alt_text, category, gender, is_published, scheduled_for, image_url, image_path, created_at",
     )
     .eq("id", id)
     .maybeSingle();
@@ -77,9 +77,13 @@ export default async function AdminOutfitDetailPage({
     id: outfit.id as string,
     title: outfit.title as string,
     description: (outfit.description as string | null) ?? "",
+    meta_description: (outfit.meta_description as string | null) ?? "",
+    keywords: ((outfit.keywords as string[] | null) ?? []),
+    alt_text: (outfit.alt_text as string | null) ?? "",
     category: (outfit.category as string | null) ?? "",
     gender: ((outfit.gender as string | null) ?? "dam") as "dam" | "herr",
     is_published: !!outfit.is_published,
+    scheduled_for: (outfit.scheduled_for as string | null) ?? null,
   };
 
   const tagRows = (tags ?? []) as Array<

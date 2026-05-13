@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Eye, Heart, Bookmark, MousePointerClick, MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PublishToggle } from "./PublishToggle";
+import { BulkSeedButton } from "./BulkSeedButton";
 
 export const dynamic = "force-dynamic";
 
@@ -90,6 +91,25 @@ export default async function AdminInlaggPage({
     published: outfits.filter((o) => o.is_published).length,
   };
 
+  // Demo + real users for the bulk seed modal — admin chooses who each
+  // generated draft is posted as.
+  const { data: seedUsers } = await supabase
+    .from("profiles")
+    .select("id, username, display_name, is_demo")
+    .order("is_demo", { ascending: false })
+    .order("username", { ascending: true })
+    .limit(50);
+  const seedUserOptions = ((seedUsers ?? []) as Array<{
+    id: string;
+    username: string;
+    display_name: string | null;
+    is_demo: boolean;
+  }>).map((u) => ({
+    id: u.id,
+    username: u.username,
+    display_name: u.display_name,
+  }));
+
   // Resolve creators in one round-trip.
   const profileMap = new Map<string, ProfileLite>();
   const userIds = Array.from(new Set(outfits.map((o) => o.user_id)));
@@ -108,9 +128,12 @@ export default async function AdminInlaggPage({
       <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-3">
         Admin / Inlägg
       </p>
-      <h1 className="font-heading text-4xl md:text-6xl uppercase tracking-tight leading-none">
-        Alla inlägg
-      </h1>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <h1 className="font-heading text-4xl md:text-6xl uppercase tracking-tight leading-none">
+          Alla inlägg
+        </h1>
+        <BulkSeedButton users={seedUserOptions} />
+      </div>
       <p className="mt-4 text-foreground-muted">
         {counts.all} matchande inlägg ({counts.published} publicerade,{" "}
         {counts.drafts} utkast). Klicka på status-pillerna nedan för att
