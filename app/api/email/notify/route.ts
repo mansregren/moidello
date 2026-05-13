@@ -59,12 +59,23 @@ export async function POST(request: Request) {
     .select("id, display_name, username, contact_email")
     .eq("id", payload.user_id)
     .maybeSingle();
-  if (!recipient?.contact_email) {
+
+  // contact_email is a manual profile field; most users won't set it. Fall
+  // back to the auth email so notifications still deliver by default.
+  let recipientEmail =
+    (recipient?.contact_email as string | null) ?? null;
+  if (!recipientEmail) {
+    const { data: authUser } = await admin.auth.admin.getUserById(
+      payload.user_id,
+    );
+    recipientEmail = authUser?.user?.email ?? null;
+  }
+  if (!recipient || !recipientEmail) {
     return NextResponse.json({ ok: true, sent: 0, reason: "no email" });
   }
 
   const recipientName =
-    (recipient.display_name as string | null) ??
+    ((recipient.display_name as string | null)?.trim() || null) ??
     (recipient.username as string);
 
   let actor: { display_name: string | null; username: string } | null = null;
@@ -84,7 +95,7 @@ export async function POST(request: Request) {
   if (!actor) {
     return NextResponse.json({ ok: true, sent: 0, reason: "no actor" });
   }
-  const actorName = actor.display_name ?? actor.username;
+  const actorName = (actor.display_name?.trim() || null) ?? actor.username;
 
   let template: ReturnType<typeof newFollowerEmail> | null = null;
 
@@ -133,7 +144,7 @@ export async function POST(request: Request) {
   }
 
   const result = await sendEmail({
-    to: recipient.contact_email as string,
+    to: recipientEmail,
     subject: template.subject,
     html: template.html,
     text: template.text,

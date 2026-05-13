@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight } from "lucide-react";
@@ -28,23 +28,34 @@ export default function OnboardingPage() {
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
 
-  // Prefill from OAuth provider metadata (Google: full_name / name).
+  // Prefill from OAuth provider metadata (Google: full_name / name). Reset
+  // when a different user signs in mid-page so we don't carry over the
+  // previous account's prefill.
+  const lastUserIdRef = useRef<string | null>(null);
   useEffect(() => {
     if (!user) return;
+    const switched = lastUserIdRef.current !== null && lastUserIdRef.current !== user.id;
+    lastUserIdRef.current = user.id;
+
     const meta = user.user_metadata ?? {};
     const guess =
       (typeof meta.full_name === "string" && meta.full_name) ||
       (typeof meta.name === "string" && meta.name) ||
       "";
-    if (guess && !displayName) setDisplayName(guess);
-    // Suggest a username from the email local-part if user hasn't typed one.
+
+    if (switched) {
+      // New user — wipe any state from the previous one.
+      setDisplayName(guess);
+      setUsername("");
+    } else if (guess && !displayName) {
+      setDisplayName(guess);
+    }
+
     if (!username && user.email) {
       const local = user.email.split("@")[0] ?? "";
       const cleaned = local.toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 24);
       if (cleaned.length >= 3) setUsername(cleaned);
     }
-    // Intentionally only depend on `user` — we don't want to overwrite the
-    // user's typing once they've started editing.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
   const [genderChoice, setGenderChoice] = useState<GenderChoice | null>(null);

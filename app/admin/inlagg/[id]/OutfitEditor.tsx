@@ -416,9 +416,11 @@ export function TagPositionEditor({
     e.stopPropagation();
     const container = containerRef.current;
     if (!container) return;
-    const rect = container.getBoundingClientRect();
 
     const onMove = (ev: PointerEvent) => {
+      // Re-read the rect each frame so scroll/resize during the drag
+      // doesn't snap the dot to a stale position.
+      const rect = container.getBoundingClientRect();
       const xPct = ((ev.clientX - rect.left) / rect.width) * 100;
       const yPct = ((ev.clientY - rect.top) / rect.height) * 100;
       const clamp = (v: number) => Math.max(2, Math.min(98, v));

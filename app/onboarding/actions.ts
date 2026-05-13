@@ -65,6 +65,15 @@ export async function completeOnboarding(
     return { fieldErrors: { username: "Användarnamnet är upptaget." } };
   }
 
+  // Read existing profile state so we can tell if this is the first
+  // onboarding (i.e. should we send the welcome mail) vs. a re-entry.
+  const { data: currentProfile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", user.id)
+    .maybeSingle();
+  const isFirstOnboarding = !currentProfile?.display_name;
+
   const { error: profileError } = await supabase
     .from("profiles")
     .update({ username, display_name: displayName })
@@ -90,8 +99,8 @@ export async function completeOnboarding(
     );
   }
 
-  // Best-effort welcome email. Fail-soft — onboarding completes either way.
-  if (user.email) {
+  // Best-effort welcome email — only on first onboarding. Fail-soft.
+  if (isFirstOnboarding && user.email) {
     const tpl = welcomeEmail({
       displayName: displayName ?? username,
       username,

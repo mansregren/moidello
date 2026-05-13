@@ -87,10 +87,10 @@ export async function POST(request: Request) {
       .eq("id", payload.actor_id)
       .maybeSingle();
     if (data) {
-      actorName =
-        (data.display_name as string | null) ??
-        (data.username as string | null);
-      actorUsername = data.username as string | null;
+      const dn = (data.display_name as string | null)?.trim() ?? "";
+      const un = (data.username as string | null) ?? null;
+      actorName = dn || un;
+      actorUsername = un;
     }
   }
   if (!actorName) {
