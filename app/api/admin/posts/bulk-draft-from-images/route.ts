@@ -6,7 +6,7 @@
 // image doesn't kill the rest.
 
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { isCurrentUserAdmin } from "@/lib/admin";
 import { slugify, storageFilename } from "@/lib/slug";
 import {
@@ -99,7 +99,22 @@ export async function POST(request: Request) {
   const drafts: DraftResult[] = [];
   const errors: DraftError[] = [];
 
-  const supabase = await createClient();
+  // Use the service-role client for both storage uploads AND DB inserts.
+  // The cookie-bound client trips RLS on cross-user inserts in some
+  // request contexts even with the admin-INSERT policy in place; since
+  // isCurrentUserAdmin() above is our security gate, service-role is the
+  // right tool for this admin-on-behalf-of operation.
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRole) {
+    return NextResponse.json(
+      { error: "Server env saknas (SUPABASE_SERVICE_ROLE_KEY)." },
+      { status: 503 },
+    );
+  }
+  const supabase = createServiceClient(supabaseUrl, serviceRole, {
+    auth: { persistSession: false },
+  });
 
   for (let i = 0; i < images.length; i++) {
     const image = images[i];
