@@ -10,6 +10,7 @@ import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { CookieBanner } from "@/components/layout/CookieBanner";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { pickBg } from "@/lib/session-background";
+import { getViewerGender } from "@/lib/gender-server";
 import { siteJsonLd } from "@/lib/json-ld";
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
@@ -119,6 +120,7 @@ export default async function RootLayout({
   }
 
   const footerBg = await pickBg("footer");
+  const initialGender = await getViewerGender();
 
   return (
     <html
@@ -135,7 +137,7 @@ export default async function RootLayout({
         <ImpersonationBanner />
         <AuthProvider initialUser={user} initialProfile={initialProfile}>
           <ToastProvider>
-            <GenderProvider>
+            <GenderProvider initial={initialGender}>
               <AppShell footerBg={footerBg}>{children}</AppShell>
             </GenderProvider>
           </ToastProvider>

@@ -10,6 +10,7 @@ import { UserLink } from "@/components/shared/UserLink";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { brandPageJsonLd } from "@/lib/json-ld";
 import { createPublicClient } from "@/lib/supabase/public";
+import { getViewerGender } from "@/lib/gender-server";
 import {
   fetchBrandsAggregated,
   fetchBrandOutfits,
@@ -48,7 +49,8 @@ export default async function BrandPage({
   const dbMatch = aggregated.find((b) => b.slug === slug);
   if (!dbMatch) notFound();
 
-  const dbOutfits = await fetchBrandOutfits(dbMatch.name);
+  const gender = await getViewerGender();
+  const dbOutfits = await fetchBrandOutfits(dbMatch.name, gender);
   const { liked, saved } = await fetchEngagementForViewer(
     dbOutfits.map((o) => o.id),
   );

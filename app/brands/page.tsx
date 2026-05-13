@@ -1,10 +1,12 @@
 import { fetchBrandsAggregated } from "@/lib/queries";
+import { getViewerGender } from "@/lib/gender-server";
 import BrandsClient, { type BrandRow } from "./BrandsClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function BrandsPage() {
-  const aggregated = await fetchBrandsAggregated();
+  const gender = await getViewerGender();
+  const aggregated = await fetchBrandsAggregated(undefined, gender);
 
   const rows: BrandRow[] = aggregated.map((a) => ({
     id: a.slug,

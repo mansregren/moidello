@@ -547,8 +547,21 @@ interface ClaimedBrandRow {
 
 export async function fetchBrandsAggregated(
   client?: QueryClient,
+  gender?: "dam" | "herr",
 ): Promise<BrandAggregate[]> {
   const supabase = await resolveClient(client);
+
+  let outfitGenderFilter: Set<string> | null = null;
+  if (gender) {
+    const { data: genderRows } = await supabase
+      .from("outfits")
+      .select("id")
+      .eq("gender", gender)
+      .eq("is_published", true);
+    outfitGenderFilter = new Set(
+      ((genderRows ?? []) as Array<{ id: string }>).map((r) => r.id),
+    );
+  }
 
   const [{ data: items }, { data: claimed }] = await Promise.all([
     supabase.from("tagged_items").select("brand, outfit_id"),
@@ -565,9 +578,11 @@ export async function fetchBrandsAggregated(
   for (const row of items ?? []) {
     const display = (row.brand as string).trim();
     if (!display) continue;
+    const outfitId = row.outfit_id as string;
+    if (outfitGenderFilter && !outfitGenderFilter.has(outfitId)) continue;
     const key = display.toLowerCase();
     const entry = counts.get(key) ?? { display, outfits: new Set<string>() };
-    entry.outfits.add(row.outfit_id as string);
+    entry.outfits.add(outfitId);
     counts.set(key, entry);
   }
 
@@ -747,7 +762,10 @@ export async function fetchOutfitsByItem(
   return attachOutfitStats(mapped);
 }
 
-export async function fetchBrandOutfits(brandName: string): Promise<Outfit[]> {
+export async function fetchBrandOutfits(
+  brandName: string,
+  gender?: "dam" | "herr",
+): Promise<Outfit[]> {
   const supabase = await createClient();
 
   // tagged_items has a lower(brand) index from migration 0007
@@ -766,12 +784,13 @@ export async function fetchBrandOutfits(brandName: string): Promise<Outfit[]> {
   );
   if (outfitIds.length === 0) return [];
 
-  const { data } = await supabase
+  let query = supabase
     .from("outfits")
     .select(OUTFIT_COLUMNS)
     .in("id", outfitIds)
-    .eq("is_published", true)
-    .order("created_at", { ascending: false });
+    .eq("is_published", true);
+  if (gender) query = query.eq("gender", gender);
+  const { data } = await query.order("created_at", { ascending: false });
 
   const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
   return attachOutfitStats(mapped);

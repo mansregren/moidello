@@ -18,6 +18,7 @@ import { OutfitOwnerActions } from "@/components/outfit/OutfitOwnerActions";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { profilePageJsonLd } from "@/lib/json-ld";
 import { useAuth } from "@/lib/auth-context";
+import { useGender, matchesGenderFilter } from "@/lib/gender-context";
 import { motion } from "framer-motion";
 import type { Outfit, User as MoidelloUser } from "@/lib/types";
 import { toggleFollow } from "@/app/actions/engagement";
@@ -37,7 +38,7 @@ function formatNumber(n: number): string {
 
 export default function ProfileDetail({
   user,
-  outfits,
+  outfits: allOutfits,
   likedIds = [],
   savedIds = [],
   initiallyFollowing = false,
@@ -51,6 +52,7 @@ export default function ProfileDetail({
   publicBoards?: PublicBoardSummary[];
 }) {
   const { user: viewer, isLoggedIn, requireAuth } = useAuth();
+  const { gender } = useGender();
   const [activeTab, setActiveTab] = useState<
     "outfits" | "boards" | "followers" | "following" | "about"
   >("outfits");
@@ -63,6 +65,15 @@ export default function ProfileDetail({
   const saved = useMemo(() => new Set(savedIds), [savedIds]);
 
   const isOwnProfile = viewer?.id === user.id;
+  // Owner sees ALL their own outfits regardless of gender toggle — otherwise
+  // a Herr user would be unable to find their own Dam-tagged drafts.
+  const outfits = useMemo(
+    () =>
+      isOwnProfile
+        ? allOutfits
+        : allOutfits.filter((o) => matchesGenderFilter(o.gender, gender)),
+    [allOutfits, isOwnProfile, gender],
+  );
 
   const handleFollow = () => {
     if (!isLoggedIn) {

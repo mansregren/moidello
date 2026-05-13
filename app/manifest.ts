@@ -7,11 +7,13 @@ export default function manifest(): MetadataRoute.Manifest {
     description:
       "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
     start_url: "/",
+    scope: "/",
     display: "standalone",
     orientation: "portrait",
     background_color: "#000000",
     theme_color: "#000000",
     lang: "sv",
+    categories: ["lifestyle", "shopping", "social"],
     icons: [
       {
         src: "/icon.svg",

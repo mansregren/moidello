@@ -6,6 +6,7 @@ import { Container } from "@/components/layout/Container";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { createPublicClient } from "@/lib/supabase/public";
 import { outfitPathFromParts } from "@/lib/outfit-url";
+import { getViewerGender } from "@/lib/gender-server";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -90,6 +91,7 @@ export default async function SokPage({
 async function SearchResults({ q }: { q: string }) {
   const supabase = createPublicClient();
   const pattern = `%${escapeIlike(q)}%`;
+  const gender = await getViewerGender();
 
   const [profilesRes, outfitsRes, brandsRes] = await Promise.all([
     supabase
@@ -107,6 +109,7 @@ async function SearchResults({ q }: { q: string }) {
         "id, slug, title, image_url, description, profiles!outfits_user_id_fkey(username)",
       )
       .eq("is_published", true)
+      .eq("gender", gender)
       .or(`title.ilike.${pattern},description.ilike.${pattern}`)
       .order("created_at", { ascending: false })
       .limit(24),

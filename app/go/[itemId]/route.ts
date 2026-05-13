@@ -110,6 +110,18 @@ export async function GET(
         }
       }
     }
+  } else if (!item.is_affiliate) {
+    // No retailer set → no geo-rewrite, no allowlist guarantee. Log so we
+    // can spot phishing-style buy_urls (S-3 from audit 2026-05-13). Doesn't
+    // block — admin still controls what gets saved.
+    try {
+      const targetHost = new URL(target).hostname;
+      console.warn(
+        `[go] unknown retailer, passthrough redirect itemId=${itemId} host=${targetHost}`,
+      );
+    } catch {
+      // ignore
+    }
   }
 
   // Log the click best-effort. Skip bots (social preview crawlers, search
