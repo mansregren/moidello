@@ -11,6 +11,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email/client";
+import { timingSafeStringEqual } from "@/lib/timing-safe";
 import {
   newCommentEmail,
   newFollowerEmail,
@@ -30,7 +31,7 @@ interface NotifyBody {
 export async function POST(request: Request) {
   const secret = process.env.PUSH_WEBHOOK_SECRET;
   const provided = request.headers.get("x-push-secret");
-  if (!secret || provided !== secret) {
+  if (!timingSafeStringEqual(provided, secret)) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 

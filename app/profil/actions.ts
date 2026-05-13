@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { slugify, storageFilename } from "@/lib/slug";
 import { isReservedUsername } from "@/lib/reserved-usernames";
+import type { Database } from "@/lib/supabase/database.types";
+
+type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
+type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"];
 
 export interface ProfileUpdateState {
   ok?: boolean;
@@ -119,7 +123,7 @@ export async function updateProfile(
   // fallback only if the row is genuinely missing (trigger never ran, or
   // the row was deleted). UPDATE-then-INSERT plays nicer with RLS than a
   // single upsert because each path hits exactly one policy.
-  const fields: Record<string, unknown> = {
+  const fields: ProfileUpdate = {
     username,
     display_name: displayName,
     bio,
@@ -147,9 +151,12 @@ export async function updateProfile(
   }
 
   if (!updated || updated.length === 0) {
+    // username is always set in fields above; cast through Insert so the
+    // type checker accepts it (Update has username optional).
+    const insertRow: ProfileInsert = { id: user.id, ...fields, username };
     const { error: insertError } = await supabase
       .from("profiles")
-      .insert({ id: user.id, ...fields });
+      .insert(insertRow);
     if (insertError) {
       return { error: `Kunde inte skapa profilen: ${insertError.message}` };
     }

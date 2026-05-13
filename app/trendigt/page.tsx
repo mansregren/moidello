@@ -1,9 +1,11 @@
 import {
   fetchTopOutfits,
-  fetchTopCreators,
-  fetchBrandsAggregated,
   fetchEngagementForViewer,
 } from "@/lib/queries";
+import {
+  fetchTopCreatorsCached,
+  fetchBrandsAggregatedCached,
+} from "@/lib/queries-cached";
 import TrendigtClient from "./TrendigtClient";
 
 export const dynamic = "force-dynamic";
@@ -11,8 +13,8 @@ export const dynamic = "force-dynamic";
 export default async function TrendigtPage() {
   const [topOutfits, topCreators, brandAggs] = await Promise.all([
     fetchTopOutfits(12),
-    fetchTopCreators(12),
-    fetchBrandsAggregated(),
+    fetchTopCreatorsCached(12),
+    fetchBrandsAggregatedCached(),
   ]);
 
   const brandsForUI = brandAggs.slice(0, 6).map((b) => ({

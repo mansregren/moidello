@@ -18,6 +18,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "./database.types";
 
 export function createPublicClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -27,7 +28,7 @@ export function createPublicClient() {
       "NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY missing",
     );
   }
-  return createClient(url, anonKey, {
+  return createClient<Database>(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }

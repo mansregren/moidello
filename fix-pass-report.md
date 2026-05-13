@@ -45,3 +45,53 @@ Varje fas committas + pushas + verifieras mot prod innan nästa startar.
 
 ---
 
+## Fas 3 — KLAR ✓
+
+- **Commit:** `e993f88`
+- **Pushad till origin/main:** ja
+- **Vercel deploy:** `moidello-db1atlets...` Ready (1m build)
+- **moidello.com:** HTTP 200
+
+### Vad som ändrats
+- **BUG-3a:** `app/admin/inlagg/[id]/OutfitEditor.tsx:411-446` — `refetchFromUrl` patchar nu också `retailer` + `retailer_locale` så geo-redirect faktiskt har data att jobba med.
+- **BUG-3a:** `updateTaggedItem` i `app/actions/admin-content.ts` accepterar nu `retailer` + `retailer_locale` i patch-typen. `saveTag` skickar dem.
+- **BUG-3b:** `supabase/migrations/0032_backfill_tagged_item_retailer.sql` — idempotent backfill av `retailer` + `retailer_locale` på existerande rader. Hjälpfunktioner i `private.` schema (`url_apex_host`, `url_first_path_segment`). Mappar 31 domain-host:s till retailer-id; locale-detection per retailer baserat på URL-pattern.
+- **BUG-3+4c:** 6 nya retailer-moduler i `lib/retailers/`:
+  - `hm.ts` — `/<lang>_<country>/` (sv_se, da_dk, en_us etc), 17 locales
+  - `cos.ts` — `/en_<currency>/` (en_sek, en_eur etc), 15 locales
+  - `arket.ts` — samma mönster som COS, 15 locales
+  - `nakd.ts` — `/<lang>/` eller `/<lang>-<country>/`, 12 locales
+  - `nelly.ts` — `/<country>/`, 4 nordiska locales
+  - `filippak.ts` — `/<lang>-<country>/`, 15 locales
+- `lib/retailers/stubs.ts` rensad: bara `acnestudios`, `toteme`, `ganni`, `sezane`, `mango` kvar som stubs. `lib/retailers/index.ts` uppdaterad med nya imports.
+- **BUG-4:** `lib/retailers/openGraphFallback.ts` har nu `inferPriceFromHtml`-fallback med 3 regex-pattern: `data-price=`, `class="price"`, fri-text `1 295 kr` / `$199`. `parsePriceString` hanterar både europeiska (1.295,00) och amerikanska (1,295.00) decimaler.
+
+### Upptäckt under fasen
+- Migrationen ligger i `supabase/migrations/0032_...sql` men har **INTE** applicerats på prod. Måste pushas med `npx supabase db push` när du är tillbaka — Claude kan inte köra migrations enligt deployment-rutinerna i AGENTS.md.
+- Inga audit-fil/rad-mismatchar.
+
+---
+
+## Fas 4 — KLAR ✓
+
+- **Commit:** `9ca035b`
+- **Pushad till origin/main:** ja
+- **Vercel deploy:** Ready (verifierad manuellt i dashboard — poll-skriptet är fortfarande brokenrelaterat awk-format men deployen själv är grön)
+
+### Vad som ändrats
+- **BUG-5a:** Gender-filter applicerat där det saknades:
+  - `/profile/[username]` (`ProfileDetail.tsx`) — klient-sidigt via `useGender`, ägare ser ALLT regardless av toggle.
+  - `/sok` (`app/sok/page.tsx:94`) — server-sidigt via `getViewerGender()` + `.eq("gender", gender)` på outfits-query.
+  - `/brand/[slug]` — `fetchBrandOutfits(name, gender)` filtrerar på outfits.gender.
+  - `/brands` — `fetchBrandsAggregated(_, gender)` räknar bara outfits för viewer's gender.
+- **BUG-5b+c:** `lib/gender-context.tsx` skriven om från `useSyncExternalStore` till plain Context + useState. Nytt: `moidello_gender_pref`-cookie skrivs av `GenderToggle` (path=/, max-age=1år, samesite=lax, secure). Ny server-helper `lib/gender-server.ts:getViewerGender()` läser cookien. `app/layout.tsx` skickar in `initial` till `<GenderProvider>` så SSR/första-paint matchar viewer's preferens — **hydration-flash eliminerad**.
+- **UX-1:** `app/manifest.ts` fanns redan (audit-false-positive — auditen letade i `/public/manifest.json`). Lade till `scope: "/"` och `categories` för PWA-kvalitet.
+- **UX-2:** 5 nya `loading.tsx` (profil, skapa, admin, brands, sok) + återanvändbar `components/shared/OutfitGridSkeleton.tsx`. Skeleton-kort med `animate-pulse`.
+- **S-3:** `/go/[itemId]` `console.warn` loggar nu när ett buy_url passthrough:as utan känd retailer — phishing-monitoring utan att blockera ägare som vill länka till mindre retailers.
+
+### Upptäckt under fasen
+- `app/manifest.ts` fanns redan — det här är ett audit-misstag. UX-1 är delvis levererat sedan tidigare; mina ändringar är en upgradering (scope+categories).
+- Admin-UI badge "Okänd retailer" finns redan i både `PasteTagForm` och `TagsEditor` (`TagStatusBadge`) — den var redan implementerad. Ingen ytterligare ändring krävdes för S-3:s UI-del.
+
+---
+

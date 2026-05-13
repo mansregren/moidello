@@ -71,7 +71,7 @@ export async function exportMyData(): Promise<
       .select("*")
       .or(`user_a.eq.${user.id},user_b.eq.${user.id}`),
     supabase.from("messages").select("*").eq("sender_id", user.id),
-    supabase.from("notifications").select("*").eq("recipient_id", user.id),
+    supabase.from("notifications").select("*").eq("user_id", user.id),
   ]);
 
   return {

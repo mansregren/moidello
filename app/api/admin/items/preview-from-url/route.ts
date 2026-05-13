@@ -13,6 +13,8 @@ import { isCurrentUserAdmin } from "@/lib/admin";
 import { findRetailer, openGraphFallback } from "@/lib/retailers";
 import type { ProductMeta } from "@/lib/retailers";
 import { detectAffiliate } from "@/lib/affiliate/detect";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { createClient as createServerClient } from "@/lib/supabase/server";
 
 // SSRF-skydd: blockera privata IP-ranges + DNS-rebinding. Vi resolverar
 // hostname → IP innan fetch, returnerar 400 om någon record pekar inåt.
@@ -113,6 +115,25 @@ async function fetchHtml(url: string): Promise<string | null> {
 export async function POST(request: Request) {
   if (!(await isCurrentUserAdmin())) {
     return NextResponse.json({ error: "Inte behörig." }, { status: 403 });
+  }
+
+  // Rate-limit per-admin-user so a runaway script doesn't spam upstream
+  // retailers (and incidentally DoS them on our IP). Limit: 10/min.
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const rateKey =
+    user?.id ?? request.headers.get("x-forwarded-for") ?? "anon";
+  const rl = await checkRateLimit("preview", rateKey);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "För många anrop. Vänta lite." },
+      {
+        status: 429,
+        headers: rl.retryAfter
+          ? { "retry-after": String(rl.retryAfter) }
+          : undefined,
+      },
+    );
   }
 
   let body: { url?: string };

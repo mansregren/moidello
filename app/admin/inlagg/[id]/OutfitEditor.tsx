@@ -628,6 +628,7 @@ export function TagsEditor({
                 type="button"
                 disabled={busyId === t.id}
                 onClick={() => removeTag(t.id)}
+                aria-label={`Radera ${t.brand} ${t.name}`.trim()}
                 className="ml-auto inline-flex items-center justify-center rounded-full border border-red-500/30 text-red-400 h-7 w-7 hover:bg-red-500/10 disabled:opacity-60"
               >
                 <Trash2 className="h-3 w-3" />

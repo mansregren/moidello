@@ -31,6 +31,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { outfitPageJsonLd } from "@/lib/json-ld";
 import { outfitPath } from "@/lib/outfit-url";
 import { OutfitOwnerActions } from "@/components/outfit/OutfitOwnerActions";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Send } from "lucide-react";
 
 export default function OutfitDetail({
@@ -455,58 +456,66 @@ function CommentsSection({
           );
         })}
 
-        {confirmDelete && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-6">
-            <div className="w-full max-w-sm rounded-3xl bg-background-secondary border border-white/10 p-6">
-              <h3 className="font-heading text-2xl uppercase tracking-tight text-white">
-                Radera kommentar?
-              </h3>
-              <p className="mt-3 text-sm text-foreground-muted">
-                Detta går inte att ångra.
-              </p>
-              <div className="mt-6 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setConfirmDelete(null)}
-                  className="flex-1 rounded-full border border-border text-white py-3 text-sm font-medium hover:border-white/30"
-                >
-                  Avbryt
-                </button>
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => {
-                    const targetId = confirmDelete;
-                    setConfirmDelete(null);
-                    setComments((prev) =>
-                      prev.filter((c) => c.id !== targetId),
-                    );
-                    startTransition(async () => {
-                      const res = await deleteComment(targetId, outfitId);
-                      if (!res.ok) {
-                        // Restore on failure
-                        const restored = initialComments.find(
-                          (c) => c.id === targetId,
-                        );
-                        if (restored) {
-                          setComments((prev) =>
-                            prev.some((c) => c.id === restored.id)
-                              ? prev
-                              : [...prev, restored],
+        <AlertDialog.Root
+          open={confirmDelete !== null}
+          onOpenChange={(open) => {
+            if (!open) setConfirmDelete(null);
+          }}
+        >
+          <AlertDialog.Portal>
+            <AlertDialog.Backdrop className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-md data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 transition-opacity" />
+            <AlertDialog.Popup className="fixed inset-0 z-[60] flex items-center justify-center p-6 outline-none">
+              <div className="w-full max-w-sm rounded-3xl bg-background-secondary border border-white/10 p-6">
+                <AlertDialog.Title className="font-heading text-2xl uppercase tracking-tight text-white">
+                  Radera kommentar?
+                </AlertDialog.Title>
+                <AlertDialog.Description className="mt-3 text-sm text-foreground-muted">
+                  Detta går inte att ångra.
+                </AlertDialog.Description>
+                <div className="mt-6 flex gap-3">
+                  <AlertDialog.Close
+                    type="button"
+                    className="flex-1 rounded-full border border-border text-white py-3 text-sm font-medium hover:border-white/30"
+                  >
+                    Avbryt
+                  </AlertDialog.Close>
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() => {
+                      const targetId = confirmDelete;
+                      if (!targetId) return;
+                      setConfirmDelete(null);
+                      setComments((prev) =>
+                        prev.filter((c) => c.id !== targetId),
+                      );
+                      startTransition(async () => {
+                        const res = await deleteComment(targetId, outfitId);
+                        if (!res.ok) {
+                          // Restore on failure
+                          const restored = initialComments.find(
+                            (c) => c.id === targetId,
                           );
+                          if (restored) {
+                            setComments((prev) =>
+                              prev.some((c) => c.id === restored.id)
+                                ? prev
+                                : [...prev, restored],
+                            );
+                          }
+                          setError(res.error ?? "Kunde inte radera.");
                         }
-                        setError(res.error ?? "Kunde inte radera.");
-                      }
-                    });
-                  }}
-                  className="flex-1 rounded-full bg-red-500 text-white py-3 text-sm font-semibold hover:bg-red-600 disabled:opacity-60"
-                >
-                  Radera
-                </button>
+                      });
+                    }}
+                    className="flex-1 rounded-full bg-red-500 text-white py-3 text-sm font-semibold hover:bg-red-600 disabled:opacity-60"
+                  >
+                    Radera
+                  </button>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            </AlertDialog.Popup>
+          </AlertDialog.Portal>
+        </AlertDialog.Root>
 
         <form
           onSubmit={submit}

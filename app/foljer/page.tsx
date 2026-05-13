@@ -6,9 +6,9 @@ import { FollowButton } from "@/components/user/FollowButton";
 import { createClient } from "@/lib/supabase/server";
 import {
   fetchFollowingFeed,
-  fetchTopCreators,
   fetchEngagementForViewer,
 } from "@/lib/queries";
+import { fetchTopCreatorsCached as fetchTopCreators } from "@/lib/queries-cached";
 import { FoljerClient } from "./FoljerClient";
 
 export const metadata = {

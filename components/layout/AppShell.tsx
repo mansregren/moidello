@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { MotionConfig } from "framer-motion";
 import { FloatingBottomNav } from "./FloatingBottomNav";
 import { Footer } from "./Footer";
 import { shouldShowAppNav, shouldShowFooter } from "@/lib/nav";
@@ -19,7 +20,11 @@ export function AppShell({
   const showFooter = shouldShowFooter(pathname);
 
   return (
-    <>
+    // reducedMotion="user" — framer-motion now respects
+    // prefers-reduced-motion globally. CSS-level @media-rule in
+    // globals.css already shorted CSS transitions; this catches the
+    // JS-driven motion.* components too.
+    <MotionConfig reducedMotion="user">
       <div
         className={cn(
           "flex min-h-screen flex-1 flex-col",
@@ -30,6 +35,6 @@ export function AppShell({
         {showFooter && <Footer bg={footerBg} />}
       </div>
       {showNav && <FloatingBottomNav />}
-    </>
+    </MotionConfig>
   );
 }

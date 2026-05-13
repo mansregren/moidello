@@ -1,4 +1,5 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "./database.types";
 
 /**
  * Service-role client. Bypasses RLS entirely — use only inside admin-
@@ -14,7 +15,7 @@ export function createAdminClient() {
       "SUPABASE_SERVICE_ROLE_KEY missing — set it in Vercel env to enable admin user creation/deletion.",
     );
   }
-  return createSupabaseClient(url, key, {
+  return createSupabaseClient<Database>(url, key, {
     auth: { persistSession: false },
   });
 }

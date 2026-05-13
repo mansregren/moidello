@@ -60,7 +60,9 @@
   --background-tertiary: #141414;
   --foreground: #FFFFFF;
   --foreground-muted: #A0A0A0;
-  --foreground-subtle: #666666;
+  /* Audit UX-7: bumped from #666 → #7A7A7A for WCAG AA contrast on
+   * 11-12 px text on the #000 background (4.5:1 minimum). */
+  --foreground-subtle: #7A7A7A;
 
   --card: #0A0A0A;
   --card-foreground: #FFFFFF;

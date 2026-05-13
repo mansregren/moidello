@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export interface MessagingResult {
   ok: boolean;
@@ -77,6 +78,11 @@ export async function sendMessage(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Inte inloggad" };
 
+  const rl = await checkRateLimit("message", user.id);
+  if (!rl.ok) {
+    return { ok: false, error: "För många meddelanden. Vänta lite." };
+  }
+
   const trimmed = body.trim();
   if (trimmed.length === 0) return { ok: false, error: "Skriv något." };
   if (trimmed.length > 4000)
@@ -112,7 +118,11 @@ export async function sendShare(args: {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Inte inloggad" };
-  if (args.recipientIds.length === 0)
+
+  const uniqRecipients = Array.from(new Set(args.recipientIds)).filter(
+    (id) => id !== user.id,
+  );
+  if (uniqRecipients.length === 0)
     return { ok: false, error: "Välj minst en mottagare" };
 
   const text = (args.message ?? "").trim();
@@ -123,30 +133,80 @@ export async function sendShare(args: {
       ? { outfit_id: args.refId }
       : { tagged_item_id: args.refId };
 
-  let lastConversationId: string | undefined;
+  // Batch-fetch existing conversations for all recipient pairs in one query.
+  // The canonical key is (lower-uuid, higher-uuid) so we sort each pair.
+  type Pair = { recipientId: string; a: string; b: string };
+  const pairs: Pair[] = uniqRecipients.map((rid) => {
+    const [a, b] = user.id < rid ? [user.id, rid] : [rid, user.id];
+    return { recipientId: rid, a, b };
+  });
 
-  for (const recipientId of args.recipientIds) {
-    if (recipientId === user.id) continue;
-    const conv = await getOrCreateConversation(recipientId);
-    if (!conv.ok || !conv.conversationId) continue;
+  const otherIds = uniqRecipients;
+  const { data: existing } = await supabase
+    .from("conversations")
+    .select("id, user_a, user_b")
+    .or(
+      otherIds
+        .map(
+          (rid) =>
+            `and(user_a.eq.${user.id < rid ? user.id : rid},user_b.eq.${user.id < rid ? rid : user.id})`,
+        )
+        .join(","),
+    );
 
-    const { error } = await supabase.from("messages").insert({
-      conversation_id: conv.conversationId,
+  const existingByKey = new Map<string, string>();
+  for (const row of (existing ?? []) as Array<{
+    id: string;
+    user_a: string;
+    user_b: string;
+  }>) {
+    existingByKey.set(`${row.user_a}:${row.user_b}`, row.id);
+  }
+
+  const missingPairs = pairs.filter(
+    (p) => !existingByKey.has(`${p.a}:${p.b}`),
+  );
+
+  // Batch-insert any missing conversations.
+  if (missingPairs.length > 0) {
+    const { data: inserted, error: insertError } = await supabase
+      .from("conversations")
+      .insert(missingPairs.map((p) => ({ user_a: p.a, user_b: p.b })))
+      .select("id, user_a, user_b");
+    if (insertError) {
+      return { ok: false, error: insertError.message };
+    }
+    for (const row of (inserted ?? []) as Array<{
+      id: string;
+      user_a: string;
+      user_b: string;
+    }>) {
+      existingByKey.set(`${row.user_a}:${row.user_b}`, row.id);
+    }
+  }
+
+  // Batch-insert all messages in one statement.
+  const messages = pairs
+    .map((p) => existingByKey.get(`${p.a}:${p.b}`))
+    .filter((id): id is string => !!id)
+    .map((conversation_id) => ({
+      conversation_id,
       sender_id: user.id,
       body: text,
       content_type: args.type,
       content_data: dataPayload,
-    });
-    if (error) {
-      return { ok: false, error: error.message };
-    }
-    lastConversationId = conv.conversationId;
+    }));
+
+  if (messages.length === 0) {
+    return { ok: false, error: "Kunde inte hitta samtal." };
   }
 
+  const { error: msgError } = await supabase.from("messages").insert(messages);
+  if (msgError) return { ok: false, error: msgError.message };
+
+  const lastConversationId = messages[messages.length - 1].conversation_id;
   revalidatePath("/meddelanden");
-  if (lastConversationId) {
-    revalidatePath(`/meddelanden/${lastConversationId}`);
-  }
+  revalidatePath(`/meddelanden/${lastConversationId}`);
   return { ok: true, conversationId: lastConversationId };
 }
 

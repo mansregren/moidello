@@ -2,6 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit } from "@/lib/rate-limit";
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface EngagementResult {
   ok: boolean;
@@ -18,8 +22,16 @@ async function requireUser() {
 }
 
 export async function toggleLike(outfitId: string): Promise<EngagementResult> {
+  if (!UUID_RE.test(outfitId)) {
+    return { ok: false, active: false, error: "Ogiltigt id." };
+  }
   const { supabase, user } = await requireUser();
   if (!user) return { ok: false, active: false, error: "Inte inloggad" };
+
+  const rl = await checkRateLimit("like", user.id);
+  if (!rl.ok) {
+    return { ok: false, active: false, error: "För många klick. Vänta lite." };
+  }
 
   const { data: existing } = await supabase
     .from("likes")
@@ -47,6 +59,9 @@ export async function toggleLike(outfitId: string): Promise<EngagementResult> {
 }
 
 export async function toggleSave(outfitId: string): Promise<EngagementResult> {
+  if (!UUID_RE.test(outfitId)) {
+    return { ok: false, active: false, error: "Ogiltigt id." };
+  }
   const { supabase, user } = await requireUser();
   if (!user) return { ok: false, active: false, error: "Inte inloggad" };
 
@@ -76,6 +91,9 @@ export async function toggleSave(outfitId: string): Promise<EngagementResult> {
 export async function toggleFollow(
   followeeId: string,
 ): Promise<EngagementResult> {
+  if (!UUID_RE.test(followeeId)) {
+    return { ok: false, active: false, error: "Ogiltigt id." };
+  }
   const { supabase, user } = await requireUser();
   if (!user) return { ok: false, active: false, error: "Inte inloggad" };
   if (user.id === followeeId)
@@ -108,8 +126,16 @@ export async function postComment(
   outfitId: string,
   body: string,
 ): Promise<{ ok: boolean; error?: string }> {
+  if (!UUID_RE.test(outfitId)) {
+    return { ok: false, error: "Ogiltigt id." };
+  }
   const { supabase, user } = await requireUser();
   if (!user) return { ok: false, error: "Inte inloggad" };
+
+  const rl = await checkRateLimit("comment", user.id);
+  if (!rl.ok) {
+    return { ok: false, error: "För många kommentarer. Vänta lite." };
+  }
 
   const trimmed = body.trim();
   if (trimmed.length === 0)
@@ -129,6 +155,9 @@ export async function deleteComment(
   commentId: string,
   outfitId: string,
 ): Promise<{ ok: boolean; error?: string }> {
+  if (!UUID_RE.test(commentId) || !UUID_RE.test(outfitId)) {
+    return { ok: false, error: "Ogiltigt id." };
+  }
   const { supabase, user } = await requireUser();
   if (!user) return { ok: false, error: "Inte inloggad" };
 

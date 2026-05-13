@@ -3,6 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isCurrentUserAdmin } from "@/lib/admin";
+import type { Database } from "@/lib/supabase/database.types";
+
+type OutfitUpdate = Database["public"]["Tables"]["outfits"]["Update"];
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -97,7 +100,7 @@ export async function updateOwnOutfit(
   const gate = await gateOwnerOrAdmin(outfitId);
   if (!gate.ok) return gate;
 
-  const updates: Record<string, string | null> = {};
+  const updates: OutfitUpdate = {};
   if (patch.title !== undefined) {
     const t = patch.title.trim();
     if (!t) return { ok: false, error: "Titel får inte vara tom." };

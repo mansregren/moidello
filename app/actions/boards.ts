@@ -2,6 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/supabase/database.types";
+
+type BoardUpdate = Database["public"]["Tables"]["boards"]["Update"];
 
 export interface BoardActionResult {
   ok: boolean;
@@ -56,7 +59,7 @@ export async function updateBoard(
   patch: { name?: string; description?: string | null; isPublic?: boolean },
 ): Promise<{ ok: boolean; error?: string }> {
   const supabase = await createClient();
-  const update: Record<string, unknown> = {};
+  const update: BoardUpdate = {};
   if (patch.name !== undefined) update.name = patch.name;
   if (patch.description !== undefined) update.description = patch.description;
   if (patch.isPublic !== undefined) update.is_public = patch.isPublic;

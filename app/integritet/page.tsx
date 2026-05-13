@@ -70,6 +70,13 @@ export default function IntegritetPage() {
                   {" "}(t.ex. valt kön-filter) sparas i din webbläsare via
                   localStorage. Dessa data lämnar aldrig din enhet.
                 </li>
+                <li>
+                  <strong className="text-white font-medium">Klicklogg för köp-länkar</strong>
+                  {" "}lagrar besökarens land (ISO-kod, t.ex. SE), referrer och
+                  user-agent när någon klickar på en köp-länk i en taggad outfit.
+                  Detta används enbart för fraud-detection och kreatörsstatistik,
+                  och raderas automatiskt efter 90 dagar.
+                </li>
               </ul>
               <p className="mt-4">
                 När kontoskapande och inloggning aktiveras kommer vi att samla

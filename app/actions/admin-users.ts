@@ -8,6 +8,9 @@ import {
   IMPERSONATION_COOKIE,
 } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Database } from "@/lib/supabase/database.types";
+
+type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 const COOKIE_MAX_AGE = 60 * 60 * 8; // 8 hours
 
@@ -181,7 +184,7 @@ export async function updateUserProfile(
     return { ok: false, error: "Inte behörig." };
   }
 
-  const updates: Record<string, string | null> = {};
+  const updates: ProfileUpdate = {};
 
   if (patch.username !== undefined) {
     const u = patch.username.trim().toLowerCase();
@@ -214,8 +217,10 @@ export async function updateUserProfile(
     updates.avatar_url = a && a.length > 0 ? a : null;
   }
   if (patch.region !== undefined) {
-    const r = patch.region?.trim().toUpperCase() ?? null;
-    updates.region = r && r.length > 0 ? r.slice(0, 8) : null;
+    const r = patch.region?.trim().toUpperCase();
+    // region is NOT NULL in DB with default 'SE'; falling back keeps the
+    // constraint happy when admin clears the field.
+    updates.region = r && r.length > 0 ? r.slice(0, 8) : "SE";
   }
   for (const key of [
     "instagram",

@@ -13,6 +13,8 @@
 import { NextResponse } from "next/server";
 import webpush from "web-push";
 import { createClient } from "@supabase/supabase-js";
+import { timingSafeStringEqual } from "@/lib/timing-safe";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 interface SubRow {
   id: string;
@@ -34,8 +36,25 @@ interface NotifyBody {
 export async function POST(request: Request) {
   const secret = process.env.PUSH_WEBHOOK_SECRET;
   const provided = request.headers.get("x-push-secret");
-  if (!secret || provided !== secret) {
+  if (!timingSafeStringEqual(provided, secret)) {
     return new NextResponse("Forbidden", { status: 403 });
+  }
+
+  // Defence-in-depth: even with the secret, cap deliveries so a runaway
+  // Supabase webhook doesn't melt the route. 120/min per caller IP is far
+  // above expected steady-state and well under web-push provider limits.
+  const ip = request.headers.get("x-forwarded-for") ?? "webhook";
+  const rl = await checkRateLimit("webhook", ip);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { ok: false, error: "rate limited" },
+      {
+        status: 429,
+        headers: rl.retryAfter
+          ? { "retry-after": String(rl.retryAfter) }
+          : undefined,
+      },
+    );
   }
 
   const vapidPublic = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;

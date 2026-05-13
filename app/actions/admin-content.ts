@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isCurrentUserAdmin } from "@/lib/admin";
+import { invalidateAggregateCaches } from "@/lib/queries-cached";
+import type { Database, Json } from "@/lib/supabase/database.types";
+
+type OutfitUpdate = Database["public"]["Tables"]["outfits"]["Update"];
+type TaggedItemUpdate = Database["public"]["Tables"]["tagged_items"]["Update"];
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -30,10 +35,7 @@ export async function updateOutfit(
     return { ok: false, error: "Ogiltigt id." };
   }
 
-  const updates: Record<
-    string,
-    string | string[] | boolean | null
-  > = {};
+  const updates: OutfitUpdate = {};
   if (patch.title !== undefined) {
     const t = patch.title.trim();
     if (!t) return { ok: false, error: "Titel får inte vara tom." };
@@ -105,6 +107,7 @@ export async function updateOutfit(
   revalidatePath("/admin/inlagg");
   revalidatePath(`/admin/inlagg/${outfitId}`);
   revalidatePath(`/outfit/${outfitId}`);
+  if (updates.is_published !== undefined) invalidateAggregateCaches();
   return { ok: true };
 }
 
@@ -139,6 +142,7 @@ export async function deleteOutfit(
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/admin/inlagg");
+  invalidateAggregateCaches();
   return { ok: true };
 }
 
@@ -194,7 +198,7 @@ export async function addTaggedItem(
       affiliate_network:
         data.affiliate_network?.trim().slice(0, 32) || null,
       garment: data.garment?.slice(0, 40) || "Toppar",
-      cached_metadata: data.cached_metadata ?? null,
+      cached_metadata: (data.cached_metadata ?? null) as Json | null,
       last_fetched_at: new Date().toISOString(),
       // Required NOT NULL legacy columns:
       position_x: 50,
@@ -230,7 +234,7 @@ export async function updateTaggedItem(
   }
   if (!UUID_RE.test(tagId)) return { ok: false, error: "Ogiltigt id." };
 
-  const updates: Record<string, string | number | boolean | null> = {};
+  const updates: TaggedItemUpdate = {};
   if (patch.brand !== undefined) {
     const b = patch.brand.trim();
     if (!b) return { ok: false, error: "Märke får inte vara tomt." };
@@ -321,6 +325,7 @@ export async function bulkPublishOutfits(
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/admin/inlagg");
+  invalidateAggregateCaches();
   return { ok: true, count: valid.length };
 }
 
@@ -351,6 +356,7 @@ export async function bulkDeleteOutfits(
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/admin/inlagg");
+  invalidateAggregateCaches();
   return { ok: true, count: valid.length };
 }
 

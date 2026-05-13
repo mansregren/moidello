@@ -128,7 +128,7 @@ export function TaggedItemCard({
             aria-label={saved ? "Ta bort sparad" : "Spara plagg"}
             aria-pressed={saved}
             className={cn(
-              "flex h-9 w-9 items-center justify-center rounded-full border transition-colors",
+              "flex h-11 w-11 items-center justify-center rounded-full border transition-colors",
               saved
                 ? "bg-white text-black border-white"
                 : "border-border text-foreground-muted hover:text-white hover:border-white/30",
@@ -140,7 +140,7 @@ export function TaggedItemCard({
             type="button"
             onClick={handleShare}
             aria-label="Skicka plagg till vän"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 transition-colors"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 transition-colors"
           >
             <Send className="h-4 w-4" />
           </button>

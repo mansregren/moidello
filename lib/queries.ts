@@ -457,8 +457,11 @@ export async function fetchEngagementForViewer(
   };
 }
 
-export async function fetchTopCreators(limit = 12): Promise<MoidelloUser[]> {
-  const supabase = await createClient();
+export async function fetchTopCreators(
+  limit = 12,
+  client?: QueryClient,
+): Promise<MoidelloUser[]> {
+  const supabase = await resolveClient(client);
   // Use the profile_stats view to sort by followers; falls back to recent
   // profiles if the view doesn't exist yet.
   const { data: stats, error: statsError } = await supabase
@@ -470,7 +473,8 @@ export async function fetchTopCreators(limit = 12): Promise<MoidelloUser[]> {
   if (statsError) return [];
   if (!stats || stats.length === 0) return [];
 
-  const ids = stats.map((s) => s.profile_id as string);
+  const typedStats = stats as ProfileStatsRow[];
+  const ids = typedStats.map((s) => s.profile_id);
   const { data: profiles } = await supabase
     .from("profiles")
     .select(
@@ -479,14 +483,14 @@ export async function fetchTopCreators(limit = 12): Promise<MoidelloUser[]> {
     .in("id", ids);
 
   const profileMap = new Map(
-    (profiles ?? []).map((p) => [p.id as string, p as ProfileRow]),
+    ((profiles ?? []) as ProfileRow[]).map((p) => [p.id, p]),
   );
 
-  return stats
+  return typedStats
     .map((s) => {
-      const p = profileMap.get(s.profile_id as string);
+      const p = profileMap.get(s.profile_id);
       if (!p) return null;
-      return profileToUser(p, s as ProfileStatsRow);
+      return profileToUser(p, s);
     })
     .filter((u): u is MoidelloUser => !!u);
 }

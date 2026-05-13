@@ -1,9 +1,9 @@
 import {
   fetchOutfits,
-  fetchTopCreators,
   fetchEngagementForViewer,
   fetchFollowingFeed,
 } from "@/lib/queries";
+import { fetchTopCreatorsCached } from "@/lib/queries-cached";
 import { createClient } from "@/lib/supabase/server";
 import { pickBgs, HERO_POOL } from "@/lib/session-background";
 import HomeClient from "./HomeClient";
@@ -23,7 +23,7 @@ export default async function HomePage() {
   const [outfits, creators, [heroBg, lifestyleBg], following] =
     await Promise.all([
       fetchOutfits(12),
-      fetchTopCreators(6),
+      fetchTopCreatorsCached(6),
       pickBgs(["home-hero", "home-lifestyle"], HERO_POOL),
       followingPromise,
     ]);

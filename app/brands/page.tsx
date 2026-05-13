@@ -1,4 +1,4 @@
-import { fetchBrandsAggregated } from "@/lib/queries";
+import { fetchBrandsAggregatedCached } from "@/lib/queries-cached";
 import { getViewerGender } from "@/lib/gender-server";
 import BrandsClient, { type BrandRow } from "./BrandsClient";
 
@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function BrandsPage() {
   const gender = await getViewerGender();
-  const aggregated = await fetchBrandsAggregated(undefined, gender);
+  const aggregated = await fetchBrandsAggregatedCached(gender);
 
   const rows: BrandRow[] = aggregated.map((a) => ({
     id: a.slug,
