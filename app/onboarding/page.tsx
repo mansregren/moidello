@@ -21,12 +21,32 @@ const initialState: OnboardingState = {};
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { isLoggedIn, loading } = useAuth();
+  const { isLoggedIn, loading, user } = useAuth();
   const { setGender } = useGender();
 
   const [step, setStep] = useState<Step>(0);
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
+
+  // Prefill from OAuth provider metadata (Google: full_name / name).
+  useEffect(() => {
+    if (!user) return;
+    const meta = user.user_metadata ?? {};
+    const guess =
+      (typeof meta.full_name === "string" && meta.full_name) ||
+      (typeof meta.name === "string" && meta.name) ||
+      "";
+    if (guess && !displayName) setDisplayName(guess);
+    // Suggest a username from the email local-part if user hasn't typed one.
+    if (!username && user.email) {
+      const local = user.email.split("@")[0] ?? "";
+      const cleaned = local.toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 24);
+      if (cleaned.length >= 3) setUsername(cleaned);
+    }
+    // Intentionally only depend on `user` — we don't want to overwrite the
+    // user's typing once they've started editing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
   const [genderChoice, setGenderChoice] = useState<GenderChoice | null>(null);
   const [styles, setStyles] = useState<Set<string>>(new Set());
   const [following, setFollowing] = useState<Set<string>>(new Set());

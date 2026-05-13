@@ -26,8 +26,15 @@ export async function completeOnboarding(
   const username = ((formData.get("username") as string | null) ?? "")
     .trim()
     .toLowerCase();
+  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const metaName =
+    (typeof meta.full_name === "string" && meta.full_name.trim()) ||
+    (typeof meta.name === "string" && meta.name.trim()) ||
+    "";
   const displayName =
-    ((formData.get("display_name") as string | null) ?? "").trim() || null;
+    ((formData.get("display_name") as string | null) ?? "").trim() ||
+    metaName ||
+    null;
   const followIdsRaw = (formData.get("follow_ids") as string | null) ?? "[]";
 
   if (!USERNAME_RE.test(username)) {
