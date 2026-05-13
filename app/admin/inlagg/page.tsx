@@ -4,6 +4,7 @@ import { Eye, Heart, Bookmark, MousePointerClick, MessageCircle } from "lucide-r
 import { createClient } from "@/lib/supabase/server";
 import { PublishToggle } from "./PublishToggle";
 import { BulkSeedButton } from "./BulkSeedButton";
+import { BulkManualButton } from "./BulkManualButton";
 import {
   SelectionProvider,
   SelectCheckbox,
@@ -168,7 +169,10 @@ export default async function AdminInlaggPage({
         <h1 className="font-heading text-4xl md:text-6xl uppercase tracking-tight leading-none">
           Alla inlägg
         </h1>
-        <BulkSeedButton users={seedUserOptions} />
+        <div className="flex flex-wrap items-center gap-2">
+          <BulkManualButton users={seedUserOptions} />
+          <BulkSeedButton users={seedUserOptions} />
+        </div>
       </div>
       <p className="mt-4 text-foreground-muted">
         {counts.all} matchande inlägg ({counts.published} publicerade,{" "}

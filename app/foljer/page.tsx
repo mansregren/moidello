@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
-import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { FollowButton } from "@/components/user/FollowButton";
 import { createClient } from "@/lib/supabase/server";
@@ -10,6 +9,7 @@ import {
   fetchTopCreators,
   fetchEngagementForViewer,
 } from "@/lib/queries";
+import { FoljerClient } from "./FoljerClient";
 
 export const metadata = {
   title: "Följer",
@@ -95,11 +95,10 @@ function Shell({
 
           {mode === "feed" && (
             <section className="mt-12">
-              <OutfitGrid
+              <FoljerClient
                 outfits={outfits}
-                columns={3}
-                liked={new Set(likedIds)}
-                saved={new Set(savedIds)}
+                likedIds={likedIds}
+                savedIds={savedIds}
               />
             </section>
           )}

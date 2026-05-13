@@ -25,6 +25,18 @@ interface Assignment {
   user_id: string;
   category_hint?: string | null;
   gender?: "dam" | "herr";
+  /** When false, skip the Claude call and use whatever manual fields the
+   *  admin filled in. Required fields (title, gender) MUST be provided on
+   *  the assignment itself. Optional fields fall back to null. */
+  ai_generate_missing?: boolean;
+  // Manual overrides — used directly when ai_generate_missing=false, or as
+  // overrides when true (manual value wins over Claude output).
+  title?: string;
+  description?: string | null;
+  category?: string | null;
+  keywords?: string[];
+  meta_description?: string | null;
+  alt_text?: string | null;
 }
 
 interface DraftResult {
@@ -176,24 +188,54 @@ export async function POST(request: Request) {
       data: { publicUrl },
     } = supabase.storage.from("outfits").getPublicUrl(path);
 
-    // 2. Ask Claude for the meta. On any failure, drop the storage blob
-    // we just uploaded so we don't leak orphans.
-    let meta;
-    try {
-      meta = await generateOutfitMeta(publicUrl, categoryHint);
-    } catch (e) {
+    // 2. Resolve outfit meta. Default = AI-generate everything (legacy
+    // path). When ai_generate_missing=false (manual flow), use what the
+    // admin typed and only synthesise the few fields the DB requires.
+    const useAi = a.ai_generate_missing !== false;
+    let resolvedTitle = a.title?.trim() || "";
+    let resolvedDescription = a.description?.trim() || null;
+    let resolvedCategory = a.category?.trim() || null;
+    let resolvedKeywords: string[] | null = Array.isArray(a.keywords)
+      ? a.keywords.map((k) => k.trim().toLowerCase()).filter(Boolean).slice(0, 10)
+      : null;
+    let resolvedMetaDesc = a.meta_description?.trim() || null;
+    let resolvedAltText = a.alt_text?.trim() || null;
+
+    if (useAi) {
+      // AI path — call Claude. Admin's manual values still override.
+      let meta;
+      try {
+        meta = await generateOutfitMeta(publicUrl, categoryHint);
+      } catch (e) {
+        await supabase.storage.from("outfits").remove([path]);
+        errors.push({
+          index: i,
+          user_id: a.user_id,
+          error: e instanceof Error ? e.message : "AI-fel.",
+        });
+        continue;
+      }
+      resolvedTitle = resolvedTitle || meta.title;
+      resolvedCategory = resolvedCategory || meta.category;
+      resolvedKeywords = resolvedKeywords ?? meta.keywords;
+      resolvedMetaDesc = resolvedMetaDesc ?? meta.meta_description;
+      resolvedAltText = resolvedAltText ?? meta.alt_text;
+    }
+
+    if (!resolvedTitle) {
       await supabase.storage.from("outfits").remove([path]);
       errors.push({
         index: i,
         user_id: a.user_id,
-        error: e instanceof Error ? e.message : "AI-fel.",
+        error: "Titel saknas (krävs i manuellt läge).",
       });
       continue;
     }
+    // Alt-text fallback so Google Images-trafiken inte är helt tom.
+    if (!resolvedAltText) resolvedAltText = resolvedTitle;
 
-    // 3. Insert the outfit row. Retry the slug a few times on collision
-    // (Claude can produce repeated titles when batches are similar).
-    const baseSlug = slugify(meta.title);
+    // 3. Insert the outfit row. Retry slug on collision.
+    const baseSlug = slugify(resolvedTitle);
     let chosenSlug = baseSlug || "outfit";
     let inserted:
       | { id: string; slug: string | null }
@@ -207,13 +249,13 @@ export async function POST(request: Request) {
           user_id: a.user_id,
           image_url: publicUrl,
           image_path: path,
-          title: meta.title,
+          title: resolvedTitle,
           slug: chosenSlug,
-          description: null,
-          meta_description: meta.meta_description,
-          keywords: meta.keywords,
-          alt_text: meta.alt_text,
-          category: meta.category,
+          description: resolvedDescription,
+          meta_description: resolvedMetaDesc,
+          keywords: resolvedKeywords,
+          alt_text: resolvedAltText,
+          category: resolvedCategory,
           gender,
           type: "photo",
           is_published: false,
@@ -251,7 +293,7 @@ export async function POST(request: Request) {
       index: i,
       id: inserted.id,
       user_id: a.user_id,
-      title: meta.title,
+      title: resolvedTitle,
       slug: inserted.slug,
       edit_url: `/admin/inlagg/${inserted.id}`,
       status: "draft",
