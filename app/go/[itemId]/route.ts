@@ -3,6 +3,11 @@ import { cookies, headers } from "next/headers";
 import crypto from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
 import { getRetailerById } from "@/lib/retailers";
+import {
+  detectLocale,
+  LOCALE_COOKIE,
+  type Locale,
+} from "@/lib/geo/detect-locale";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -10,26 +15,14 @@ const UUID_RE =
 const VIEWER_COOKIE = "moidello_viewer";
 const VIEWER_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
-type Region = "SE" | "NO" | "DK" | "FI" | "DE" | "GB" | "US";
-const DEFAULT_REGION: Region = "SE";
+type Region = Locale;
 
-/**
- * Visitor country from Vercel's x-vercel-ip-country header (ISO2). Falls
- * back to Accept-Language's primary tag, then SE as the platform default.
- */
-function resolveCountry(hdrs: Headers): string {
-  const cc = hdrs.get("x-vercel-ip-country");
-  if (cc && /^[A-Z]{2}$/.test(cc)) return cc;
-  const accept = hdrs.get("accept-language") ?? "";
-  const m = accept.match(/^[a-z]{2,3}-([A-Z]{2})/);
-  if (m) return m[1];
-  return DEFAULT_REGION;
-}
-
-/** Map ISO2 → our retailer-locale convention (lowercase ISO2 we use across retailer modules). */
+/** Map ISO2 (uppercase) → our retailer-locale convention (lowercase). */
 function countryToLocale(country: string): string {
   return country.toLowerCase();
 }
+
+const DEFAULT_REGION: Region = "SE";
 
 function pickBuyUrl(
   buyUrl: string | null,
@@ -77,12 +70,21 @@ export async function GET(
   }
 
   const hdrs = await headers();
-  const country = resolveCountry(hdrs);
-  const region = (
-    ["SE", "NO", "DK", "FI", "DE", "GB", "US"].includes(country)
-      ? country
-      : DEFAULT_REGION
-  ) as Region;
+  const jar = await cookies();
+  const detection = detectLocale({
+    cookie: jar.get(LOCALE_COOKIE)?.value ?? null,
+    acceptLanguage: hdrs.get("accept-language"),
+    ipCountry: hdrs.get("x-vercel-ip-country"),
+  });
+  // INFO-level — we expect this every request. We just want signal in
+  // Vercel logs so we can spot Accept-Language-vs-IP disagreements
+  // (e.g. Malmö Telia routing via Copenhagen) and tune accordingly.
+  console.info(
+    `[go] locale=${detection.locale} source=${detection.source} ` +
+      `al=${hdrs.get("accept-language") ?? ""} ip=${hdrs.get("x-vercel-ip-country") ?? ""}`,
+  );
+  const country = detection.locale;
+  const region = country;
 
   let target = pickBuyUrl(
     (item.buy_url as string | null) ?? null,
