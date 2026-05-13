@@ -7,6 +7,8 @@ import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { PremiumButton } from "@/components/shared/PremiumButton";
 import { UserLink } from "@/components/shared/UserLink";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { brandPageJsonLd } from "@/lib/json-ld";
 import { createPublicClient } from "@/lib/supabase/public";
 import {
   fetchBrandsAggregated,
@@ -61,24 +63,36 @@ export default async function BrandPage({
     .order("created_at", { ascending: false })
     .limit(60);
 
+  const description = dbMatch.isClaimed
+    ? "Verifierat märke på Moidello"
+    : `Outfits som taggar ${dbMatch.name}.`;
+
   return (
-    <BrandShell
-      name={dbMatch.name}
-      description={
-        dbMatch.isClaimed
-          ? "Verifierat märke på Moidello"
-          : `Outfits som taggar ${dbMatch.name}.`
-      }
-      website={dbMatch.claimedBy?.website ?? null}
-      tierLabel="Contemporary"
-      TierIcon={Star}
-      outfits={dbOutfits}
-      likedIds={Array.from(liked)}
-      savedIds={Array.from(saved)}
-      outfitsCount={dbOutfits.length}
-      verified={dbMatch.isClaimed}
-      products={(productRows as BrandProduct[] | null) ?? []}
-    />
+    <>
+      <JsonLd
+        data={brandPageJsonLd({
+          slug,
+          name: dbMatch.name,
+          logo: null,
+          website: dbMatch.claimedBy?.website ?? null,
+          description,
+          outfits: dbOutfits,
+        })}
+      />
+      <BrandShell
+        name={dbMatch.name}
+        description={description}
+        website={dbMatch.claimedBy?.website ?? null}
+        tierLabel="Contemporary"
+        TierIcon={Star}
+        outfits={dbOutfits}
+        likedIds={Array.from(liked)}
+        savedIds={Array.from(saved)}
+        outfitsCount={dbOutfits.length}
+        verified={dbMatch.isClaimed}
+        products={(productRows as BrandProduct[] | null) ?? []}
+      />
+    </>
   );
 }
 

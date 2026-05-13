@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Min profil",
   description: "Hantera dina outfits, sparade looks och följda kreatörer.",
   alternates: { canonical: "/profil" },
+  robots: { index: false, follow: true },
 };
 
 export default function ProfilLayout({ children }: { children: React.ReactNode }) {

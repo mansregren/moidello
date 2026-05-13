@@ -12,9 +12,10 @@ import {
 } from "@/lib/queries";
 
 export const metadata = {
-  title: "Följer · Moidello",
+  title: "Följer",
   description: "Outfits från kreatörer du följer.",
   alternates: { canonical: "/foljer" },
+  robots: { index: false, follow: true },
 };
 
 export const dynamic = "force-dynamic";

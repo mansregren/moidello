@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 
 export const metadata = {
-  title: "Admin · Moidello",
+  title: "Admin",
   robots: { index: false, follow: false },
 };
 

@@ -26,7 +26,16 @@ export function siteJsonLd() {
       name: SITE_NAME,
       url: SITE_BASE,
       logo: abs("/icon.svg"),
-      sameAs: [],
+      sameAs: [
+        "https://www.instagram.com/moidello",
+        "https://www.tiktok.com/@moidello",
+      ],
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: "hello@moidello.com",
+        contactType: "customer service",
+        availableLanguage: ["Swedish", "English"],
+      },
     },
     {
       "@context": "https://schema.org",
@@ -265,6 +274,70 @@ export function produktPageJsonLd(item: {
             item: abs(`/produkt/${item.id}`),
           },
         ],
+      },
+    ],
+  };
+}
+
+/** Brand page: Brand + Breadcrumb + ItemList of outfits tagging this brand. */
+export function brandPageJsonLd(brand: {
+  slug: string;
+  name: string;
+  logo?: string | null;
+  website?: string | null;
+  description?: string | null;
+  outfits: Outfit[];
+}) {
+  const url = `/brand/${brand.slug.toLowerCase()}`;
+  const sameAs = brand.website
+    ? [brand.website.startsWith("http") ? brand.website : `https://${brand.website}`]
+    : undefined;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Brand",
+        "@id": `${SITE_BASE}${url}#brand`,
+        name: brand.name,
+        url: abs(url),
+        logo: brand.logo ? abs(brand.logo) : undefined,
+        description: brand.description || undefined,
+        sameAs,
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: SITE_NAME, item: SITE_BASE },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Märken",
+            item: `${SITE_BASE}/brands`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: brand.name,
+            item: abs(url),
+          },
+        ],
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${SITE_BASE}${url}#outfits`,
+        numberOfItems: brand.outfits.length,
+        itemListElement: brand.outfits.slice(0, 50).map((o, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          url: abs(
+            o.slug && o.creator.username
+              ? `/${o.creator.username.toLowerCase()}/${o.slug}`
+              : `/outfit/${o.id}`,
+          ),
+          name: o.title,
+          image: abs(o.image),
+        })),
       },
     ],
   };

@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Brand-dashboard",
   description: "Aggregerat engagemang på outfits som taggar ditt märke.",
   alternates: { canonical: "/brand-dashboard" },
+  robots: { index: false, follow: true },
 };
 
 export default function BrandDashboardLayout({
