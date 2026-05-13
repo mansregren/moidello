@@ -7,10 +7,66 @@
 
 import { NextResponse } from "next/server";
 import { LRUCache } from "lru-cache";
+import { lookup } from "node:dns/promises";
+import { isIP } from "node:net";
 import { isCurrentUserAdmin } from "@/lib/admin";
 import { findRetailer, openGraphFallback } from "@/lib/retailers";
 import type { ProductMeta } from "@/lib/retailers";
 import { detectAffiliate } from "@/lib/affiliate/detect";
+
+// SSRF-skydd: blockera privata IP-ranges + DNS-rebinding. Vi resolverar
+// hostname → IP innan fetch, returnerar 400 om någon record pekar inåt.
+// Dokumenterad begränsning: mellan resolve och fetch kan en TTL=0 DNS-
+// rebinding teoretiskt smyga förbi (Node fetch saknar custom lookup-hook
+// utan undici-dispatcher). Acceptabel risk för admin-only route.
+function isPrivateOrLocalAddress(address: string): boolean {
+  const family = isIP(address);
+  if (family === 0) return true;
+  if (family === 4) {
+    const p = address.split(".").map(Number);
+    if (p[0] === 10) return true;
+    if (p[0] === 127) return true;
+    if (p[0] === 0) return true;
+    if (p[0] === 169 && p[1] === 254) return true; // link-local + AWS metadata
+    if (p[0] === 172 && p[1] >= 16 && p[1] <= 31) return true;
+    if (p[0] === 192 && p[1] === 168) return true;
+    if (p[0] === 100 && p[1] >= 64 && p[1] <= 127) return true; // CGNAT
+    if (p[0] >= 224) return true; // multicast + reserved
+    return false;
+  }
+  const lower = address.toLowerCase();
+  if (lower === "::1" || lower === "::") return true;
+  if (lower.startsWith("fe80:")) return true;
+  if (lower.startsWith("fc") || lower.startsWith("fd")) return true;
+  if (lower.startsWith("::ffff:")) {
+    return isPrivateOrLocalAddress(lower.slice(7));
+  }
+  return false;
+}
+
+async function isHostnameSafe(hostname: string): Promise<boolean> {
+  if (isIP(hostname)) return !isPrivateOrLocalAddress(hostname);
+  const lower = hostname.toLowerCase();
+  if (
+    lower === "localhost" ||
+    lower.endsWith(".localhost") ||
+    lower.endsWith(".internal") ||
+    lower.endsWith(".local") ||
+    lower === "metadata.google.internal"
+  ) {
+    return false;
+  }
+  try {
+    const records = await lookup(hostname, { all: true });
+    if (records.length === 0) return false;
+    for (const r of records) {
+      if (isPrivateOrLocalAddress(r.address)) return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 interface PreviewResult extends ProductMeta {
   is_affiliate: boolean;
@@ -78,6 +134,13 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json(
       { error: "Ogiltig URL — måste börja med http(s)." },
+      { status: 400 },
+    );
+  }
+
+  if (!(await isHostnameSafe(url.hostname))) {
+    return NextResponse.json(
+      { error: "URL pekar mot intern eller ej tillåten adress." },
       { status: 400 },
     );
   }

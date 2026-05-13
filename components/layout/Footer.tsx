@@ -20,7 +20,7 @@ const footerLinks = {
 };
 
 export function Footer({
-  bg = "/images/bg/harbor.jpg",
+  bg = "/images/bg/harbor.webp",
 }: { bg?: string }) {
   const year = new Date().getFullYear();
 

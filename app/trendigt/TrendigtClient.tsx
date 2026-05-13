@@ -20,10 +20,10 @@ interface TrendingBrand {
 }
 
 const TRENDING_STYLES = [
-  { name: "Quiet Luxury", count: 412, image: "/images/bg/positano.jpg" },
-  { name: "Y2K", count: 287, image: "/images/bg/boats.jpg" },
-  { name: "Old Money", count: 356, image: "/images/bg/harbor.jpg" },
-  { name: "Coastal Grandma", count: 198, image: "/images/bg/positano.jpg" },
+  { name: "Quiet Luxury", count: 412, image: "/images/bg/positano.webp" },
+  { name: "Y2K", count: 287, image: "/images/bg/boats.webp" },
+  { name: "Old Money", count: 356, image: "/images/bg/harbor.webp" },
+  { name: "Coastal Grandma", count: 198, image: "/images/bg/positano.webp" },
 ];
 
 export default function TrendigtClient({

@@ -13,7 +13,7 @@ export function LifestyleBanner() {
       className="relative h-[40vh] md:h-[50vh] overflow-hidden"
     >
       <Image
-        src="/images/bg/parasols.jpg"
+        src="/images/bg/parasols.webp"
         alt="Mediterranean lifestyle"
         fill
         className="object-cover"

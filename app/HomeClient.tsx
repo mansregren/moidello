@@ -27,14 +27,14 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
 // Static cover per category — used when no real outfits exist for that
 // category yet. Avoids leaking placeholder outfit imagery in production.
 const CATEGORY_COVER: Record<string, string> = {
-  Streetwear: "/images/bg/harbor.jpg",
-  Minimalism: "/images/bg/parasols.jpg",
-  Vintage: "/images/bg/positano.jpg",
-  Casual: "/images/bg/riviera.jpg",
-  Formal: "/images/bg/boats.jpg",
-  Sporty: "/images/bg/parasols.jpg",
-  Bohemian: "/images/bg/positano.jpg",
-  Preppy: "/images/bg/harbor.jpg",
+  Streetwear: "/images/bg/harbor.webp",
+  Minimalism: "/images/bg/parasols.webp",
+  Vintage: "/images/bg/positano.webp",
+  Casual: "/images/bg/riviera.webp",
+  Formal: "/images/bg/boats.webp",
+  Sporty: "/images/bg/parasols.webp",
+  Bohemian: "/images/bg/positano.webp",
+  Preppy: "/images/bg/harbor.webp",
 };
 
 export default function HomeClient({
@@ -43,8 +43,8 @@ export default function HomeClient({
   creators,
   likedIds = [],
   savedIds = [],
-  heroBg = "/images/bg/positano.jpg",
-  lifestyleBg = "/images/bg/parasols.jpg",
+  heroBg = "/images/bg/positano.webp",
+  lifestyleBg = "/images/bg/parasols.webp",
 }: {
   outfits: Outfit[];
   following?: Outfit[];
@@ -77,7 +77,7 @@ export default function HomeClient({
   const categoryImage = (cat: string): string => {
     const match = visible.find((o) => o.category === cat);
     if (match) return match.image;
-    return CATEGORY_COVER[cat] ?? "/images/bg/positano.jpg";
+    return CATEGORY_COVER[cat] ?? "/images/bg/positano.webp";
   };
 
   return (

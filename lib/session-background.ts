@@ -6,13 +6,13 @@ import { cookies } from "next/headers";
  * not in this pool — drop them in here later if you want them back.
  */
 export const HERO_POOL = [
-  "/images/bg/positano.jpg",
-  "/images/bg/parasols.jpg",
-  "/images/bg/harbor.jpg",
-  "/images/bg/ocean.jpg",
-  "/images/bg/riviera.jpg",
-  "/images/bg/boats.jpg",
-  "/images/bg/cafe.jpg",
+  "/images/bg/positano.webp",
+  "/images/bg/parasols.webp",
+  "/images/bg/harbor.webp",
+  "/images/bg/ocean.webp",
+  "/images/bg/riviera.webp",
+  "/images/bg/boats.webp",
+  "/images/bg/cafe.webp",
 ] as const;
 
 export const BG_POOL = HERO_POOL;

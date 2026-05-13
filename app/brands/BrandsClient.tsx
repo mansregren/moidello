@@ -47,7 +47,7 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
       <Header />
       <main id="main" tabIndex={-1} className="flex-1">
         <div className="relative h-[28vh] md:h-[35vh] overflow-hidden">
-          <Image src="/images/bg/boats.jpg" alt="" fill className="object-cover" priority />
+          <Image src="/images/bg/boats.webp" alt="" fill className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-background" />
           <Container className="relative z-10 h-full flex items-end pb-8">
             <motion.div

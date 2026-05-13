@@ -29,7 +29,7 @@ export function HowItWorks() {
       {/* Background image */}
       <div className="absolute inset-0">
         <Image
-          src="/images/bg/ocean.jpg"
+          src="/images/bg/ocean.webp"
           alt=""
           fill
           className="object-cover"
