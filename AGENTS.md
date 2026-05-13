@@ -6,7 +6,35 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Aktuell status
 
-Senast uppdaterad: 2026-05-11 (stor session — 26 commits, ~10k rader)
+Senast uppdaterad: 2026-05-13 — "fixa allt"-session: activity feed på /, drag-position i admin, 2FA, push/email auto-leverans-trigger (0028).
+
+### 2026-05-13-leveranser (ej committade ännu)
+
+- **Activity feed på `/`** — inloggade som följer någon ser "Från dina följda" som första section i `app/HomeClient.tsx`. Tom array = ingen section. Backas av `fetchFollowingFeed` (12 outfits) och gender-filtrering via klient-context.
+- **Drag-position i `/admin/inlagg/[id]`** — bilden ersatt med `TagPositionEditor` (i `OutfitEditor.tsx`). Punkterna är draggbara, ändrade punkter blir bärnstensfärgade tills man trycker "Spara". Server-action: `updateTaggedItemPosition`.
+- **2FA / TOTP** — ny `components/settings/TwoFactorSettings.tsx` inbäddad på `/profil/installningar/konto`. Använder Supabase `auth.mfa.enroll/challenge/verify/unenroll` direkt från browser-clienten. Visar Supabase's SVG-QR + secret för manuell entry.
+- **Push/email auto-leverans** — migration `0028_notify_webhooks.sql` skapar `pg_net`-extension, `private.app_settings`-tabell, helpers `private.post_notify` + `private.fanout_notify`. Triggers `notify_on_like/follow/comment` utökade att fan-out till `/api/push/notify` och `/api/email/notify`. Ny `notify_on_message`-trigger för DMs (skickar bara webhook, inga notifications-rader).
+- **Push notify-route** — refaktorerad till `{user_id, kind, actor_id?, outfit_id?, comment_id?}`-shape (samma som email-routen). Resolver display_name + outfit-URL server-side och bygger title/body i svenska.
+
+### Att göra själv efter pull (Mans)
+
+1. **Pusha migrationen** — `npx supabase db push` (blockerad i sandbox av Claude).
+2. **Sätt env vars i Vercel** (alla tre miljöer):
+   ```
+   NEXT_PUBLIC_VAPID_PUBLIC_KEY=BG-6i-6eA5Ukxmi-Kq_VdcAfj_blLCUNcrKQh2q6k5bRQXAOKET1Krm_MKfiZ-LGVjADXNimJ8tRTawXOOwmvpM
+   VAPID_PRIVATE_KEY=1mij4Ji6OaKKi40T5gBUdET3-yW0cvHI_xPAZrrCSoo
+   VAPID_SUBJECT=mailto:hello@moidello.com
+   PUSH_WEBHOOK_SECRET=26c7fd256d6858111e6e9d9a4b7ee0e078d88c42f76ffc0ee649cbdb175f89e7
+   ```
+   Plus `RESEND_API_KEY` när Resend-kontot finns + domänen är verifierad.
+3. **Fyll i settings-tabellen i Supabase SQL Editor:**
+   ```sql
+   insert into private.app_settings (key, value) values
+     ('base_url', 'https://moidello.com'),
+     ('push_webhook_secret', '26c7fd256d6858111e6e9d9a4b7ee0e078d88c42f76ffc0ee649cbdb175f89e7');
+   ```
+4. **Skapa Resend-konto** + verifiera moidello.com-domänen (DNS-records).
+5. **Verifiera i prod** — lika + kommentera + meddela en annan användare och kolla att push-notiser landar; samma för mail när Resend är upp.
 
 ### Sessionens leveranser (alla på `main`, deployat via Vercel)
 
