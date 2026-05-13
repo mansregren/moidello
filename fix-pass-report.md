@@ -95,3 +95,61 @@ Varje fas committas + pushas + verifieras mot prod innan nästa startar.
 
 ---
 
+## Fas 5 — KLAR ✓
+
+- **Commit:** `b10229e`
+- **Pushad till origin/main:** ja
+- **Vercel deploy:** `moidello-3u8d782pe...` Ready (1m build)
+- **moidello.com:** HTTP 200
+
+### Vad som ändrats
+
+**Säkerhet:**
+- **S-4:** `crypto.timingSafeEqual`-jämförelse för `PUSH_WEBHOOK_SECRET` i både `app/api/push/notify/route.ts` och `app/api/email/notify/route.ts`. Helper: `lib/timing-safe.ts:timingSafeStringEqual` (längd-check först för att undvika throw).
+- **S-6:** Rate-limiting via `@upstash/ratelimit` + `@upstash/redis` (nya deps, var godkända i spec). 5 buckets i `lib/rate-limit.ts`: preview (10/min), comment (5/min), message (5/min), like (60/min), webhook (120/min). **Env-gated:** utan `UPSTASH_REDIS_REST_URL`/`KV_REST_API_URL` no-op:ar med `disabled:true`. Aktiverad på `/api/admin/items/preview-from-url`, `/api/push/notify`, `postComment`, `sendMessage`, `toggleLike`. 429 returnerar `retry-after`.
+- **S-7:** UUID-validering på `toggleLike`, `toggleSave`, `toggleFollow`, `postComment`, `deleteComment` (engagement.ts) + `toggleSavedItem` (saved-items.ts). Returnerar "Ogiltigt id."-fel innan DB.
+
+**UX / a11y:**
+- **UX-4:** `components/outfit/TaggedItem.tsx` save/share-knappar 36×36 → 44×44 (`h-11 w-11`).
+- **UX-5:** `<MotionConfig reducedMotion="user">` i `AppShell.tsx` — Framer Motion respekterar nu `prefers-reduced-motion` globalt. CSS-nivåns `@media`-rule fanns redan för CSS-animations.
+- **UX-7:** `--foreground-subtle: #666 → #7A7A7A` i `app/globals.css`. WCAG AA-kontrast på 11-12px text mot #000.
+- **UX-11:** Comment-radera-confirm i `OutfitDetail.tsx` refaktorerad till `@base-ui/react/alert-dialog` — Escape stänger, focus-trap, autofocus, portal. Andra modaler (ShareToDmSheet, bulk-modaler) är redan @base-ui via egna komponenter.
+- **UX-12:** `aria-label="Radera ${brand} ${name}"` på delete-button i `TagsEditor`.
+
+**Kod:**
+- **K-5:** `lib/supabase/database.types.ts` (1689 rader) genererad via `npx supabase gen types typescript --project-id cqarmynxrewurcbrrftn`. Alla 4 supabase-clients (`server`, `client`, `public`, `admin`) använder nu `createClient<Database>()`. **Bug fångad i typing:** `app/actions/account.ts:74` använde `notifications.recipient_id` — kolumnen heter `user_id`. Skulle ha returnerat tom array i prod GDPR-export. Fixad.
+- **K-6:** `sendShare` i `app/actions/messaging.ts` batch:ar nu konversationer (1 SELECT + 1 INSERT + 1 INSERT istället för O(N) round-trips per mottagare).
+
+**Prestanda:**
+- **P-2:** `lib/queries-cached.ts` med `fetchTopCreatorsCached` + `fetchBrandsAggregatedCached` (unstable_cache, revalidate 300s, taggar "top-creators" + "brand-aggregate"). Använder `createPublicClient()` internt för att kunna cacha utan dynamic-context-tripping. Wired in på `app/page.tsx`, `app/trendigt/page.tsx`, `app/brands/page.tsx`, `app/foljer/page.tsx`. `invalidateAggregateCaches()` anropas i `updateOutfit` (när is_published ändras), `deleteOutfit`, `bulkPublishOutfits`, `bulkDeleteOutfits`.
+
+**Compliance:**
+- **C-2:** `supabase/migrations/0033_tag_clicks_retention.sql` schemalägger pg_cron-jobb dagligen 01:15 UTC som raderar `tag_clicks` äldre än 90 dagar. Idempotent unschedule först. Tabell-kommentar dokumenterar retention. Integritetspolicyn (`app/integritet/page.tsx`) uppdaterad med en extra bullet om klicklogg-retention.
+
+### Upptäckt under fasen
+- **Bug i `app/actions/account.ts:74`** — som ovan, typed clients fångade fel kolumnnamn. Ändrade `recipient_id` → `user_id`. GDPR-exporten saknade alla notifikations-rader tidigare.
+- **Bug i `app/actions/admin-users.ts:218`** — koden försökte sätta `region = null` när admin clearade fältet, men kolumnen är NOT NULL med default `'SE'`. Hade tyst returnerat ett DB-error i prod (constraint violation). Ändrade fallback till `"SE"`.
+- **Next.js 16 API-change:** `revalidateTag` kräver nu 2 argument (`tag, profile`). Använder `revalidateTag("...", "max")` för omedelbar invalidering.
+- **Supabase CLI** la till en `<claude-code-hint>`-line på sista raden av `database.types.ts` som bröt TS-build. Strippad bort.
+- **Migration 0033 har INTE applicerats på prod.** Du måste pusha med `npx supabase db push` när du är tillbaka. `pg_cron`-extensionen måste vara aktiverad i Supabase Dashboard → Database → Extensions först.
+- **Rate-limit är aktiv men no-op:ar utan KV-env.** För att aktivera i prod: sätt `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` (eller motsvarande KV_-prefix) i Vercel env. Tills dess returnerar `checkRateLimit` `{ok: true, disabled: true}` — vilket loggas men inte krashar.
+
+### Nästa steg du måste göra själv
+1. `npx supabase db push` — kör migrations 0032 (retailer backfill) + 0033 (tag_clicks retention). Aktivera `pg_cron` i Supabase Dashboard om det inte redan är på.
+2. Sätt Upstash/Vercel KV env-vars för att aktivera rate-limit:
+   ```
+   UPSTASH_REDIS_REST_URL=...
+   UPSTASH_REDIS_REST_TOKEN=...
+   ```
+   (Eller `KV_REST_API_URL` / `KV_REST_API_TOKEN` om du använder Vercel KV.)
+3. Rotera den GitHub PAT som användes för push-stegen — den exponerades i chatten.
+
+---
+
+## Fas 6 — INTE STARTAD (per spec)
+
+Spec sa att Fas 6 är valbar och Claude ska STOPPA efter Fas 5. Status-rapporten är klar; säg "kör Fas 6" när du är redo att gå vidare med:
+- S-8: Zod-validering på server actions
+- K-1: Vitest + Playwright test-infrastruktur
+- K-3: Splitta `lib/queries.ts`
+
