@@ -37,10 +37,13 @@ const CATEGORY_COVER: Record<string, string> = {
   Preppy: "/images/bg/harbor.webp",
 };
 
+type CategoryCover = { category: string; gender: "herr" | "dam"; image: string };
+
 export default function HomeClient({
   outfits,
   following = [],
   creators,
+  categoryCovers = [],
   likedIds = [],
   savedIds = [],
   heroBg = "/images/bg/positano.webp",
@@ -49,6 +52,7 @@ export default function HomeClient({
   outfits: Outfit[];
   following?: Outfit[];
   creators: User[];
+  categoryCovers?: CategoryCover[];
   likedIds?: string[];
   savedIds?: string[];
   heroBg?: string;
@@ -74,9 +78,16 @@ export default function HomeClient({
     [following, gender],
   );
 
+  // Real outfit image for a category card — prefer one matching the
+  // current gender filter, then any gender, and only fall back to the
+  // static background when the category has no published outfit at all.
   const categoryImage = (cat: string): string => {
-    const match = visible.find((o) => o.category === cat);
-    if (match) return match.image;
+    const sameGender = categoryCovers.find(
+      (c) => c.category === cat && c.gender === gender,
+    );
+    if (sameGender) return sameGender.image;
+    const anyGender = categoryCovers.find((c) => c.category === cat);
+    if (anyGender) return anyGender.image;
     return CATEGORY_COVER[cat] ?? "/images/bg/positano.webp";
   };
 

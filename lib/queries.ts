@@ -230,6 +230,35 @@ export async function fetchOutfits(
   return attachOutfitStats(mapped, supabase);
 }
 
+/**
+ * Lightweight cover lookup for the homepage category cards: every
+ * published outfit's category + gender + image, newest first. The
+ * homepage only pulls 12 recent outfits for its grids, which isn't
+ * enough to guarantee one image per category — this fills that gap
+ * cheaply (3 columns, no joins, no stats).
+ */
+export async function fetchCategoryCovers(
+  client?: QueryClient,
+): Promise<Array<{ category: string; gender: "herr" | "dam"; image: string }>> {
+  const supabase = await resolveClient(client);
+  const { data, error } = await supabase
+    .from("outfits")
+    .select("category, gender, image_url")
+    .eq("is_published", true)
+    .not("category", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(500);
+
+  if (error || !data) return [];
+  return (
+    data as Array<{ category: string; gender: string; image_url: string }>
+  ).map((r) => ({
+    category: r.category,
+    gender: r.gender === "herr" ? "herr" : "dam",
+    image: r.image_url,
+  }));
+}
+
 export async function fetchOutfitsByUser(
   userId: string,
   client?: QueryClient,

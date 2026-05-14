@@ -2,6 +2,7 @@ import {
   fetchOutfits,
   fetchEngagementForViewer,
   fetchFollowingFeed,
+  fetchCategoryCovers,
 } from "@/lib/queries";
 import { fetchTopCreatorsCached } from "@/lib/queries-cached";
 import { createClient } from "@/lib/supabase/server";
@@ -20,13 +21,19 @@ export default async function HomePage() {
     ? fetchFollowingFeed(user.id, 12)
     : Promise.resolve([]);
 
-  const [outfits, creators, [heroBg, lifestyleBg], following] =
-    await Promise.all([
-      fetchOutfits(12),
-      fetchTopCreatorsCached(6),
-      pickBgs(["home-hero", "home-lifestyle"], HERO_POOL),
-      followingPromise,
-    ]);
+  const [
+    outfits,
+    creators,
+    [heroBg, lifestyleBg],
+    following,
+    categoryCovers,
+  ] = await Promise.all([
+    fetchOutfits(12),
+    fetchTopCreatorsCached(6),
+    pickBgs(["home-hero", "home-lifestyle"], HERO_POOL),
+    followingPromise,
+    fetchCategoryCovers(),
+  ]);
 
   const allIds = Array.from(
     new Set([...outfits.map((o) => o.id), ...following.map((o) => o.id)]),
@@ -38,6 +45,7 @@ export default async function HomePage() {
       outfits={outfits}
       following={following}
       creators={creators}
+      categoryCovers={categoryCovers}
       likedIds={Array.from(liked)}
       savedIds={Array.from(saved)}
       heroBg={heroBg}
