@@ -11,7 +11,7 @@ import {
   updateTaggedItemPosition,
   deleteTaggedItem,
 } from "@/app/actions/admin-content";
-import { GARMENTS } from "@/lib/garments";
+import { garmentOptions, type Gender } from "@/lib/garments";
 import { ColorPicker } from "@/components/shared/ColorPicker";
 
 export interface OutfitForm {
@@ -311,9 +311,11 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
 
 export function TagsEditor({
   outfitId: _outfitId,
+  gender,
   tags: initialTags,
 }: {
   outfitId: string;
+  gender: Gender;
   tags: TagForm[];
 }) {
   const router = useRouter();
@@ -476,7 +478,7 @@ export function TagsEditor({
                     onChange={(e) => patch(t.id, { garment: e.target.value })}
                     className={INPUT}
                   >
-                    {GARMENTS.map((g) => (
+                    {garmentOptions(gender, t.garment).map((g) => (
                       <option key={g} value={g}>
                         {g}
                       </option>

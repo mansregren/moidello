@@ -11,7 +11,11 @@ import {
   Tag as TagIcon,
 } from "lucide-react";
 import { addTaggedItem } from "@/app/actions/admin-content";
-import { GARMENTS } from "@/lib/garments";
+import {
+  garmentOptions,
+  garmentsForGender,
+  type Gender,
+} from "@/lib/garments";
 
 interface PreviewResult {
   brand: string | null;
@@ -45,10 +49,16 @@ interface Draft {
 const INPUT =
   "w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30";
 
-export function PasteTagForm({ outfitId }: { outfitId: string }) {
+export function PasteTagForm({
+  outfitId,
+  gender,
+}: {
+  outfitId: string;
+  gender: Gender;
+}) {
   const router = useRouter();
   const [url, setUrl] = useState("");
-  const [garment, setGarment] = useState("Toppar");
+  const [garment, setGarment] = useState(garmentsForGender(gender)[0]);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [fetching, setFetching] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -245,7 +255,7 @@ export function PasteTagForm({ outfitId }: { outfitId: string }) {
                   onChange={(e) => setGarment(e.target.value)}
                   className={INPUT}
                 >
-                  {GARMENTS.map((g) => (
+                  {garmentOptions(gender, garment).map((g) => (
                     <option key={g} value={g}>
                       {g}
                     </option>

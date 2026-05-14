@@ -40,7 +40,10 @@ export default async function OutfitPage({
     isFollowing(outfit.creator.id),
   ]);
 
-  const similar = allOutfits.filter((o) => o.id !== outfit.id).slice(0, 3);
+  // Same-gender only — a herr outfit shouldn't surface dam "liknande".
+  const similar = allOutfits
+    .filter((o) => o.id !== outfit.id && o.gender === outfit.gender)
+    .slice(0, 3);
 
   const similarEngagement = await fetchEngagementForViewer(
     similar.map((o) => o.id),

@@ -15,7 +15,7 @@ import { useGender } from "@/lib/gender-context";
 import { resizeImageForUpload } from "@/lib/image-resize";
 import { BrandAutocomplete } from "@/components/skapa/BrandAutocomplete";
 import { ColorPicker } from "@/components/shared/ColorPicker";
-import { GARMENTS } from "@/lib/garments";
+import { garmentOptions, garmentsForGender } from "@/lib/garments";
 import { createOutfit, type PublishedOutfit } from "./actions";
 
 type Gender = "dam" | "herr";
@@ -250,7 +250,7 @@ export default function SkapaPage() {
       brand: "",
       name: "",
       url: "",
-      garment: "Toppar",
+      garment: garmentsForGender(active.gender)[0],
       price: "",
       currency: "SEK",
       color: "",
@@ -919,7 +919,7 @@ export default function SkapaPage() {
                           }
                           className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-foreground outline-none"
                         >
-                          {GARMENTS.map((g) => (
+                          {garmentOptions(active.gender, tag.garment).map((g) => (
                             <option key={g} value={g}>
                               {g}
                             </option>

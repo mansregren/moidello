@@ -214,8 +214,15 @@ export default async function AdminOutfitDetailPage({
 
         <div className="space-y-8">
           <OutfitEditor outfit={outfitForm} />
-          <PasteTagForm outfitId={outfit.id as string} />
-          <TagsEditor outfitId={outfit.id as string} tags={tagsForm} />
+          <PasteTagForm
+            outfitId={outfit.id as string}
+            gender={outfitForm.gender}
+          />
+          <TagsEditor
+            outfitId={outfit.id as string}
+            gender={outfitForm.gender}
+            tags={tagsForm}
+          />
         </div>
       </div>
     </Container>
