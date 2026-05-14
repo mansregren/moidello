@@ -1,16 +1,17 @@
 import { cookies } from "next/headers";
 
 /**
- * The 7 original seed images. Used both for hero placements and ambient
- * rotation. anna/eirik/jerzy/nikola live in /public but are intentionally
- * not in this pool — drop them in here later if you want them back.
+ * The seed images used for hero placements and ambient rotation.
+ * anna/eirik/jerzy/nikola live in /public but are intentionally not in
+ * this pool — drop them in here later if you want them back. riviera.webp
+ * was pulled (a moody mountain landscape, off-brand for the hero); it's
+ * still referenced as the Casual category cover in HomeClient.
  */
 export const HERO_POOL = [
   "/images/bg/positano.webp",
   "/images/bg/parasols.webp",
   "/images/bg/harbor.webp",
   "/images/bg/ocean.webp",
-  "/images/bg/riviera.webp",
   "/images/bg/boats.webp",
   "/images/bg/cafe.webp",
 ] as const;
