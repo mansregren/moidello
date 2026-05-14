@@ -81,7 +81,7 @@ export function ReportButton({
           onClick={handleOpen}
           aria-label="Rapportera"
           title="Rapportera"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 transition-colors"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors"
         >
           <Flag className="h-4 w-4" />
         </button>
@@ -98,22 +98,22 @@ export function ReportButton({
 
       {open && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-6"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-background/70 backdrop-blur-md p-6"
           onClick={() => !pending && setOpen(false)}
         >
           <div
-            className="w-full max-w-md rounded-3xl bg-background-secondary border border-white/10 p-6"
+            className="w-full max-w-md rounded-3xl bg-background-secondary border border-foreground/10 p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-heading text-2xl uppercase tracking-tight text-white">
+              <h3 className="font-heading text-2xl uppercase tracking-tight text-foreground">
                 Rapportera
               </h3>
               <button
                 type="button"
                 onClick={() => !pending && setOpen(false)}
                 aria-label="Stäng"
-                className="text-foreground-muted hover:text-white"
+                className="text-foreground-muted hover:text-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -128,7 +128,7 @@ export function ReportButton({
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="mt-6 w-full rounded-full bg-white text-black py-3 text-sm font-semibold hover:bg-white/90"
+                  className="mt-6 w-full rounded-full bg-foreground text-background py-3 text-sm font-semibold hover:bg-foreground/90"
                 >
                   Stäng
                 </button>
@@ -147,7 +147,7 @@ export function ReportButton({
                   {(Object.keys(REASON_LABELS) as Reason[]).map((r) => (
                     <label
                       key={r}
-                      className="flex items-start gap-3 cursor-pointer p-3 rounded-xl border border-border hover:border-white/30 transition-colors"
+                      className="flex items-start gap-3 cursor-pointer p-3 rounded-xl border border-border hover:border-foreground/30 transition-colors"
                     >
                       <input
                         type="radio"
@@ -157,7 +157,7 @@ export function ReportButton({
                         onChange={() => setReason(r)}
                         className="mt-1 accent-white"
                       />
-                      <span className="text-sm text-white">
+                      <span className="text-sm text-foreground">
                         {REASON_LABELS[r]}
                       </span>
                     </label>
@@ -173,7 +173,7 @@ export function ReportButton({
                   maxLength={2000}
                   rows={3}
                   placeholder="Vad såg du? Vad bör vi titta på?"
-                  className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30"
+                  className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30"
                 />
 
                 {error && (
@@ -185,14 +185,14 @@ export function ReportButton({
                     type="button"
                     onClick={() => setOpen(false)}
                     disabled={pending}
-                    className="flex-1 rounded-full border border-border text-white py-3 text-sm font-medium hover:border-white/30"
+                    className="flex-1 rounded-full border border-border text-foreground py-3 text-sm font-medium hover:border-foreground/30"
                   >
                     Avbryt
                   </button>
                   <button
                     type="submit"
                     disabled={pending}
-                    className="flex-1 rounded-full bg-white text-black py-3 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+                    className="flex-1 rounded-full bg-foreground text-background py-3 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
                   >
                     {pending ? "Skickar…" : "Skicka rapport"}
                   </button>

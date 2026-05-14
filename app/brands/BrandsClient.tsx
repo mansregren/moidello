@@ -55,10 +55,10 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+              <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
                 Märken
               </h1>
-              <p className="mt-2 text-white/60">
+              <p className="mt-2 text-foreground/60">
                 Utforska alla märken på Moidello
               </p>
             </motion.div>
@@ -73,7 +73,7 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
               placeholder="Sök märken..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-full bg-background-tertiary border border-border pl-11 pr-6 py-3 text-sm text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+              className="w-full rounded-full bg-background-tertiary border border-border pl-11 pr-6 py-3 text-sm text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
             />
           </div>
 
@@ -82,8 +82,8 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
               onClick={() => setActiveTier(null)}
               className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300 active:scale-95 ${
                 !activeTier
-                  ? "bg-white text-black"
-                  : "border border-border text-foreground-muted hover:border-white/30 hover:text-white"
+                  ? "bg-foreground text-background"
+                  : "border border-border text-foreground-muted hover:border-foreground/30 hover:text-foreground"
               }`}
             >
               Alla
@@ -96,8 +96,8 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
                   onClick={() => setActiveTier(activeTier === tier ? null : tier)}
                   className={`shrink-0 flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300 active:scale-95 ${
                     activeTier === tier
-                      ? "bg-white text-black"
-                      : "border border-border text-foreground-muted hover:border-white/30 hover:text-white"
+                      ? "bg-foreground text-background"
+                      : "border border-border text-foreground-muted hover:border-foreground/30 hover:text-foreground"
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -118,13 +118,13 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
                   transition={{ duration: 0.3, delay: i * 0.03 }}
                 >
                   <Link href={`/brand/${brand.slug}`}>
-                    <div className="group rounded-2xl border border-border bg-background-secondary p-6 hover:border-white/20 transition-all duration-300 hover:bg-background-tertiary h-full">
+                    <div className="group rounded-2xl border border-border bg-background-secondary p-6 hover:border-foreground/20 transition-all duration-300 hover:bg-background-tertiary h-full">
                       <div className="flex items-start justify-between mb-3">
-                        <h3 className="font-heading text-xl uppercase tracking-tight text-white group-hover:text-white/90 flex items-center gap-1.5">
+                        <h3 className="font-heading text-xl uppercase tracking-tight text-foreground group-hover:text-foreground/90 flex items-center gap-1.5">
                           {brand.name}
                           {brand.isClaimed && (
                             <BadgeCheck
-                              className="h-4 w-4 text-white"
+                              className="h-4 w-4 text-foreground"
                               aria-label="Verifierat"
                             />
                           )}

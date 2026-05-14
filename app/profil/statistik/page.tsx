@@ -59,13 +59,13 @@ export default async function StatistikPage() {
         <Container>
           <Link
             href="/profil"
-            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
             Tillbaka till profilen
           </Link>
 
-          <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+          <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
             Statistik
           </h1>
           <p className="mt-3 text-foreground-muted">
@@ -89,7 +89,7 @@ export default async function StatistikPage() {
 
           {/* Per-outfit table */}
           <section className="mt-12">
-            <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white mb-5">
+            <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground mb-5">
               Per outfit
             </h2>
 
@@ -144,7 +144,7 @@ export default async function StatistikPage() {
                                 />
                               </div>
                               <div className="min-w-0">
-                                <p className="text-white font-medium truncate max-w-[18rem]">
+                                <p className="text-foreground font-medium truncate max-w-[18rem]">
                                   {r.title}
                                 </p>
                                 <p className="text-xs text-foreground-subtle">
@@ -153,12 +153,12 @@ export default async function StatistikPage() {
                               </div>
                             </Link>
                           </td>
-                          <td className="text-right tabular-nums text-white py-3 px-2">{r.views}</td>
+                          <td className="text-right tabular-nums text-foreground py-3 px-2">{r.views}</td>
                           <td className="text-right tabular-nums text-foreground-muted py-3 px-2">{r.unique_views}</td>
-                          <td className="text-right tabular-nums text-white py-3 px-2">{r.likes}</td>
-                          <td className="text-right tabular-nums text-white py-3 px-2">{r.saves}</td>
-                          <td className="text-right tabular-nums text-white py-3 px-2">{r.comments}</td>
-                          <td className="text-right tabular-nums text-white py-3 px-2">{r.clicks}</td>
+                          <td className="text-right tabular-nums text-foreground py-3 px-2">{r.likes}</td>
+                          <td className="text-right tabular-nums text-foreground py-3 px-2">{r.saves}</td>
+                          <td className="text-right tabular-nums text-foreground py-3 px-2">{r.comments}</td>
+                          <td className="text-right tabular-nums text-foreground py-3 px-2">{r.clicks}</td>
                           <td className="text-right tabular-nums text-foreground-muted py-3 pl-2">
                             {ctr.toFixed(1)}%
                           </td>
@@ -197,7 +197,7 @@ function SummaryCard({
         {showIcon && <Icon className="h-3.5 w-3.5" />}
         <span className="text-[11px] uppercase tracking-wider">{label}</span>
       </div>
-      <p className="mt-2 font-heading text-3xl uppercase text-white tabular-nums">
+      <p className="mt-2 font-heading text-3xl uppercase text-foreground tabular-nums">
         {value.toLocaleString("sv-SE")}
       </p>
       {sub && <p className="mt-1 text-xs text-foreground-subtle">{sub}</p>}

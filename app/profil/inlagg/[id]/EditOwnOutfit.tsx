@@ -28,7 +28,7 @@ const CATEGORIES = [
 ];
 
 const INPUT =
-  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30";
+  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30";
 
 export function EditOwnOutfit({ form: initial }: { form: OwnOutfitForm }) {
   const router = useRouter();
@@ -69,7 +69,7 @@ export function EditOwnOutfit({ form: initial }: { form: OwnOutfitForm }) {
             unoptimized={form.imageUrl.startsWith("http")}
           />
           {!form.isPublished && (
-            <span className="absolute top-2 left-2 inline-flex rounded-full bg-amber-500/90 text-black px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold">
+            <span className="absolute top-2 left-2 inline-flex rounded-full bg-amber-500/90 text-background px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold">
               Utkast
             </span>
           )}
@@ -119,7 +119,7 @@ export function EditOwnOutfit({ form: initial }: { form: OwnOutfitForm }) {
             eller radera inlägget, använd knapparna på{" "}
             <a
               href={form.publicUrl}
-              className="underline hover:text-white"
+              className="underline hover:text-foreground"
             >
               outfit-sidan
             </a>
@@ -133,7 +133,7 @@ export function EditOwnOutfit({ form: initial }: { form: OwnOutfitForm }) {
             <button
               type="submit"
               disabled={pending}
-              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
             >
               <Save className="h-4 w-4" />
               {pending ? "Sparar…" : "Spara"}

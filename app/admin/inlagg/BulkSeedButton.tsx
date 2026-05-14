@@ -17,7 +17,7 @@ export function BulkSeedButton({ users }: { users: SeedUser[] }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-white/90"
+        className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-foreground/90"
       >
         <Sparkles className="h-4 w-4" />
         Skapa från bilder

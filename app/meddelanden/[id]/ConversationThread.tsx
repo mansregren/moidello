@@ -172,8 +172,8 @@ export function ConversationThread({
                     <div
                       className={`rounded-2xl px-4 py-2.5 ${
                         isMine
-                          ? "bg-white text-black rounded-br-sm"
-                          : "bg-background-secondary text-white rounded-bl-sm"
+                          ? "bg-foreground text-background rounded-br-sm"
+                          : "bg-background-secondary text-foreground rounded-bl-sm"
                       } self-${isMine ? "end" : "start"}`}
                     >
                       <p className="text-sm whitespace-pre-wrap break-words">
@@ -212,13 +212,13 @@ export function ConversationThread({
           placeholder="Skriv ett meddelande…"
           rows={1}
           maxLength={4000}
-          className="flex-1 resize-none bg-transparent px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none max-h-32"
+          className="flex-1 resize-none bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-foreground-subtle outline-none max-h-32"
         />
         <button
           type="submit"
           disabled={pending || !body.trim()}
           aria-label="Skicka"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-black disabled:opacity-40 hover:bg-white/90 active:scale-95 transition-transform"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background disabled:opacity-40 hover:bg-foreground/90 active:scale-95 transition-transform"
         >
           <Send className="h-4 w-4" />
         </button>

@@ -108,7 +108,7 @@ export function FollowersList({
       {rows.map((r) => (
         <li
           key={r.id}
-          className="flex items-center gap-3 p-3 rounded-2xl hover:bg-white/[0.04] transition-colors"
+          className="flex items-center gap-3 p-3 rounded-2xl hover:bg-foreground/[0.04] transition-colors"
         >
           <Link
             href={`/profile/${r.username}`}
@@ -120,7 +120,7 @@ export function FollowersList({
               size="md"
             />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="text-sm font-medium text-foreground truncate">
                 {r.display_name ?? r.username}
               </p>
               <p className="text-xs text-foreground-subtle truncate">

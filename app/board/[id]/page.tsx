@@ -151,7 +151,7 @@ export default async function BoardPage({
                   ? `/profile/${owner.username}`
                   : "/"
             }
-            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
             {isOwner ? "Mina samlingar" : owner ? `Profilen för @${owner.username}` : "Tillbaka"}
@@ -171,7 +171,7 @@ export default async function BoardPage({
             </span>
           </div>
 
-          <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+          <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
             {board.name}
           </h1>
 
@@ -180,7 +180,7 @@ export default async function BoardPage({
               Av{" "}
               <Link
                 href={`/profile/${owner.username}`}
-                className="text-white hover:underline"
+                className="text-foreground hover:underline"
               >
                 {owner.display_name ?? owner.username}
               </Link>

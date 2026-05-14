@@ -55,9 +55,9 @@ export function ShareButton({
     "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors active:scale-[0.98]";
   const styles = {
     outline:
-      "border border-border text-white hover:border-white/30",
-    solid: "bg-white text-black hover:bg-white/90",
-    ghost: "text-foreground-muted hover:text-white",
+      "border border-border text-foreground hover:border-foreground/30",
+    solid: "bg-foreground text-background hover:bg-foreground/90",
+    ghost: "text-foreground-muted hover:text-foreground",
   }[variant];
 
   return (

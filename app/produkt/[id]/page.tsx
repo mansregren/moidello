@@ -90,7 +90,7 @@ export default async function ProduktPage({
         <Container>
           <Link
             href={outfitPathFromParts(item.creator.username, item.outfitSlug, item.outfitId)}
-            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
             Tillbaka till outfit
@@ -119,20 +119,20 @@ export default async function ProduktPage({
               <p className="text-xs uppercase tracking-[0.25em] text-foreground-subtle">
                 {item.garment}
               </p>
-              <h1 className="mt-2 font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-white">
-                <span className="text-white/80">{item.brand}</span>
+              <h1 className="mt-2 font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-foreground">
+                <span className="text-foreground/80">{item.brand}</span>
                 <br />
                 {item.name}
               </h1>
 
               {item.isAffiliate && (
-                <span className="mt-4 inline-flex rounded-full bg-white/10 text-foreground-muted px-2 py-0.5 text-[10px] font-semibold tracking-wider">
+                <span className="mt-4 inline-flex rounded-full bg-foreground/10 text-foreground-muted px-2 py-0.5 text-[10px] font-semibold tracking-wider">
                   REKLAM
                 </span>
               )}
 
               {item.price > 0 && (
-                <p className="mt-6 text-2xl md:text-3xl font-semibold text-white tabular-nums">
+                <p className="mt-6 text-2xl md:text-3xl font-semibold text-foreground tabular-nums">
                   {item.price.toLocaleString("sv-SE")} {item.currency}
                 </p>
               )}
@@ -141,7 +141,7 @@ export default async function ProduktPage({
                 {isUsableBuyUrl(item.buyUrl) && (
                   <UserLink
                     href={`/go/${item.id}`}
-                    className="inline-flex items-center gap-2 rounded-full bg-white text-black px-6 py-3 text-sm font-semibold hover:bg-white/90 transition-colors"
+                    className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-3 text-sm font-semibold hover:bg-foreground/90 transition-colors"
                   >
                     Köp hos {item.brand}
                     <ExternalLink className="h-4 w-4" />
@@ -182,13 +182,13 @@ export default async function ProduktPage({
                     />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {item.outfitTitle}
                     </p>
                     {item.creator.username && (
                       <Link
                         href={`/profile/${item.creator.username}`}
-                        className="flex items-center gap-2 mt-1 text-xs text-foreground-muted hover:text-white"
+                        className="flex items-center gap-2 mt-1 text-xs text-foreground-muted hover:text-foreground"
                       >
                         <UserAvatar
                           src={item.creator.avatarUrl ?? ""}
@@ -226,7 +226,7 @@ export default async function ProduktPage({
                 Plagget syns hittills bara i{" "}
                 <Link
                   href={outfitPathFromParts(item.creator.username, item.outfitSlug, item.outfitId)}
-                  className="text-white border-b border-white/30 hover:border-white"
+                  className="text-foreground border-b border-foreground/30 hover:border-foreground"
                 >
                   ursprungsoutfiten
                 </Link>

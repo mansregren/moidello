@@ -37,7 +37,7 @@ export function BoardOwnerActions({
         <button
           type="button"
           onClick={() => setEditOpen(true)}
-          className="inline-flex items-center gap-2 rounded-full border border-border text-white px-4 py-2 text-sm hover:border-white/30 transition-colors"
+          className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2 text-sm hover:border-foreground/30 transition-colors"
         >
           <Pencil className="h-3.5 w-3.5" />
           Redigera
@@ -68,7 +68,7 @@ export function BoardOwnerActions({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-6"
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-background/70 backdrop-blur-md p-6"
             onClick={() => setConfirmDelete(false)}
           >
             <motion.div
@@ -77,9 +77,9 @@ export function BoardOwnerActions({
               exit={{ y: 20, opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm rounded-3xl bg-background-secondary border border-white/10 p-6"
+              className="w-full max-w-sm rounded-3xl bg-background-secondary border border-foreground/10 p-6"
             >
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground">
                 Radera samling?
               </h2>
               <p className="mt-3 text-sm text-foreground-muted">
@@ -90,7 +90,7 @@ export function BoardOwnerActions({
                 <button
                   type="button"
                   onClick={() => setConfirmDelete(false)}
-                  className="flex-1 rounded-full border border-border text-white py-3 text-sm font-medium hover:border-white/30"
+                  className="flex-1 rounded-full border border-border text-foreground py-3 text-sm font-medium hover:border-foreground/30"
                 >
                   Avbryt
                 </button>
@@ -98,7 +98,7 @@ export function BoardOwnerActions({
                   type="button"
                   onClick={handleDelete}
                   disabled={pending}
-                  className="flex-1 rounded-full bg-red-500 text-white py-3 text-sm font-semibold hover:bg-red-600 disabled:opacity-60"
+                  className="flex-1 rounded-full bg-red-500 text-foreground py-3 text-sm font-semibold hover:bg-red-600 disabled:opacity-60"
                 >
                   {pending ? "Raderar…" : "Radera"}
                 </button>
@@ -162,7 +162,7 @@ function EditBoardModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md"
+          className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-background/70 backdrop-blur-md"
           onClick={onClose}
         >
           <motion.div
@@ -171,16 +171,16 @@ function EditBoardModal({
             exit={{ y: 40, opacity: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl bg-background-secondary border border-white/10 p-6"
+            className="w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl bg-background-secondary border border-foreground/10 p-6"
           >
             <div className="flex items-center justify-between mb-5">
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground">
                 Redigera samling
               </h2>
               <button
                 onClick={onClose}
                 aria-label="Stäng"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-white/5 hover:text-white"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-foreground/5 hover:text-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -197,7 +197,7 @@ function EditBoardModal({
                   maxLength={80}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-white outline-none focus:border-white/30"
+                  className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-foreground outline-none focus:border-foreground/30"
                 />
               </div>
               <div>
@@ -209,12 +209,12 @@ function EditBoardModal({
                   maxLength={500}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-white outline-none focus:border-white/30 resize-none"
+                  className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-foreground outline-none focus:border-foreground/30 resize-none"
                 />
               </div>
               <div className="flex items-center justify-between rounded-xl bg-background-tertiary border border-border px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-sm font-medium text-foreground">
                     Publik samling
                   </p>
                 </div>
@@ -225,8 +225,8 @@ function EditBoardModal({
                     onChange={(e) => setIsPublic(e.target.checked)}
                     className="peer sr-only"
                   />
-                  <span className="h-6 w-11 rounded-full bg-background-secondary border border-border peer-checked:bg-white peer-checked:border-white transition-colors" />
-                  <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-foreground-muted peer-checked:translate-x-5 peer-checked:bg-black transition-transform" />
+                  <span className="h-6 w-11 rounded-full bg-background-secondary border border-border peer-checked:bg-foreground peer-checked:border-foreground transition-colors" />
+                  <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-foreground-muted peer-checked:translate-x-5 peer-checked:bg-background transition-transform" />
                 </label>
               </div>
 
@@ -235,7 +235,7 @@ function EditBoardModal({
               <button
                 type="submit"
                 disabled={pending}
-                className="w-full rounded-full bg-white text-black py-3 text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-60"
+                className="w-full rounded-full bg-foreground text-background py-3 text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-60"
               >
                 {pending ? "Sparar…" : "Spara"}
               </button>

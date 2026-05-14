@@ -22,7 +22,7 @@ export default function VillkorPage() {
 
           <div className="space-y-12 text-foreground-muted leading-relaxed">
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 1. Inledning
               </h2>
               <p>
@@ -34,7 +34,7 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 2. Tjänsten
               </h2>
               <p>
@@ -46,7 +46,7 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 3. Användarkonton
               </h2>
               <p>
@@ -58,7 +58,7 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 4. Användargenererat innehåll
               </h2>
               <p>
@@ -75,7 +75,7 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 5. Licens till uppladdat innehåll
               </h2>
               <p>
@@ -93,7 +93,7 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 6. Affiliate-länkar och marknadsföring
               </h2>
               <p>
@@ -111,7 +111,7 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 7. Otillåtet innehåll
               </h2>
               <p>
@@ -127,7 +127,7 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 8. Moderation
               </h2>
               <p>
@@ -139,7 +139,7 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 9. Immateriella rättigheter
               </h2>
               <p>
@@ -150,7 +150,7 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 10. Ansvarsbegränsning
               </h2>
               <p>
@@ -163,7 +163,7 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 11. Ändringar
               </h2>
               <p>
@@ -174,7 +174,7 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 12. Tillämplig lag
               </h2>
               <p>
@@ -184,14 +184,14 @@ export default function VillkorPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 13. Kontakt
               </h2>
               <p>
                 Frågor om Villkoren skickas till{" "}
                 <a
                   href="mailto:hello@moidello.com"
-                  className="text-white border-b border-white/30 hover:border-white transition-colors"
+                  className="text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"
                 >
                   hello@moidello.com
                 </a>
@@ -203,7 +203,7 @@ export default function VillkorPage() {
           <div className="mt-20 pt-10 border-t border-border">
             <Link
               href="/integritet"
-              className="text-sm text-foreground-muted hover:text-white transition-colors"
+              className="text-sm text-foreground-muted hover:text-foreground transition-colors"
             >
               Läs även Integritetspolicyn →
             </Link>

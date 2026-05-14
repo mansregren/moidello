@@ -136,7 +136,7 @@ export default function ProfileDetail({
               size="xl"
               className="border-4 border-background"
             />
-            <h1 className="mt-4 font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+            <h1 className="mt-4 font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
               {user.displayName}
             </h1>
             <p className="text-sm text-foreground-subtle mt-1">
@@ -150,9 +150,9 @@ export default function ProfileDetail({
               <button
                 type="button"
                 onClick={() => setActiveTab("followers")}
-                className="text-center rounded-md px-1 -mx-1 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                className="text-center rounded-md px-1 -mx-1 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40"
               >
-                <p className="text-lg font-semibold text-white">
+                <p className="text-lg font-semibold text-foreground">
                   {formatNumber(user.followers)}
                 </p>
                 <p className="text-xs text-foreground-subtle">Följare</p>
@@ -160,9 +160,9 @@ export default function ProfileDetail({
               <button
                 type="button"
                 onClick={() => setActiveTab("following")}
-                className="text-center rounded-md px-1 -mx-1 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                className="text-center rounded-md px-1 -mx-1 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40"
               >
-                <p className="text-lg font-semibold text-white">
+                <p className="text-lg font-semibold text-foreground">
                   {formatNumber(user.following)}
                 </p>
                 <p className="text-xs text-foreground-subtle">Följer</p>
@@ -170,9 +170,9 @@ export default function ProfileDetail({
               <button
                 type="button"
                 onClick={() => setActiveTab("outfits")}
-                className="text-center rounded-md px-1 -mx-1 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                className="text-center rounded-md px-1 -mx-1 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40"
               >
-                <p className="text-lg font-semibold text-white">
+                <p className="text-lg font-semibold text-foreground">
                   {user.outfitCount}
                 </p>
                 <p className="text-xs text-foreground-subtle">Outfits</p>
@@ -189,8 +189,8 @@ export default function ProfileDetail({
                     onClick={handleFollow}
                     className={`rounded-full px-6 py-2 text-sm font-semibold transition-colors ${
                       following
-                        ? "border border-border text-white hover:border-white/30"
-                        : "bg-white text-black hover:bg-white/90"
+                        ? "border border-border text-foreground hover:border-foreground/30"
+                        : "bg-foreground text-background hover:bg-foreground/90"
                     }`}
                   >
                     {following ? "Följer" : "Följ"}
@@ -220,7 +220,7 @@ export default function ProfileDetail({
                 onClick={() => setActiveTab(tab.key)}
                 className={`px-6 py-3 text-sm font-medium transition-colors relative ${
                   activeTab === tab.key
-                    ? "text-white"
+                    ? "text-foreground"
                     : "text-foreground-subtle hover:text-foreground-muted"
                 }`}
               >
@@ -233,7 +233,7 @@ export default function ProfileDetail({
                 {activeTab === tab.key && (
                   <motion.div
                     layoutId="profileTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-white"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground"
                   />
                 )}
               </button>
@@ -286,7 +286,7 @@ export default function ProfileDetail({
                   <Link
                     key={b.id}
                     href={`/board/${b.id}`}
-                    className="group rounded-2xl border border-border bg-background-secondary overflow-hidden hover:border-white/20 transition-colors"
+                    className="group rounded-2xl border border-border bg-background-secondary overflow-hidden hover:border-foreground/20 transition-colors"
                   >
                     <div className="relative aspect-[4/3] bg-background-tertiary">
                       {b.coverImage ? (
@@ -303,12 +303,12 @@ export default function ProfileDetail({
                           Tom samling
                         </div>
                       )}
-                      <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 backdrop-blur px-2.5 py-1 text-[10px] uppercase tracking-wider text-white">
+                      <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-background/70 backdrop-blur px-2.5 py-1 text-[10px] uppercase tracking-wider text-foreground">
                         <Globe className="h-3 w-3" /> Publik
                       </span>
                     </div>
                     <div className="p-4">
-                      <p className="font-medium text-white truncate">{b.name}</p>
+                      <p className="font-medium text-foreground truncate">{b.name}</p>
                       <p className="text-xs text-foreground-subtle mt-0.5">
                         {b.outfitCount} {b.outfitCount === 1 ? "outfit" : "outfits"}
                       </p>

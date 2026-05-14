@@ -88,7 +88,7 @@ export function BrandAutocomplete({
         value={brand}
         onChange={(e) => onChangeBrand(e.target.value)}
         onFocus={() => hits.length > 0 && setOpen(true)}
-        className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
+        className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-foreground placeholder:text-foreground-subtle outline-none"
       />
       {loading && (
         <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-subtle animate-spin" />
@@ -106,12 +106,12 @@ export function BrandAutocomplete({
                 <button
                   type="button"
                   onClick={() => pick(h)}
-                  className="w-full text-left px-3 py-2 hover:bg-white/5 transition-colors"
+                  className="w-full text-left px-3 py-2 hover:bg-foreground/5 transition-colors"
                 >
                   <p className="text-xs uppercase tracking-wider text-foreground-muted">
                     {titleCase(h.brand_key)}
                   </p>
-                  <p className="text-sm text-white truncate">{h.name}</p>
+                  <p className="text-sm text-foreground truncate">{h.name}</p>
                   {h.price !== null && h.price > 0 && (
                     <p className="text-xs text-foreground-subtle">
                       {h.price.toLocaleString("sv-SE")}{" "}

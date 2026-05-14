@@ -63,9 +63,9 @@ export default function TrendigtClient({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white flex items-center gap-3">
+            <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground flex items-center gap-3">
               Trendigt
-              <Flame className="h-8 w-8 md:h-12 md:w-12 text-white" />
+              <Flame className="h-8 w-8 md:h-12 md:w-12 text-foreground" />
             </h1>
             <p className="mt-3 text-foreground-muted">
               Vad alla pratar om just nu
@@ -113,13 +113,13 @@ export default function TrendigtClient({
                         <UserAvatar src={user.avatar} alt="" size="lg" />
                         <span
                           aria-hidden="true"
-                          className="absolute -top-1 -right-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-black text-[10px] font-bold"
+                          className="absolute -top-1 -right-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-foreground text-background text-[10px] font-bold"
                         >
                           {i + 1}
                         </span>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm font-medium text-white truncate max-w-[8rem]">
+                        <p className="text-sm font-medium text-foreground truncate max-w-[8rem]">
                           {user.displayName}
                         </p>
                         <p className="text-xs text-foreground-subtle">
@@ -145,9 +145,9 @@ export default function TrendigtClient({
                   >
                     <Link
                       href={`/brand/${b.slug}`}
-                      className="block rounded-2xl border border-border bg-background-secondary p-5 text-center transition-colors hover:border-white/30 hover:bg-background-tertiary"
+                      className="block rounded-2xl border border-border bg-background-secondary p-5 text-center transition-colors hover:border-foreground/30 hover:bg-background-tertiary"
                     >
-                      <p className="font-medium text-white text-sm truncate">
+                      <p className="font-medium text-foreground text-sm truncate">
                         {b.name}
                       </p>
                       <p className="mt-1 text-[11px] text-foreground-subtle">
@@ -183,10 +183,10 @@ export default function TrendigtClient({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
                     <div className="absolute inset-x-4 bottom-4">
-                      <p className="font-heading text-2xl uppercase tracking-tight text-white">
+                      <p className="font-heading text-2xl uppercase tracking-tight text-foreground">
                         {s.name}
                       </p>
-                      <p className="text-xs text-white/70">
+                      <p className="text-xs text-foreground/70">
                         {s.count} outfits
                       </p>
                     </div>
@@ -200,7 +200,7 @@ export default function TrendigtClient({
             <Section
               title="Populärt i Stockholm"
               href="/upptack"
-              icon={<MapPin className="h-6 w-6 text-white" />}
+              icon={<MapPin className="h-6 w-6 text-foreground" />}
             >
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                 {localOutfits.map((outfit, i) => (
@@ -242,13 +242,13 @@ function Section({
   return (
     <section>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="flex items-center gap-3 font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+        <h2 className="flex items-center gap-3 font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
           {icon}
           {title}
         </h2>
         <Link
           href={href}
-          className="inline-flex items-center gap-1 text-sm text-foreground-muted hover:text-white transition-colors shrink-0"
+          className="inline-flex items-center gap-1 text-sm text-foreground-muted hover:text-foreground transition-colors shrink-0"
         >
           Se alla
           <ChevronRight className="h-4 w-4" />

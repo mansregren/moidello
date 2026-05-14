@@ -16,7 +16,7 @@ export function UserCard({ user }: UserCardProps) {
         <UserAvatar src={user.avatar} alt={user.displayName} size="lg" />
       </div>
       <div className="text-center">
-        <p className="text-sm font-medium text-white">{user.displayName}</p>
+        <p className="text-sm font-medium text-foreground">{user.displayName}</p>
         <p className="text-xs text-foreground-subtle">
           @{user.username}
         </p>

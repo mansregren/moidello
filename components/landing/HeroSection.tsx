@@ -51,14 +51,14 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="font-heading text-[48px] md:text-[80px] lg:text-[100px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+            <h1 className="font-heading text-[48px] md:text-[80px] lg:text-[100px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
               Inspiration
               <br />
-              <span className="text-white/50">for every</span>
+              <span className="text-foreground/50">for every</span>
               <br />
               Outfit
             </h1>
-            <p className="mt-6 text-lg text-white/70 max-w-md">
+            <p className="mt-6 text-lg text-foreground/70 max-w-md">
               Upptäck, dela och shoppa outfits från kreatörer du älskar.
               Tagga varje plagg, länka var du köper.
             </p>

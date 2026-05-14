@@ -238,7 +238,7 @@ export default async function AdminInlaggPage({
             return (
               <li
                 key={o.outfit_id}
-                className="flex items-center gap-3 p-3 rounded-2xl border border-border bg-background-secondary hover:border-white/30 transition-colors"
+                className="flex items-center gap-3 p-3 rounded-2xl border border-border bg-background-secondary hover:border-foreground/30 transition-colors"
               >
                 <SelectCheckbox outfitId={o.outfit_id} />
                 <Link
@@ -256,7 +256,7 @@ export default async function AdminInlaggPage({
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="text-sm font-medium text-foreground truncate">
                     {o.title}
                   </p>
                   <div className="flex flex-wrap items-center gap-2 text-xs text-foreground-subtle mt-0.5">
@@ -322,8 +322,8 @@ function SortPill({
       href={href}
       className={`rounded-full border px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
         s === current
-          ? "bg-white text-black border-white"
-          : "border-border text-foreground-muted hover:text-white hover:border-white/30"
+          ? "bg-foreground text-background border-foreground"
+          : "border-border text-foreground-muted hover:text-foreground hover:border-foreground/30"
       }`}
     >
       {label}
@@ -355,8 +355,8 @@ function StatusPill({
       href={href}
       className={`rounded-full border px-4 py-2 text-xs font-semibold transition-colors ${
         st === current
-          ? "bg-white text-black border-white"
-          : "border-border text-foreground-muted hover:text-white hover:border-white/30"
+          ? "bg-foreground text-background border-foreground"
+          : "border-border text-foreground-muted hover:text-foreground hover:border-foreground/30"
       }`}
     >
       {label}

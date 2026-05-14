@@ -22,11 +22,11 @@ const PremiumButton = forwardRef<HTMLButtonElement, PremiumButtonProps>(
           size === "lg" && "px-10 py-5 text-lg",
           // Variants
           variant === "primary" &&
-            "bg-white text-black hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]",
+            "bg-foreground text-background hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]",
           variant === "secondary" &&
-            "border border-white/20 bg-transparent text-white hover:border-white/40 hover:scale-[1.02]",
+            "border border-foreground/20 bg-transparent text-foreground hover:border-foreground/40 hover:scale-[1.02]",
           variant === "glass" &&
-            "glass text-white hover:scale-[1.02] hover:bg-white/10",
+            "glass text-foreground hover:scale-[1.02] hover:bg-foreground/10",
           className
         )}
         {...props}

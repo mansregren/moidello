@@ -60,7 +60,7 @@ export default async function BrandDashboardPage() {
       <Shell>
         <p className="text-foreground-muted">
           Du har inte aktiverat ett brand-konto. Gå till{" "}
-          <Link href="/profil" className="text-white underline hover:text-white/80">
+          <Link href="/profil" className="text-foreground underline hover:text-foreground/80">
             din profil
           </Link>{" "}
           och kryssa i &quot;Jag representerar ett märke&quot; för att komma
@@ -93,7 +93,7 @@ export default async function BrandDashboardPage() {
   return (
     <Shell>
       <div className="flex items-center gap-2 mb-3">
-        <span className="inline-flex rounded-full bg-white text-black px-3 py-1 text-[11px] uppercase tracking-wider font-semibold">
+        <span className="inline-flex rounded-full bg-foreground text-background px-3 py-1 text-[11px] uppercase tracking-wider font-semibold">
           Brand
         </span>
         {profile.brand_website && (
@@ -101,7 +101,7 @@ export default async function BrandDashboardPage() {
             href={profile.brand_website}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-foreground-muted hover:text-white"
+            className="inline-flex items-center gap-1 text-xs text-foreground-muted hover:text-foreground"
           >
             <Globe className="h-3 w-3" />
             {profile.brand_website.replace(/^https?:\/\//, "")}
@@ -109,7 +109,7 @@ export default async function BrandDashboardPage() {
         )}
       </div>
 
-      <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+      <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
         {profile.brand_name}
       </h1>
       <p className="mt-3 text-foreground-muted">
@@ -119,7 +119,7 @@ export default async function BrandDashboardPage() {
       <div className="mt-5 flex flex-wrap gap-2">
         <Link
           href="/brand-dashboard/import"
-          className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 text-xs font-semibold hover:bg-white/90"
+          className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-xs font-semibold hover:bg-foreground/90"
         >
           Importera produkter (CSV)
         </Link>
@@ -133,7 +133,7 @@ export default async function BrandDashboardPage() {
       </section>
 
       <section className="mt-12">
-        <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white mb-5">
+        <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground mb-5">
           Outfits som taggar {profile.brand_name}
         </h2>
 
@@ -190,7 +190,7 @@ export default async function BrandDashboardPage() {
                           />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-white font-medium truncate max-w-[18rem]">
+                          <p className="text-foreground font-medium truncate max-w-[18rem]">
                             {r.title}
                           </p>
                           <p className="text-xs text-foreground-subtle">
@@ -199,10 +199,10 @@ export default async function BrandDashboardPage() {
                         </div>
                       </Link>
                     </td>
-                    <td className="text-right tabular-nums text-white py-3 px-2">{r.likes}</td>
-                    <td className="text-right tabular-nums text-white py-3 px-2">{r.saves}</td>
-                    <td className="text-right tabular-nums text-white py-3 px-2">{r.comments}</td>
-                    <td className="text-right tabular-nums text-white py-3 pl-2">{r.brand_clicks}</td>
+                    <td className="text-right tabular-nums text-foreground py-3 px-2">{r.likes}</td>
+                    <td className="text-right tabular-nums text-foreground py-3 px-2">{r.saves}</td>
+                    <td className="text-right tabular-nums text-foreground py-3 px-2">{r.comments}</td>
+                    <td className="text-right tabular-nums text-foreground py-3 pl-2">{r.brand_clicks}</td>
                   </tr>
                 ))}
               </tbody>
@@ -224,7 +224,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <Container>
           <Link
             href="/profil"
-            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
             Tillbaka till profilen
@@ -251,7 +251,7 @@ function SummaryCard({
         <Icon className="h-3.5 w-3.5" />
         <span className="text-[11px] uppercase tracking-wider">{label}</span>
       </div>
-      <p className="mt-2 font-heading text-3xl uppercase text-white tabular-nums">
+      <p className="mt-2 font-heading text-3xl uppercase text-foreground tabular-nums">
         {value.toLocaleString("sv-SE")}
       </p>
     </div>

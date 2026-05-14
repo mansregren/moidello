@@ -123,7 +123,7 @@ export function PushToggle() {
   return (
     <section className="rounded-2xl border border-border bg-background-secondary p-6 md:p-8">
       <div className="flex items-start gap-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
           {enabled ? (
             <Bell className="h-4 w-4" />
           ) : (
@@ -131,7 +131,7 @@ export function PushToggle() {
           )}
         </div>
         <div className="flex-1">
-          <h2 className="font-heading text-xl uppercase tracking-tight text-white">
+          <h2 className="font-heading text-xl uppercase tracking-tight text-foreground">
             Push-notiser
           </h2>
           <p className="mt-2 text-sm text-foreground-muted">
@@ -149,8 +149,8 @@ export function PushToggle() {
               onClick={enabled ? handleDisable : handleEnable}
               className={
                 enabled
-                  ? "mt-5 inline-flex items-center gap-2 rounded-full border border-border text-white px-5 py-2.5 text-sm font-semibold hover:border-white/30 disabled:opacity-60"
-                  : "mt-5 inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+                  ? "mt-5 inline-flex items-center gap-2 rounded-full border border-border text-foreground px-5 py-2.5 text-sm font-semibold hover:border-foreground/30 disabled:opacity-60"
+                  : "mt-5 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
               }
             >
               {pending

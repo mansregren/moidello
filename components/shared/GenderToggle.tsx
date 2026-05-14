@@ -53,8 +53,8 @@ export function GenderToggle({
                 ? "px-3 py-1.5"
                 : "px-2 py-1.5 text-center",
               active
-                ? "bg-white text-black"
-                : "text-foreground-muted hover:text-white"
+                ? "bg-foreground text-background"
+                : "text-foreground-muted hover:text-foreground"
             )}
           >
             {opt.label}

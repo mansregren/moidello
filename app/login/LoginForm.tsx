@@ -140,7 +140,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
     >
       <div className="glass-strong rounded-3xl p-8 md:p-10">
         <div className="text-center mb-8">
-          <h1 className="font-heading text-[36px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+          <h1 className="font-heading text-[36px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
             {phase === "code" ? "Kolla din inkorg" : "Logga in"}
           </h1>
           <p className="text-foreground-muted mt-2 text-sm">
@@ -158,16 +158,16 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={pending}
-              className="w-full inline-flex items-center justify-center gap-3 rounded-full bg-white text-black px-5 py-3 text-sm font-medium hover:bg-white/90 transition-colors active:scale-[0.98] disabled:opacity-60"
+              className="w-full inline-flex items-center justify-center gap-3 rounded-full bg-foreground text-background px-5 py-3 text-sm font-medium hover:bg-foreground/90 transition-colors active:scale-[0.98] disabled:opacity-60"
             >
               <GoogleIcon className="h-4 w-4" />
               Fortsätt med Google
             </button>
 
             <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-wider text-foreground-subtle">
-              <span className="flex-1 h-px bg-white/10" />
+              <span className="flex-1 h-px bg-foreground/10" />
               eller
-              <span className="flex-1 h-px bg-white/10" />
+              <span className="flex-1 h-px bg-foreground/10" />
             </div>
           </>
         )}
@@ -189,7 +189,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="din@email.se"
-                className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+                className="w-full rounded-xl bg-foreground/5 border border-foreground/10 px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
               />
             </div>
 
@@ -213,7 +213,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                   setPhase("password");
                   setErrorMessage("");
                 }}
-                className="text-foreground-muted hover:text-white underline"
+                className="text-foreground-muted hover:text-foreground underline"
               >
                 Logga in med lösenord istället
               </button>
@@ -239,7 +239,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="din@email.se"
-                  className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+                  className="w-full rounded-xl bg-foreground/5 border border-foreground/10 px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
                 />
               </div>
             )}
@@ -264,7 +264,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                   setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
                 }
                 placeholder="••••••"
-                className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-center text-2xl tracking-[0.5em] text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+                className="w-full rounded-xl bg-foreground/5 border border-foreground/10 px-4 py-3 text-center text-2xl tracking-[0.5em] text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
               />
             </div>
 
@@ -290,7 +290,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                   setCode("");
                   setErrorMessage("");
                 }}
-                className="text-foreground-muted hover:text-white underline"
+                className="text-foreground-muted hover:text-foreground underline"
               >
                 Använd annan e-post
               </button>
@@ -315,7 +315,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="din@email.se"
-                className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+                className="w-full rounded-xl bg-foreground/5 border border-foreground/10 px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
               />
             </div>
 
@@ -334,7 +334,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+                className="w-full rounded-xl bg-foreground/5 border border-foreground/10 px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
               />
             </div>
 
@@ -359,7 +359,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                   setPassword("");
                   setErrorMessage("");
                 }}
-                className="text-foreground-muted hover:text-white underline"
+                className="text-foreground-muted hover:text-foreground underline"
               >
                 Tillbaka till magisk länk
               </button>

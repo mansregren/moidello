@@ -104,7 +104,7 @@ export default async function AdminUserDetailPage({
     <Container className="max-w-5xl">
       <Link
         href="/admin/anvandare"
-        className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white mb-6"
+        className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground mb-6"
       >
         <ArrowLeft className="h-4 w-4" />
         Alla användare
@@ -140,19 +140,19 @@ export default async function AdminUserDetailPage({
               </span>
             )}
             {user.account_type === "brand" && (
-              <span className="inline-flex rounded-full bg-white/10 text-white px-2 py-0.5 text-[10px] uppercase tracking-wider">
+              <span className="inline-flex rounded-full bg-foreground/10 text-foreground px-2 py-0.5 text-[10px] uppercase tracking-wider">
                 Märke
               </span>
             )}
           </div>
-          <h1 className="font-heading text-3xl md:text-5xl uppercase tracking-tight text-white leading-none">
+          <h1 className="font-heading text-3xl md:text-5xl uppercase tracking-tight text-foreground leading-none">
             {user.display_name ?? user.username}
           </h1>
           <p className="text-sm text-foreground-subtle mt-1">
             <Link
               href={`/profile/${user.username}`}
               target="_blank"
-              className="hover:text-white"
+              className="hover:text-foreground"
             >
               @{user.username} →
             </Link>
@@ -199,7 +199,7 @@ export default async function AdminUserDetailPage({
       {/* Outfit grid — each card has inline publish + delete actions */}
       <section className="mt-14">
         <div className="flex items-end justify-between mb-5 gap-3">
-          <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white">
+          <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground">
             Inlägg ({outfits.length})
           </h2>
           <p className="text-xs text-foreground-subtle">
@@ -238,7 +238,7 @@ function Stat({
         <Icon className="h-4 w-4" />
         <span className="text-[11px] uppercase tracking-wider">{label}</span>
       </div>
-      <p className="text-xl sm:text-2xl font-semibold text-white tabular-nums">
+      <p className="text-xl sm:text-2xl font-semibold text-foreground tabular-nums">
         {value.toLocaleString("sv-SE")}
       </p>
     </div>

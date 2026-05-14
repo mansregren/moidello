@@ -43,7 +43,7 @@ interface Draft {
 }
 
 const INPUT =
-  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30";
+  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30";
 
 export function PasteTagForm({ outfitId }: { outfitId: string }) {
   const router = useRouter();
@@ -154,7 +154,7 @@ export function PasteTagForm({ outfitId }: { outfitId: string }) {
 
   return (
     <section className="rounded-2xl border border-border bg-background-secondary p-6">
-      <h2 className="font-heading text-xl uppercase tracking-tight text-white mb-1">
+      <h2 className="font-heading text-xl uppercase tracking-tight text-foreground mb-1">
         Lägg till plagg-tag
       </h2>
       <p className="text-xs text-foreground-subtle mb-5">
@@ -196,7 +196,7 @@ export function PasteTagForm({ outfitId }: { outfitId: string }) {
               type="button"
               onClick={() => preview(url)}
               disabled={fetching || !url.trim()}
-              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
             >
               {fetching ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -321,7 +321,7 @@ export function PasteTagForm({ outfitId }: { outfitId: string }) {
               type="button"
               onClick={reset}
               disabled={pending}
-              className="rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 px-4 py-2 text-xs disabled:opacity-60"
+              className="rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 px-4 py-2 text-xs disabled:opacity-60"
             >
               Avbryt
             </button>
@@ -329,7 +329,7 @@ export function PasteTagForm({ outfitId }: { outfitId: string }) {
               type="button"
               onClick={save}
               disabled={pending}
-              className="ml-auto inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 text-xs font-semibold hover:bg-white/90 disabled:opacity-60"
+              className="ml-auto inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-xs font-semibold hover:bg-foreground/90 disabled:opacity-60"
             >
               {pending ? (
                 <Loader2 className="h-3 w-3 animate-spin" />

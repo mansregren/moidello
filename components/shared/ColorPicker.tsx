@@ -33,7 +33,7 @@ export function ColorPicker({
             aria-pressed={selected}
             className={`h-7 w-7 rounded-full border transition-transform disabled:opacity-50 disabled:cursor-not-allowed ${
               selected
-                ? "border-white ring-2 ring-white/40 scale-110"
+                ? "border-foreground ring-2 ring-foreground/40 scale-110"
                 : "border-border hover:scale-105"
             }`}
             style={{ backgroundColor: c.hex }}

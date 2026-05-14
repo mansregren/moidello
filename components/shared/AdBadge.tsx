@@ -18,7 +18,7 @@ export function AdBadge({ variant = "full", className }: AdBadgeProps) {
         title="Reklam"
         aria-label="Reklam"
         className={cn(
-          "inline-flex h-4 w-4 items-center justify-center rounded-full bg-white/15 text-[9px] font-bold text-white",
+          "inline-flex h-4 w-4 items-center justify-center rounded-full bg-foreground/15 text-[9px] font-bold text-foreground",
           className
         )}
       >
@@ -30,7 +30,7 @@ export function AdBadge({ variant = "full", className }: AdBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/80",
+        "inline-flex items-center rounded-full bg-foreground/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground/80",
         className
       )}
     >

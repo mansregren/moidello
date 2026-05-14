@@ -104,7 +104,7 @@ export function UserDetailClient({ user }: { user: FullUserRow }) {
 
   return (
     <section className="rounded-2xl border border-border bg-background-secondary p-6 md:p-8">
-      <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-6">
+      <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-6">
         Redigera profil
       </h2>
 
@@ -133,7 +133,7 @@ export function UserDetailClient({ user }: { user: FullUserRow }) {
             type="button"
             onClick={() => fileRef.current?.click()}
             disabled={uploading || pending}
-            className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
           >
             <Upload className="h-4 w-4" />
             {uploading ? "Laddar upp…" : "Ladda upp ny"}
@@ -278,7 +278,7 @@ export function UserDetailClient({ user }: { user: FullUserRow }) {
           <button
             type="submit"
             disabled={pending}
-            className="inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
           >
             <Save className="h-4 w-4" />
             {pending ? "Sparar…" : "Spara ändringar"}
@@ -290,7 +290,7 @@ export function UserDetailClient({ user }: { user: FullUserRow }) {
 }
 
 const INPUT =
-  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30";
+  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30";
 
 function Field({
   label,

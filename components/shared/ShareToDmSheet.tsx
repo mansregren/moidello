@@ -96,7 +96,7 @@ export function ShareToDmSheet({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md"
+          className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-background/70 backdrop-blur-md"
           onClick={onClose}
         >
           <motion.div
@@ -105,11 +105,11 @@ export function ShareToDmSheet({
             exit={{ y: 40, opacity: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full sm:max-w-md max-h-[88vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-background-secondary border border-white/10 p-6"
+            className="w-full sm:max-w-md max-h-[88vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-background-secondary border border-foreground/10 p-6"
           >
             <div className="flex items-start justify-between gap-3 mb-5">
               <div>
-                <h2 className="font-heading text-2xl uppercase tracking-tight text-white leading-tight">
+                <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground leading-tight">
                   Skicka till
                 </h2>
                 <p className="text-xs text-foreground-subtle mt-1 truncate">
@@ -119,7 +119,7 @@ export function ShareToDmSheet({
               <button
                 onClick={onClose}
                 aria-label="Stäng"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-foreground-muted hover:bg-white/5 hover:text-white"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-foreground-muted hover:bg-foreground/5 hover:text-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -132,7 +132,7 @@ export function ShareToDmSheet({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Sök bland följda och följare…"
-                className="w-full rounded-xl bg-background-tertiary border border-border pl-10 pr-3 py-2.5 text-sm text-white placeholder:text-foreground-subtle outline-none focus:border-white/30"
+                className="w-full rounded-xl bg-background-tertiary border border-border pl-10 pr-3 py-2.5 text-sm text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
               />
             </div>
 
@@ -156,7 +156,7 @@ export function ShareToDmSheet({
                       <button
                         type="button"
                         onClick={() => toggle(r.id)}
-                        className="w-full flex items-center gap-3 px-1 py-3 text-left hover:bg-white/5 rounded-lg"
+                        className="w-full flex items-center gap-3 px-1 py-3 text-left hover:bg-foreground/5 rounded-lg"
                       >
                         <UserAvatar
                           src={r.avatarUrl ?? ""}
@@ -164,7 +164,7 @@ export function ShareToDmSheet({
                           size="sm"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white truncate">
+                          <p className="text-sm font-medium text-foreground truncate">
                             {r.displayName}
                           </p>
                           <p className="text-xs text-foreground-subtle truncate">
@@ -174,7 +174,7 @@ export function ShareToDmSheet({
                         <span
                           className={`flex h-6 w-6 items-center justify-center rounded-full border transition-colors ${
                             isSelected
-                              ? "bg-white text-black border-white"
+                              ? "bg-foreground text-background border-foreground"
                               : "border-border text-foreground-subtle"
                           }`}
                         >
@@ -193,7 +193,7 @@ export function ShareToDmSheet({
               placeholder="Lägg till en text (valfritt)…"
               rows={2}
               maxLength={500}
-              className="mt-4 w-full resize-none rounded-xl bg-background-tertiary border border-border px-3 py-2.5 text-sm text-white placeholder:text-foreground-subtle outline-none focus:border-white/30"
+              className="mt-4 w-full resize-none rounded-xl bg-background-tertiary border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
             />
 
             {error && (
@@ -204,7 +204,7 @@ export function ShareToDmSheet({
               type="button"
               onClick={submit}
               disabled={pending || selected.size === 0}
-              className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 text-sm font-semibold hover:bg-white/90 transition-transform active:scale-[0.98] disabled:opacity-60"
+              className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-full bg-foreground text-background py-3 text-sm font-semibold hover:bg-foreground/90 transition-transform active:scale-[0.98] disabled:opacity-60"
             >
               <Send className="h-4 w-4" />
               {pending

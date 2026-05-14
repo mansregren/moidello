@@ -105,16 +105,16 @@ export function TaggedItemCard({
           <p className="text-[10px] text-foreground-muted uppercase tracking-wider truncate">
             {item.brand}
             {item.isAffiliate && (
-              <span className="ml-2 inline-flex rounded-full bg-white/10 text-foreground-muted px-1.5 py-0.5 text-[9px] font-semibold tracking-wider">
+              <span className="ml-2 inline-flex rounded-full bg-foreground/10 text-foreground-muted px-1.5 py-0.5 text-[9px] font-semibold tracking-wider">
                 REKLAM
               </span>
             )}
           </p>
-          <p className="text-sm font-medium text-white mt-0.5 line-clamp-1">
+          <p className="text-sm font-medium text-foreground mt-0.5 line-clamp-1">
             {item.name}
           </p>
           {item.price > 0 && (
-            <p className="text-sm text-white/90 mt-0.5 tabular-nums">
+            <p className="text-sm text-foreground/90 mt-0.5 tabular-nums">
               {item.price.toLocaleString("sv-SE")} {item.currency}
             </p>
           )}
@@ -130,8 +130,8 @@ export function TaggedItemCard({
             className={cn(
               "flex h-11 w-11 items-center justify-center rounded-full border transition-colors",
               saved
-                ? "bg-white text-black border-white"
-                : "border-border text-foreground-muted hover:text-white hover:border-white/30",
+                ? "bg-foreground text-background border-foreground"
+                : "border-border text-foreground-muted hover:text-foreground hover:border-foreground/30",
             )}
           >
             <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />
@@ -140,7 +140,7 @@ export function TaggedItemCard({
             type="button"
             onClick={handleShare}
             aria-label="Skicka plagg till vän"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 transition-colors"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors"
           >
             <Send className="h-4 w-4" />
           </button>
@@ -148,7 +148,7 @@ export function TaggedItemCard({
             <UserLink
               href={outfitId ? `/go/${item.id}` : buyUrl}
               aria-label={`Köp ${item.brand} ${item.name}`}
-              className="inline-flex items-center gap-1 rounded-full bg-white text-black px-3 py-2 text-xs font-semibold hover:bg-white/90 transition-colors"
+              className="inline-flex items-center gap-1 rounded-full bg-foreground text-background px-3 py-2 text-xs font-semibold hover:bg-foreground/90 transition-colors"
             >
               Köp
               <ExternalLink className="h-3 w-3" />

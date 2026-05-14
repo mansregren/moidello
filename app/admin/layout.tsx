@@ -40,7 +40,7 @@ function AdminTab({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="px-4 py-3 text-sm font-medium text-foreground-muted hover:text-white border-b-2 border-transparent hover:border-white/30 -mb-px transition-colors"
+      className="px-4 py-3 text-sm font-medium text-foreground-muted hover:text-foreground border-b-2 border-transparent hover:border-foreground/30 -mb-px transition-colors"
     >
       {label}
     </Link>

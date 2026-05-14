@@ -58,11 +58,11 @@ export function CookieBanner() {
     <div
       role="dialog"
       aria-label="Cookie-information"
-      className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md z-[55] rounded-2xl border border-white/10 bg-background-secondary/95 backdrop-blur-xl shadow-2xl p-5"
+      className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md z-[55] rounded-2xl border border-foreground/10 bg-background-secondary/95 backdrop-blur-xl shadow-2xl p-5"
     >
       <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
-          <p className="font-heading text-sm uppercase tracking-wider text-white mb-2">
+          <p className="font-heading text-sm uppercase tracking-wider text-foreground mb-2">
             Cookies på Moidello
           </p>
           <p className="text-xs text-foreground-muted leading-relaxed">
@@ -71,7 +71,7 @@ export function CookieBanner() {
             Läs mer i vår{" "}
             <Link
               href="/integritet"
-              className="text-white underline hover:text-white/80"
+              className="text-foreground underline hover:text-foreground/80"
             >
               integritetspolicy
             </Link>
@@ -81,14 +81,14 @@ export function CookieBanner() {
             <button
               type="button"
               onClick={() => dismiss("essential")}
-              className="rounded-full border border-border text-white px-3 py-1.5 text-xs hover:border-white/30"
+              className="rounded-full border border-border text-foreground px-3 py-1.5 text-xs hover:border-foreground/30"
             >
               Endast nödvändiga
             </button>
             <button
               type="button"
               onClick={() => dismiss("accepted")}
-              className="rounded-full bg-white text-black px-4 py-1.5 text-xs font-semibold hover:bg-white/90"
+              className="rounded-full bg-foreground text-background px-4 py-1.5 text-xs font-semibold hover:bg-foreground/90"
             >
               OK
             </button>
@@ -98,7 +98,7 @@ export function CookieBanner() {
           type="button"
           onClick={() => dismiss("essential")}
           aria-label="Stäng"
-          className="shrink-0 text-foreground-muted hover:text-white"
+          className="shrink-0 text-foreground-muted hover:text-foreground"
         >
           <X className="h-4 w-4" />
         </button>

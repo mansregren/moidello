@@ -29,7 +29,7 @@ export function EmptyState({
           <Icon className="h-7 w-7 text-foreground-muted" strokeWidth={1.5} />
         </div>
       )}
-      <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white">
+      <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground">
         {title}
       </h2>
       {description && (

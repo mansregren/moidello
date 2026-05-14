@@ -32,8 +32,8 @@ export function OutfitTag({ tag, outfitId, region }: OutfitTagProps) {
         aria-label={`${tag.brand} ${tag.name}`}
         aria-expanded={showTooltip}
       >
-        <span className="absolute inset-0 rounded-full bg-white/40 animate-ping" />
-        <span className="absolute inset-[3px] rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+        <span className="absolute inset-0 rounded-full bg-foreground/40 animate-ping" />
+        <span className="absolute inset-[3px] rounded-full bg-foreground shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
       </button>
 
       {showTooltip && (
@@ -50,9 +50,9 @@ export function OutfitTag({ tag, outfitId, region }: OutfitTagProps) {
               </span>
             )}
           </p>
-          <p className="text-sm font-medium text-white">{tag.name}</p>
+          <p className="text-sm font-medium text-foreground">{tag.name}</p>
           {tag.price > 0 && (
-            <p className="text-sm font-semibold text-white mt-1">
+            <p className="text-sm font-semibold text-foreground mt-1">
               {tag.price.toLocaleString("sv-SE")} {tag.currency}
             </p>
           )}
@@ -61,7 +61,7 @@ export function OutfitTag({ tag, outfitId, region }: OutfitTagProps) {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white text-black px-3 py-1.5 text-xs font-medium hover:bg-white/90"
+              className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1.5 text-xs font-medium hover:bg-foreground/90"
             >
               Köp
               <ExternalLink className="h-3 w-3" />

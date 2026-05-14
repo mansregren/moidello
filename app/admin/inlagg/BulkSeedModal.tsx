@@ -41,7 +41,7 @@ const MAX_BATCH = 20;
 const LAST_USER_KEY = "moidello_admin_last_seed_user";
 
 const INPUT =
-  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-white p-2 outline-none focus:border-white/30";
+  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground p-2 outline-none focus:border-foreground/30";
 
 export function BulkSeedModal({
   users,
@@ -183,12 +183,12 @@ export function BulkSeedModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 backdrop-blur-sm p-4 md:p-8">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/70 backdrop-blur-sm p-4 md:p-8">
       <div className="w-full max-w-4xl rounded-2xl border border-border bg-background-secondary shadow-xl">
         <div className="flex items-center justify-between gap-4 p-5 border-b border-border">
           <div className="flex items-center gap-2.5">
-            <Sparkles className="h-4 w-4 text-white" />
-            <h2 className="font-heading text-xl uppercase tracking-tight text-white">
+            <Sparkles className="h-4 w-4 text-foreground" />
+            <h2 className="font-heading text-xl uppercase tracking-tight text-foreground">
               Skapa utkast från bilder
             </h2>
           </div>
@@ -196,7 +196,7 @@ export function BulkSeedModal({
             type="button"
             onClick={onClose}
             disabled={busy}
-            className="text-foreground-muted hover:text-white disabled:opacity-60"
+            className="text-foreground-muted hover:text-foreground disabled:opacity-60"
           >
             <X className="h-5 w-5" />
           </button>
@@ -254,12 +254,12 @@ export function BulkSeedModal({
                             type="button"
                             onClick={() => removeSlot(i)}
                             disabled={busy}
-                            className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center disabled:opacity-60"
+                            className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full bg-background/70 hover:bg-background text-foreground flex items-center justify-center disabled:opacity-60"
                             aria-label="Ta bort bild"
                           >
                             <X className="h-3 w-3" />
                           </button>
-                          <span className="absolute bottom-1.5 left-1.5 rounded-full bg-black/70 text-white text-[10px] px-1.5 py-0.5">
+                          <span className="absolute bottom-1.5 left-1.5 rounded-full bg-background/70 text-foreground text-[10px] px-1.5 py-0.5">
                             #{i + 1}
                           </span>
                         </div>
@@ -314,7 +314,7 @@ export function BulkSeedModal({
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={busy || slots.length >= MAX_BATCH}
-                    className="inline-flex items-center gap-2 rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 px-4 py-2 text-sm disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 px-4 py-2 text-sm disabled:opacity-50"
                   >
                     <Upload className="h-3.5 w-3.5" />
                     Lägg till fler ({slots.length}/{MAX_BATCH})
@@ -343,7 +343,7 @@ export function BulkSeedModal({
                     type="button"
                     onClick={onClose}
                     disabled={busy}
-                    className="rounded-full border border-border text-foreground-muted hover:text-white px-4 py-2 text-sm disabled:opacity-60"
+                    className="rounded-full border border-border text-foreground-muted hover:text-foreground px-4 py-2 text-sm disabled:opacity-60"
                   >
                     Avbryt
                   </button>
@@ -351,7 +351,7 @@ export function BulkSeedModal({
                     type="button"
                     onClick={submit}
                     disabled={busy || slots.length === 0}
-                    className="inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
                   >
                     {busy ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -402,12 +402,12 @@ function Dropzone({
       }}
       className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed py-12 px-6 cursor-pointer transition-colors ${
         hover
-          ? "border-white/50 bg-white/5"
-          : "border-border hover:border-white/30"
+          ? "border-foreground/50 bg-foreground/5"
+          : "border-border hover:border-foreground/30"
       }`}
     >
       <Upload className="h-8 w-8 text-foreground-muted mb-3" />
-      <p className="font-medium text-white">Dra in bilder eller klicka</p>
+      <p className="font-medium text-foreground">Dra in bilder eller klicka</p>
       <p className="mt-1 text-xs text-foreground-subtle">
         JPG, PNG, WebP — upp till {MAX_BATCH} st
       </p>
@@ -443,8 +443,8 @@ function DistributePanel({
             disabled={disabled}
             className={`rounded-full border px-2.5 py-1 text-xs transition-colors disabled:opacity-60 ${
               selected.has(u.id)
-                ? "bg-white text-black border-white"
-                : "border-border text-foreground-muted hover:text-white hover:border-white/30"
+                ? "bg-foreground text-background border-foreground"
+                : "border-border text-foreground-muted hover:text-foreground hover:border-foreground/30"
             }`}
           >
             {u.display_name ?? u.username}
@@ -454,7 +454,7 @@ function DistributePanel({
           type="button"
           onClick={onApply}
           disabled={disabled || selected.size === 0}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-white/10 hover:bg-white/15 text-white px-3 py-1 text-xs font-semibold disabled:opacity-50"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-foreground/10 hover:bg-foreground/15 text-foreground px-3 py-1 text-xs font-semibold disabled:opacity-50"
         >
           Fördela jämnt ({selected.size})
         </button>
@@ -479,7 +479,7 @@ function SeedResultPanel({
           <AlertTriangle className="h-6 w-6 text-red-300" />
         )}
         <div>
-          <p className="text-lg font-semibold text-white">
+          <p className="text-lg font-semibold text-foreground">
             {result.drafts} utkast skapade
           </p>
           <p className="text-xs text-foreground-muted">
@@ -505,7 +505,7 @@ function SeedResultPanel({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-full bg-white text-black px-5 py-2 text-sm font-semibold hover:bg-white/90"
+          className="rounded-full bg-foreground text-background px-5 py-2 text-sm font-semibold hover:bg-foreground/90"
         >
           Stäng
         </button>

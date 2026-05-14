@@ -24,7 +24,7 @@ export function FeaturedOutfits() {
           className="flex items-end justify-between mb-12"
         >
           <div>
-            <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+            <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
               Utvalda
               <br />
               <span className="text-foreground-subtle">Outfits</span>

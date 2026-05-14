@@ -35,7 +35,7 @@ export function AddToBoardButton({ outfitId }: { outfitId: string }) {
       <button
         type="button"
         onClick={handleClick}
-        className="inline-flex items-center gap-2 rounded-full border border-border text-white px-4 py-2 text-sm hover:border-white/30 transition-colors"
+        className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2 text-sm hover:border-foreground/30 transition-colors"
       >
         <FolderPlus className="h-4 w-4" />
         Lägg i samling
@@ -121,7 +121,7 @@ function BoardSheet({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md"
+        className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-background/70 backdrop-blur-md"
         onClick={onClose}
       >
         <motion.div
@@ -130,16 +130,16 @@ function BoardSheet({
           exit={{ y: 40, opacity: 0 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full sm:max-w-md max-h-[80vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-background-secondary border border-white/10 p-6"
+          className="w-full sm:max-w-md max-h-[80vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-background-secondary border border-foreground/10 p-6"
         >
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-heading text-2xl uppercase tracking-tight text-white">
+            <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground">
               Spara i samling
             </h2>
             <button
               onClick={onClose}
               aria-label="Stäng"
-              className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-white/5 hover:text-white"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-foreground/5 hover:text-foreground"
             >
               <X className="h-5 w-5" />
             </button>
@@ -148,7 +148,7 @@ function BoardSheet({
           <button
             type="button"
             onClick={() => setCreating(true)}
-            className="w-full mb-4 inline-flex items-center gap-2 rounded-xl border border-dashed border-border bg-background-tertiary px-4 py-3 text-sm text-white hover:border-white/30"
+            className="w-full mb-4 inline-flex items-center gap-2 rounded-xl border border-dashed border-border bg-background-tertiary px-4 py-3 text-sm text-foreground hover:border-foreground/30"
           >
             <Plus className="h-4 w-4" />
             Skapa ny samling
@@ -187,7 +187,7 @@ function BoardSheet({
                   className="w-full flex items-center justify-between py-3 text-left disabled:opacity-60"
                 >
                   <span>
-                    <span className="block text-sm font-medium text-white">
+                    <span className="block text-sm font-medium text-foreground">
                       {b.name}
                     </span>
                     <span className="block text-xs text-foreground-subtle">
@@ -197,7 +197,7 @@ function BoardSheet({
                   <span
                     className={`flex h-6 w-6 items-center justify-center rounded-full border transition-colors ${
                       b.contains
-                        ? "bg-white text-black border-white"
+                        ? "bg-foreground text-background border-foreground"
                         : "border-border text-foreground-subtle"
                     }`}
                   >
@@ -257,7 +257,7 @@ function CreateInline({
         value={name}
         onChange={(e) => setName(e.target.value)}
         maxLength={80}
-        className="w-full rounded-lg bg-background-secondary border border-border px-3 py-2 text-sm text-white outline-none focus:border-white/30"
+        className="w-full rounded-lg bg-background-secondary border border-border px-3 py-2 text-sm text-foreground outline-none focus:border-foreground/30"
         autoFocus
       />
       <label className="flex items-center gap-2 text-xs text-foreground-muted">
@@ -274,14 +274,14 @@ function CreateInline({
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 rounded-full border border-border text-white py-2 text-xs font-medium hover:border-white/30"
+          className="flex-1 rounded-full border border-border text-foreground py-2 text-xs font-medium hover:border-foreground/30"
         >
           Avbryt
         </button>
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 rounded-full bg-white text-black py-2 text-xs font-semibold disabled:opacity-60"
+          className="flex-1 rounded-full bg-foreground text-background py-2 text-xs font-semibold disabled:opacity-60"
         >
           {pending ? "Skapar…" : "Skapa"}
         </button>

@@ -49,7 +49,7 @@ const LAST_GENDER_KEY = "moidello_admin_last_manual_gender";
 const LAST_DISTRIBUTE_KEY = "moidello_admin_last_distribute_users";
 
 const INPUT =
-  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-2 outline-none focus:border-white/30";
+  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-2 outline-none focus:border-foreground/30";
 
 function newRowId(): string {
   return Math.random().toString(36).slice(2, 10);
@@ -263,12 +263,12 @@ export function BulkManualModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 backdrop-blur-sm p-4 md:p-8">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/70 backdrop-blur-sm p-4 md:p-8">
       <div className="w-full max-w-5xl rounded-2xl border border-border bg-background-secondary shadow-xl">
         <div className="flex items-center justify-between gap-4 p-5 border-b border-border">
           <div className="flex items-center gap-2.5">
-            <PenLine className="h-4 w-4 text-white" />
-            <h2 className="font-heading text-xl uppercase tracking-tight text-white">
+            <PenLine className="h-4 w-4 text-foreground" />
+            <h2 className="font-heading text-xl uppercase tracking-tight text-foreground">
               Skapa manuellt
             </h2>
           </div>
@@ -276,7 +276,7 @@ export function BulkManualModal({
             type="button"
             onClick={onClose}
             disabled={busy}
-            className="text-foreground-muted hover:text-white disabled:opacity-60"
+            className="text-foreground-muted hover:text-foreground disabled:opacity-60"
           >
             <X className="h-5 w-5" />
           </button>
@@ -321,8 +321,8 @@ export function BulkManualModal({
                             }
                             className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${
                               distributeUsers.has(u.id)
-                                ? "bg-white text-black border-white"
-                                : "border-border text-foreground-muted hover:text-white hover:border-white/30"
+                                ? "bg-foreground text-background border-foreground"
+                                : "border-border text-foreground-muted hover:text-foreground hover:border-foreground/30"
                             }`}
                           >
                             {u.display_name ?? u.username}
@@ -332,7 +332,7 @@ export function BulkManualModal({
                           type="button"
                           onClick={distributeEvenly}
                           disabled={distributeUsers.size === 0}
-                          className="ml-auto inline-flex rounded-full bg-white/10 hover:bg-white/15 text-white px-3 py-1 text-xs font-semibold disabled:opacity-50"
+                          className="ml-auto inline-flex rounded-full bg-foreground/10 hover:bg-foreground/15 text-foreground px-3 py-1 text-xs font-semibold disabled:opacity-50"
                         >
                           Fördela jämnt ({distributeUsers.size})
                         </button>
@@ -367,13 +367,13 @@ export function BulkManualModal({
                         value={titlePrefix}
                         onChange={(e) => setTitlePrefix(e.target.value)}
                         placeholder="ex: Sommar 2026"
-                        className="rounded-full bg-background-secondary border border-border text-white text-xs px-3 py-1 outline-none focus:border-white/30"
+                        className="rounded-full bg-background-secondary border border-border text-foreground text-xs px-3 py-1 outline-none focus:border-foreground/30"
                       />
                       <button
                         type="button"
                         onClick={applyPrefix}
                         disabled={!titlePrefix.trim()}
-                        className="rounded-full bg-white/10 hover:bg-white/15 text-white px-3 py-1 text-xs font-semibold disabled:opacity-50"
+                        className="rounded-full bg-foreground/10 hover:bg-foreground/15 text-foreground px-3 py-1 text-xs font-semibold disabled:opacity-50"
                       >
                         Applicera
                       </button>
@@ -395,7 +395,7 @@ export function BulkManualModal({
                               alt=""
                               className="absolute inset-0 h-full w-full object-cover"
                             />
-                            <span className="absolute top-1 left-1 rounded-full bg-black/70 text-white text-[9px] px-1.5 py-0.5">
+                            <span className="absolute top-1 left-1 rounded-full bg-background/70 text-foreground text-[9px] px-1.5 py-0.5">
                               #{idx + 1}
                             </span>
                           </div>
@@ -499,7 +499,7 @@ export function BulkManualModal({
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={busy || rows.length >= MAX_BATCH}
-                    className="inline-flex items-center gap-2 rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 px-4 py-2 text-sm disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 px-4 py-2 text-sm disabled:opacity-50"
                   >
                     <Upload className="h-3.5 w-3.5" />
                     Lägg till fler ({rows.length}/{MAX_BATCH})
@@ -531,7 +531,7 @@ export function BulkManualModal({
                     type="button"
                     onClick={onClose}
                     disabled={busy}
-                    className="rounded-full border border-border text-foreground-muted hover:text-white px-4 py-2 text-sm disabled:opacity-60"
+                    className="rounded-full border border-border text-foreground-muted hover:text-foreground px-4 py-2 text-sm disabled:opacity-60"
                   >
                     Avbryt
                   </button>
@@ -540,7 +540,7 @@ export function BulkManualModal({
                     onClick={submit}
                     disabled={busy || readyCount === 0}
                     title="Cmd/Ctrl+Enter"
-                    className="inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
                   >
                     {busy ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -596,13 +596,13 @@ function KeywordsInput({
       {value.map((k) => (
         <span
           key={k}
-          className="inline-flex items-center gap-1 rounded-full bg-white/10 text-white px-2 py-0.5 text-xs"
+          className="inline-flex items-center gap-1 rounded-full bg-foreground/10 text-foreground px-2 py-0.5 text-xs"
         >
           {k}
           <button
             type="button"
             onClick={() => remove(k)}
-            className="text-white/60 hover:text-white"
+            className="text-foreground/60 hover:text-foreground"
             disabled={disabled}
           >
             ×
@@ -627,7 +627,7 @@ function KeywordsInput({
             e.target.value = "";
           }
         }}
-        className="flex-1 min-w-[120px] bg-transparent text-xs text-white placeholder:text-foreground-subtle outline-none"
+        className="flex-1 min-w-[120px] bg-transparent text-xs text-foreground placeholder:text-foreground-subtle outline-none"
       />
     </div>
   );
@@ -664,12 +664,12 @@ function Dropzone({
       }}
       className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed py-12 px-6 cursor-pointer transition-colors ${
         hover
-          ? "border-white/50 bg-white/5"
-          : "border-border hover:border-white/30"
+          ? "border-foreground/50 bg-foreground/5"
+          : "border-border hover:border-foreground/30"
       }`}
     >
       <Upload className="h-8 w-8 text-foreground-muted mb-3" />
-      <p className="font-medium text-white">Dra in bilder eller klicka</p>
+      <p className="font-medium text-foreground">Dra in bilder eller klicka</p>
       <p className="mt-1 text-xs text-foreground-subtle">
         JPG, PNG, WebP — upp till {MAX_BATCH} st
       </p>
@@ -693,7 +693,7 @@ function ResultPanel({
           <AlertTriangle className="h-6 w-6 text-red-300" />
         )}
         <div>
-          <p className="text-lg font-semibold text-white">
+          <p className="text-lg font-semibold text-foreground">
             {result.drafts} utkast skapade
           </p>
           <p className="text-xs text-foreground-muted">
@@ -717,7 +717,7 @@ function ResultPanel({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-full bg-white text-black px-5 py-2 text-sm font-semibold hover:bg-white/90"
+          className="rounded-full bg-foreground text-background px-5 py-2 text-sm font-semibold hover:bg-foreground/90"
         >
           Stäng
         </button>

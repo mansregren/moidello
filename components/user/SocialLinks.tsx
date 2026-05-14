@@ -60,7 +60,7 @@ export function SocialLinks({
             <UserLink
               href={href}
               aria-label={label}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 transition-colors"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors"
             >
               <Icon className="h-4 w-4" />
             </UserLink>

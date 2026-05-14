@@ -113,7 +113,7 @@ function Shell({
                   Inga kreatörer än. Bli först ut —{" "}
                   <Link
                     href="/skapa"
-                    className="text-white underline hover:text-white/80"
+                    className="text-foreground underline hover:text-foreground/80"
                   >
                     skapa en outfit
                   </Link>
@@ -124,7 +124,7 @@ function Shell({
                   {creators.map((c) => (
                     <li
                       key={c.id}
-                      className="flex items-center gap-3 p-4 rounded-2xl border border-border bg-background-secondary hover:border-white/30 transition-colors"
+                      className="flex items-center gap-3 p-4 rounded-2xl border border-border bg-background-secondary hover:border-foreground/30 transition-colors"
                     >
                       <Link
                         href={`/profile/${c.username}`}
@@ -136,7 +136,7 @@ function Shell({
                           size="md"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white truncate">
+                          <p className="text-sm font-medium text-foreground truncate">
                             {c.displayName}
                           </p>
                           <p className="text-xs text-foreground-subtle truncate">
@@ -154,7 +154,7 @@ function Shell({
                 Eller bläddra hela katalogen på{" "}
                 <Link
                   href="/upptack"
-                  className="text-white underline hover:text-white/80"
+                  className="text-foreground underline hover:text-foreground/80"
                 >
                   Upptäck
                 </Link>

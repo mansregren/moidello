@@ -108,13 +108,13 @@ export default function OnboardingPage() {
       className="min-h-screen flex flex-col bg-background"
     >
       <header className="flex items-center justify-between px-6 md:px-12 pt-6">
-        <span className="font-heading text-2xl uppercase tracking-tight text-white">
+        <span className="font-heading text-2xl uppercase tracking-tight text-foreground">
           Moidello
         </span>
         {step > 0 && step < TOTAL_STEPS - 1 && (
           <button
             onClick={skip}
-            className="text-sm text-foreground-muted hover:text-white transition-colors"
+            className="text-sm text-foreground-muted hover:text-foreground transition-colors"
           >
             Hoppa över
           </button>
@@ -128,7 +128,7 @@ export default function OnboardingPage() {
               key={i}
               className={cn(
                 "h-1 flex-1 rounded-full transition-colors duration-300",
-                i <= step ? "bg-white" : "bg-border",
+                i <= step ? "bg-foreground" : "bg-border",
               )}
             />
           ))}
@@ -193,7 +193,7 @@ export default function OnboardingPage() {
               <button
                 type="button"
                 onClick={skip}
-                className="text-sm text-foreground-muted hover:text-white transition-colors"
+                className="text-sm text-foreground-muted hover:text-foreground transition-colors"
               >
                 Hoppa över detta steg
               </button>
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
                   "inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 active:scale-95",
                   pending || !usernameValid
                     ? "bg-background-tertiary text-foreground-subtle cursor-not-allowed"
-                    : "bg-white text-black hover:bg-white/90",
+                    : "bg-foreground text-background hover:bg-foreground/90",
                 )}
               >
                 {pending ? "Sparar…" : "Kom igång"}
@@ -223,7 +223,7 @@ export default function OnboardingPage() {
                 className={cn(
                   "inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 active:scale-95",
                   canContinue
-                    ? "bg-white text-black hover:bg-white/90"
+                    ? "bg-foreground text-background hover:bg-foreground/90"
                     : "bg-background-tertiary text-foreground-subtle cursor-not-allowed",
                 )}
               >
@@ -253,7 +253,7 @@ function StepUsername({
 }) {
   return (
     <div className="flex flex-col">
-      <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+      <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
         Välj användarnamn
       </h1>
       <p className="mt-3 text-foreground-muted">
@@ -268,7 +268,7 @@ function StepUsername({
           >
             Användarnamn
           </label>
-          <div className="flex items-center rounded-xl bg-background-secondary border border-border focus-within:border-white/30 transition-colors overflow-hidden">
+          <div className="flex items-center rounded-xl bg-background-secondary border border-border focus-within:border-foreground/30 transition-colors overflow-hidden">
             <span className="px-4 text-foreground-subtle">@</span>
             <input
               id="username-input"
@@ -284,7 +284,7 @@ function StepUsername({
                 onUsernameChange(e.target.value.toLowerCase().replace(/\s+/g, ""))
               }
               placeholder="dittnamn"
-              className="flex-1 bg-transparent border-0 px-0 py-3 text-white placeholder:text-foreground-subtle outline-none"
+              className="flex-1 bg-transparent border-0 px-0 py-3 text-foreground placeholder:text-foreground-subtle outline-none"
             />
           </div>
           <p className="mt-2 text-xs text-foreground-subtle">
@@ -309,7 +309,7 @@ function StepUsername({
             value={displayName}
             onChange={(e) => onDisplayNameChange(e.target.value)}
             placeholder="T.ex. Anna Svensson"
-            className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+            className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
           />
         </div>
       </div>
@@ -331,7 +331,7 @@ function StepGender({
 
   return (
     <div className="flex flex-col">
-      <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+      <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
         Vad vill du se?
       </h1>
       <p className="mt-3 text-foreground-muted">
@@ -350,8 +350,8 @@ function StepGender({
               className={cn(
                 "relative rounded-2xl border p-8 text-left transition-all duration-300 active:scale-[0.98]",
                 active
-                  ? "bg-white text-black border-white"
-                  : "border-border text-white hover:border-white/30 bg-background-secondary",
+                  ? "bg-foreground text-background border-foreground"
+                  : "border-border text-foreground hover:border-foreground/30 bg-background-secondary",
               )}
             >
               <span className="font-heading text-3xl uppercase tracking-tight">
@@ -387,7 +387,7 @@ function StepStyles({
 
   return (
     <div className="flex flex-col">
-      <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+      <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
         Välj stilar
       </h1>
       <p className="mt-3 text-foreground-muted">
@@ -406,8 +406,8 @@ function StepStyles({
               className={cn(
                 "inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-all duration-300 active:scale-95",
                 active
-                  ? "bg-white text-black"
-                  : "border border-border text-foreground-muted hover:text-white hover:border-white/30",
+                  ? "bg-foreground text-background"
+                  : "border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30",
               )}
             >
               {active && <Check className="h-3.5 w-3.5" strokeWidth={2.5} />}
@@ -444,7 +444,7 @@ function StepFollow({
 
   return (
     <div className="flex flex-col">
-      <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+      <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
         Följ kreatörer
       </h1>
       <p className="mt-3 text-foreground-muted">
@@ -460,7 +460,7 @@ function StepFollow({
               className={cn(
                 "flex items-center gap-3 rounded-2xl border p-4 transition-colors duration-300",
                 active
-                  ? "border-white/40 bg-white/5"
+                  ? "border-foreground/40 bg-foreground/5"
                   : "border-border bg-background-secondary",
               )}
             >
@@ -470,7 +470,7 @@ function StepFollow({
                 size="md"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {user.displayName}
                 </p>
                 <p className="text-xs text-foreground-subtle truncate">
@@ -485,8 +485,8 @@ function StepFollow({
                 className={cn(
                   "shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-300 active:scale-95",
                   active
-                    ? "bg-white text-black"
-                    : "border border-border text-white hover:border-white/40",
+                    ? "bg-foreground text-background"
+                    : "border border-border text-foreground hover:border-foreground/40",
                 )}
               >
                 {active ? "Följer" : "Följ"}

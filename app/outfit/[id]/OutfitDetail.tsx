@@ -190,7 +190,7 @@ export default function OutfitDetail({
                     size="lg"
                   />
                   <div className="min-w-0">
-                    <p className="font-medium text-white group-hover:underline truncate">
+                    <p className="font-medium text-foreground group-hover:underline truncate">
                       {outfit.creator.displayName}
                     </p>
                     <p className="text-sm text-foreground-subtle truncate">
@@ -204,7 +204,7 @@ export default function OutfitDetail({
                 />
               </div>
 
-              <h1 className="font-heading text-[32px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-white mb-4">
+              <h1 className="font-heading text-[32px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-4">
                 {outfit.title}
               </h1>
 
@@ -232,12 +232,12 @@ export default function OutfitDetail({
                   className={cn(
                     "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                     liked
-                      ? "bg-white/10 border-white/40 text-white"
-                      : "border-border text-white hover:border-white/30",
+                      ? "bg-foreground/10 border-foreground/40 text-foreground"
+                      : "border-border text-foreground hover:border-foreground/30",
                   )}
                 >
                   <Heart
-                    className={cn("h-4 w-4", liked && "fill-white text-white")}
+                    className={cn("h-4 w-4", liked && "fill-foreground text-foreground")}
                   />
                   <span className="tabular-nums">{likeCount}</span>
                 </button>
@@ -250,12 +250,12 @@ export default function OutfitDetail({
                   className={cn(
                     "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                     saved
-                      ? "bg-white/10 border-white/40 text-white"
-                      : "border-border text-white hover:border-white/30",
+                      ? "bg-foreground/10 border-foreground/40 text-foreground"
+                      : "border-border text-foreground hover:border-foreground/30",
                   )}
                 >
                   <Bookmark
-                    className={cn("h-4 w-4", saved && "fill-white text-white")}
+                    className={cn("h-4 w-4", saved && "fill-foreground text-foreground")}
                   />
                   <span className="tabular-nums">{saveCount}</span>
                 </button>
@@ -264,7 +264,7 @@ export default function OutfitDetail({
                   <button
                     type="button"
                     onClick={() => setShareOpen(true)}
-                    className="inline-flex items-center gap-2 rounded-full border border-border text-white px-4 py-2 text-sm font-medium hover:border-white/30 transition-colors"
+                    className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2 text-sm font-medium hover:border-foreground/30 transition-colors"
                   >
                     <Send className="h-4 w-4" />
                     Skicka till vän
@@ -326,7 +326,7 @@ export default function OutfitDetail({
           </div>
 
           <section className="mt-16 md:mt-24 mb-16">
-            <h2 className="font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-white mb-8">
+            <h2 className="font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-8">
               Liknande <span className="text-foreground-subtle">outfits</span>
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
@@ -421,7 +421,7 @@ function CommentsSection({
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm">
-                  <span className="font-medium text-white">
+                  <span className="font-medium text-foreground">
                     {comment.user.displayName}
                   </span>{" "}
                   <span className="text-foreground-muted">{comment.text}</span>
@@ -463,10 +463,10 @@ function CommentsSection({
           }}
         >
           <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-md data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 transition-opacity" />
+            <AlertDialog.Backdrop className="fixed inset-0 z-[60] bg-background/70 backdrop-blur-md data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 transition-opacity" />
             <AlertDialog.Popup className="fixed inset-0 z-[60] flex items-center justify-center p-6 outline-none">
-              <div className="w-full max-w-sm rounded-3xl bg-background-secondary border border-white/10 p-6">
-                <AlertDialog.Title className="font-heading text-2xl uppercase tracking-tight text-white">
+              <div className="w-full max-w-sm rounded-3xl bg-background-secondary border border-foreground/10 p-6">
+                <AlertDialog.Title className="font-heading text-2xl uppercase tracking-tight text-foreground">
                   Radera kommentar?
                 </AlertDialog.Title>
                 <AlertDialog.Description className="mt-3 text-sm text-foreground-muted">
@@ -475,7 +475,7 @@ function CommentsSection({
                 <div className="mt-6 flex gap-3">
                   <AlertDialog.Close
                     type="button"
-                    className="flex-1 rounded-full border border-border text-white py-3 text-sm font-medium hover:border-white/30"
+                    className="flex-1 rounded-full border border-border text-foreground py-3 text-sm font-medium hover:border-foreground/30"
                   >
                     Avbryt
                   </AlertDialog.Close>
@@ -507,7 +507,7 @@ function CommentsSection({
                         }
                       });
                     }}
-                    className="flex-1 rounded-full bg-red-500 text-white py-3 text-sm font-semibold hover:bg-red-600 disabled:opacity-60"
+                    className="flex-1 rounded-full bg-red-500 text-foreground py-3 text-sm font-semibold hover:bg-red-600 disabled:opacity-60"
                   >
                     Radera
                   </button>
@@ -533,13 +533,13 @@ function CommentsSection({
             }
             disabled={!isPersisted || pending}
             maxLength={1000}
-            className="flex-1 bg-transparent text-sm text-white placeholder:text-foreground-subtle outline-none disabled:cursor-not-allowed"
+            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-foreground-subtle outline-none disabled:cursor-not-allowed"
           />
           {body && isPersisted && (
             <button
               type="submit"
               disabled={pending}
-              className="text-sm text-white font-semibold disabled:opacity-50"
+              className="text-sm text-foreground font-semibold disabled:opacity-50"
             >
               Posta
             </button>

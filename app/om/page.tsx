@@ -27,13 +27,13 @@ export default async function OmPage() {
             />
             <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-background" />
             <Container className="relative z-10 h-full flex flex-col justify-end pb-12 md:pb-20">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/70">
+              <p className="text-xs uppercase tracking-[0.3em] text-foreground/70">
                 Om oss
               </p>
-              <h1 className="mt-4 font-heading text-[48px] md:text-[112px] leading-[0.9] uppercase tracking-[-0.02em] text-white">
+              <h1 className="mt-4 font-heading text-[48px] md:text-[112px] leading-[0.9] uppercase tracking-[-0.02em] text-foreground">
                 Om Moidello
               </h1>
-              <p className="mt-5 max-w-xl text-base md:text-lg text-white/80 leading-relaxed">
+              <p className="mt-5 max-w-xl text-base md:text-lg text-foreground/80 leading-relaxed">
                 Inspiration för varje outfit. En plattform för att upptäcka,
                 dela och inspireras av outfits — där stil är enkelt att hitta
                 och ännu enklare att köpa.
@@ -47,7 +47,7 @@ export default async function OmPage() {
           <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-5">
             Varför vi finns
           </p>
-          <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-white mb-8">
+          <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-foreground mb-8">
             Stil ska gå att hitta
           </h2>
           <div className="space-y-6 text-base md:text-lg text-foreground-muted leading-relaxed">
@@ -75,13 +75,13 @@ export default async function OmPage() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-black/85" />
+            <div className="absolute inset-0 bg-background/85" />
           </div>
           <Container className="relative z-10 py-20 md:py-28">
             <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-5">
               Så funkar det
             </p>
-            <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-white mb-12 max-w-2xl">
+            <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-foreground mb-12 max-w-2xl">
               Fyra steg, ingen gissningslek
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
@@ -114,7 +114,7 @@ export default async function OmPage() {
           <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-5">
             För kreatörer
           </p>
-          <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-white mb-8">
+          <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-foreground mb-8">
             En kanal utan algoritm
           </h2>
           <div className="space-y-6 text-base md:text-lg text-foreground-muted leading-relaxed">
@@ -127,7 +127,7 @@ export default async function OmPage() {
           <div className="mt-10">
             <Link
               href="/skapa"
-              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-6 py-3 text-sm font-medium hover:bg-white/90 transition-transform active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-3 text-sm font-medium hover:bg-foreground/90 transition-transform active:scale-[0.98]"
             >
               <Plus className="h-4 w-4" />
               Skapa din första outfit
@@ -146,13 +146,13 @@ export default async function OmPage() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-black/80" />
+            <div className="absolute inset-0 bg-background/80" />
           </div>
           <Container className="relative z-10 max-w-2xl py-20 md:py-24 text-center">
             <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-5">
               Made in Stockholm
             </p>
-            <h2 className="font-heading text-[32px] md:text-[44px] leading-[0.95] uppercase tracking-tight text-white mb-6">
+            <h2 className="font-heading text-[32px] md:text-[44px] leading-[0.95] uppercase tracking-tight text-foreground mb-6">
               Litet team, korta beslutsvägar
             </h2>
             <p className="text-base text-foreground-muted leading-relaxed">
@@ -165,7 +165,7 @@ export default async function OmPage() {
             </p>
             <a
               href="mailto:hello@moidello.com"
-              className="mt-3 inline-block text-base text-white border-b border-white/30 hover:border-white transition-colors"
+              className="mt-3 inline-block text-base text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"
             >
               hello@moidello.com
             </a>
@@ -186,11 +186,11 @@ function Step({
   body: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-6 md:p-7 h-full">
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black mb-5">
+    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.04] backdrop-blur-sm p-6 md:p-7 h-full">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background mb-5">
         <Icon className="h-4 w-4" strokeWidth={2.4} />
       </div>
-      <h3 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white">
+      <h3 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground">
         {title}
       </h3>
       <p className="mt-3 text-sm text-foreground-muted leading-relaxed">

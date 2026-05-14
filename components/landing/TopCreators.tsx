@@ -14,7 +14,7 @@ export function TopCreators() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-[-0.02em] text-white text-center mb-16"
+          className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground text-center mb-16"
         >
           Top <span className="text-foreground-subtle">Kreatörer</span>
         </motion.h2>

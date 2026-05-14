@@ -144,7 +144,7 @@ async function SearchResults({ q }: { q: string }) {
         <p>Inga träffar för &quot;{q}&quot;.</p>
         <p className="text-sm text-foreground-subtle mt-2">
           Försök med ett annat ord, eller bläddra på{" "}
-          <Link href="/upptack" className="underline text-white">
+          <Link href="/upptack" className="underline text-foreground">
             Upptäck
           </Link>
           .
@@ -157,7 +157,7 @@ async function SearchResults({ q }: { q: string }) {
     <div className="mt-10 space-y-14">
       {profiles.length > 0 && (
         <section>
-          <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white mb-5">
+          <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground mb-5">
             Kreatörer & märken
           </h2>
           <ul className="grid gap-3 sm:grid-cols-2">
@@ -165,7 +165,7 @@ async function SearchResults({ q }: { q: string }) {
               <li key={p.id}>
                 <Link
                   href={`/profile/${p.username}`}
-                  className="flex items-center gap-3 p-3 rounded-2xl border border-border hover:border-white/30 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-2xl border border-border hover:border-foreground/30 transition-colors"
                 >
                   <UserAvatar
                     src={p.avatar_url ?? ""}
@@ -173,7 +173,7 @@ async function SearchResults({ q }: { q: string }) {
                     size="md"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {p.display_name ?? p.brand_name ?? p.username}
                     </p>
                     <p className="text-xs text-foreground-subtle truncate">
@@ -190,7 +190,7 @@ async function SearchResults({ q }: { q: string }) {
 
       {brands.length > 0 && (
         <section>
-          <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white mb-5">
+          <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground mb-5">
             Märken i taggade plagg
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -198,7 +198,7 @@ async function SearchResults({ q }: { q: string }) {
               <Link
                 key={b.brand}
                 href={`/brand/${encodeURIComponent(b.brand.toLowerCase())}`}
-                className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-white hover:border-white/30 transition-colors"
+                className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-foreground hover:border-foreground/30 transition-colors"
               >
                 {b.brand}
                 <span className="text-xs text-foreground-subtle">
@@ -212,7 +212,7 @@ async function SearchResults({ q }: { q: string }) {
 
       {outfits.length > 0 && (
         <section>
-          <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white mb-5">
+          <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground mb-5">
             Outfits
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
@@ -236,7 +236,7 @@ async function SearchResults({ q }: { q: string }) {
                     unoptimized={o.image_url.startsWith("http")}
                   />
                 </div>
-                <p className="mt-2 text-sm text-white truncate">{o.title}</p>
+                <p className="mt-2 text-sm text-foreground truncate">{o.title}</p>
                 {o.profiles?.username && (
                   <p className="text-xs text-foreground-subtle truncate">
                     @{o.profiles.username}

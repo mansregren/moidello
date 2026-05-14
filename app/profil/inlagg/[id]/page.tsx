@@ -68,20 +68,20 @@ export default async function EditOwnOutfitPage({
         <Container className="max-w-3xl">
           <Link
             href="/profil"
-            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white mb-6"
+            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
             Tillbaka till profilen
           </Link>
 
           <div className="mb-6 flex items-center justify-between gap-3">
-            <h1 className="font-heading text-3xl md:text-4xl uppercase tracking-tight text-white">
+            <h1 className="font-heading text-3xl md:text-4xl uppercase tracking-tight text-foreground">
               Redigera inlägg
             </h1>
             <Link
               href={publicUrl}
               target="_blank"
-              className="inline-flex items-center gap-1.5 text-xs text-foreground-muted hover:text-white"
+              className="inline-flex items-center gap-1.5 text-xs text-foreground-muted hover:text-foreground"
             >
               Publik vy
               <ExternalLink className="h-3 w-3" />

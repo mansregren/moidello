@@ -96,7 +96,7 @@ export function OutfitCard({
       >
         <div
           className={`relative overflow-hidden rounded-2xl aspect-[3/4] ${
-            outfit.type === "flatlay" ? "bg-white" : "bg-background-tertiary"
+            outfit.type === "flatlay" ? "bg-foreground" : "bg-background-tertiary"
           }`}
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
@@ -115,16 +115,16 @@ export function OutfitCard({
             className="absolute top-3 left-3 z-10 flex items-center gap-1.5"
           >
             {outfit.type === "flatlay" && (
-              <div className="flex items-center gap-1.5 rounded-full bg-black/70 backdrop-blur-sm px-3 py-1.5">
-                <LayoutGrid className="h-3 w-3 text-white" />
-                <span className="text-[10px] font-medium text-white">
+              <div className="flex items-center gap-1.5 rounded-full bg-background/70 backdrop-blur-sm px-3 py-1.5">
+                <LayoutGrid className="h-3 w-3 text-foreground" />
+                <span className="text-[10px] font-medium text-foreground">
                   Flatlay
                 </span>
               </div>
             )}
-            <div className="flex items-center gap-1 rounded-full bg-black/70 backdrop-blur-sm px-2.5 py-1.5">
-              <Tag className="h-3 w-3 text-white" />
-              <span className="text-[10px] font-medium text-white">
+            <div className="flex items-center gap-1 rounded-full bg-background/70 backdrop-blur-sm px-2.5 py-1.5">
+              <Tag className="h-3 w-3 text-foreground" />
+              <span className="text-[10px] font-medium text-foreground">
                 {outfit.tags.length}
               </span>
             </div>
@@ -137,8 +137,8 @@ export function OutfitCard({
             className={cn(
               "absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-md transition-all duration-300 active:scale-90",
               saved
-                ? "bg-white text-black"
-                : "bg-black/50 text-white hover:bg-black/70",
+                ? "bg-foreground text-background"
+                : "bg-background/50 text-foreground hover:bg-background/70",
             )}
           >
             <Bookmark
@@ -156,14 +156,14 @@ export function OutfitCard({
             {outfit.tags.map((tag) => (
               <div
                 key={tag.id}
-                className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] ring-2 ring-white/30 transition-transform duration-300 hover:scale-150"
+                className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground shadow-[0_0_10px_rgba(255,255,255,0.5)] ring-2 ring-foreground/30 transition-transform duration-300 hover:scale-150"
                 style={{ left: `${tag.x}%`, top: `${tag.y}%` }}
               />
             ))}
 
             <div className="absolute bottom-4 left-4 right-4">
-              <p className="text-sm font-medium text-white">{outfit.title}</p>
-              <p className="text-xs text-white/70 mt-1">
+              <p className="text-sm font-medium text-foreground">{outfit.title}</p>
+              <p className="text-xs text-foreground/70 mt-1">
                 {outfit.tags.length} taggade plagg
               </p>
             </div>
@@ -178,7 +178,7 @@ export function OutfitCard({
           className="flex items-center gap-2 group/user"
         >
           <UserAvatar src={outfit.creator.avatar} alt="" size="sm" />
-          <span className="text-sm text-foreground-muted group-hover/user:text-white transition-colors">
+          <span className="text-sm text-foreground-muted group-hover/user:text-foreground transition-colors">
             {outfit.creator.displayName}
           </span>
         </Link>
@@ -186,25 +186,25 @@ export function OutfitCard({
         <div className="flex items-center gap-3">
           <button
             onClick={handleLike}
-            className="flex items-center gap-1 text-foreground-subtle hover:text-white transition-colors active:scale-95"
+            className="flex items-center gap-1 text-foreground-subtle hover:text-foreground transition-colors active:scale-95"
             aria-label={liked ? "Ta bort gilla" : "Gilla"}
             aria-pressed={liked}
           >
             <Heart
-              className={`h-4 w-4 ${liked ? "fill-white text-white" : ""}`}
+              className={`h-4 w-4 ${liked ? "fill-foreground text-foreground" : ""}`}
             />
             <span className="text-xs">{likeCount}</span>
           </button>
           <button
             onClick={handleSave}
-            className="flex items-center gap-1 text-foreground-subtle hover:text-white transition-colors active:scale-95"
+            className="flex items-center gap-1 text-foreground-subtle hover:text-foreground transition-colors active:scale-95"
             aria-label={saved ? "Ta bort sparad" : "Spara"}
             aria-pressed={saved}
           >
             <Bookmark
               className={cn(
                 "h-4 w-4",
-                saved && "fill-white text-white",
+                saved && "fill-foreground text-foreground",
               )}
             />
             <span className="text-xs">{saveCount}</span>

@@ -61,7 +61,7 @@ const CATEGORIES = [
 ];
 
 const INPUT =
-  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30";
+  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30";
 
 export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
   const router = useRouter();
@@ -121,7 +121,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
 
   return (
     <section className="rounded-2xl border border-border bg-background-secondary p-6">
-      <h2 className="font-heading text-xl uppercase tracking-tight text-white mb-5">
+      <h2 className="font-heading text-xl uppercase tracking-tight text-foreground mb-5">
         Redigera inlägg
       </h2>
       <form onSubmit={save} className="space-y-4">
@@ -153,13 +153,13 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
             {form.keywords.map((k) => (
               <span
                 key={k}
-                className="inline-flex items-center gap-1 rounded-full bg-white/10 text-white px-2 py-0.5 text-xs"
+                className="inline-flex items-center gap-1 rounded-full bg-foreground/10 text-foreground px-2 py-0.5 text-xs"
               >
                 {k}
                 <button
                   type="button"
                   onClick={() => removeKeyword(k)}
-                  className="text-white/60 hover:text-white"
+                  className="text-foreground/60 hover:text-foreground"
                   aria-label={`Ta bort ${k}`}
                 >
                   ×
@@ -188,7 +188,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
                   e.target.value = "";
                 }
               }}
-              className="flex-1 min-w-[120px] bg-transparent text-sm text-white placeholder:text-foreground-subtle outline-none"
+              className="flex-1 min-w-[120px] bg-transparent text-sm text-foreground placeholder:text-foreground-subtle outline-none"
             />
           </div>
         </Field>
@@ -289,7 +289,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
           <button
             type="submit"
             disabled={pending}
-            className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
           >
             <Save className="h-4 w-4" />
             {pending ? "Sparar…" : "Spara"}
@@ -410,7 +410,7 @@ export function TagsEditor({
 
   return (
     <section className="rounded-2xl border border-border bg-background-secondary p-6">
-      <h2 className="font-heading text-xl uppercase tracking-tight text-white mb-2">
+      <h2 className="font-heading text-xl uppercase tracking-tight text-foreground mb-2">
         Taggade plagg ({tags.length})
       </h2>
       <p className="text-xs text-foreground-subtle mb-5">
@@ -429,7 +429,7 @@ export function TagsEditor({
           <li
             key={t.id}
             id={`tag-card-${t.id}`}
-            className="rounded-xl border border-border bg-background-tertiary p-4 space-y-3 transition-colors focus-within:border-white/40 focus-within:bg-background-tertiary/80 hover:border-white/20 scroll-mt-24"
+            className="rounded-xl border border-border bg-background-tertiary p-4 space-y-3 transition-colors focus-within:border-foreground/40 focus-within:bg-background-tertiary/80 hover:border-foreground/20 scroll-mt-24"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] uppercase tracking-wider text-foreground-subtle">
@@ -580,7 +580,7 @@ export function TagsEditor({
                 type="button"
                 disabled={busyId === t.id}
                 onClick={() => saveTag(t)}
-                className="inline-flex items-center gap-1.5 rounded-full bg-white text-black px-3 py-1.5 text-xs font-semibold hover:bg-white/90 disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1.5 text-xs font-semibold hover:bg-foreground/90 disabled:opacity-60"
               >
                 <Save className="h-3 w-3" />
                 Spara plagg
@@ -737,7 +737,7 @@ export function TagPositionEditor({
         />
 
         {!isPublished && (
-          <span className="absolute top-3 left-3 inline-flex rounded-full bg-amber-500/90 text-black px-3 py-1 text-xs uppercase tracking-wider font-semibold pointer-events-none">
+          <span className="absolute top-3 left-3 inline-flex rounded-full bg-amber-500/90 text-background px-3 py-1 text-xs uppercase tracking-wider font-semibold pointer-events-none">
             Utkast
           </span>
         )}
@@ -759,18 +759,18 @@ export function TagPositionEditor({
               >
                 <span
                   className={`absolute inset-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full ${
-                    isDirty ? "bg-amber-300/50" : "bg-white/40"
+                    isDirty ? "bg-amber-300/50" : "bg-foreground/40"
                   } animate-ping`}
                 />
                 <span
                   className={`absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] ${
-                    isDirty ? "bg-amber-300" : "bg-white"
+                    isDirty ? "bg-amber-300" : "bg-foreground"
                   }`}
                 />
               </div>
-              <div className="absolute left-3 top-3 flex items-center gap-1 whitespace-nowrap rounded-full bg-black/80 px-2 py-0.5 text-[10px] font-medium text-white shadow-lg backdrop-blur-sm">
+              <div className="absolute left-3 top-3 flex items-center gap-1 whitespace-nowrap rounded-full bg-background/80 px-2 py-0.5 text-[10px] font-medium text-foreground shadow-lg backdrop-blur-sm">
                 <span>#{i + 1}</span>
-                <span className="text-white/60">·</span>
+                <span className="text-foreground/60">·</span>
                 <span className="truncate max-w-[8rem]">
                   {tag.brand || "(utan märke)"}
                 </span>
@@ -779,7 +779,7 @@ export function TagPositionEditor({
                     type="button"
                     onClick={() => save(tag.id)}
                     disabled={isSaving}
-                    className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-300 text-black px-2 py-0.5 text-[10px] font-semibold hover:bg-amber-200 disabled:opacity-60"
+                    className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-300 text-background px-2 py-0.5 text-[10px] font-semibold hover:bg-amber-200 disabled:opacity-60"
                   >
                     {isSaving ? (
                       <Loader2 className="h-2.5 w-2.5 animate-spin" />
@@ -809,7 +809,7 @@ export function TagPositionEditor({
             type="button"
             onClick={saveAll}
             disabled={savingId !== null}
-            className="inline-flex items-center gap-1.5 rounded-full bg-amber-300 text-black px-3 py-1.5 text-xs font-semibold hover:bg-amber-200 disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-full bg-amber-300 text-background px-3 py-1.5 text-xs font-semibold hover:bg-amber-200 disabled:opacity-60"
           >
             <Save className="h-3 w-3" />
             Spara alla ({dirty.size})
@@ -874,15 +874,15 @@ function StatusButton({
 }) {
   const tones: Record<string, { active: string; idle: string }> = {
     amber: {
-      active: "bg-amber-500 text-black border-amber-500",
+      active: "bg-amber-500 text-background border-amber-500",
       idle: "border-amber-500/30 text-amber-300 hover:bg-amber-500/10",
     },
     blue: {
-      active: "bg-blue-500 text-white border-blue-500",
+      active: "bg-blue-500 text-foreground border-blue-500",
       idle: "border-blue-500/30 text-blue-300 hover:bg-blue-500/10",
     },
     emerald: {
-      active: "bg-emerald-500 text-black border-emerald-500",
+      active: "bg-emerald-500 text-background border-emerald-500",
       idle: "border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/10",
     },
   };

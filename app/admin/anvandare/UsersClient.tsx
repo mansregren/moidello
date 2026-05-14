@@ -142,14 +142,14 @@ export function UsersClient({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Sök användarnamn, namn eller märke…"
-              className="w-full rounded-full bg-background-secondary border border-border pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-foreground-subtle outline-none focus:border-white/30"
+              className="w-full rounded-full bg-background-secondary border border-border pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
             />
           </div>
         </form>
         <button
           type="button"
           onClick={() => setCreating(true)}
-          className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2.5 text-sm font-semibold hover:bg-white/90"
+          className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2.5 text-sm font-semibold hover:bg-foreground/90"
         >
           <Plus className="h-4 w-4" />
           Ny användare
@@ -157,7 +157,7 @@ export function UsersClient({
         <button
           type="button"
           onClick={handleSeed}
-          className="inline-flex items-center gap-2 rounded-full border border-border text-white px-4 py-2.5 text-sm font-semibold hover:border-white/30"
+          className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2.5 text-sm font-semibold hover:border-foreground/30"
         >
           <Sparkles className="h-4 w-4" />
           Seed 8 demo
@@ -201,20 +201,20 @@ export function UsersClient({
                 <div className="flex flex-wrap items-center gap-2">
                   <Link
                     href={`/admin/anvandare/${u.id}`}
-                    className="text-sm font-medium text-white hover:underline truncate"
+                    className="text-sm font-medium text-foreground hover:underline truncate"
                   >
                     {u.display_name ?? u.username}
                   </Link>
                   <Link
                     href={`/profile/${u.username}`}
                     target="_blank"
-                    className="text-xs text-foreground-subtle hover:text-white inline-flex items-center gap-1"
+                    className="text-xs text-foreground-subtle hover:text-foreground inline-flex items-center gap-1"
                   >
                     @{u.username}
                     <ExternalLink className="h-3 w-3" />
                   </Link>
                   {u.account_type === "brand" && (
-                    <span className="inline-flex rounded-full bg-white/10 text-white px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                    <span className="inline-flex rounded-full bg-foreground/10 text-foreground px-2 py-0.5 text-[10px] uppercase tracking-wider">
                       Märke
                     </span>
                   )}
@@ -229,7 +229,7 @@ export function UsersClient({
                     </span>
                   )}
                   {isViewer && (
-                    <span className="inline-flex rounded-full bg-white/10 text-white px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                    <span className="inline-flex rounded-full bg-foreground/10 text-foreground px-2 py-0.5 text-[10px] uppercase tracking-wider">
                       Du
                     </span>
                   )}
@@ -245,7 +245,7 @@ export function UsersClient({
                     type="button"
                     disabled={isBusy}
                     onClick={() => handleImpersonate(u.id)}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-white text-black px-3 py-1.5 text-xs font-semibold hover:bg-white/90 disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1.5 text-xs font-semibold hover:bg-foreground/90 disabled:opacity-50"
                   >
                     <UserCheck className="h-3 w-3" />
                     Posta som
@@ -256,7 +256,7 @@ export function UsersClient({
                   disabled={isBusy}
                   onClick={() => setEditing(u)}
                   aria-label="Redigera"
-                  className="inline-flex items-center justify-center rounded-full border border-border text-white h-7 w-7 hover:border-white/30 disabled:opacity-50"
+                  className="inline-flex items-center justify-center rounded-full border border-border text-foreground h-7 w-7 hover:border-foreground/30 disabled:opacity-50"
                 >
                   <Pencil className="h-3 w-3" />
                 </button>
@@ -267,7 +267,7 @@ export function UsersClient({
                     onClick={() => handleToggleAdmin(u.id)}
                     aria-label={u.is_admin ? "Ta bort admin" : "Gör till admin"}
                     title={u.is_admin ? "Ta bort admin" : "Gör till admin"}
-                    className="inline-flex items-center justify-center rounded-full border border-border text-white h-7 w-7 hover:border-white/30 disabled:opacity-50"
+                    className="inline-flex items-center justify-center rounded-full border border-border text-foreground h-7 w-7 hover:border-foreground/30 disabled:opacity-50"
                   >
                     {u.is_admin ? (
                       <ShieldOff className="h-3 w-3" />
@@ -378,7 +378,7 @@ function EditUserModal({
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30 font-mono"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30 font-mono"
           />
         </Field>
         <Field label="Visningsnamn">
@@ -386,7 +386,7 @@ function EditUserModal({
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30"
           />
         </Field>
         <Field label="Bio">
@@ -395,7 +395,7 @@ function EditUserModal({
             onChange={(e) => setBio(e.target.value)}
             rows={3}
             maxLength={500}
-            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30 resize-none"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30 resize-none"
           />
         </Field>
         <Field label="Profilbild">
@@ -421,7 +421,7 @@ function EditUserModal({
                 type="button"
                 onClick={() => avatarFileRef.current?.click()}
                 disabled={uploading || pending}
-                className="inline-flex items-center gap-2 rounded-full bg-white text-black px-3 py-2 text-xs font-semibold hover:bg-white/90 disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-3 py-2 text-xs font-semibold hover:bg-foreground/90 disabled:opacity-60"
               >
                 <Upload className="h-3 w-3" />
                 {uploading ? "Laddar upp…" : "Välj bild"}
@@ -449,7 +449,7 @@ function EditUserModal({
             value={avatarUrl}
             onChange={(e) => setAvatarUrl(e.target.value)}
             placeholder="https://i.pravatar.cc/300?img=10"
-            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30"
           />
         </Field>
         {error && <p className="text-xs text-red-400">{error}</p>}
@@ -457,14 +457,14 @@ function EditUserModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 rounded-full border border-border text-white py-2.5 text-sm font-medium hover:border-white/30"
+            className="flex-1 rounded-full border border-border text-foreground py-2.5 text-sm font-medium hover:border-foreground/30"
           >
             Avbryt
           </button>
           <button
             type="submit"
             disabled={pending}
-            className="flex-1 rounded-full bg-white text-black py-2.5 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+            className="flex-1 rounded-full bg-foreground text-background py-2.5 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
           >
             {pending ? "Sparar…" : "Spara"}
           </button>
@@ -518,7 +518,7 @@ function CreateUserModal({
             required
             pattern="[a-z0-9_]{2,30}"
             placeholder="anna_styles"
-            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30 font-mono"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30 font-mono"
           />
         </Field>
         <Field label="Visningsnamn">
@@ -528,7 +528,7 @@ function CreateUserModal({
             onChange={(e) => setDisplayName(e.target.value)}
             required
             placeholder="Anna Styles"
-            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30"
           />
         </Field>
         <Field label="Bio (valfri)">
@@ -538,7 +538,7 @@ function CreateUserModal({
             rows={2}
             maxLength={500}
             placeholder="Berätta i en mening."
-            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30 resize-none"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30 resize-none"
           />
         </Field>
         <Field label="Avatar-URL (valfri)">
@@ -547,7 +547,7 @@ function CreateUserModal({
             value={avatarUrl}
             onChange={(e) => setAvatarUrl(e.target.value)}
             placeholder="https://i.pravatar.cc/300?img=20"
-            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30"
+            className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30"
           />
         </Field>
         {error && <p className="text-xs text-red-400">{error}</p>}
@@ -555,14 +555,14 @@ function CreateUserModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 rounded-full border border-border text-white py-2.5 text-sm font-medium hover:border-white/30"
+            className="flex-1 rounded-full border border-border text-foreground py-2.5 text-sm font-medium hover:border-foreground/30"
           >
             Avbryt
           </button>
           <button
             type="submit"
             disabled={pending}
-            className="flex-1 rounded-full bg-white text-black py-2.5 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+            className="flex-1 rounded-full bg-foreground text-background py-2.5 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
           >
             {pending ? "Skapar…" : "Skapa"}
           </button>
@@ -583,21 +583,21 @@ function Modal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-6"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-background/70 backdrop-blur-md p-6"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-3xl bg-background-secondary border border-white/10 p-6 max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-md rounded-3xl bg-background-secondary border border-foreground/10 p-6 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-heading text-xl uppercase tracking-tight text-white">
+          <h3 className="font-heading text-xl uppercase tracking-tight text-foreground">
             {title}
           </h3>
           <button
             onClick={onClose}
             aria-label="Stäng"
-            className="text-foreground-muted hover:text-white"
+            className="text-foreground-muted hover:text-foreground"
           >
             <X className="h-5 w-5" />
           </button>

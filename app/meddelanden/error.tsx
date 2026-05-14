@@ -24,7 +24,7 @@ export default function MeddelandenError({
       <main id="main" tabIndex={-1} className="flex-1 pt-10">
         <Container className="max-w-xl text-center py-20">
           <MessageCircle className="mx-auto h-10 w-10 text-foreground-subtle mb-5" />
-          <h1 className="font-heading text-3xl md:text-4xl uppercase tracking-tight text-white">
+          <h1 className="font-heading text-3xl md:text-4xl uppercase tracking-tight text-foreground">
             Det blev fel
           </h1>
           <p className="mt-4 text-foreground-muted">
@@ -39,13 +39,13 @@ export default function MeddelandenError({
             <button
               type="button"
               onClick={reset}
-              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-medium hover:bg-white/90 transition-colors"
+              className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors"
             >
               Försök igen
             </button>
             <Link
               href="/profil"
-              className="inline-flex items-center gap-2 rounded-full border border-border text-white px-5 py-2.5 text-sm font-medium hover:border-white/30 transition-colors"
+              className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-5 py-2.5 text-sm font-medium hover:border-foreground/30 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               Tillbaka till profilen

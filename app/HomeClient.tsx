@@ -100,25 +100,25 @@ export default function HomeClient({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <p className="text-xs uppercase tracking-[0.2em] text-white/70">
+                <p className="text-xs uppercase tracking-[0.2em] text-foreground/70">
                   Inspiration for every outfit
                 </p>
-                <h1 className="mt-3 font-heading text-[44px] md:text-[88px] leading-[0.92] uppercase tracking-[-0.02em] text-white max-w-3xl">
+                <h1 className="mt-3 font-heading text-[44px] md:text-[88px] leading-[0.92] uppercase tracking-[-0.02em] text-foreground max-w-3xl">
                   Hitta din nästa
                   <br />
-                  <span className="text-white/60">outfit</span>
+                  <span className="text-foreground/60">outfit</span>
                 </h1>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link
                     href="/upptack"
-                    className="inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
+                    className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
                   >
                     <Search className="h-4 w-4" />
                     Utforska
                   </Link>
                   <Link
                     href="/trendigt"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/20 text-white px-5 py-2.5 text-sm font-medium transition-colors hover:bg-white/10"
+                    className="inline-flex items-center gap-2 rounded-full border border-foreground/20 text-foreground px-5 py-2.5 text-sm font-medium transition-colors hover:bg-foreground/10"
                   >
                     <Sparkles className="h-4 w-4" />
                     Trendigt nu
@@ -174,10 +174,10 @@ export default function HomeClient({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
                     <div className="absolute inset-x-3 bottom-3">
-                      <p className="font-heading text-lg md:text-xl uppercase tracking-tight text-white leading-tight">
+                      <p className="font-heading text-lg md:text-xl uppercase tracking-tight text-foreground leading-tight">
                         {cat}
                       </p>
-                      <p className="text-[11px] text-white/70 mt-0.5">
+                      <p className="text-[11px] text-foreground/70 mt-0.5">
                         {CATEGORY_DESCRIPTIONS[cat]}
                       </p>
                     </div>
@@ -202,7 +202,7 @@ export default function HomeClient({
                 </p>
                 <Link
                   href="/skapa"
-                  className="mt-4 inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-medium hover:bg-white/90 transition-colors"
+                  className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                   Skapa outfit
@@ -224,15 +224,15 @@ export default function HomeClient({
               fill
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-black/45" />
+            <div className="absolute inset-0 bg-background/45" />
             <div className="absolute inset-0 flex items-center justify-center px-6">
               <div className="text-center max-w-3xl">
-                <p className="font-heading text-[36px] md:text-[64px] lg:text-[80px] uppercase tracking-[-0.02em] text-white leading-[0.95]">
+                <p className="font-heading text-[36px] md:text-[64px] lg:text-[80px] uppercase tracking-[-0.02em] text-foreground leading-[0.95]">
                   Dress for the
                   <br />
-                  <span className="text-white/60">life you want</span>
+                  <span className="text-foreground/60">life you want</span>
                 </p>
-                <p className="mt-4 text-sm md:text-base text-white/70 max-w-md mx-auto">
+                <p className="mt-4 text-sm md:text-base text-foreground/70 max-w-md mx-auto">
                   Tagga varje plagg, länka var du köper. Inspirera och
                   inspireras.
                 </p>
@@ -259,7 +259,7 @@ export default function HomeClient({
                     >
                       <UserAvatar src={u.avatar} alt="" size="lg" />
                       <div className="text-center">
-                        <p className="text-sm font-medium text-white truncate max-w-[7rem]">
+                        <p className="text-sm font-medium text-foreground truncate max-w-[7rem]">
                           {u.displayName}
                         </p>
                         <p className="text-[11px] text-foreground-subtle">
@@ -281,7 +281,7 @@ export default function HomeClient({
             className="rounded-3xl border border-border bg-background-secondary p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
           >
             <div className="max-w-lg">
-              <h2 className="font-heading text-3xl md:text-5xl uppercase tracking-tight text-white leading-[0.95]">
+              <h2 className="font-heading text-3xl md:text-5xl uppercase tracking-tight text-foreground leading-[0.95]">
                 Bygg ditt eget bibliotek
               </h2>
               <p className="mt-3 text-foreground-muted text-sm md:text-base">
@@ -292,14 +292,14 @@ export default function HomeClient({
             <div className="flex gap-3 shrink-0">
               <Link
                 href="/skapa"
-                className="inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
+                className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
               >
                 <Plus className="h-4 w-4" />
                 Skapa outfit
               </Link>
               <Link
                 href="/welcome"
-                className="inline-flex items-center rounded-full border border-border text-white px-5 py-2.5 text-sm font-medium hover:border-white/30 transition-colors"
+                className="inline-flex items-center rounded-full border border-border text-foreground px-5 py-2.5 text-sm font-medium hover:border-foreground/30 transition-colors"
               >
                 Lär dig mer
               </Link>
@@ -327,12 +327,12 @@ function Section({
   return (
     <section>
       <div className="flex items-end justify-between mb-5">
-        <h2 className="font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+        <h2 className="font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
           {title}
         </h2>
         <Link
           href={href}
-          className="inline-flex items-center gap-1 text-sm text-foreground-muted hover:text-white transition-colors shrink-0"
+          className="inline-flex items-center gap-1 text-sm text-foreground-muted hover:text-foreground transition-colors shrink-0"
         >
           {seeAllLabel}
           <ChevronRight className="h-4 w-4" />

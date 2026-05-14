@@ -75,8 +75,8 @@ export function SelectCheckbox({ outfitId }: { outfitId: string }) {
       }}
       className={`shrink-0 inline-flex items-center justify-center h-6 w-6 rounded transition-colors ${
         isSelected
-          ? "bg-white text-black"
-          : "border border-border text-foreground-muted hover:text-white hover:border-white/30"
+          ? "bg-foreground text-background"
+          : "border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30"
       }`}
       aria-label={isSelected ? "Avmarkera" : "Markera"}
     >
@@ -96,7 +96,7 @@ export function SelectAllToggle({ ids }: { ids: string[] }) {
     <button
       type="button"
       onClick={() => selectAll(ids)}
-      className="inline-flex items-center gap-1.5 text-xs text-foreground-muted hover:text-white"
+      className="inline-flex items-center gap-1.5 text-xs text-foreground-muted hover:text-foreground"
     >
       {allIn ? (
         <CheckSquare className="h-3.5 w-3.5" />
@@ -166,16 +166,16 @@ export function BulkActionBar({ users }: { users: SeedUser[] }) {
   };
 
   return (
-    <div className="sticky top-2 z-30 rounded-2xl border border-white/30 bg-background-secondary/95 backdrop-blur-sm p-3 shadow-xl mt-6">
+    <div className="sticky top-2 z-30 rounded-2xl border border-foreground/30 bg-background-secondary/95 backdrop-blur-sm p-3 shadow-xl mt-6">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm font-semibold text-white">
+        <span className="text-sm font-semibold text-foreground">
           {selected.size} markerade
         </span>
         <button
           type="button"
           onClick={clear}
           disabled={pending}
-          className="text-xs text-foreground-muted hover:text-white"
+          className="text-xs text-foreground-muted hover:text-foreground"
         >
           rensa
         </button>
@@ -226,7 +226,7 @@ export function BulkActionBar({ users }: { users: SeedUser[] }) {
             value={reassignTo}
             onChange={(e) => setReassignTo(e.target.value)}
             disabled={pending}
-            className="rounded-xl bg-background-tertiary border border-border text-sm text-white p-2 outline-none focus:border-white/30"
+            className="rounded-xl bg-background-tertiary border border-border text-sm text-foreground p-2 outline-none focus:border-foreground/30"
           >
             <option value="">— välj —</option>
             {users.map((u) => (
@@ -239,7 +239,7 @@ export function BulkActionBar({ users }: { users: SeedUser[] }) {
             type="button"
             onClick={reassign}
             disabled={pending || !reassignTo}
-            className="rounded-full bg-blue-500 hover:bg-blue-400 text-white px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
+            className="rounded-full bg-blue-500 hover:bg-blue-400 text-foreground px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
           >
             Genomför
           </button>

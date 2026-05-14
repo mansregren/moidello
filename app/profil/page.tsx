@@ -423,7 +423,7 @@ export default function ProfilPage() {
           <button
             onClick={() => setSettingsOpen(true)}
             aria-label="Inställningar"
-            className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 backdrop-blur text-white hover:bg-black/80 transition-colors"
+            className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-background/60 backdrop-blur text-foreground hover:bg-background/80 transition-colors"
           >
             <Settings className="h-5 w-5" />
           </button>
@@ -439,7 +439,7 @@ export default function ProfilPage() {
               />
             </div>
             <div className="flex-1 pb-3 min-w-0">
-              <h1 className="font-heading text-3xl md:text-5xl uppercase tracking-tight text-white truncate">
+              <h1 className="font-heading text-3xl md:text-5xl uppercase tracking-tight text-foreground truncate">
                 {profile.displayName}
               </h1>
               <p className="text-sm text-foreground-muted truncate">
@@ -460,7 +460,7 @@ export default function ProfilPage() {
             <button
               type="button"
               onClick={() => setEditOpen(true)}
-              className="rounded-full border border-border text-white px-5 py-2 text-sm font-medium hover:border-white/30 transition-colors"
+              className="rounded-full border border-border text-foreground px-5 py-2 text-sm font-medium hover:border-foreground/30 transition-colors"
             >
               Redigera profil
             </button>
@@ -472,20 +472,20 @@ export default function ProfilPage() {
             />
             <a
               href="/profil/statistik"
-              className="rounded-full border border-border text-white px-5 py-2 text-sm font-medium hover:border-white/30 transition-colors"
+              className="rounded-full border border-border text-foreground px-5 py-2 text-sm font-medium hover:border-foreground/30 transition-colors"
             >
               Statistik
             </a>
             <a
               href="/profil/boards"
-              className="rounded-full border border-border text-white px-5 py-2 text-sm font-medium hover:border-white/30 transition-colors"
+              className="rounded-full border border-border text-foreground px-5 py-2 text-sm font-medium hover:border-foreground/30 transition-colors"
             >
               Samlingar
             </a>
             {profile.accountType === "brand" && (
               <a
                 href="/brand-dashboard"
-                className="rounded-full bg-white text-black px-5 py-2 text-sm font-medium hover:bg-white/90 transition-colors"
+                className="rounded-full bg-foreground text-background px-5 py-2 text-sm font-medium hover:bg-foreground/90 transition-colors"
               >
                 Brand-dashboard
               </a>
@@ -630,7 +630,7 @@ export default function ProfilPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md"
+              className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-background/70 backdrop-blur-md"
               onClick={() => setSettingsOpen(false)}
             >
               <motion.div
@@ -639,16 +639,16 @@ export default function ProfilPage() {
                 exit={{ y: 40, opacity: 0 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl bg-background-secondary border border-white/10 p-6 relative"
+                className="w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl bg-background-secondary border border-foreground/10 p-6 relative"
               >
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="font-heading text-2xl uppercase tracking-tight text-white">
+                  <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground">
                     Inställningar
                   </h2>
                   <button
                     onClick={() => setSettingsOpen(false)}
                     aria-label="Stäng"
-                    className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-white/5 hover:text-white"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-foreground/5 hover:text-foreground"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -695,7 +695,7 @@ function ProfileTabButton({
       className={cn(
         "relative flex-1 sm:flex-none px-4 py-3 text-sm font-medium transition-colors",
         active
-          ? "text-white"
+          ? "text-foreground"
           : "text-foreground-subtle hover:text-foreground-muted",
       )}
     >
@@ -703,7 +703,7 @@ function ProfileTabButton({
       {active && (
         <motion.span
           layoutId="profile-tab-indicator"
-          className="absolute inset-x-3 -bottom-px h-0.5 bg-white rounded-full"
+          className="absolute inset-x-3 -bottom-px h-0.5 bg-foreground rounded-full"
           transition={{ duration: 0.3, ease: "easeOut" }}
         />
       )}
@@ -714,7 +714,7 @@ function ProfileTabButton({
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div>
-      <p className="text-lg font-semibold text-white">
+      <p className="text-lg font-semibold text-foreground">
         {value.toLocaleString("sv-SE")}
       </p>
       <p className="text-xs text-foreground-subtle uppercase tracking-wider">
@@ -739,7 +739,7 @@ function SavedItemGrid({ items }: { items: SavedItem[] }) {
         <Link
           key={it.id}
           href={`/outfit/${it.outfitId}`}
-          className="group rounded-2xl border border-border bg-background-secondary overflow-hidden hover:border-white/20 transition-colors"
+          className="group rounded-2xl border border-border bg-background-secondary overflow-hidden hover:border-foreground/20 transition-colors"
         >
           <div className="relative aspect-[3/4] bg-background-tertiary">
             {it.outfitImage && (
@@ -757,11 +757,11 @@ function SavedItemGrid({ items }: { items: SavedItem[] }) {
             <p className="text-[10px] uppercase tracking-wider text-foreground-muted truncate">
               {it.brand}
             </p>
-            <p className="text-sm font-medium text-white mt-0.5 line-clamp-2">
+            <p className="text-sm font-medium text-foreground mt-0.5 line-clamp-2">
               {it.name}
             </p>
             {it.price !== null && it.price > 0 && (
-              <p className="text-sm font-semibold text-white mt-1">
+              <p className="text-sm font-semibold text-foreground mt-1">
                 {it.price.toLocaleString("sv-SE")} {it.currency ?? "SEK"}
               </p>
             )}
@@ -779,7 +779,7 @@ function UserList({ users }: { users: FollowedUser[] }) {
         <li key={u.id}>
           <Link
             href={`/profile/${u.username}`}
-            className="flex items-center gap-3 p-4 hover:bg-white/5 transition-colors"
+            className="flex items-center gap-3 p-4 hover:bg-foreground/5 transition-colors"
           >
             <UserAvatar
               src={u.avatarUrl ?? ""}
@@ -787,7 +787,7 @@ function UserList({ users }: { users: FollowedUser[] }) {
               size="md"
             />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="text-sm font-medium text-foreground truncate">
                 {u.displayName}
               </p>
               <p className="text-xs text-foreground-subtle truncate">
@@ -807,7 +807,7 @@ function Field({ label, value }: { label: string; value: string }) {
       <p className="text-xs uppercase tracking-wider text-foreground-subtle">
         {label}
       </p>
-      <p className="mt-1 text-white">{value}</p>
+      <p className="mt-1 text-foreground">{value}</p>
     </div>
   );
 }
@@ -829,7 +829,7 @@ function SettingsRow({
     "w-full flex items-center gap-3 py-4 text-left transition-colors",
     danger
       ? "text-red-400 hover:text-red-300"
-      : "text-white hover:text-white/80",
+      : "text-foreground hover:text-foreground/80",
   );
 
   if (href) {

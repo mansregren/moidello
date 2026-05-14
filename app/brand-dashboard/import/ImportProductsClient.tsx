@@ -36,7 +36,7 @@ export function ImportProductsClient() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="inline-flex items-center gap-2 rounded-full border border-border text-white px-4 py-2 text-sm hover:border-white/30"
+          className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2 text-sm hover:border-foreground/30"
         >
           <Upload className="h-4 w-4" />
           Välj CSV-fil
@@ -62,13 +62,13 @@ export function ImportProductsClient() {
         onChange={(e) => setCsvText(e.target.value)}
         placeholder="name,description,price,currency,buy_url,image_url"
         rows={12}
-        className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-4 outline-none focus:border-white/30 font-mono"
+        className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-4 outline-none focus:border-foreground/30 font-mono"
       />
 
       <button
         type="submit"
         disabled={pending || !csvText.trim()}
-        className="inline-flex items-center gap-2 rounded-full bg-white text-black px-6 py-3 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+        className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-3 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
       >
         {pending ? "Importerar…" : "Importera"}
       </button>
@@ -79,7 +79,7 @@ export function ImportProductsClient() {
             <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.05] p-5 flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm text-white">
+                <p className="text-sm text-foreground">
                   {result.inserted} produkter importerade.
                 </p>
                 {result.skipped.length > 0 && (
@@ -93,7 +93,7 @@ export function ImportProductsClient() {
             <div className="rounded-2xl border border-red-500/30 bg-red-500/[0.05] p-5 flex items-start gap-3">
               <AlertTriangle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm text-white">Import misslyckades.</p>
+                <p className="text-sm text-foreground">Import misslyckades.</p>
                 {result.error && (
                   <p className="text-xs text-red-300 mt-1">{result.error}</p>
                 )}
@@ -103,7 +103,7 @@ export function ImportProductsClient() {
 
           {result.skipped.length > 0 && (
             <details className="rounded-2xl border border-border bg-background-secondary p-5">
-              <summary className="text-sm text-white cursor-pointer">
+              <summary className="text-sm text-foreground cursor-pointer">
                 Hoppade över rader ({result.skipped.length})
               </summary>
               <ul className="mt-3 space-y-1 text-xs text-foreground-muted">

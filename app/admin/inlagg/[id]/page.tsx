@@ -124,7 +124,7 @@ export default async function AdminOutfitDetailPage({
     <Container className="max-w-6xl">
       <Link
         href="/admin/inlagg"
-        className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white mb-6"
+        className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground mb-6"
       >
         <ArrowLeft className="h-4 w-4" />
         Alla inlägg
@@ -140,7 +140,7 @@ export default async function AdminOutfitDetailPage({
           />
 
           {creator && (
-            <div className="mt-4 flex items-center gap-3 p-3 rounded-2xl border border-border bg-background-secondary hover:border-white/30 transition-colors">
+            <div className="mt-4 flex items-center gap-3 p-3 rounded-2xl border border-border bg-background-secondary hover:border-foreground/30 transition-colors">
               {/* Two separate links rather than a nested <a> — nesting is
                   invalid HTML and forced an onClick stopPropagation hack
                   that a server component can't pass to a client <Link>. */}
@@ -156,7 +156,7 @@ export default async function AdminOutfitDetailPage({
                   size="md"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="text-sm font-medium text-foreground truncate">
                     {(creator.display_name as string | null) ??
                       creator.username}
                     {creator.is_demo && (
@@ -173,7 +173,7 @@ export default async function AdminOutfitDetailPage({
               <Link
                 href={`/profile/${creator.username}`}
                 target="_blank"
-                className="shrink-0 text-foreground-muted hover:text-white"
+                className="shrink-0 text-foreground-muted hover:text-foreground"
                 aria-label={`Visa @${creator.username}s publika profil`}
               >
                 <ExternalLink className="h-4 w-4" />
@@ -187,7 +187,7 @@ export default async function AdminOutfitDetailPage({
             <Link
               href={publicUrl}
               target="_blank"
-              className="hover:text-white inline-flex items-center gap-1"
+              className="hover:text-foreground inline-flex items-center gap-1"
             >
               Publik vy
               <ExternalLink className="h-3 w-3" />
@@ -234,7 +234,7 @@ function Stat({
   return (
     <div className="rounded-xl border border-border bg-background-secondary p-3 text-center">
       <Icon className="h-4 w-4 text-foreground-muted mx-auto mb-1" />
-      <p className="text-base sm:text-lg font-semibold text-white tabular-nums">
+      <p className="text-base sm:text-lg font-semibold text-foreground tabular-nums">
         {value.toLocaleString("sv-SE")}
       </p>
       <p className="text-[10px] text-foreground-subtle uppercase tracking-wider">

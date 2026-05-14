@@ -130,7 +130,7 @@ function BrandShell({
         <Container>
           <Link
             href="/brands"
-            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white transition-colors mb-8"
+            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-8"
           >
             <ArrowLeft className="h-4 w-4" />
             Alla märken
@@ -143,13 +143,13 @@ function BrandShell({
                 <span className="text-xs text-foreground-muted">{tierLabel}</span>
               </div>
               {verified && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white text-black px-3 py-1 text-[11px] uppercase tracking-wider font-semibold">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1 text-[11px] uppercase tracking-wider font-semibold">
                   <BadgeCheck className="h-3.5 w-3.5" />
                   Verifierat
                 </span>
               )}
             </div>
-            <h1 className="font-heading text-[48px] md:text-[80px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+            <h1 className="font-heading text-[48px] md:text-[80px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
               {name}
             </h1>
             <p className="mt-4 text-lg text-foreground-muted max-w-xl">
@@ -221,11 +221,11 @@ function BrandShell({
                       )}
                     </div>
                     <div className="p-3 flex-1 flex flex-col">
-                      <p className="text-sm text-white line-clamp-2">
+                      <p className="text-sm text-foreground line-clamp-2">
                         {p.name}
                       </p>
                       {p.price !== null && p.price > 0 && (
-                        <p className="mt-1 text-sm font-semibold text-white tabular-nums">
+                        <p className="mt-1 text-sm font-semibold text-foreground tabular-nums">
                           {p.price.toLocaleString("sv-SE")}{" "}
                           {p.currency ?? "SEK"}
                         </p>
@@ -233,7 +233,7 @@ function BrandShell({
                       {p.buy_url && (
                         <UserLink
                           href={p.buy_url}
-                          className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-white text-black px-3 py-1.5 text-xs font-semibold hover:bg-white/90"
+                          className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1.5 text-xs font-semibold hover:bg-foreground/90"
                         >
                           Köp
                           <ExternalLink className="h-3 w-3" />

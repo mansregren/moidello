@@ -29,7 +29,7 @@ export function UserFilterSelect({
     <select
       value={current ?? ""}
       onChange={(e) => onChange(e.target.value)}
-      className="rounded-full border border-border bg-background-secondary text-foreground-muted hover:text-white hover:border-white/30 text-xs px-3 py-1.5 outline-none cursor-pointer"
+      className="rounded-full border border-border bg-background-secondary text-foreground-muted hover:text-foreground hover:border-foreground/30 text-xs px-3 py-1.5 outline-none cursor-pointer"
     >
       <option value="">Alla användare</option>
       {users.map((u) => (

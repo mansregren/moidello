@@ -22,7 +22,7 @@ export default function IntegritetPage() {
 
           <div className="space-y-12 text-foreground-muted leading-relaxed">
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 1. Inledning
               </h2>
               <p>
@@ -34,7 +34,7 @@ export default function IntegritetPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 2. Personuppgiftsansvarig
               </h2>
               <p>
@@ -43,7 +43,7 @@ export default function IntegritetPage() {
                 ställas till{" "}
                 <a
                   href="mailto:hello@moidello.com"
-                  className="text-white border-b border-white/30 hover:border-white transition-colors"
+                  className="text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"
                 >
                   hello@moidello.com
                 </a>
@@ -52,7 +52,7 @@ export default function IntegritetPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 3. Vilka uppgifter vi samlar in
               </h2>
               <p>
@@ -61,17 +61,17 @@ export default function IntegritetPage() {
               </p>
               <ul className="mt-4 space-y-2 list-disc list-outside pl-6">
                 <li>
-                  <strong className="text-white font-medium">Anonym besöksstatistik</strong>
+                  <strong className="text-foreground font-medium">Anonym besöksstatistik</strong>
                   {" "}via Vercel Web Analytics — utan cookies, utan IP-adress
                   som identifierar enskild person.
                 </li>
                 <li>
-                  <strong className="text-white font-medium">Lokala inställningar</strong>
+                  <strong className="text-foreground font-medium">Lokala inställningar</strong>
                   {" "}(t.ex. valt kön-filter) sparas i din webbläsare via
                   localStorage. Dessa data lämnar aldrig din enhet.
                 </li>
                 <li>
-                  <strong className="text-white font-medium">Klicklogg för köp-länkar</strong>
+                  <strong className="text-foreground font-medium">Klicklogg för köp-länkar</strong>
                   {" "}lagrar besökarens land (ISO-kod, t.ex. SE), referrer och
                   user-agent när någon klickar på en köp-länk i en taggad outfit.
                   Detta används enbart för fraud-detection och kreatörsstatistik,
@@ -86,7 +86,7 @@ export default function IntegritetPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 4. Hur vi använder uppgifterna
               </h2>
               <p>
@@ -98,7 +98,7 @@ export default function IntegritetPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 5. Tredjepartstjänster
               </h2>
               <p>
@@ -110,7 +110,7 @@ export default function IntegritetPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 6. Cookies
               </h2>
               <p>
@@ -122,7 +122,7 @@ export default function IntegritetPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 7. Dina rättigheter
               </h2>
               <p>
@@ -136,7 +136,7 @@ export default function IntegritetPage() {
                 Förfrågningar skickas till{" "}
                 <a
                   href="mailto:hello@moidello.com"
-                  className="text-white border-b border-white/30 hover:border-white transition-colors"
+                  className="text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"
                 >
                   hello@moidello.com
                 </a>
@@ -145,7 +145,7 @@ export default function IntegritetPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 8. Säkerhet
               </h2>
               <p>
@@ -156,7 +156,7 @@ export default function IntegritetPage() {
             </section>
 
             <section>
-              <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-4">
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
                 9. Ändringar
               </h2>
               <p>
@@ -169,7 +169,7 @@ export default function IntegritetPage() {
           <div className="mt-20 pt-10 border-t border-border">
             <Link
               href="/villkor"
-              className="text-sm text-foreground-muted hover:text-white transition-colors"
+              className="text-sm text-foreground-muted hover:text-foreground transition-colors"
             >
               Läs även Användarvillkoren →
             </Link>

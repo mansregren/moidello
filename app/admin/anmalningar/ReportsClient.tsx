@@ -85,7 +85,7 @@ function ReportItem({ report }: { report: ReportRow }) {
             <span className="text-xs uppercase tracking-wider text-foreground-subtle">
               {report.target_type}
             </span>
-            <span className="text-sm font-medium text-white">
+            <span className="text-sm font-medium text-foreground">
               {REASON_LABEL[report.reason] ?? report.reason}
             </span>
             <span className="text-xs text-foreground-subtle">
@@ -107,7 +107,7 @@ function ReportItem({ report }: { report: ReportRow }) {
               <Link
                 href={targetUrl}
                 target="_blank"
-                className="inline-flex items-center gap-1.5 rounded-full border border-border text-white px-3 py-1.5 text-xs hover:border-white/30"
+                className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground px-3 py-1.5 text-xs hover:border-foreground/30"
               >
                 Öppna {labelForTarget(report.target_type)}
                 <ArrowRight className="h-3 w-3" />
@@ -118,7 +118,7 @@ function ReportItem({ report }: { report: ReportRow }) {
                 type="button"
                 disabled={pending}
                 onClick={() => act("reviewed")}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border text-white px-3 py-1.5 text-xs hover:border-white/30 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground px-3 py-1.5 text-xs hover:border-foreground/30 disabled:opacity-50"
               >
                 <AlertCircle className="h-3 w-3" />
                 Markera granskad
@@ -128,7 +128,7 @@ function ReportItem({ report }: { report: ReportRow }) {
               type="button"
               disabled={pending}
               onClick={() => act("dismissed")}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground-muted px-3 py-1.5 text-xs hover:text-white hover:border-white/30 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground-muted px-3 py-1.5 text-xs hover:text-foreground hover:border-foreground/30 disabled:opacity-50"
             >
               <X className="h-3 w-3" />
               Avvisa

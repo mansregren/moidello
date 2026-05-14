@@ -64,7 +64,7 @@ export function Header() {
       className={cn(
         "sticky top-0 z-40 transition-colors duration-300",
         scrolled
-          ? "bg-black/80 backdrop-blur-xl border-b border-white/5"
+          ? "bg-background/80 backdrop-blur-xl border-b border-foreground/5"
           : "bg-transparent"
       )}
       style={{ paddingTop: "env(safe-area-inset-top)" }}
@@ -78,7 +78,7 @@ export function Header() {
         {/* Desktop: logo (left) */}
         <Link
           href="/"
-          className="hidden md:block font-heading text-3xl uppercase tracking-tight text-white shrink-0"
+          className="hidden md:block font-heading text-3xl uppercase tracking-tight text-foreground shrink-0"
         >
           Moidello
         </Link>
@@ -86,7 +86,7 @@ export function Header() {
         {/* Mobile: logo (center, absolute) */}
         <Link
           href="/"
-          className="md:hidden absolute left-1/2 -translate-x-1/2 font-heading text-2xl uppercase tracking-tight text-white"
+          className="md:hidden absolute left-1/2 -translate-x-1/2 font-heading text-2xl uppercase tracking-tight text-foreground"
         >
           Moidello
         </Link>
@@ -107,8 +107,8 @@ export function Header() {
                 className={cn(
                   "px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
                   active
-                    ? "text-white bg-white/10"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
+                    ? "text-foreground bg-foreground/10"
+                    : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
                 )}
               >
                 {item.label}
@@ -137,7 +137,7 @@ export function Header() {
           ) : (
             <Link
               href="/login"
-              className="inline-flex items-center rounded-full bg-white text-black px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-transform active:scale-95 hover:bg-white/90"
+              className="inline-flex items-center rounded-full bg-foreground text-background px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-transform active:scale-95 hover:bg-foreground/90"
             >
               Logga in
             </Link>
@@ -152,7 +152,7 @@ export function Header() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="absolute inset-0 flex items-center bg-black/95 backdrop-blur-xl px-4 md:px-6 z-10"
+              className="absolute inset-0 flex items-center bg-background/95 backdrop-blur-xl px-4 md:px-6 z-10"
               onSubmit={(e) => {
                 e.preventDefault();
                 const q = searchInputRef.current?.value.trim();
@@ -168,7 +168,7 @@ export function Header() {
                 type="search"
                 name="q"
                 placeholder="Sök outfits, märken, kreatörer…"
-                className="flex-1 bg-transparent border-0 outline-none px-3 text-base text-white placeholder:text-foreground-subtle"
+                className="flex-1 bg-transparent border-0 outline-none px-3 text-base text-foreground placeholder:text-foreground-subtle"
               />
               <IconButton aria-label="Stäng sök" onClick={() => setSearchOpen(false)}>
                 <X className="h-5 w-5" />

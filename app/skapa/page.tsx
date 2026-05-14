@@ -433,7 +433,7 @@ export default function SkapaPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white mb-2">
+            <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-2">
               Skapa <span className="text-foreground-subtle">Outfit</span>
             </h1>
             <p className="text-foreground-muted mb-6">
@@ -454,7 +454,7 @@ export default function SkapaPage() {
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white">
+                  <p className="text-sm text-foreground">
                     {publishedCount}{" "}
                     {publishedCount === 1 ? "outfit" : "outfits"}{" "}
                     publicerad{publishedCount === 1 ? "" : "e"}
@@ -477,7 +477,7 @@ export default function SkapaPage() {
                     <div className="mt-3">
                       <Link
                         href={`/profile/${profileUsername}`}
-                        className="text-xs text-white underline hover:text-white/80"
+                        className="text-xs text-foreground underline hover:text-foreground/80"
                       >
                         Visa min profil →
                       </Link>
@@ -498,8 +498,8 @@ export default function SkapaPage() {
                   onClick={() => setActiveIndex(i)}
                   className={`relative h-24 w-20 shrink-0 rounded-xl overflow-hidden border-2 transition-all snap-start ${
                     i === activeIndex
-                      ? "border-white"
-                      : "border-transparent hover:border-white/30"
+                      ? "border-foreground"
+                      : "border-transparent hover:border-foreground/30"
                   }`}
                 >
                   {d.previewUrl ? (
@@ -516,14 +516,14 @@ export default function SkapaPage() {
                       Tom
                     </div>
                   )}
-                  <span className="absolute top-1 left-1 inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-black/70 text-[10px] font-semibold text-white">
+                  <span className="absolute top-1 left-1 inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-background/70 text-[10px] font-semibold text-foreground">
                     {i + 1}
                   </span>
                   {d.status === "published" && (
                     <CheckCircle2 className="absolute top-1 right-1 h-4 w-4 text-emerald-400 drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
                   )}
                   {d.status === "publishing" && (
-                    <Loader2 className="absolute top-1 right-1 h-4 w-4 text-white animate-spin drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
+                    <Loader2 className="absolute top-1 right-1 h-4 w-4 text-foreground animate-spin drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
                   )}
                   {d.status === "error" && (
                     <AlertTriangle className="absolute top-1 right-1 h-4 w-4 text-red-400 drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
@@ -536,9 +536,9 @@ export default function SkapaPage() {
                       }}
                       role="button"
                       aria-label="Ta bort bild"
-                      className="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-black/70 hover:bg-red-500 flex items-center justify-center transition-colors"
+                      className="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-background/70 hover:bg-red-500 flex items-center justify-center transition-colors"
                     >
-                      <X className="h-3 w-3 text-white" />
+                      <X className="h-3 w-3 text-foreground" />
                     </span>
                   )}
                 </button>
@@ -546,7 +546,7 @@ export default function SkapaPage() {
               {drafts.length < MAX_DRAFTS && (
                 <label
                   htmlFor="add-more-input"
-                  className="h-24 w-20 shrink-0 rounded-xl border-2 border-dashed border-border bg-background-secondary flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-white/30 transition-colors snap-start"
+                  className="h-24 w-20 shrink-0 rounded-xl border-2 border-dashed border-border bg-background-secondary flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-foreground/30 transition-colors snap-start"
                 >
                   <Plus className="h-5 w-5 text-foreground-muted" />
                   <span className="text-[10px] text-foreground-subtle">
@@ -576,7 +576,7 @@ export default function SkapaPage() {
               {noImageYet ? (
                 <label
                   htmlFor="image-input"
-                  className="relative aspect-[3/4] rounded-2xl border-2 border-dashed border-border bg-background-secondary flex flex-col items-center justify-center cursor-pointer hover:border-white/30 transition-colors group overflow-hidden"
+                  className="relative aspect-[3/4] rounded-2xl border-2 border-dashed border-border bg-background-secondary flex flex-col items-center justify-center cursor-pointer hover:border-foreground/30 transition-colors group overflow-hidden"
                 >
                   <Upload className="h-12 w-12 text-foreground-subtle mb-4 group-hover:text-foreground-muted transition-colors" />
                   <p className="text-foreground-muted font-medium">
@@ -614,7 +614,7 @@ export default function SkapaPage() {
 
                   {!previewMode && active.tags.length === 0 && (
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pointer-events-none">
-                      <p className="text-center text-sm font-medium text-white">
+                      <p className="text-center text-sm font-medium text-foreground">
                         Klicka på ett plagg för att tagga det
                       </p>
                     </div>
@@ -637,9 +637,9 @@ export default function SkapaPage() {
                             : (e) => handleTagDragStart(e, tag.id)
                         }
                       >
-                        <span className="absolute inset-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/40 animate-ping" />
-                        <span className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
-                        <span className="absolute -translate-x-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-black/0">
+                        <span className="absolute inset-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/40 animate-ping" />
+                        <span className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                        <span className="absolute -translate-x-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-background/0">
                           {i + 1}
                         </span>
                         {!previewMode && (
@@ -653,7 +653,7 @@ export default function SkapaPage() {
                             className="absolute -top-3 -right-3 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center hover:bg-red-600"
                             aria-label="Ta bort tagg"
                           >
-                            <X className="h-3 w-3 text-white" />
+                            <X className="h-3 w-3 text-foreground" />
                           </button>
                         )}
                       </div>
@@ -724,7 +724,7 @@ export default function SkapaPage() {
                 <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.05] p-4 flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">
+                    <p className="text-sm text-foreground truncate">
                       Publicerad — {active.published.title}
                     </p>
                     <Link
@@ -759,7 +759,7 @@ export default function SkapaPage() {
                   onChange={(e) => updateActive({ title: e.target.value })}
                   placeholder="Ge din outfit ett namn..."
                   disabled={active.status === "published" || publishing}
-                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors disabled:opacity-60"
+                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors disabled:opacity-60"
                 />
               </div>
 
@@ -779,7 +779,7 @@ export default function SkapaPage() {
                   placeholder="Berätta om din outfit..."
                   rows={4}
                   disabled={active.status === "published" || publishing}
-                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors resize-none disabled:opacity-60"
+                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors resize-none disabled:opacity-60"
                 />
               </div>
 
@@ -795,7 +795,7 @@ export default function SkapaPage() {
                   value={active.category}
                   onChange={(e) => updateActive({ category: e.target.value })}
                   disabled={active.status === "published" || publishing}
-                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-foreground-subtle outline-none focus:border-white/30 transition-colors disabled:opacity-60"
+                  className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-foreground-subtle outline-none focus:border-foreground/30 transition-colors disabled:opacity-60"
                 >
                   <option value="">Välj kategori...</option>
                   {CATEGORIES.map((c) => (
@@ -819,8 +819,8 @@ export default function SkapaPage() {
                       disabled={active.status === "published" || publishing}
                       className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors disabled:opacity-60 ${
                         active.gender === g
-                          ? "border-white bg-white text-black"
-                          : "border-border bg-background-secondary text-foreground-muted hover:border-white/30"
+                          ? "border-foreground bg-foreground text-background"
+                          : "border-border bg-background-secondary text-foreground-muted hover:border-foreground/30"
                       }`}
                     >
                       {g === "dam" ? "Dam" : "Herr"}
@@ -840,13 +840,13 @@ export default function SkapaPage() {
                   {active.keywords.map((k) => (
                     <span
                       key={k}
-                      className="inline-flex items-center gap-1 rounded-full bg-white/10 text-white px-2 py-0.5 text-xs"
+                      className="inline-flex items-center gap-1 rounded-full bg-foreground/10 text-foreground px-2 py-0.5 text-xs"
                     >
                       {k}
                       <button
                         type="button"
                         onClick={() => removeKeyword(k)}
-                        className="text-white/60 hover:text-white"
+                        className="text-foreground/60 hover:text-foreground"
                         aria-label={`Ta bort ${k}`}
                       >
                         ×
@@ -878,7 +878,7 @@ export default function SkapaPage() {
                         e.target.value = "";
                       }
                     }}
-                    className="flex-1 min-w-[120px] bg-transparent text-sm text-white placeholder:text-foreground-subtle outline-none px-1"
+                    className="flex-1 min-w-[120px] bg-transparent text-sm text-foreground placeholder:text-foreground-subtle outline-none px-1"
                   />
                 </div>
               </div>
@@ -900,7 +900,7 @@ export default function SkapaPage() {
                         className="rounded-xl border border-border bg-background-secondary p-4 space-y-3"
                       >
                         <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium text-white">
+                          <p className="text-sm font-medium text-foreground">
                             Plagg {i + 1}
                           </p>
                           <IconButton
@@ -917,7 +917,7 @@ export default function SkapaPage() {
                           onChange={(e) =>
                             updateTag(tag.id, { garment: e.target.value })
                           }
-                          className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white outline-none"
+                          className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-foreground outline-none"
                         >
                           {GARMENTS.map((g) => (
                             <option key={g} value={g}>
@@ -945,7 +945,7 @@ export default function SkapaPage() {
                           onChange={(e) =>
                             updateTag(tag.id, { name: e.target.value })
                           }
-                          className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
+                          className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-foreground placeholder:text-foreground-subtle outline-none"
                         />
                         <input
                           type="url"
@@ -954,7 +954,7 @@ export default function SkapaPage() {
                           onChange={(e) =>
                             updateTag(tag.id, { url: e.target.value })
                           }
-                          className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
+                          className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-foreground placeholder:text-foreground-subtle outline-none"
                         />
                         <div className="grid grid-cols-2 gap-2">
                           <input
@@ -966,7 +966,7 @@ export default function SkapaPage() {
                             onChange={(e) =>
                               updateTag(tag.id, { price: e.target.value })
                             }
-                            className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
+                            className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-foreground placeholder:text-foreground-subtle outline-none"
                           />
                           <input
                             type="text"
@@ -980,7 +980,7 @@ export default function SkapaPage() {
                                   .slice(0, 8),
                               })
                             }
-                            className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
+                            className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-foreground placeholder:text-foreground-subtle outline-none"
                           />
                         </div>
                         <div>
@@ -1004,7 +1004,7 @@ export default function SkapaPage() {
                           onChange={(e) =>
                             updateTag(tag.id, { imageUrl: e.target.value })
                           }
-                          className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
+                          className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-foreground placeholder:text-foreground-subtle outline-none"
                         />
                         <label className="flex items-start gap-2.5 cursor-pointer pt-1">
                           <input
@@ -1030,7 +1030,7 @@ export default function SkapaPage() {
                           onClick={() =>
                             updateTag(tag.id, { showRegions: !tag.showRegions })
                           }
-                          className="text-[11px] uppercase tracking-wider text-foreground-subtle hover:text-white transition-colors text-left"
+                          className="text-[11px] uppercase tracking-wider text-foreground-subtle hover:text-foreground transition-colors text-left"
                         >
                           {tag.showRegions
                             ? "Dölj region-länkar"
@@ -1062,7 +1062,7 @@ export default function SkapaPage() {
                                       },
                                     })
                                   }
-                                  className="flex-1 rounded-lg bg-background-tertiary border border-border px-3 py-1.5 text-xs text-white placeholder:text-foreground-subtle outline-none"
+                                  className="flex-1 rounded-lg bg-background-tertiary border border-border px-3 py-1.5 text-xs text-foreground placeholder:text-foreground-subtle outline-none"
                                 />
                               </div>
                             ))}

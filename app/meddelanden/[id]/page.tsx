@@ -84,7 +84,7 @@ export default async function ConversationPage({
         <Container className="max-w-2xl">
           <Link
             href="/meddelanden"
-            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
             Inkorg
@@ -99,7 +99,7 @@ export default async function ConversationPage({
             <div className="min-w-0">
               <Link
                 href={`/profile/${otherProfile.username}`}
-                className="font-medium text-white truncate hover:underline"
+                className="font-medium text-foreground truncate hover:underline"
               >
                 {otherProfile.display_name ?? otherProfile.username}
               </Link>

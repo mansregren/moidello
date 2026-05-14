@@ -277,7 +277,7 @@ export default async function AdminStatsPage() {
 
       <div className="grid lg:grid-cols-2 gap-8 mt-14">
         <section>
-          <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-5">
+          <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-5">
             Topp kreatörer
           </h2>
           <ul className="space-y-2">
@@ -311,7 +311,7 @@ export default async function AdminStatsPage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {c.display_name ?? c.username}
                       {c.is_demo && (
                         <span className="ml-2 inline-flex rounded-full bg-amber-500/20 text-amber-300 px-1.5 py-0.5 text-[9px] uppercase tracking-wider">
@@ -324,7 +324,7 @@ export default async function AdminStatsPage() {
                     </p>
                   </div>
                 </Link>
-                <p className="shrink-0 text-sm font-semibold text-white tabular-nums">
+                <p className="shrink-0 text-sm font-semibold text-foreground tabular-nums">
                   {c.followers.toLocaleString("sv-SE")}
                 </p>
               </li>
@@ -333,7 +333,7 @@ export default async function AdminStatsPage() {
         </section>
 
         <section>
-          <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-5">
+          <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-5">
             Topp märken (klick, 90d)
           </h2>
           <ul className="space-y-2">
@@ -353,11 +353,11 @@ export default async function AdminStatsPage() {
                 <Link
                   href={`/brand/${encodeURIComponent(b.brand.toLowerCase())}`}
                   target="_blank"
-                  className="flex-1 min-w-0 text-sm font-medium text-white truncate hover:underline"
+                  className="flex-1 min-w-0 text-sm font-medium text-foreground truncate hover:underline"
                 >
                   {b.brand}
                 </Link>
-                <p className="shrink-0 text-sm font-semibold text-white tabular-nums inline-flex items-center gap-1.5">
+                <p className="shrink-0 text-sm font-semibold text-foreground tabular-nums inline-flex items-center gap-1.5">
                   <MousePointerClick className="h-3 w-3 text-foreground-muted" />
                   {b.clicks.toLocaleString("sv-SE")}
                 </p>
@@ -385,7 +385,7 @@ function OutfitTopList({
 }) {
   return (
     <section>
-      <h2 className="font-heading text-2xl uppercase tracking-tight text-white mb-5 inline-flex items-center gap-2">
+      <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-5 inline-flex items-center gap-2">
         <Icon className="h-5 w-5" />
         {title}
       </h2>
@@ -418,13 +418,13 @@ function OutfitTopList({
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white truncate">{o.title}</p>
+                  <p className="text-sm text-foreground truncate">{o.title}</p>
                   <p className="text-xs text-foreground-subtle truncate">
                     @{c?.username ?? "?"}
                   </p>
                 </div>
               </Link>
-              <p className="shrink-0 text-sm font-semibold text-white tabular-nums">
+              <p className="shrink-0 text-sm font-semibold text-foreground tabular-nums">
                 {metric(o).toLocaleString("sv-SE")}
               </p>
             </li>

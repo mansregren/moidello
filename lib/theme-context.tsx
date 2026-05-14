@@ -13,7 +13,7 @@ export type Theme = "dark" | "light";
 
 export const THEME_COOKIE = "moidello_theme";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
-const DEFAULT_THEME: Theme = "dark";
+const DEFAULT_THEME: Theme = "light";
 
 function isValidTheme(v: string | null | undefined): v is Theme {
   return v === "dark" || v === "light";

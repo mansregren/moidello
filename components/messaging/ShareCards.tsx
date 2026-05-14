@@ -124,13 +124,13 @@ export function OutfitShareCard({
             className="object-cover"
             unoptimized={preview.image_url.startsWith("http")}
           />
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-black/70 backdrop-blur-sm px-2.5 py-1 text-[10px] font-medium text-white">
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-background/70 backdrop-blur-sm px-2.5 py-1 text-[10px] font-medium text-foreground">
             <Tag className="h-3 w-3" />
             {preview.tag_count}
           </span>
         </div>
         <div className="p-3">
-          <p className="text-sm font-medium text-white truncate">
+          <p className="text-sm font-medium text-foreground truncate">
             {preview.title}
           </p>
           <p className="text-xs text-foreground-subtle truncate mt-0.5">
@@ -217,7 +217,7 @@ export function ItemShareCard({
     <ShareCardShell fromMe={fromMe}>
       <Link
         href={`/produkt/${preview.id}`}
-        className="flex gap-3 p-3 hover:bg-white/5 transition-colors"
+        className="flex gap-3 p-3 hover:bg-foreground/5 transition-colors"
       >
         <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-background-tertiary">
           {preview.outfit_image && (
@@ -235,11 +235,11 @@ export function ItemShareCard({
           <p className="text-[10px] uppercase tracking-wider text-foreground-muted truncate">
             {preview.brand}
           </p>
-          <p className="text-sm font-medium text-white mt-0.5 line-clamp-2">
+          <p className="text-sm font-medium text-foreground mt-0.5 line-clamp-2">
             {preview.name}
           </p>
           {preview.price !== null && preview.price > 0 && (
-            <p className="text-sm font-semibold text-white mt-1">
+            <p className="text-sm font-semibold text-foreground mt-1">
               {preview.price.toLocaleString("sv-SE")}{" "}
               {preview.currency ?? "SEK"}
             </p>
@@ -253,7 +253,7 @@ export function ItemShareCard({
             href={preview.buy_url}
             target="_blank"
             rel="ugc nofollow noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-medium text-white hover:bg-white/5"
+            className="flex items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-medium text-foreground hover:bg-foreground/5"
           >
             Köp
             <ExternalLink className="h-3 w-3" />
@@ -273,7 +273,7 @@ function ShareCardShell({
   return (
     <div
       className={`w-72 max-w-full overflow-hidden rounded-2xl border ${
-        fromMe ? "border-white/20 bg-white/5" : "border-border bg-background-secondary"
+        fromMe ? "border-foreground/20 bg-foreground/5" : "border-border bg-background-secondary"
       }`}
     >
       {children}

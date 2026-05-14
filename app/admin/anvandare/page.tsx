@@ -114,8 +114,8 @@ function FilterPill({
       href={href}
       className={`rounded-full border px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
         f === current
-          ? "bg-white text-black border-white"
-          : "border-border text-foreground-muted hover:text-white hover:border-white/30"
+          ? "bg-foreground text-background border-foreground"
+          : "border-border text-foreground-muted hover:text-foreground hover:border-foreground/30"
       }`}
     >
       {labels[f]}

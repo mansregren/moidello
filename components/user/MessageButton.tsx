@@ -54,7 +54,7 @@ export function MessageButton({ userId }: { userId: string }) {
       type="button"
       onClick={handleClick}
       disabled={pending}
-      className="inline-flex items-center gap-2 rounded-full border border-border text-white px-5 py-2 text-sm font-medium hover:border-white/30 transition-colors disabled:opacity-60"
+      className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-5 py-2 text-sm font-medium hover:border-foreground/30 transition-colors disabled:opacity-60"
     >
       <MessageCircle className="h-4 w-4" />
       {pending ? "Öppnar…" : "Skicka meddelande"}

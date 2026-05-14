@@ -136,7 +136,7 @@ export default function UpptackClient({
         <Container className="pt-6 md:pt-10">
           {/* Title + search */}
           <div className="mb-5">
-            <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+            <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
               Upptäck
             </h1>
             <div className="relative mt-5 max-w-xl">
@@ -146,13 +146,13 @@ export default function UpptackClient({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Sök outfits, kreatörer, märken…"
-                className="w-full rounded-full bg-background-tertiary border border-border pl-12 pr-12 py-3 text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors"
+                className="w-full rounded-full bg-background-tertiary border border-border pl-12 pr-12 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
                   aria-label="Rensa sök"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full text-foreground-muted hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full text-foreground-muted hover:text-foreground"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -172,8 +172,8 @@ export default function UpptackClient({
                   className={cn(
                     "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 active:scale-95",
                     active
-                      ? "bg-white text-black"
-                      : "border border-border text-foreground-muted hover:text-white hover:border-white/30"
+                      ? "bg-foreground text-background"
+                      : "border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30"
                   )}
                 >
                   {g}
@@ -183,7 +183,7 @@ export default function UpptackClient({
           </div>
 
           {/* Sticky filter bar */}
-          <div className="sticky top-14 md:top-20 z-20 -mx-6 md:-mx-12 px-6 md:px-12 py-3 bg-background/85 backdrop-blur-md border-b border-white/5">
+          <div className="sticky top-14 md:top-20 z-20 -mx-6 md:-mx-12 px-6 md:px-12 py-3 bg-background/85 backdrop-blur-md border-b border-foreground/5">
             {/* Mobile: single Filter button */}
             <div className="flex items-center justify-between gap-3 lg:hidden">
               <button
@@ -191,21 +191,21 @@ export default function UpptackClient({
                 className={cn(
                   "inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors active:scale-95",
                   totalActive > 0
-                    ? "bg-white text-black"
-                    : "border border-border text-white bg-background-secondary"
+                    ? "bg-foreground text-background"
+                    : "border border-border text-foreground bg-background-secondary"
                 )}
               >
                 <SlidersHorizontal className="h-4 w-4" />
                 Filter
                 {totalActive > 0 && (
-                  <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-black text-white px-1.5 text-[11px] font-bold">
+                  <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-background text-foreground px-1.5 text-[11px] font-bold">
                     {totalActive}
                   </span>
                 )}
               </button>
 
               <p className="text-xs text-foreground-muted">
-                <span className="text-white font-semibold">{visible.length}</span>{" "}
+                <span className="text-foreground font-semibold">{visible.length}</span>{" "}
                 resultat
               </p>
             </div>
@@ -256,13 +256,13 @@ export default function UpptackClient({
 
               <div className="ml-auto flex items-center gap-4">
                 <p className="text-sm text-foreground-muted whitespace-nowrap">
-                  <span className="text-white font-semibold">{visible.length}</span>{" "}
+                  <span className="text-foreground font-semibold">{visible.length}</span>{" "}
                   {visible.length === 1 ? "outfit" : "outfits"}
                 </p>
                 {totalActive > 0 && (
                   <button
                     onClick={clearAll}
-                    className="text-sm text-foreground-muted hover:text-white whitespace-nowrap"
+                    className="text-sm text-foreground-muted hover:text-foreground whitespace-nowrap"
                   >
                     Rensa alla
                   </button>
@@ -286,20 +286,20 @@ export default function UpptackClient({
                     <button
                       key={`${chip.category}-${chip.value}`}
                       onClick={() => toggleFilter(chip.category, chip.value)}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-white text-black pl-3 pr-2 py-1 text-xs font-medium transition-transform active:scale-95"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background pl-3 pr-2 py-1 text-xs font-medium transition-transform active:scale-95"
                     >
-                      <span className="text-[10px] uppercase tracking-wider text-black/50">
+                      <span className="text-[10px] uppercase tracking-wider text-background/50">
                         {CATEGORY_LABELS[chip.category]}:
                       </span>
                       {chip.label}
-                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-black/10">
+                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-background/10">
                         <X className="h-2.5 w-2.5" strokeWidth={2.5} />
                       </span>
                     </button>
                   ))}
                   <button
                     onClick={clearAll}
-                    className="text-xs text-foreground-muted hover:text-white px-2 py-1 lg:hidden"
+                    className="text-xs text-foreground-muted hover:text-foreground px-2 py-1 lg:hidden"
                   >
                     Rensa alla
                   </button>
@@ -322,7 +322,7 @@ export default function UpptackClient({
                       clearAll();
                       setSearch("");
                     }}
-                    className="rounded-full bg-white text-black px-6 py-2.5 text-sm font-medium transition-transform active:scale-95 hover:bg-white/90"
+                    className="rounded-full bg-foreground text-background px-6 py-2.5 text-sm font-medium transition-transform active:scale-95 hover:bg-foreground/90"
                   >
                     Rensa alla filter
                   </button>
@@ -344,20 +344,20 @@ export default function UpptackClient({
               className="fixed inset-0 z-[60] lg:hidden"
               onClick={() => setMobileFiltersOpen(false)}
             >
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+              <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
               <motion.div
                 initial={{ x: "100%" }}
                 animate={{ x: 0 }}
                 exit={{ x: "100%" }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 onClick={(e) => e.stopPropagation()}
-                className="absolute top-0 bottom-0 right-0 w-[88vw] max-w-sm bg-background border-l border-white/5 flex flex-col"
+                className="absolute top-0 bottom-0 right-0 w-[88vw] max-w-sm bg-background border-l border-foreground/5 flex flex-col"
               >
-                <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
-                  <h2 className="text-base font-semibold text-white">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-foreground/5 shrink-0">
+                  <h2 className="text-base font-semibold text-foreground">
                     Filter
                     {totalActive > 0 && (
-                      <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white text-black px-1.5 text-[11px] font-bold align-middle">
+                      <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground text-background px-1.5 text-[11px] font-bold align-middle">
                         {totalActive}
                       </span>
                     )}
@@ -365,7 +365,7 @@ export default function UpptackClient({
                   <button
                     onClick={() => setMobileFiltersOpen(false)}
                     aria-label="Stäng filter"
-                    className="flex h-9 w-9 items-center justify-center rounded-full text-white hover:bg-white/5"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-foreground hover:bg-foreground/5"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -381,18 +381,18 @@ export default function UpptackClient({
                 </div>
 
                 {/* Sticky bottom bar */}
-                <div className="border-t border-white/5 p-4 flex gap-3 shrink-0 bg-background">
+                <div className="border-t border-foreground/5 p-4 flex gap-3 shrink-0 bg-background">
                   {totalActive > 0 && (
                     <button
                       onClick={clearAll}
-                      className="rounded-full border border-border text-white px-4 py-3 text-sm font-medium hover:border-white/30"
+                      className="rounded-full border border-border text-foreground px-4 py-3 text-sm font-medium hover:border-foreground/30"
                     >
                       Rensa
                     </button>
                   )}
                   <button
                     onClick={() => setMobileFiltersOpen(false)}
-                    className="flex-1 rounded-full bg-white text-black py-3 text-sm font-semibold transition-transform active:scale-95"
+                    className="flex-1 rounded-full bg-foreground text-background py-3 text-sm font-semibold transition-transform active:scale-95"
                   >
                     Visa {visible.length} resultat
                   </button>
@@ -422,7 +422,7 @@ function FilterPanel({
       {totalActive > 0 && (
         <button
           onClick={onClear}
-          className="mb-4 text-xs uppercase tracking-wider text-foreground-muted hover:text-white"
+          className="mb-4 text-xs uppercase tracking-wider text-foreground-muted hover:text-foreground"
         >
           Rensa filter ({totalActive})
         </button>
@@ -498,11 +498,11 @@ function Accordion({
         className="w-full flex items-center justify-between py-1 text-left"
       >
         <span className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-white uppercase tracking-wide">
+          <span className="text-sm font-semibold text-foreground uppercase tracking-wide">
             {title}
           </span>
           {badge && badge > 0 ? (
-            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white text-black px-1.5 text-[10px] font-semibold">
+            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground text-background px-1.5 text-[10px] font-semibold">
               {badge}
             </span>
           ) : null}
@@ -551,12 +551,12 @@ function CheckList({
                 className={cn(
                   "h-4 w-4 rounded border flex items-center justify-center transition-colors",
                   checked
-                    ? "bg-white border-white"
-                    : "border-border group-hover:border-white/40"
+                    ? "bg-foreground border-foreground"
+                    : "border-border group-hover:border-foreground/40"
                 )}
               >
                 {checked && (
-                  <svg viewBox="0 0 12 12" className="h-3 w-3 text-black">
+                  <svg viewBox="0 0 12 12" className="h-3 w-3 text-background">
                     <path
                       d="M2.5 6L5 8.5L9.5 3.5"
                       fill="none"
@@ -577,7 +577,7 @@ function CheckList({
               <span
                 className={cn(
                   "text-sm transition-colors",
-                  checked ? "text-white" : "text-foreground-muted group-hover:text-white"
+                  checked ? "text-foreground" : "text-foreground-muted group-hover:text-foreground"
                 )}
               >
                 {v}
@@ -631,8 +631,8 @@ function FilterDropdown({
         className={cn(
           "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors",
           active
-            ? "bg-white text-black hover:bg-white/90"
-            : "border border-border text-white bg-background-secondary hover:border-white/30"
+            ? "bg-foreground text-background hover:bg-foreground/90"
+            : "border border-border text-foreground bg-background-secondary hover:border-foreground/30"
         )}
       >
         {label}
@@ -640,7 +640,7 @@ function FilterDropdown({
           <span
             className={cn(
               "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold",
-              "bg-black text-white"
+              "bg-background text-foreground"
             )}
           >
             {badge}
@@ -695,7 +695,7 @@ function BrandList({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Sök märke…"
-          className="w-full rounded-lg bg-background-tertiary border border-border pl-9 pr-3 py-2 text-xs text-white placeholder:text-foreground-subtle outline-none focus:border-white/30"
+          className="w-full rounded-lg bg-background-tertiary border border-border pl-9 pr-3 py-2 text-xs text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
         />
       </div>
       <div className="max-h-64 overflow-y-auto pr-1 -mr-1">

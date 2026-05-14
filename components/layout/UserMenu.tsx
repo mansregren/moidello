@@ -55,7 +55,7 @@ export function UserMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Användarmeny"
-        className="rounded-full transition-transform active:scale-95 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="rounded-full transition-transform active:scale-95 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <UserAvatar src={avatarUrl} alt={email || "Konto"} size="sm" />
       </button>
@@ -74,7 +74,7 @@ export function UserMenu() {
               <p className="text-xs text-foreground-subtle uppercase tracking-wider">
                 Inloggad som
               </p>
-              <p className="text-sm text-white truncate mt-0.5">{email}</p>
+              <p className="text-sm text-foreground truncate mt-0.5">{email}</p>
             </div>
             <ul className="py-1">
               <MenuItem
@@ -110,7 +110,7 @@ export function UserMenu() {
                   type="button"
                   onClick={handleSignOut}
                   role="menuitem"
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-white/5 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-foreground/5 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
                   Logga ut
@@ -141,7 +141,7 @@ function MenuItem({
         href={href}
         onClick={onClick}
         role="menuitem"
-        className="flex items-center gap-3 px-4 py-2.5 text-sm text-white hover:bg-white/5 transition-colors"
+        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-foreground/5 transition-colors"
       >
         <Icon className="h-4 w-4" />
         {children}

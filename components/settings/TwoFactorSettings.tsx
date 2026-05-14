@@ -17,7 +17,7 @@ type Stage =
     };
 
 const INPUT =
-  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30";
+  "w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30";
 
 export function TwoFactorSettings() {
   const [stage, setStage] = useState<Stage>({ kind: "loading" });
@@ -145,7 +145,7 @@ export function TwoFactorSettings() {
       <div className="flex items-start gap-4">
         <div
           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-            stage.kind === "on" ? "bg-emerald-500 text-black" : "bg-white text-black"
+            stage.kind === "on" ? "bg-emerald-500 text-background" : "bg-foreground text-background"
           }`}
         >
           {stage.kind === "on" ? (
@@ -155,7 +155,7 @@ export function TwoFactorSettings() {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h2 className="font-heading text-xl uppercase tracking-tight text-white">
+          <h2 className="font-heading text-xl uppercase tracking-tight text-foreground">
             Tvåfaktorsautentisering
           </h2>
           <p className="mt-1 text-sm text-foreground-muted">
@@ -176,7 +176,7 @@ export function TwoFactorSettings() {
               type="button"
               onClick={startEnroll}
               disabled={busy}
-              className="mt-4 inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+              className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
             >
               {busy ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -202,10 +202,10 @@ export function TwoFactorSettings() {
           {stage.kind === "enrolling" && (
             <div className="mt-5 space-y-4">
               <div>
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium text-foreground">
                   1. Scanna QR-koden med din authenticator-app
                 </p>
-                <div className="mt-3 inline-block rounded-xl bg-white p-3">
+                <div className="mt-3 inline-block rounded-xl bg-foreground p-3">
                   {/* Supabase returns the QR as a data:image/svg+xml URI */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -223,7 +223,7 @@ export function TwoFactorSettings() {
               </div>
 
               <div>
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium text-foreground">
                   2. Bekräfta med en 6-siffrig kod från appen
                 </p>
                 <input
@@ -245,7 +245,7 @@ export function TwoFactorSettings() {
                   type="button"
                   onClick={verifyEnroll}
                   disabled={busy || code.length !== 6}
-                  className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
                 >
                   {busy ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -258,7 +258,7 @@ export function TwoFactorSettings() {
                   type="button"
                   onClick={cancelEnroll}
                   disabled={busy}
-                  className="inline-flex items-center rounded-full border border-border text-foreground-muted px-4 py-2 text-sm font-semibold hover:text-white hover:border-white/30 disabled:opacity-60"
+                  className="inline-flex items-center rounded-full border border-border text-foreground-muted px-4 py-2 text-sm font-semibold hover:text-foreground hover:border-foreground/30 disabled:opacity-60"
                 >
                   Avbryt
                 </button>

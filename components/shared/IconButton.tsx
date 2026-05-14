@@ -14,7 +14,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         ref={ref}
         className={cn(
           "inline-flex items-center justify-center rounded-full transition-all duration-300 ease-out",
-          "hover:bg-white/10 active:scale-95",
+          "hover:bg-foreground/10 active:scale-95",
           size === "sm" && "h-8 w-8",
           size === "md" && "h-10 w-10",
           size === "lg" && "h-12 w-12",

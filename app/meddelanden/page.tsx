@@ -99,13 +99,13 @@ export default async function MeddelandenPage() {
         <Container className="max-w-3xl">
           <Link
             href="/profil"
-            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
             Tillbaka
           </Link>
 
-          <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
+          <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
             Meddelanden
           </h1>
 
@@ -138,7 +138,7 @@ export default async function MeddelandenPage() {
                   <li key={c.id}>
                     <Link
                       href={`/meddelanden/${c.id}`}
-                      className="flex items-center gap-4 p-4 hover:bg-white/5 transition-colors"
+                      className="flex items-center gap-4 p-4 hover:bg-foreground/5 transition-colors"
                     >
                       <UserAvatar
                         src={otherProfile.avatar_url ?? ""}
@@ -150,8 +150,8 @@ export default async function MeddelandenPage() {
                           <p
                             className={`text-sm truncate ${
                               unread > 0
-                                ? "text-white font-semibold"
-                                : "text-white"
+                                ? "text-foreground font-semibold"
+                                : "text-foreground"
                             }`}
                           >
                             {otherProfile.display_name ?? otherProfile.username}
@@ -171,7 +171,7 @@ export default async function MeddelandenPage() {
                         </p>
                       </div>
                       {unread > 0 && (
-                        <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white text-black px-1.5 text-[11px] font-bold">
+                        <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground text-background px-1.5 text-[11px] font-bold">
                           {unread}
                         </span>
                       )}

@@ -38,7 +38,7 @@ export default async function BrandImportPage() {
         <Container className="max-w-3xl">
           <Link
             href="/brand-dashboard"
-            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-white mb-6"
+            className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
             Tillbaka till dashboard
@@ -56,12 +56,12 @@ export default async function BrandImportPage() {
           </p>
 
           <section className="mt-10 rounded-2xl border border-border bg-background-secondary p-6 md:p-8">
-            <h2 className="font-heading text-xl uppercase tracking-tight text-white mb-3">
+            <h2 className="font-heading text-xl uppercase tracking-tight text-foreground mb-3">
               CSV-format
             </h2>
             <p className="text-sm text-foreground-muted mb-4">
               Första raden måste innehålla kolumnnamnen nedan. Endast{" "}
-              <code className="text-white">name</code> krävs — resten är
+              <code className="text-foreground">name</code> krävs — resten är
               valfria. Värden med komma måste omslutas med citationstecken.
             </p>
             <pre className="text-xs text-foreground-muted bg-background-tertiary rounded-xl p-4 overflow-x-auto">

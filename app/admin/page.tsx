@@ -123,12 +123,12 @@ export default async function AdminDashboardPage() {
 
       <section className="mt-14">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white">
+          <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground">
             Senaste anmälningar
           </h2>
           <Link
             href="/admin/anmalningar"
-            className="text-sm text-foreground-muted hover:text-white"
+            className="text-sm text-foreground-muted hover:text-foreground"
           >
             Alla →
           </Link>
@@ -147,7 +147,7 @@ export default async function AdminDashboardPage() {
       </section>
 
       <section className="mt-14">
-        <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white mb-5">
+        <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground mb-5">
           Externa verktyg
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -198,7 +198,7 @@ function StatCard({
         <Icon className="h-4 w-4" />
         <span className="text-xs uppercase tracking-wider">{label}</span>
       </div>
-      <p className="text-2xl md:text-3xl font-semibold text-white tabular-nums">
+      <p className="text-2xl md:text-3xl font-semibold text-foreground tabular-nums">
         {value.toLocaleString("sv-SE")}
       </p>
     </div>
@@ -214,7 +214,7 @@ function ReportRow({ r }: { r: ReportPreview }) {
     <li className="rounded-xl border border-border bg-background-secondary p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-sm text-white">
+          <p className="text-sm text-foreground">
             <span className="text-foreground-muted uppercase tracking-wider text-[10px] mr-2">
               {r.target_type}
             </span>
@@ -235,7 +235,7 @@ function ReportRow({ r }: { r: ReportPreview }) {
         </div>
         <Link
           href="/admin/anmalningar"
-          className="text-xs text-foreground-muted hover:text-white shrink-0"
+          className="text-xs text-foreground-muted hover:text-foreground shrink-0"
         >
           Hantera →
         </Link>
@@ -260,14 +260,14 @@ function ExternalCard({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="block rounded-2xl border border-border bg-background-secondary p-5 hover:border-white/30 transition-colors"
+      className="block rounded-2xl border border-border bg-background-secondary p-5 hover:border-foreground/30 transition-colors"
     >
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
           <Icon className="h-4 w-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white inline-flex items-center gap-1.5">
+          <p className="text-sm font-medium text-foreground inline-flex items-center gap-1.5">
             {label}
             <ExternalLink className="h-3 w-3 text-foreground-muted" />
           </p>

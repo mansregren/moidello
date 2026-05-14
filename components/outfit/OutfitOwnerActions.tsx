@@ -66,7 +66,7 @@ export function OutfitOwnerActions({
 
       <Link
         href={editHref}
-        className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 px-3 py-1.5 text-xs"
+        className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 px-3 py-1.5 text-xs"
       >
         <Edit className="h-3 w-3" />
         Redigera
@@ -76,7 +76,7 @@ export function OutfitOwnerActions({
         type="button"
         onClick={toggleHide}
         disabled={pending}
-        className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground-muted hover:text-white hover:border-white/30 px-3 py-1.5 text-xs disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 px-3 py-1.5 text-xs disabled:opacity-60"
       >
         {pending ? (
           <Loader2 className="h-3 w-3 animate-spin" />

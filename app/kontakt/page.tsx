@@ -25,7 +25,7 @@ export default function KontaktPage() {
               </p>
               <a
                 href="mailto:hello@moidello.com"
-                className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white border-b border-white/30 hover:border-white transition-colors"
+                className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"
               >
                 hello@moidello.com
               </a>
@@ -40,7 +40,7 @@ export default function KontaktPage() {
               </p>
               <a
                 href="mailto:hello@moidello.com?subject=Brand%20samarbete"
-                className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-white border-b border-white/30 hover:border-white transition-colors"
+                className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"
               >
                 hello@moidello.com
               </a>

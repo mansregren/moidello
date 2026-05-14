@@ -54,11 +54,11 @@ export function AccountSettingsClient({ username }: { username: string }) {
 
       <section className="rounded-2xl border border-border bg-background-secondary p-6 md:p-8">
         <div className="flex items-start gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
             <Download className="h-4 w-4" />
           </div>
           <div className="flex-1">
-            <h2 className="font-heading text-xl uppercase tracking-tight text-white">
+            <h2 className="font-heading text-xl uppercase tracking-tight text-foreground">
               Exportera mina data
             </h2>
             <p className="mt-2 text-sm text-foreground-muted">
@@ -69,7 +69,7 @@ export function AccountSettingsClient({ username }: { username: string }) {
               type="button"
               disabled={pending}
               onClick={handleExport}
-              className="mt-5 inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-semibold hover:bg-white/90 disabled:opacity-60"
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
             >
               {pending ? "Förbereder…" : "Ladda ner JSON"}
             </button>
@@ -86,7 +86,7 @@ export function AccountSettingsClient({ username }: { username: string }) {
             <Trash2 className="h-4 w-4" />
           </div>
           <div className="flex-1">
-            <h2 className="font-heading text-xl uppercase tracking-tight text-white">
+            <h2 className="font-heading text-xl uppercase tracking-tight text-foreground">
               Radera mitt konto
             </h2>
             <p className="mt-2 text-sm text-foreground-muted">
@@ -109,7 +109,7 @@ export function AccountSettingsClient({ username }: { username: string }) {
                   <AlertTriangle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
                   <p className="text-sm text-foreground-muted">
                     Skriv ditt användarnamn{" "}
-                    <span className="font-mono text-white">{username}</span>{" "}
+                    <span className="font-mono text-foreground">{username}</span>{" "}
                     för att bekräfta.
                   </p>
                 </div>
@@ -118,7 +118,7 @@ export function AccountSettingsClient({ username }: { username: string }) {
                   value={typedUsername}
                   onChange={(e) => setTypedUsername(e.target.value)}
                   placeholder={username}
-                  className="w-full rounded-xl bg-background-secondary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30 font-mono"
+                  className="w-full rounded-xl bg-background-secondary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30 font-mono"
                   autoComplete="off"
                 />
                 {error && (
@@ -133,7 +133,7 @@ export function AccountSettingsClient({ username }: { username: string }) {
                       setTypedUsername("");
                       setError(null);
                     }}
-                    className="flex-1 rounded-full border border-border text-white py-2.5 text-sm font-medium hover:border-white/30"
+                    className="flex-1 rounded-full border border-border text-foreground py-2.5 text-sm font-medium hover:border-foreground/30"
                   >
                     Avbryt
                   </button>
@@ -141,7 +141,7 @@ export function AccountSettingsClient({ username }: { username: string }) {
                     type="button"
                     disabled={pending || typedUsername !== username}
                     onClick={handleDelete}
-                    className="flex-1 rounded-full bg-red-500 text-white py-2.5 text-sm font-semibold hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex-1 rounded-full bg-red-500 text-foreground py-2.5 text-sm font-semibold hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {pending ? "Raderar…" : "Radera mitt konto"}
                   </button>
