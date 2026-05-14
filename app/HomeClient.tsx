@@ -78,16 +78,14 @@ export default function HomeClient({
     [following, gender],
   );
 
-  // Real outfit image for a category card — prefer one matching the
-  // current gender filter, then any gender, and only fall back to the
-  // static background when the category has no published outfit at all.
+  // Real outfit image for a category card — strictly same-gender as the
+  // current filter. If the category has no outfit for this gender, fall
+  // back to the static background (never show the other gender's outfit).
   const categoryImage = (cat: string): string => {
-    const sameGender = categoryCovers.find(
+    const match = categoryCovers.find(
       (c) => c.category === cat && c.gender === gender,
     );
-    if (sameGender) return sameGender.image;
-    const anyGender = categoryCovers.find((c) => c.category === cat);
-    if (anyGender) return anyGender.image;
+    if (match) return match.image;
     return CATEGORY_COVER[cat] ?? "/images/bg/positano.webp";
   };
 
