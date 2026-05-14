@@ -17,9 +17,7 @@ export interface OutfitForm {
   id: string;
   title: string;
   description: string;
-  meta_description: string;
   keywords: string[];
-  alt_text: string;
   category: string;
   gender: "dam" | "herr";
   is_published: boolean;
@@ -80,9 +78,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
       const res = await updateOutfit(outfit.id, {
         title: form.title,
         description: form.description || null,
-        meta_description: form.meta_description || null,
         keywords: form.keywords,
-        alt_text: form.alt_text || null,
         category: form.category || null,
         gender: form.gender,
         is_published: form.is_published,
@@ -150,21 +146,6 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
         </Field>
 
         <Field
-          label={`Meta-description (SEO) · ${form.meta_description.length}/160`}
-        >
-          <textarea
-            value={form.meta_description}
-            onChange={(e) =>
-              setForm({ ...form, meta_description: e.target.value })
-            }
-            rows={2}
-            maxLength={200}
-            placeholder="140–155 tecken, svenska. Visas i Google."
-            className={`${INPUT} resize-none`}
-          />
-        </Field>
-
-        <Field
           label={`Keywords (${form.keywords.length}/10)`}
         >
           <div className="flex flex-wrap gap-1.5 p-2 rounded-xl bg-background-tertiary border border-border min-h-[44px]">
@@ -211,18 +192,6 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
           </div>
         </Field>
 
-        <Field label="Alt-text (Google Images + tillgänglighet)">
-          <textarea
-            value={form.alt_text}
-            onChange={(e) =>
-              setForm({ ...form, alt_text: e.target.value })
-            }
-            rows={2}
-            maxLength={400}
-            placeholder="Svenska, beskrivande mening. Plaggtyp + färg."
-            className={`${INPUT} resize-none`}
-          />
-        </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Kategori">
             <select

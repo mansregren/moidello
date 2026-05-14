@@ -19,9 +19,7 @@ export async function updateOutfit(
   patch: {
     title?: string;
     description?: string | null;
-    meta_description?: string | null;
     keywords?: string[] | null;
-    alt_text?: string | null;
     category?: string | null;
     gender?: "dam" | "herr";
     is_published?: boolean;
@@ -45,13 +43,6 @@ export async function updateOutfit(
     const d = patch.description?.trim() ?? null;
     updates.description = d && d.length > 0 ? d.slice(0, 2000) : null;
   }
-  if (patch.meta_description !== undefined) {
-    const m = patch.meta_description?.trim() ?? null;
-    if (m && m.length > 200) {
-      return { ok: false, error: "Meta-description max 200 tecken." };
-    }
-    updates.meta_description = m && m.length > 0 ? m : null;
-  }
   if (patch.keywords !== undefined) {
     if (patch.keywords === null) {
       updates.keywords = null;
@@ -62,13 +53,6 @@ export async function updateOutfit(
         .slice(0, 10);
       updates.keywords = cleaned.length > 0 ? cleaned : null;
     }
-  }
-  if (patch.alt_text !== undefined) {
-    const a = patch.alt_text?.trim() ?? null;
-    if (a && a.length > 400) {
-      return { ok: false, error: "Alt-text max 400 tecken." };
-    }
-    updates.alt_text = a && a.length > 0 ? a : null;
   }
   if (patch.category !== undefined) {
     const c = patch.category?.trim() ?? null;
