@@ -3,7 +3,12 @@ import { createPublicClient } from "@/lib/supabase/public";
 
 const BASE_URL = "https://moidello.com";
 
-export const dynamic = "force-dynamic";
+// Cached and regenerated at most once an hour, rather than rebuilt
+// against Supabase on every crawler request. When published outfits
+// approach Google's 50k-URL-per-sitemap limit, split this into
+// paginated sitemaps via generateSitemaps() — until then a single
+// /sitemap.xml is correct and keeps robots.ts + Search Console stable.
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
