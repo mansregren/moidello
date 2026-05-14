@@ -399,12 +399,6 @@ export const categories = [
   "Preppy",
 ] as const;
 
-export const garmentTypes = [
-  "Toppar",
-  "Byxor",
-  "Skor",
-  "Accessoarer",
-  "Ytterkläder",
-  "Klänningar",
-  "Väskor",
-] as const;
+// Garment options live in one place — see lib/garments.ts. Re-exported
+// here so the discover filter keeps importing from @/lib/data.
+export { GARMENTS as garmentTypes } from "@/lib/garments";

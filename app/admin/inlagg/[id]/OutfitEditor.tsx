@@ -11,6 +11,7 @@ import {
   updateTaggedItemPosition,
   deleteTaggedItem,
 } from "@/app/actions/admin-content";
+import { GARMENTS } from "@/lib/garments";
 
 export interface OutfitForm {
   id: string;
@@ -58,16 +59,6 @@ const CATEGORIES = [
   "Sporty",
   "Bohemian",
   "Preppy",
-];
-
-const GARMENTS = [
-  "Toppar",
-  "Byxor",
-  "Skor",
-  "Accessoarer",
-  "Ytterkläder",
-  "Klänningar",
-  "Väskor",
 ];
 
 const INPUT =

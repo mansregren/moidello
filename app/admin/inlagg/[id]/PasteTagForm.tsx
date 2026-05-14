@@ -11,6 +11,7 @@ import {
   Tag as TagIcon,
 } from "lucide-react";
 import { addTaggedItem } from "@/app/actions/admin-content";
+import { GARMENTS } from "@/lib/garments";
 
 interface PreviewResult {
   brand: string | null;
@@ -43,16 +44,6 @@ interface Draft {
 
 const INPUT =
   "w-full rounded-xl bg-background-tertiary border border-border text-sm text-white placeholder:text-foreground-subtle p-3 outline-none focus:border-white/30";
-
-const GARMENTS = [
-  "Toppar",
-  "Byxor",
-  "Skor",
-  "Accessoarer",
-  "Ytterkläder",
-  "Klänningar",
-  "Väskor",
-];
 
 export function PasteTagForm({ outfitId }: { outfitId: string }) {
   const router = useRouter();

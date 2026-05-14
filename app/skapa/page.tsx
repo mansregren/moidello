@@ -14,7 +14,10 @@ import { useAuth } from "@/lib/auth-context";
 import { useGender } from "@/lib/gender-context";
 import { resizeImageForUpload } from "@/lib/image-resize";
 import { BrandAutocomplete } from "@/components/skapa/BrandAutocomplete";
+import { GARMENTS } from "@/lib/garments";
 import { createOutfit, type PublishedOutfit } from "./actions";
+
+type Gender = "dam" | "herr";
 
 interface DemoTag {
   id: number;
@@ -36,6 +39,7 @@ interface Draft {
   title: string;
   description: string;
   category: string;
+  gender: Gender;
   tags: DemoTag[];
   status: "draft" | "publishing" | "published" | "error";
   published?: PublishedOutfit;
@@ -47,16 +51,6 @@ const REGION_OPTIONS: { code: string; label: string }[] = [
   { code: "NO", label: "Norge" },
   { code: "DK", label: "Danmark" },
   { code: "FI", label: "Finland" },
-];
-
-const GARMENTS = [
-  "Toppar",
-  "Byxor",
-  "Skor",
-  "Accessoarer",
-  "Ytterkläder",
-  "Klänningar",
-  "Väskor",
 ];
 
 const CATEGORIES = [
@@ -73,7 +67,7 @@ const CATEGORIES = [
 const MAX_DRAFTS = 10;
 
 let nextDraftId = 1;
-function makeDraft(file: File | null = null): Draft {
+function makeDraft(file: File | null = null, gender: Gender = "dam"): Draft {
   return {
     id: nextDraftId++,
     file,
@@ -81,6 +75,7 @@ function makeDraft(file: File | null = null): Draft {
     title: "",
     description: "",
     category: "",
+    gender,
     tags: [],
     status: "draft",
   };
@@ -172,12 +167,15 @@ export default function SkapaPage() {
           ...next[0],
           file: resized[i],
           previewUrl: URL.createObjectURL(resized[i]),
+          // Seed from the browse filter so the picker starts on a sensible
+          // value — the user still confirms it explicitly below.
+          gender,
         };
         i++;
       }
 
       while (i < resized.length && next.length < MAX_DRAFTS) {
-        next.push(makeDraft(resized[i]));
+        next.push(makeDraft(resized[i], gender));
         i++;
       }
 
@@ -352,7 +350,7 @@ export default function SkapaPage() {
         fd.set("title", draft.title);
         fd.set("description", draft.description);
         fd.set("category", draft.category);
-        fd.set("gender", gender);
+        fd.set("gender", draft.gender);
         fd.set("tags", JSON.stringify(tagsForSubmit(draft.tags)));
 
         try {
@@ -773,6 +771,29 @@ export default function SkapaPage() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-foreground-muted block mb-2">
+                  Kön
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(["dam", "herr"] as const).map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => updateActive({ gender: g })}
+                      disabled={active.status === "published" || publishing}
+                      className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors disabled:opacity-60 ${
+                        active.gender === g
+                          ? "border-white bg-white text-black"
+                          : "border-border bg-background-secondary text-foreground-muted hover:border-white/30"
+                      }`}
+                    >
+                      {g === "dam" ? "Dam" : "Herr"}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div>
