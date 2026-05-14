@@ -44,7 +44,7 @@ export function UserAvatar({ src, alt, size = "md", className }: UserAvatarProps
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-full border border-foreground/10 bg-background-tertiary flex items-center justify-center font-semibold text-foreground-muted shrink-0",
+        "relative overflow-hidden rounded-full bg-background-tertiary flex items-center justify-center font-semibold text-foreground-muted shrink-0",
         sizeMap[size],
         className,
       )}
