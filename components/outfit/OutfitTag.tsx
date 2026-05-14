@@ -32,13 +32,13 @@ export function OutfitTag({ tag, outfitId, region }: OutfitTagProps) {
         aria-label={`${tag.brand} ${tag.name}`}
         aria-expanded={showTooltip}
       >
-        <span className="absolute inset-0 rounded-full bg-foreground/40 animate-ping" />
-        <span className="absolute inset-[3px] rounded-full bg-foreground shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+        <span className="absolute inset-0 rounded-full bg-white/40 animate-ping" />
+        <span className="absolute inset-[3px] rounded-full bg-white shadow-[0_0_10px_rgba(0,0,0,0.45)]" />
       </button>
 
       {showTooltip && (
         <div
-          className="absolute left-6 top-1/2 -translate-y-1/2 z-10 glass-strong rounded-xl px-4 py-3 min-w-[200px]"
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-10 rounded-xl border border-border bg-background-secondary shadow-xl px-4 py-3 min-w-[200px]"
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
         >
