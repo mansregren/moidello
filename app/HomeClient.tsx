@@ -93,32 +93,36 @@ export default function HomeClient({
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-background" />
+            {/* Dark scrim — heaviest at the bottom where the text sits, so
+                the white hero copy stays legible over any photo in both
+                themes. Intentionally NOT theme-tokenised (text-over-photo,
+                same rationale as image-scrim gradients elsewhere). */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/30 to-black/70" />
             <Container className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <p className="text-xs uppercase tracking-[0.2em] text-foreground/70">
-                  Inspiration for every outfit
+                <p className="text-xs uppercase tracking-[0.2em] text-white/80">
+                  Inspiration för din stil
                 </p>
-                <h1 className="mt-3 font-heading text-[44px] md:text-[88px] leading-[0.92] uppercase tracking-[-0.02em] text-foreground max-w-3xl">
+                <h1 className="mt-3 font-heading text-[44px] md:text-[88px] leading-[0.92] uppercase tracking-[-0.02em] text-white max-w-3xl">
                   Hitta din nästa
                   <br />
-                  <span className="text-foreground/60">outfit</span>
+                  <span className="text-white/60">favorit</span>
                 </h1>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link
                     href="/upptack"
-                    className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
+                    className="inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
                   >
                     <Search className="h-4 w-4" />
                     Utforska
                   </Link>
                   <Link
                     href="/trendigt"
-                    className="inline-flex items-center gap-2 rounded-full border border-foreground/20 text-foreground px-5 py-2.5 text-sm font-medium transition-colors hover:bg-foreground/10"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/30 text-white px-5 py-2.5 text-sm font-medium transition-colors hover:bg-white/10"
                   >
                     <Sparkles className="h-4 w-4" />
                     Trendigt nu
