@@ -3,7 +3,6 @@ import { Inter, Anton } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GenderProvider } from "@/lib/gender-context";
-import { ThemeProvider } from "@/lib/theme-context";
 import { ToastProvider } from "@/lib/toast-context";
 import { AuthProvider, type AuthProfile } from "@/lib/auth-context";
 import { AppShell } from "@/components/layout/AppShell";
@@ -12,7 +11,6 @@ import { CookieBanner } from "@/components/layout/CookieBanner";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { pickBg } from "@/lib/session-background";
 import { getViewerGender } from "@/lib/gender-server";
-import { getViewerTheme } from "@/lib/theme-server";
 import { siteJsonLd } from "@/lib/json-ld";
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
@@ -123,12 +121,10 @@ export default async function RootLayout({
 
   const footerBg = await pickBg("footer");
   const initialGender = await getViewerGender();
-  const initialTheme = await getViewerTheme();
 
   return (
     <html
       lang="sv"
-      data-theme={initialTheme}
       className={`${inter.variable} ${anton.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
@@ -139,15 +135,13 @@ export default async function RootLayout({
           Hoppa till innehåll
         </a>
         <ImpersonationBanner />
-        <ThemeProvider initial={initialTheme}>
-          <AuthProvider initialUser={user} initialProfile={initialProfile}>
-            <ToastProvider>
-              <GenderProvider initial={initialGender}>
-                <AppShell footerBg={footerBg}>{children}</AppShell>
-              </GenderProvider>
-            </ToastProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider initialUser={user} initialProfile={initialProfile}>
+          <ToastProvider>
+            <GenderProvider initial={initialGender}>
+              <AppShell footerBg={footerBg}>{children}</AppShell>
+            </GenderProvider>
+          </ToastProvider>
+        </AuthProvider>
         <CookieBanner />
         <Analytics />
         <SpeedInsights />

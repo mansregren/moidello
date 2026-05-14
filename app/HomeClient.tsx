@@ -178,10 +178,10 @@ export default function HomeClient({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
                     <div className="absolute inset-x-3 bottom-3">
-                      <p className="font-heading text-lg md:text-xl uppercase tracking-tight text-foreground leading-tight">
+                      <p className="font-heading text-lg md:text-xl uppercase tracking-tight text-white leading-tight">
                         {cat}
                       </p>
-                      <p className="text-[11px] text-foreground/70 mt-0.5">
+                      <p className="text-[11px] text-white/70 mt-0.5">
                         {CATEGORY_DESCRIPTIONS[cat]}
                       </p>
                     </div>
@@ -228,15 +228,15 @@ export default function HomeClient({
               fill
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-background/45" />
+            <div className="absolute inset-0 bg-black/50" />
             <div className="absolute inset-0 flex items-center justify-center px-6">
               <div className="text-center max-w-3xl">
-                <p className="font-heading text-[36px] md:text-[64px] lg:text-[80px] uppercase tracking-[-0.02em] text-foreground leading-[0.95]">
+                <p className="font-heading text-[36px] md:text-[64px] lg:text-[80px] uppercase tracking-[-0.02em] text-white leading-[0.95]">
                   Dress for the
                   <br />
-                  <span className="text-foreground/60">life you want</span>
+                  <span className="text-white/60">life you want</span>
                 </p>
-                <p className="mt-4 text-sm md:text-base text-foreground/70 max-w-md mx-auto">
+                <p className="mt-4 text-sm md:text-base text-white/70 max-w-md mx-auto">
                   Tagga varje plagg, länka var du köper. Inspirera och
                   inspireras.
                 </p>

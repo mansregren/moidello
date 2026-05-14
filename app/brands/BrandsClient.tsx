@@ -48,17 +48,17 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
       <main id="main" tabIndex={-1} className="flex-1">
         <div className="relative h-[28vh] md:h-[35vh] overflow-hidden">
           <Image src="/images/bg/boats.webp" alt="" fill className="object-cover" priority />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/30 to-black/60" />
           <Container className="relative z-10 h-full flex items-end pb-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
+              <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
                 Märken
               </h1>
-              <p className="mt-2 text-foreground/60">
+              <p className="mt-2 text-white/70">
                 Utforska alla märken på Moidello
               </p>
             </motion.div>

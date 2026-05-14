@@ -25,15 +25,15 @@ export default async function OmPage() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-background" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/40 to-black/65" />
             <Container className="relative z-10 h-full flex flex-col justify-end pb-12 md:pb-20">
-              <p className="text-xs uppercase tracking-[0.3em] text-foreground/70">
+              <p className="text-xs uppercase tracking-[0.3em] text-white/70">
                 Om oss
               </p>
-              <h1 className="mt-4 font-heading text-[48px] md:text-[112px] leading-[0.9] uppercase tracking-[-0.02em] text-foreground">
+              <h1 className="mt-4 font-heading text-[48px] md:text-[112px] leading-[0.9] uppercase tracking-[-0.02em] text-white">
                 Om Moidello
               </h1>
-              <p className="mt-5 max-w-xl text-base md:text-lg text-foreground/80 leading-relaxed">
+              <p className="mt-5 max-w-xl text-base md:text-lg text-white/80 leading-relaxed">
                 Inspiration för varje outfit. En plattform för att upptäcka,
                 dela och inspireras av outfits — där stil är enkelt att hitta
                 och ännu enklare att köpa.

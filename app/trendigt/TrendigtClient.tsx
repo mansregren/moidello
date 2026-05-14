@@ -183,10 +183,10 @@ export default function TrendigtClient({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
                     <div className="absolute inset-x-4 bottom-4">
-                      <p className="font-heading text-2xl uppercase tracking-tight text-foreground">
+                      <p className="font-heading text-2xl uppercase tracking-tight text-white">
                         {s.name}
                       </p>
-                      <p className="text-xs text-foreground/70">
+                      <p className="text-xs text-white/70">
                         {s.count} outfits
                       </p>
                     </div>

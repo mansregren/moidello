@@ -2,9 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
-@custom-variant light (@media (prefers-color-scheme: light));
-
 @theme inline {
   --color-background: var(--background);
   --color-background-secondary: var(--background-secondary);
@@ -54,59 +51,9 @@
 }
 
 :root {
-  /* Moidello dark premium theme — the default (no data-theme attribute,
-   * or data-theme="dark"). The light palette below opts in via
-   * :root[data-theme="light"], set server-side from the theme cookie. */
-  --background: #000000;
-  --background-secondary: #0A0A0A;
-  --background-tertiary: #141414;
-  --foreground: #FFFFFF;
-  --foreground-muted: #A0A0A0;
-  /* Audit UX-7: bumped from #666 → #7A7A7A for WCAG AA contrast on
-   * 11-12 px text on the #000 background (4.5:1 minimum). */
-  --foreground-subtle: #7A7A7A;
-
-  --card: #0A0A0A;
-  --card-foreground: #FFFFFF;
-  --popover: #0A0A0A;
-  --popover-foreground: #FFFFFF;
-  --primary: #FFFFFF;
-  --primary-foreground: #000000;
-  --secondary: #141414;
-  --secondary-foreground: #FFFFFF;
-  --muted: #141414;
-  --muted-foreground: #A0A0A0;
-  --accent: #FFFFFF;
-  --accent-foreground: #000000;
-  --destructive: #FF4444;
-  --border: #1F1F1F;
-  --input: #1F1F1F;
-  --ring: #FFFFFF;
-
-  --chart-1: #FFFFFF;
-  --chart-2: #A0A0A0;
-  --chart-3: #666666;
-  --chart-4: #333333;
-  --chart-5: #1F1F1F;
-
-  --radius: 0.75rem;
-
-  --sidebar: #0A0A0A;
-  --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #FFFFFF;
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: #141414;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #1F1F1F;
-  --sidebar-ring: #FFFFFF;
-}
-
-/* Moidello light theme — warm off-white, premium-editorial. Opt-in via
- * the theme cookie. NOTE: components that hardcode dark colours
- * (text-white, bg-black/70, white/10 …) do NOT flip with this — those
- * need a separate sweep. This palette covers everything built on the
- * design tokens (bg-background, text-foreground, border-border, …). */
-:root[data-theme="light"] {
+  /* Moidello — warm off-white, premium-editorial. Light is the only
+   * theme; there is no dark mode and no toggle. Text that sits over
+   * photos still uses literal text-white (see hero/card overlays). */
   --background: #F7F6F3;
   --background-secondary: #FFFFFF;
   --background-tertiary: #ECEBE6;
@@ -137,6 +84,8 @@
   --chart-4: #C9C7BE;
   --chart-5: #E3E1DA;
 
+  --radius: 0.75rem;
+
   --sidebar: #FFFFFF;
   --sidebar-foreground: #14130F;
   --sidebar-primary: #14130F;
@@ -145,29 +94,6 @@
   --sidebar-accent-foreground: #14130F;
   --sidebar-border: #E3E1DA;
   --sidebar-ring: #14130F;
-}
-
-/* Light-theme chrome overrides — the dark rules in @layer base are left
- * untouched so dark has zero regression risk. */
-:root[data-theme="light"] :focus-visible {
-  outline-color: #14130F;
-}
-:root[data-theme="light"] ::-webkit-scrollbar-track {
-  background: #F7F6F3;
-}
-:root[data-theme="light"] ::-webkit-scrollbar-thumb {
-  background: #C9C7BE;
-}
-:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
-  background: #A9A79E;
-}
-:root[data-theme="light"] .glass {
-  background: rgba(20, 19, 15, 0.04);
-  border-color: rgba(20, 19, 15, 0.08);
-}
-:root[data-theme="light"] .glass-strong {
-  background: rgba(20, 19, 15, 0.07);
-  border-color: rgba(20, 19, 15, 0.1);
 }
 
 @layer base {
@@ -183,7 +109,7 @@
 
   /* Visible focus ring on keyboard navigation; suppressed on mouse */
   :focus-visible {
-    outline: 2px solid #ffffff;
+    outline: 2px solid #14130f;
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -208,14 +134,14 @@
     width: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #000000;
+    background: #f7f6f3;
   }
   ::-webkit-scrollbar-thumb {
-    background: #333333;
+    background: #c9c7be;
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #555555;
+    background: #a9a79e;
   }
 }
 
@@ -226,8 +152,8 @@
   left: 0;
   z-index: 100;
   padding: 0.75rem 1.25rem;
-  background: #ffffff;
-  color: #000000;
+  background: #14130f;
+  color: #f7f6f3;
   font-size: 0.875rem;
   font-weight: 600;
   transform: translateY(-100%);
@@ -239,15 +165,15 @@
 
 /* Glassmorphism utility */
 .glass {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(20, 19, 15, 0.04);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(20, 19, 15, 0.08);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(20, 19, 15, 0.07);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(20, 19, 15, 0.1);
 }

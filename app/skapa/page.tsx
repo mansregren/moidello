@@ -523,7 +523,7 @@ export default function SkapaPage() {
                     <CheckCircle2 className="absolute top-1 right-1 h-4 w-4 text-emerald-400 drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
                   )}
                   {d.status === "publishing" && (
-                    <Loader2 className="absolute top-1 right-1 h-4 w-4 text-foreground animate-spin drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
+                    <Loader2 className="absolute top-1 right-1 h-4 w-4 text-white animate-spin drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
                   )}
                   {d.status === "error" && (
                     <AlertTriangle className="absolute top-1 right-1 h-4 w-4 text-red-400 drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]" />
@@ -538,7 +538,7 @@ export default function SkapaPage() {
                       aria-label="Ta bort bild"
                       className="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-background/70 hover:bg-red-500 flex items-center justify-center transition-colors"
                     >
-                      <X className="h-3 w-3 text-foreground" />
+                      <X className="h-3 w-3 text-white" />
                     </span>
                   )}
                 </button>
@@ -614,7 +614,7 @@ export default function SkapaPage() {
 
                   {!previewMode && active.tags.length === 0 && (
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pointer-events-none">
-                      <p className="text-center text-sm font-medium text-foreground">
+                      <p className="text-center text-sm font-medium text-white">
                         Klicka på ett plagg för att tagga det
                       </p>
                     </div>
@@ -637,8 +637,8 @@ export default function SkapaPage() {
                             : (e) => handleTagDragStart(e, tag.id)
                         }
                       >
-                        <span className="absolute inset-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/40 animate-ping" />
-                        <span className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                        <span className="absolute inset-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/40 animate-ping" />
+                        <span className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
                         <span className="absolute -translate-x-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-background/0">
                           {i + 1}
                         </span>
@@ -653,7 +653,7 @@ export default function SkapaPage() {
                             className="absolute -top-3 -right-3 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center hover:bg-red-600"
                             aria-label="Ta bort tagg"
                           >
-                            <X className="h-3 w-3 text-foreground" />
+                            <X className="h-3 w-3 text-white" />
                           </button>
                         )}
                       </div>
