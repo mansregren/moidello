@@ -7,7 +7,8 @@ import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { brands, garmentTypes, categories } from "@/lib/data";
+import { brands, categories } from "@/lib/data";
+import { garmentsForGender } from "@/lib/garments";
 import { useGender, matchesGenderFilter } from "@/lib/gender-context";
 import { cn } from "@/lib/utils";
 import type { Outfit } from "@/lib/types";
@@ -68,6 +69,9 @@ export default function UpptackClient({
   savedIds?: string[];
 }) {
   const { gender } = useGender();
+  // Garment filter follows the gender filter — herr shouldn't be offered
+  // Klänningar/Kjol, dam shouldn't be missing them.
+  const genderGarments = garmentsForGender(gender);
   const liked = useMemo(() => new Set(likedIds), [likedIds]);
   const saved = useMemo(() => new Set(savedIds), [savedIds]);
   const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
@@ -162,7 +166,7 @@ export default function UpptackClient({
 
           {/* Quick filters — garment chips (mobile only; desktop has Plagg dropdown) */}
           <div className="lg:hidden -mx-6 md:-mx-12 px-6 md:px-12 mb-4 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {garmentTypes.map((g) => {
+            {genderGarments.map((g) => {
               const active = filters.garment.has(g);
               return (
                 <button
@@ -214,7 +218,7 @@ export default function UpptackClient({
             <div className="hidden lg:flex items-center gap-2 flex-wrap">
               <FilterDropdown label="Plagg" badge={filters.garment.size}>
                 <CheckList
-                  values={garmentTypes as readonly string[]}
+                  values={genderGarments}
                   selected={filters.garment}
                   onToggle={(v) => toggleFilter("garment", v)}
                 />
@@ -417,6 +421,8 @@ function FilterPanel({
   onClear: () => void;
   totalActive: number;
 }) {
+  const { gender } = useGender();
+  const genderGarments = garmentsForGender(gender);
   return (
     <div>
       {totalActive > 0 && (
@@ -430,7 +436,7 @@ function FilterPanel({
 
       <Accordion title="Plagg" badge={filters.garment.size} defaultOpen>
         <CheckList
-          values={garmentTypes as readonly string[]}
+          values={genderGarments}
           selected={filters.garment}
           onToggle={(v) => onToggle("garment", v)}
         />
