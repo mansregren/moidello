@@ -12,6 +12,7 @@ import {
   deleteTaggedItem,
 } from "@/app/actions/admin-content";
 import { GARMENTS } from "@/lib/garments";
+import { ColorPicker } from "@/components/shared/ColorPicker";
 
 export interface OutfitForm {
   id: string;
@@ -516,7 +517,7 @@ export function TagsEditor({
                 </span>
               )}
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
                 placeholder="Pris"
@@ -541,14 +542,14 @@ export function TagsEditor({
                 }
                 className={INPUT}
               />
-              <input
-                type="text"
-                placeholder="Färg"
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-wider text-foreground-subtle mb-1.5">
+                Färg{t.color ? ` — ${t.color}` : ""}
+              </p>
+              <ColorPicker
                 value={t.color ?? ""}
-                onChange={(e) =>
-                  patch(t.id, { color: e.target.value || null })
-                }
-                className={INPUT}
+                onChange={(c) => patch(t.id, { color: c || null })}
               />
             </div>
             <input
