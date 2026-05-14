@@ -27,6 +27,10 @@ interface DemoTag {
   name: string;
   url: string;
   garment: string;
+  price: string;
+  currency: string;
+  color: string;
+  imageUrl: string;
   isAffiliate: boolean;
   regionUrls: Record<string, string>;
   showRegions: boolean;
@@ -40,6 +44,9 @@ interface Draft {
   description: string;
   category: string;
   gender: Gender;
+  metaDescription: string;
+  keywords: string[];
+  altText: string;
   tags: DemoTag[];
   status: "draft" | "publishing" | "published" | "error";
   published?: PublishedOutfit;
@@ -76,6 +83,9 @@ function makeDraft(file: File | null = null, gender: Gender = "dam"): Draft {
     description: "",
     category: "",
     gender,
+    metaDescription: "",
+    keywords: [],
+    altText: "",
     tags: [],
     status: "draft",
   };
@@ -244,6 +254,10 @@ export default function SkapaPage() {
       name: "",
       url: "",
       garment: "Toppar",
+      price: "",
+      currency: "SEK",
+      color: "",
+      imageUrl: "",
       isAffiliate: false,
       regionUrls: {},
       showRegions: false,
@@ -305,6 +319,19 @@ export default function SkapaPage() {
       tags: active.tags.map((t) => (t.id === id ? { ...t, ...patch } : t)),
     });
 
+  // ============ Keyword chips (outfit-level) ============
+
+  const addKeyword = (raw: string) => {
+    const cleaned = raw.trim().toLowerCase();
+    if (!cleaned) return;
+    if (active.keywords.includes(cleaned)) return;
+    if (active.keywords.length >= 10) return;
+    updateActive({ keywords: [...active.keywords, cleaned] });
+  };
+
+  const removeKeyword = (k: string) =>
+    updateActive({ keywords: active.keywords.filter((x) => x !== k) });
+
   const tagsForSubmit = (tags: DemoTag[]) =>
     tags
       .filter((t) => t.brand.trim() && t.name.trim())
@@ -313,12 +340,20 @@ export default function SkapaPage() {
         for (const [code, url] of Object.entries(t.regionUrls)) {
           if (url.trim()) regionUrls[code] = url.trim();
         }
+        const priceNum = Number(t.price);
         return {
           brand: t.brand,
           name: t.name,
           buyUrl: t.url,
           buyUrls: Object.keys(regionUrls).length > 0 ? regionUrls : undefined,
           garment: t.garment,
+          price:
+            t.price.trim() && Number.isFinite(priceNum) && priceNum >= 0
+              ? priceNum
+              : undefined,
+          currency: t.currency.trim() || undefined,
+          color: t.color.trim() || undefined,
+          imageUrl: t.imageUrl.trim() || undefined,
           x: t.x,
           y: t.y,
           isAffiliate: t.isAffiliate,
@@ -351,6 +386,9 @@ export default function SkapaPage() {
         fd.set("description", draft.description);
         fd.set("category", draft.category);
         fd.set("gender", draft.gender);
+        fd.set("metaDescription", draft.metaDescription);
+        fd.set("altText", draft.altText);
+        fd.set("keywords", JSON.stringify(draft.keywords));
         fd.set("tags", JSON.stringify(tagsForSubmit(draft.tags)));
 
         try {
@@ -796,6 +834,106 @@ export default function SkapaPage() {
                 </div>
               </div>
 
+              <div className="rounded-xl border border-border bg-background-secondary p-4 space-y-4">
+                <p className="text-sm font-medium text-white">
+                  SEO &amp; sökbarhet{" "}
+                  <span className="text-foreground-subtle font-normal">
+                    — valfritt, hjälper Google hitta din outfit
+                  </span>
+                </p>
+
+                <div>
+                  <label className="text-xs uppercase tracking-wider text-foreground-subtle block mb-2">
+                    Keywords ({active.keywords.length}/10)
+                  </label>
+                  <div className="flex flex-wrap gap-1.5 p-2 rounded-lg bg-background-tertiary border border-border min-h-[44px]">
+                    {active.keywords.map((k) => (
+                      <span
+                        key={k}
+                        className="inline-flex items-center gap-1 rounded-full bg-white/10 text-white px-2 py-0.5 text-xs"
+                      >
+                        {k}
+                        <button
+                          type="button"
+                          onClick={() => removeKeyword(k)}
+                          className="text-white/60 hover:text-white"
+                          aria-label={`Ta bort ${k}`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                    <input
+                      type="text"
+                      placeholder={
+                        active.keywords.length >= 10
+                          ? "Max 10 keywords"
+                          : "Skriv + Enter"
+                      }
+                      disabled={
+                        active.keywords.length >= 10 ||
+                        active.status === "published" ||
+                        publishing
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === ",") {
+                          e.preventDefault();
+                          addKeyword((e.target as HTMLInputElement).value);
+                          (e.target as HTMLInputElement).value = "";
+                        }
+                      }}
+                      onBlur={(e) => {
+                        if (e.target.value.trim()) {
+                          addKeyword(e.target.value);
+                          e.target.value = "";
+                        }
+                      }}
+                      className="flex-1 min-w-[120px] bg-transparent text-sm text-white placeholder:text-foreground-subtle outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="meta-description"
+                    className="text-xs uppercase tracking-wider text-foreground-subtle block mb-2"
+                  >
+                    Meta-description ({active.metaDescription.length}/160)
+                  </label>
+                  <textarea
+                    id="meta-description"
+                    value={active.metaDescription}
+                    onChange={(e) =>
+                      updateActive({ metaDescription: e.target.value })
+                    }
+                    rows={2}
+                    maxLength={200}
+                    placeholder="140–155 tecken. Visas i Googles sökresultat."
+                    disabled={active.status === "published" || publishing}
+                    className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors resize-none disabled:opacity-60"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="alt-text"
+                    className="text-xs uppercase tracking-wider text-foreground-subtle block mb-2"
+                  >
+                    Alt-text (Google Bilder + tillgänglighet)
+                  </label>
+                  <textarea
+                    id="alt-text"
+                    value={active.altText}
+                    onChange={(e) => updateActive({ altText: e.target.value })}
+                    rows={2}
+                    maxLength={400}
+                    placeholder="Beskrivande mening — plaggtyp och färg."
+                    disabled={active.status === "published" || publishing}
+                    className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors resize-none disabled:opacity-60"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
                   Taggade plagg ({active.tags.length})
@@ -866,6 +1004,51 @@ export default function SkapaPage() {
                           value={tag.url}
                           onChange={(e) =>
                             updateTag(tag.id, { url: e.target.value })
+                          }
+                          className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
+                        />
+                        <div className="grid grid-cols-3 gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            placeholder="Pris"
+                            value={tag.price}
+                            onChange={(e) =>
+                              updateTag(tag.id, { price: e.target.value })
+                            }
+                            className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
+                          />
+                          <input
+                            type="text"
+                            placeholder="SEK"
+                            maxLength={8}
+                            value={tag.currency}
+                            onChange={(e) =>
+                              updateTag(tag.id, {
+                                currency: e.target.value
+                                  .toUpperCase()
+                                  .slice(0, 8),
+                              })
+                            }
+                            className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Färg"
+                            value={tag.color}
+                            onChange={(e) =>
+                              updateTag(tag.id, { color: e.target.value })
+                            }
+                            className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
+                          />
+                        </div>
+                        <input
+                          type="url"
+                          placeholder="Bild-URL (valfritt)"
+                          value={tag.imageUrl}
+                          onChange={(e) =>
+                            updateTag(tag.id, { imageUrl: e.target.value })
                           }
                           className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none"
                         />

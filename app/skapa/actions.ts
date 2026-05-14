@@ -26,6 +26,10 @@ interface TagInput {
   buyUrl: string;
   buyUrls?: Record<string, string>;
   garment: string;
+  price?: number | null;
+  currency?: string | null;
+  color?: string | null;
+  imageUrl?: string | null;
   x: number;
   y: number;
   isAffiliate?: boolean;
@@ -55,6 +59,11 @@ export async function createOutfit(
   const description = ((formData.get("description") as string | null) ?? "").trim();
   const category = (formData.get("category") as string | null) ?? "";
   const gender = (formData.get("gender") as string | null) ?? "dam";
+  const metaDescription = (
+    (formData.get("metaDescription") as string | null) ?? ""
+  ).trim();
+  const altText = ((formData.get("altText") as string | null) ?? "").trim();
+  const keywordsRaw = (formData.get("keywords") as string | null) ?? "[]";
   const tagsRaw = (formData.get("tags") as string | null) ?? "[]";
 
   if (!(image instanceof File) || image.size === 0) {
@@ -71,6 +80,27 @@ export async function createOutfit(
   }
   if (gender !== "dam" && gender !== "herr") {
     return { error: "Välj kön." };
+  }
+  if (metaDescription.length > 200) {
+    return { error: "Meta-description max 200 tecken." };
+  }
+  if (altText.length > 400) {
+    return { error: "Alt-text max 400 tecken." };
+  }
+
+  // Keywords arrive as a JSON array; clean + cap the same way the admin
+  // editor does so the two surfaces store identical shapes.
+  let keywords: string[];
+  try {
+    const parsed = JSON.parse(keywordsRaw);
+    keywords = Array.isArray(parsed)
+      ? parsed
+          .map((k) => String(k).trim().toLowerCase())
+          .filter((k) => k.length > 0)
+          .slice(0, 10)
+      : [];
+  } catch {
+    keywords = [];
   }
 
   let tags: TagInput[];
@@ -125,6 +155,9 @@ export async function createOutfit(
         description: description || null,
         category: category || null,
         gender,
+        meta_description: metaDescription || null,
+        keywords: keywords.length > 0 ? keywords : null,
+        alt_text: altText || null,
         type: "photo",
       })
       .select("id, slug")
@@ -166,6 +199,15 @@ export async function createOutfit(
         buy_urls:
           t.buyUrls && Object.keys(t.buyUrls).length > 0 ? t.buyUrls : null,
         garment: t.garment || "Toppar",
+        price:
+          typeof t.price === "number" &&
+          Number.isFinite(t.price) &&
+          t.price >= 0
+            ? t.price
+            : null,
+        currency: t.currency?.trim().toUpperCase().slice(0, 8) || "SEK",
+        color: t.color?.trim().slice(0, 40) || null,
+        image_url: t.imageUrl?.trim().slice(0, 1000) || null,
         position_x: t.x,
         position_y: t.y,
         is_affiliate: !!t.isAffiliate,
