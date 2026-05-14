@@ -19,12 +19,6 @@ interface TrendingBrand {
   newOutfits: number;
 }
 
-const TRENDING_STYLES = [
-  { name: "Quiet Luxury", count: 412, image: "/images/bg/positano.webp" },
-  { name: "Y2K", count: 287, image: "/images/bg/boats.webp" },
-  { name: "Old Money", count: 356, image: "/images/bg/harbor.webp" },
-  { name: "Coastal Grandma", count: 198, image: "/images/bg/positano.webp" },
-];
 
 export default function TrendigtClient({
   outfits,
@@ -160,41 +154,6 @@ export default function TrendigtClient({
               </div>
             </Section>
           )}
-
-          <Section title="Trending stilar" href="/upptack">
-            <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-4 overflow-x-auto pb-3 scrollbar-hide">
-              {TRENDING_STYLES.map((s, i) => (
-                <motion.div
-                  key={s.name}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: i * 0.05 }}
-                  className="shrink-0"
-                >
-                  <Link
-                    href="/upptack"
-                    className="relative block w-56 h-72 rounded-2xl overflow-hidden group"
-                  >
-                    <Image
-                      src={s.image}
-                      alt={s.name}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                    <div className="absolute inset-x-4 bottom-4">
-                      <p className="font-heading text-2xl uppercase tracking-tight text-white">
-                        {s.name}
-                      </p>
-                      <p className="text-xs text-white/70">
-                        {s.count} outfits
-                      </p>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </Section>
 
           {localOutfits.length > 0 && (
             <Section
