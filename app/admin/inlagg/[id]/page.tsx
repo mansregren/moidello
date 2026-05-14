@@ -142,37 +142,45 @@ export default async function AdminOutfitDetailPage({
           />
 
           {creator && (
-            <Link
-              href={`/admin/anvandare/${creator.id}`}
-              className="mt-4 flex items-center gap-3 p-3 rounded-2xl border border-border bg-background-secondary hover:border-white/30 transition-colors"
-            >
-              <UserAvatar
-                src={(creator.avatar_url as string | null) ?? ""}
-                alt={(creator.display_name as string | null) ?? creator.username}
-                size="md"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
-                  {(creator.display_name as string | null) ?? creator.username}
-                  {creator.is_demo && (
-                    <span className="ml-2 inline-flex rounded-full bg-amber-500/20 text-amber-300 px-2 py-0.5 text-[10px] uppercase tracking-wider">
-                      Demo
-                    </span>
-                  )}
-                </p>
-                <p className="text-xs text-foreground-subtle">
-                  @{creator.username}
-                </p>
-              </div>
+            <div className="mt-4 flex items-center gap-3 p-3 rounded-2xl border border-border bg-background-secondary hover:border-white/30 transition-colors">
+              {/* Two separate links rather than a nested <a> — nesting is
+                  invalid HTML and forced an onClick stopPropagation hack
+                  that a server component can't pass to a client <Link>. */}
+              <Link
+                href={`/admin/anvandare/${creator.id}`}
+                className="flex items-center gap-3 flex-1 min-w-0"
+              >
+                <UserAvatar
+                  src={(creator.avatar_url as string | null) ?? ""}
+                  alt={
+                    (creator.display_name as string | null) ?? creator.username
+                  }
+                  size="md"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white truncate">
+                    {(creator.display_name as string | null) ??
+                      creator.username}
+                    {creator.is_demo && (
+                      <span className="ml-2 inline-flex rounded-full bg-amber-500/20 text-amber-300 px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                        Demo
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-xs text-foreground-subtle">
+                    @{creator.username}
+                  </p>
+                </div>
+              </Link>
               <Link
                 href={`/profile/${creator.username}`}
                 target="_blank"
-                onClick={(e) => e.stopPropagation()}
                 className="shrink-0 text-foreground-muted hover:text-white"
+                aria-label={`Visa @${creator.username}s publika profil`}
               >
                 <ExternalLink className="h-4 w-4" />
               </Link>
-            </Link>
+            </div>
           )}
 
           <div className="mt-4 flex gap-3 text-xs text-foreground-subtle">
