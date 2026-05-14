@@ -54,7 +54,9 @@
 }
 
 :root {
-  /* Moidello dark premium theme — always dark */
+  /* Moidello dark premium theme — the default (no data-theme attribute,
+   * or data-theme="dark"). The light palette below opts in via
+   * :root[data-theme="light"], set server-side from the theme cookie. */
   --background: #000000;
   --background-secondary: #0A0A0A;
   --background-tertiary: #141414;
@@ -97,6 +99,75 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #1F1F1F;
   --sidebar-ring: #FFFFFF;
+}
+
+/* Moidello light theme — warm off-white, premium-editorial. Opt-in via
+ * the theme cookie. NOTE: components that hardcode dark colours
+ * (text-white, bg-black/70, white/10 …) do NOT flip with this — those
+ * need a separate sweep. This palette covers everything built on the
+ * design tokens (bg-background, text-foreground, border-border, …). */
+:root[data-theme="light"] {
+  --background: #F7F6F3;
+  --background-secondary: #FFFFFF;
+  --background-tertiary: #ECEBE6;
+  --foreground: #14130F;
+  --foreground-muted: #5C5A52;
+  --foreground-subtle: #87857B;
+
+  --card: #FFFFFF;
+  --card-foreground: #14130F;
+  --popover: #FFFFFF;
+  --popover-foreground: #14130F;
+  --primary: #14130F;
+  --primary-foreground: #FFFFFF;
+  --secondary: #ECEBE6;
+  --secondary-foreground: #14130F;
+  --muted: #ECEBE6;
+  --muted-foreground: #5C5A52;
+  --accent: #14130F;
+  --accent-foreground: #FFFFFF;
+  --destructive: #C5301E;
+  --border: #E3E1DA;
+  --input: #E3E1DA;
+  --ring: #14130F;
+
+  --chart-1: #14130F;
+  --chart-2: #5C5A52;
+  --chart-3: #999999;
+  --chart-4: #C9C7BE;
+  --chart-5: #E3E1DA;
+
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #14130F;
+  --sidebar-primary: #14130F;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #ECEBE6;
+  --sidebar-accent-foreground: #14130F;
+  --sidebar-border: #E3E1DA;
+  --sidebar-ring: #14130F;
+}
+
+/* Light-theme chrome overrides — the dark rules in @layer base are left
+ * untouched so dark has zero regression risk. */
+:root[data-theme="light"] :focus-visible {
+  outline-color: #14130F;
+}
+:root[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F7F6F3;
+}
+:root[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #C9C7BE;
+}
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #A9A79E;
+}
+:root[data-theme="light"] .glass {
+  background: rgba(20, 19, 15, 0.04);
+  border-color: rgba(20, 19, 15, 0.08);
+}
+:root[data-theme="light"] .glass-strong {
+  background: rgba(20, 19, 15, 0.07);
+  border-color: rgba(20, 19, 15, 0.1);
 }
 
 @layer base {

@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Container } from "./Container";
 import { IconButton } from "../shared/IconButton";
 import { GenderToggle } from "../shared/GenderToggle";
+import { ThemeToggle } from "../shared/ThemeToggle";
 import { UserMenu } from "./UserMenu";
 import { NotificationBell } from "./NotificationBell";
 import { primaryNav, shouldShowAppHeader } from "@/lib/nav";
@@ -124,6 +125,7 @@ export function Header() {
           <div className="hidden md:block">
             <GenderToggle orientation="horizontal" />
           </div>
+          <ThemeToggle />
           <IconButton aria-label="Sök" onClick={() => setSearchOpen(true)}>
             <Search className="h-5 w-5" />
           </IconButton>
