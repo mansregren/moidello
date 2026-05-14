@@ -463,7 +463,7 @@ function CommentsSection({
           }}
         >
           <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="fixed inset-0 z-[60] bg-background/70 backdrop-blur-md data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 transition-opacity" />
+            <AlertDialog.Backdrop className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-md data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 transition-opacity" />
             <AlertDialog.Popup className="fixed inset-0 z-[60] flex items-center justify-center p-6 outline-none">
               <div className="w-full max-w-sm rounded-3xl bg-background-secondary border border-foreground/10 p-6">
                 <AlertDialog.Title className="font-heading text-2xl uppercase tracking-tight text-foreground">
@@ -507,7 +507,7 @@ function CommentsSection({
                         }
                       });
                     }}
-                    className="flex-1 rounded-full bg-red-500 text-foreground py-3 text-sm font-semibold hover:bg-red-600 disabled:opacity-60"
+                    className="flex-1 rounded-full bg-red-500 text-white py-3 text-sm font-semibold hover:bg-red-600 disabled:opacity-60"
                   >
                     Radera
                   </button>

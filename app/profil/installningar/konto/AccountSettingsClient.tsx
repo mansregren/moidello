@@ -141,7 +141,7 @@ export function AccountSettingsClient({ username }: { username: string }) {
                     type="button"
                     disabled={pending || typedUsername !== username}
                     onClick={handleDelete}
-                    className="flex-1 rounded-full bg-red-500 text-foreground py-2.5 text-sm font-semibold hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex-1 rounded-full bg-red-500 text-white py-2.5 text-sm font-semibold hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {pending ? "Raderar…" : "Radera mitt konto"}
                   </button>

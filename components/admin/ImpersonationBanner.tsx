@@ -18,7 +18,7 @@ export async function ImpersonationBanner() {
   const label = target.targetDisplayName ?? target.targetUsername ?? "okänd";
 
   return (
-    <div className="sticky top-0 z-50 bg-amber-500 text-background">
+    <div className="sticky top-0 z-50 bg-amber-500 text-black">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between gap-3 text-sm">
         <p className="font-medium">
           Du postar som <span className="font-bold">{label}</span>

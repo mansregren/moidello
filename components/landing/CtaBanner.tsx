@@ -17,7 +17,7 @@ export function CtaBanner() {
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-background/50" />
+        <div className="absolute inset-0 bg-black/55" />
       </div>
 
       <Container className="relative z-10">
@@ -28,12 +28,12 @@ export function CtaBanner() {
           transition={{ duration: 0.6 }}
           className="max-w-xl"
         >
-          <h2 className="font-heading text-[36px] md:text-[56px] lg:text-[72px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
+          <h2 className="font-heading text-[36px] md:text-[56px] lg:text-[72px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
             Dela din
             <br />
-            <span className="text-foreground/60">stil med världen</span>
+            <span className="text-white/60">stil med världen</span>
           </h2>
-          <p className="mt-4 text-foreground/70 text-lg max-w-md">
+          <p className="mt-4 text-white/70 text-lg max-w-md">
             Skapa ditt konto och börja posta outfits idag.
             Tagga plaggen, inspirera andra.
           </p>

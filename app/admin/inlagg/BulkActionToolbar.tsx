@@ -239,7 +239,7 @@ export function BulkActionBar({ users }: { users: SeedUser[] }) {
             type="button"
             onClick={reassign}
             disabled={pending || !reassignTo}
-            className="rounded-full bg-blue-500 hover:bg-blue-400 text-foreground px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
+            className="rounded-full bg-blue-500 hover:bg-blue-400 text-white px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
           >
             Genomför
           </button>

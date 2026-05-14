@@ -583,7 +583,7 @@ function Modal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-background/70 backdrop-blur-md p-6"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-6"
       onClick={onClose}
     >
       <div

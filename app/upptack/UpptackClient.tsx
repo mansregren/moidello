@@ -344,7 +344,7 @@ export default function UpptackClient({
               className="fixed inset-0 z-[60] lg:hidden"
               onClick={() => setMobileFiltersOpen(false)}
             >
-              <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
               <motion.div
                 initial={{ x: "100%" }}
                 animate={{ x: 0 }}

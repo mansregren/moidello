@@ -263,7 +263,7 @@ export function BulkManualModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/70 backdrop-blur-sm p-4 md:p-8">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 backdrop-blur-sm p-4 md:p-8">
       <div className="w-full max-w-5xl rounded-2xl border border-border bg-background-secondary shadow-xl">
         <div className="flex items-center justify-between gap-4 p-5 border-b border-border">
           <div className="flex items-center gap-2.5">

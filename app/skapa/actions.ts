@@ -95,7 +95,11 @@ export async function createOutfit(
 
   let tags: TagInput[];
   try {
-    tags = JSON.parse(tagsRaw);
+    const parsedTags = JSON.parse(tagsRaw);
+    if (!Array.isArray(parsedTags)) {
+      return { error: "Kunde inte tolka taggar." };
+    }
+    tags = parsedTags;
   } catch {
     return { error: "Kunde inte tolka taggar." };
   }

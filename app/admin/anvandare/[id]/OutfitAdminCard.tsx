@@ -85,7 +85,7 @@ export function OutfitAdminCard({
             unoptimized={outfit.image_url.startsWith("http")}
           />
           {!published && (
-            <span className="absolute top-2 left-2 inline-flex rounded-full bg-amber-500/90 text-background px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold pointer-events-none">
+            <span className="absolute top-2 left-2 inline-flex rounded-full bg-amber-500/90 text-black px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold pointer-events-none">
               Utkast
             </span>
           )}
@@ -99,8 +99,8 @@ export function OutfitAdminCard({
               title={published ? "Avpublicera" : "Publicera"}
               className={`inline-flex items-center justify-center h-8 w-8 rounded-full backdrop-blur-sm transition-colors disabled:opacity-60 ${
                 published
-                  ? "bg-emerald-500/85 hover:bg-emerald-500 text-background"
-                  : "bg-amber-400/90 hover:bg-amber-400 text-background"
+                  ? "bg-emerald-500/85 hover:bg-emerald-500 text-black"
+                  : "bg-amber-400/90 hover:bg-amber-400 text-black"
               }`}
             >
               {pending && !deleting ? (
@@ -116,7 +116,7 @@ export function OutfitAdminCard({
               onClick={handleDelete}
               disabled={pending || deleting}
               title="Radera inlägg permanent"
-              className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-red-500/85 hover:bg-red-500 text-foreground backdrop-blur-sm transition-colors disabled:opacity-60"
+              className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-red-500/85 hover:bg-red-500 text-white backdrop-blur-sm transition-colors disabled:opacity-60"
             >
               {deleting ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />

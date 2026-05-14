@@ -69,7 +69,7 @@ export function EditOwnOutfit({ form: initial }: { form: OwnOutfitForm }) {
             unoptimized={form.imageUrl.startsWith("http")}
           />
           {!form.isPublished && (
-            <span className="absolute top-2 left-2 inline-flex rounded-full bg-amber-500/90 text-background px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold">
+            <span className="absolute top-2 left-2 inline-flex rounded-full bg-amber-500/90 text-black px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold">
               Utkast
             </span>
           )}

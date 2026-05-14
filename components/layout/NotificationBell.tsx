@@ -164,7 +164,7 @@ export function NotificationBell() {
         {unreadCount > 0 && (
           <span
             aria-label={`${unreadCount} olästa`}
-            className="absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-foreground"
+            className="absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
           >
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>

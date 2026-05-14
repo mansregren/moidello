@@ -737,7 +737,7 @@ export function TagPositionEditor({
         />
 
         {!isPublished && (
-          <span className="absolute top-3 left-3 inline-flex rounded-full bg-amber-500/90 text-background px-3 py-1 text-xs uppercase tracking-wider font-semibold pointer-events-none">
+          <span className="absolute top-3 left-3 inline-flex rounded-full bg-amber-500/90 text-black px-3 py-1 text-xs uppercase tracking-wider font-semibold pointer-events-none">
             Utkast
           </span>
         )}
@@ -779,7 +779,7 @@ export function TagPositionEditor({
                     type="button"
                     onClick={() => save(tag.id)}
                     disabled={isSaving}
-                    className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-300 text-background px-2 py-0.5 text-[10px] font-semibold hover:bg-amber-200 disabled:opacity-60"
+                    className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-300 text-black px-2 py-0.5 text-[10px] font-semibold hover:bg-amber-200 disabled:opacity-60"
                   >
                     {isSaving ? (
                       <Loader2 className="h-2.5 w-2.5 animate-spin" />
@@ -874,15 +874,15 @@ function StatusButton({
 }) {
   const tones: Record<string, { active: string; idle: string }> = {
     amber: {
-      active: "bg-amber-500 text-background border-amber-500",
+      active: "bg-amber-500 text-black border-amber-500",
       idle: "border-amber-500/30 text-amber-300 hover:bg-amber-500/10",
     },
     blue: {
-      active: "bg-blue-500 text-foreground border-blue-500",
+      active: "bg-blue-500 text-white border-blue-500",
       idle: "border-blue-500/30 text-blue-300 hover:bg-blue-500/10",
     },
     emerald: {
-      active: "bg-emerald-500 text-background border-emerald-500",
+      active: "bg-emerald-500 text-black border-emerald-500",
       idle: "border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/10",
     },
   };
