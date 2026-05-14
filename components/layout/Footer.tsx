@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "./Container";
+import { ThemeToggle } from "../shared/ThemeToggle";
 
 const footerLinks = {
   Plattform: [
@@ -75,9 +76,12 @@ export function Footer({
           <p className="text-xs text-foreground-subtle">
             © {year} Moidello. Alla rättigheter förbehållna.
           </p>
-          <p className="text-xs text-foreground-subtle tracking-wide">
-            Made in Stockholm
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-foreground-subtle tracking-wide">
+              Made in Stockholm
+            </p>
+            <ThemeToggle />
+          </div>
         </div>
       </Container>
     </footer>
