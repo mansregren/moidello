@@ -793,6 +793,7 @@ export type Database = {
         Row: {
           alt_text: string | null
           category: string | null
+          code: string
           created_at: string
           created_by_admin: boolean
           deleted_at: string | null
@@ -815,6 +816,7 @@ export type Database = {
         Insert: {
           alt_text?: string | null
           category?: string | null
+          code?: string
           created_at?: string
           created_by_admin?: boolean
           deleted_at?: string | null
@@ -837,6 +839,7 @@ export type Database = {
         Update: {
           alt_text?: string | null
           category?: string | null
+          code?: string
           created_at?: string
           created_by_admin?: boolean
           deleted_at?: string | null
@@ -1524,7 +1527,7 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      next_outfit_code: { Args: never; Returns: string }
     }
     Enums: {
       account_type: "creator" | "brand"

@@ -63,6 +63,7 @@ interface OutfitRow {
   image_url: string;
   type: "photo" | "flatlay";
   gender: "herr" | "dam";
+  code: string | null;
   title: string;
   description: string | null;
   meta_description: string | null;
@@ -152,6 +153,7 @@ function rowToOutfit(row: OutfitRow): Outfit {
     type: row.type,
     gender: row.gender,
     title: row.title,
+    code: row.code ?? undefined,
     description: row.description ?? "",
     metaDescription: row.meta_description ?? undefined,
     creator,
@@ -170,7 +172,7 @@ function rowToOutfit(row: OutfitRow): Outfit {
 // the !fkey hint. Comments on the outfit detail page get a similar
 // hint when fetched separately.
 const OUTFIT_COLUMNS = `
-  id, slug, user_id, image_url, type, gender, title, description, meta_description, category, created_at, is_hidden,
+  id, slug, user_id, image_url, type, gender, code, title, description, meta_description, category, created_at, is_hidden,
   profiles!outfits_user_id_fkey ( id, username, display_name, avatar_url, bio, region ),
   tagged_items ( id, brand, name, price, currency, buy_url, buy_urls, garment, position_x, position_y, is_affiliate )
 `;

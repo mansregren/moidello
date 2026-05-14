@@ -93,6 +93,28 @@ async function SearchResults({ q }: { q: string }) {
   const pattern = `%${escapeIlike(q)}%`;
   const gender = await getViewerGender();
 
+  // A query like "A271" is an outfit reference code (1 letter + 3 digits) —
+  // look it up exactly, ignoring the gender filter, since the code is shared
+  // from socials and should resolve no matter how the viewer is browsing.
+  const isCode = /^[a-z]\d{3}$/i.test(q);
+  const outfitSelect =
+    "id, slug, title, code, image_url, description, profiles!outfits_user_id_fkey(username)";
+  const outfitsQuery = isCode
+    ? supabase
+        .from("outfits")
+        .select(outfitSelect)
+        .eq("is_published", true)
+        .eq("code", q.toUpperCase())
+        .limit(1)
+    : supabase
+        .from("outfits")
+        .select(outfitSelect)
+        .eq("is_published", true)
+        .eq("gender", gender)
+        .or(`title.ilike.${pattern},description.ilike.${pattern}`)
+        .order("created_at", { ascending: false })
+        .limit(24);
+
   const [profilesRes, outfitsRes, brandsRes] = await Promise.all([
     supabase
       .from("profiles")
@@ -103,16 +125,7 @@ async function SearchResults({ q }: { q: string }) {
         `username.ilike.${pattern},display_name.ilike.${pattern},brand_name.ilike.${pattern}`,
       )
       .limit(12),
-    supabase
-      .from("outfits")
-      .select(
-        "id, slug, title, image_url, description, profiles!outfits_user_id_fkey(username)",
-      )
-      .eq("is_published", true)
-      .eq("gender", gender)
-      .or(`title.ilike.${pattern},description.ilike.${pattern}`)
-      .order("created_at", { ascending: false })
-      .limit(24),
+    outfitsQuery,
     supabase
       .from("tagged_items")
       .select("brand")

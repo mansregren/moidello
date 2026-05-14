@@ -204,9 +204,14 @@ export default function OutfitDetail({
                 />
               </div>
 
-              <h1 className="font-heading text-[32px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-4">
+              <h1 className="font-heading text-[32px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-1.5">
                 {outfit.title}
               </h1>
+              {outfit.code && (
+                <p className="mb-4 text-xs font-medium uppercase tracking-[0.25em] text-foreground-subtle">
+                  ID {outfit.code}
+                </p>
+              )}
 
               {isPersisted && (user?.id === outfit.creator.id || viewerIsAdmin) && (
                 <div className="mb-5">

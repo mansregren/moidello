@@ -78,6 +78,9 @@ export interface Outfit {
   /** "photo" = person wearing outfit, "flatlay" = clothes laid out */
   type: "photo" | "flatlay";
   gender: Gender;
+  /** Short human-readable reference code, e.g. "A271" (1 letter + 3
+   *  digits). DB-assigned per outfit; absent on mock fixtures. */
+  code?: string;
   title: string;
   description: string;
   /** Optional admin-set SEO override. When present it takes priority
