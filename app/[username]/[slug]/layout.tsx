@@ -7,10 +7,15 @@ const SITE = "Moidello";
 
 function buildDescription(outfit: {
   description: string;
+  metaDescription?: string;
   category: string;
   tags: { brand: string; name: string }[];
   creator: { displayName: string };
 }): string {
+  // Admin-set SEO override wins; then the creator's own description;
+  // then an auto-derived line from category + first tagged garments.
+  const meta = outfit.metaDescription?.trim();
+  if (meta) return meta;
   const own = outfit.description?.trim();
   if (own) return own;
   const top = outfit.tags
@@ -52,7 +57,8 @@ export async function generateMetadata({
   const title = `${outfit.title} av ${outfit.creator.displayName}`;
   const description = buildDescription(outfit);
   const canonical = `/${username.toLowerCase()}/${slug}`;
-  const hasOwnDescription = !!outfit.description?.trim();
+  const hasOwnDescription =
+    !!outfit.metaDescription?.trim() || !!outfit.description?.trim();
   const isThin = !hasOwnDescription && outfit.tags.length === 0;
 
   return {

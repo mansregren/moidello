@@ -6,12 +6,15 @@ const SITE = "Moidello";
 
 function buildDescription(outfit: {
   description: string;
+  metaDescription?: string;
   category: string;
   tags: { brand: string; name: string }[];
   creator: { displayName: string };
 }): string {
-  // Prefer the creator's own description; fall back to an auto-derived one
-  // from category + first three tagged garments.
+  // Admin-set SEO override wins; then the creator's own description;
+  // then an auto-derived line from category + first three tagged garments.
+  const meta = outfit.metaDescription?.trim();
+  if (meta) return meta;
   const own = outfit.description?.trim();
   if (own) return own;
 
@@ -60,7 +63,8 @@ export async function generateMetadata({
   // Thin-content guard: if the outfit has neither a creator description
   // nor a single tagged item, leave it out of the index until the creator
   // adds more context.
-  const hasOwnDescription = !!outfit.description?.trim();
+  const hasOwnDescription =
+    !!outfit.metaDescription?.trim() || !!outfit.description?.trim();
   const isThin = !hasOwnDescription && outfit.tags.length === 0;
 
   return {

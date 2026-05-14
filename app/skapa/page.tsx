@@ -44,9 +44,7 @@ interface Draft {
   description: string;
   category: string;
   gender: Gender;
-  metaDescription: string;
   keywords: string[];
-  altText: string;
   tags: DemoTag[];
   status: "draft" | "publishing" | "published" | "error";
   published?: PublishedOutfit;
@@ -83,9 +81,7 @@ function makeDraft(file: File | null = null, gender: Gender = "dam"): Draft {
     description: "",
     category: "",
     gender,
-    metaDescription: "",
     keywords: [],
-    altText: "",
     tags: [],
     status: "draft",
   };
@@ -386,8 +382,6 @@ export default function SkapaPage() {
         fd.set("description", draft.description);
         fd.set("category", draft.category);
         fd.set("gender", draft.gender);
-        fd.set("metaDescription", draft.metaDescription);
-        fd.set("altText", draft.altText);
         fd.set("keywords", JSON.stringify(draft.keywords));
         fd.set("tags", JSON.stringify(tagsForSubmit(draft.tags)));
 
@@ -834,102 +828,56 @@ export default function SkapaPage() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border bg-background-secondary p-4 space-y-4">
-                <p className="text-sm font-medium text-white">
-                  SEO &amp; sökbarhet{" "}
+              <div>
+                <label className="text-sm font-medium text-foreground-muted block mb-2">
+                  Keywords ({active.keywords.length}/10){" "}
                   <span className="text-foreground-subtle font-normal">
                     — valfritt, hjälper Google hitta din outfit
                   </span>
-                </p>
-
-                <div>
-                  <label className="text-xs uppercase tracking-wider text-foreground-subtle block mb-2">
-                    Keywords ({active.keywords.length}/10)
-                  </label>
-                  <div className="flex flex-wrap gap-1.5 p-2 rounded-lg bg-background-tertiary border border-border min-h-[44px]">
-                    {active.keywords.map((k) => (
-                      <span
-                        key={k}
-                        className="inline-flex items-center gap-1 rounded-full bg-white/10 text-white px-2 py-0.5 text-xs"
+                </label>
+                <div className="flex flex-wrap gap-1.5 p-2 rounded-xl bg-background-secondary border border-border min-h-[48px]">
+                  {active.keywords.map((k) => (
+                    <span
+                      key={k}
+                      className="inline-flex items-center gap-1 rounded-full bg-white/10 text-white px-2 py-0.5 text-xs"
+                    >
+                      {k}
+                      <button
+                        type="button"
+                        onClick={() => removeKeyword(k)}
+                        className="text-white/60 hover:text-white"
+                        aria-label={`Ta bort ${k}`}
                       >
-                        {k}
-                        <button
-                          type="button"
-                          onClick={() => removeKeyword(k)}
-                          className="text-white/60 hover:text-white"
-                          aria-label={`Ta bort ${k}`}
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                    <input
-                      type="text"
-                      placeholder={
-                        active.keywords.length >= 10
-                          ? "Max 10 keywords"
-                          : "Skriv + Enter"
-                      }
-                      disabled={
-                        active.keywords.length >= 10 ||
-                        active.status === "published" ||
-                        publishing
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === ",") {
-                          e.preventDefault();
-                          addKeyword((e.target as HTMLInputElement).value);
-                          (e.target as HTMLInputElement).value = "";
-                        }
-                      }}
-                      onBlur={(e) => {
-                        if (e.target.value.trim()) {
-                          addKeyword(e.target.value);
-                          e.target.value = "";
-                        }
-                      }}
-                      className="flex-1 min-w-[120px] bg-transparent text-sm text-white placeholder:text-foreground-subtle outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="meta-description"
-                    className="text-xs uppercase tracking-wider text-foreground-subtle block mb-2"
-                  >
-                    Meta-description ({active.metaDescription.length}/160)
-                  </label>
-                  <textarea
-                    id="meta-description"
-                    value={active.metaDescription}
-                    onChange={(e) =>
-                      updateActive({ metaDescription: e.target.value })
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    placeholder={
+                      active.keywords.length >= 10
+                        ? "Max 10 keywords"
+                        : "Skriv + Enter"
                     }
-                    rows={2}
-                    maxLength={200}
-                    placeholder="140–155 tecken. Visas i Googles sökresultat."
-                    disabled={active.status === "published" || publishing}
-                    className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors resize-none disabled:opacity-60"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="alt-text"
-                    className="text-xs uppercase tracking-wider text-foreground-subtle block mb-2"
-                  >
-                    Alt-text (Google Bilder + tillgänglighet)
-                  </label>
-                  <textarea
-                    id="alt-text"
-                    value={active.altText}
-                    onChange={(e) => updateActive({ altText: e.target.value })}
-                    rows={2}
-                    maxLength={400}
-                    placeholder="Beskrivande mening — plaggtyp och färg."
-                    disabled={active.status === "published" || publishing}
-                    className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-white placeholder:text-foreground-subtle outline-none focus:border-white/30 transition-colors resize-none disabled:opacity-60"
+                    disabled={
+                      active.keywords.length >= 10 ||
+                      active.status === "published" ||
+                      publishing
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === ",") {
+                        e.preventDefault();
+                        addKeyword((e.target as HTMLInputElement).value);
+                        (e.target as HTMLInputElement).value = "";
+                      }
+                    }}
+                    onBlur={(e) => {
+                      if (e.target.value.trim()) {
+                        addKeyword(e.target.value);
+                        e.target.value = "";
+                      }
+                    }}
+                    className="flex-1 min-w-[120px] bg-transparent text-sm text-white placeholder:text-foreground-subtle outline-none px-1"
                   />
                 </div>
               </div>

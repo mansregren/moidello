@@ -59,10 +59,6 @@ export async function createOutfit(
   const description = ((formData.get("description") as string | null) ?? "").trim();
   const category = (formData.get("category") as string | null) ?? "";
   const gender = (formData.get("gender") as string | null) ?? "dam";
-  const metaDescription = (
-    (formData.get("metaDescription") as string | null) ?? ""
-  ).trim();
-  const altText = ((formData.get("altText") as string | null) ?? "").trim();
   const keywordsRaw = (formData.get("keywords") as string | null) ?? "[]";
   const tagsRaw = (formData.get("tags") as string | null) ?? "[]";
 
@@ -80,12 +76,6 @@ export async function createOutfit(
   }
   if (gender !== "dam" && gender !== "herr") {
     return { error: "Välj kön." };
-  }
-  if (metaDescription.length > 200) {
-    return { error: "Meta-description max 200 tecken." };
-  }
-  if (altText.length > 400) {
-    return { error: "Alt-text max 400 tecken." };
   }
 
   // Keywords arrive as a JSON array; clean + cap the same way the admin
@@ -155,9 +145,11 @@ export async function createOutfit(
         description: description || null,
         category: category || null,
         gender,
-        meta_description: metaDescription || null,
+        // No separate meta_description / alt_text from /skapa — the SEO
+        // layer derives the Google snippet from `description` (see
+        // buildDescription in the outfit layouts). The admin editor can
+        // still set meta_description as an explicit override.
         keywords: keywords.length > 0 ? keywords : null,
-        alt_text: altText || null,
         type: "photo",
       })
       .select("id, slug")

@@ -80,6 +80,11 @@ export interface Outfit {
   gender: Gender;
   title: string;
   description: string;
+  /** Optional admin-set SEO override. When present it takes priority
+   *  over `description` for the Google snippet (see buildDescription
+   *  in the outfit layouts). Creators on /skapa only fill in
+   *  `description`; this is an admin-editor power-tool field. */
+  metaDescription?: string;
   creator: User;
   tags: TaggedItem[];
   likes: number;
