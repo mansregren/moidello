@@ -124,6 +124,10 @@ export async function sendShare(args: {
   );
   if (uniqRecipients.length === 0)
     return { ok: false, error: "Välj minst en mottagare" };
+  // Cap fan-out — a share is a person-to-person action, not a broadcast.
+  // Keeps the batched .or() query and inserts bounded.
+  if (uniqRecipients.length > 30)
+    return { ok: false, error: "Du kan dela till max 30 personer åt gången" };
 
   const text = (args.message ?? "").trim();
   if (text.length > 4000) return { ok: false, error: "För lång text" };

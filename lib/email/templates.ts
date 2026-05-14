@@ -47,7 +47,7 @@ export function welcomeEmail(opts: {
     subject: `Välkommen till Moidello, ${opts.displayName}`,
     html: wrap(`
       <h1 style="margin:0 0 12px;font-size:28px;font-weight:600;letter-spacing:-0.01em;">Välkommen.</h1>
-      <p style="margin:0 0 18px;">Hej ${opts.displayName} — kul att du är här. Din profil är klar och redo att fyllas.</p>
+      <p style="margin:0 0 18px;">Hej ${escapeHtml(opts.displayName)} — kul att du är här. Din profil är klar och redo att fyllas.</p>
       <p style="margin:0 0 24px;">Börja med att ladda upp din första outfit, eller bläddra runt och se vad andra delar.</p>
       <p style="margin:0;">
         <a href="${url}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;letter-spacing:0.02em;">Öppna din profil</a>
@@ -67,7 +67,7 @@ export function newFollowerEmail(opts: {
     subject: `${opts.followerName} följer dig nu på Moidello`,
     html: wrap(`
       <h1 style="margin:0 0 12px;font-size:24px;font-weight:600;">Ny följare</h1>
-      <p style="margin:0 0 18px;">Hej ${opts.recipientName} — <strong>${opts.followerName}</strong> följer dig nu.</p>
+      <p style="margin:0 0 18px;">Hej ${escapeHtml(opts.recipientName)} — <strong>${escapeHtml(opts.followerName)}</strong> följer dig nu.</p>
       <p style="margin:0;">
         <a href="${url}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;">Visa profil</a>
       </p>
@@ -87,11 +87,11 @@ export function newCommentEmail(opts: {
     subject: `${opts.commenterName} kommenterade din outfit`,
     html: wrap(`
       <h1 style="margin:0 0 12px;font-size:24px;font-weight:600;">Ny kommentar</h1>
-      <p style="margin:0 0 8px;color:#555;">På <strong>${opts.outfitTitle}</strong></p>
+      <p style="margin:0 0 8px;color:#555;">På <strong>${escapeHtml(opts.outfitTitle)}</strong></p>
       <blockquote style="margin:0 0 18px;padding:14px 18px;border-left:3px solid #0b0b0b;background:#fafaf8;font-size:15px;">
         ${escapeHtml(opts.commentBody)}
       </blockquote>
-      <p style="margin:0 0 18px;color:#555;">– ${opts.commenterName}</p>
+      <p style="margin:0 0 18px;color:#555;">– ${escapeHtml(opts.commenterName)}</p>
       <p style="margin:0;">
         <a href="${opts.outfitUrl}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;">Öppna outfit</a>
       </p>
@@ -110,7 +110,7 @@ export function newMessageEmail(opts: {
     subject: `${opts.senderName} skickade ett meddelande`,
     html: wrap(`
       <h1 style="margin:0 0 12px;font-size:24px;font-weight:600;">Nytt meddelande</h1>
-      <p style="margin:0 0 18px;">Hej ${opts.recipientName} — <strong>${opts.senderName}</strong> (@${opts.senderUsername}) har skickat dig ett meddelande på Moidello.</p>
+      <p style="margin:0 0 18px;">Hej ${escapeHtml(opts.recipientName)} — <strong>${escapeHtml(opts.senderName)}</strong> (@${escapeHtml(opts.senderUsername)}) har skickat dig ett meddelande på Moidello.</p>
       <p style="margin:0;">
         <a href="${url}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;">Öppna inkorgen</a>
       </p>
