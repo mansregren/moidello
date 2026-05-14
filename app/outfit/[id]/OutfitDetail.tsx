@@ -208,8 +208,10 @@ export default function OutfitDetail({
                 {outfit.title}
               </h1>
               {outfit.code && (
-                <p className="mb-4 text-xs font-medium uppercase tracking-[0.25em] text-foreground-subtle">
-                  ID {outfit.code}
+                <p className="mb-4">
+                  <span className="inline-flex items-center rounded-full bg-background-tertiary px-3 py-1 text-sm font-semibold tracking-wide text-foreground">
+                    ID = ({outfit.code})
+                  </span>
                 </p>
               )}
 
