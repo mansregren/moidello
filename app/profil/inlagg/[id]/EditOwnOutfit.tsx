@@ -23,7 +23,6 @@ const CATEGORIES = [
   "Casual",
   "Formal",
   "Sporty",
-  "Bohemian",
   "Preppy",
 ];
 

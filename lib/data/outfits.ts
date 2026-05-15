@@ -395,7 +395,6 @@ export const categories = [
   "Casual",
   "Formal",
   "Sporty",
-  "Bohemian",
   "Preppy",
 ] as const;
 

@@ -117,5 +117,4 @@ export type Category =
   | "Casual"
   | "Formal"
   | "Sporty"
-  | "Bohemian"
   | "Preppy";

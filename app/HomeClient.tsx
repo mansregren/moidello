@@ -20,7 +20,6 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   Casual: "Avslappnat & lätt",
   Formal: "Tailored & polerat",
   Sporty: "Aktiv vardag",
-  Bohemian: "Fri & flödande",
   Preppy: "Klassisk & ren",
 };
 
@@ -33,7 +32,6 @@ const CATEGORY_COVER: Record<string, string> = {
   Casual: "/images/bg/riviera.webp",
   Formal: "/images/bg/boats.webp",
   Sporty: "/images/bg/parasols.webp",
-  Bohemian: "/images/bg/positano.webp",
   Preppy: "/images/bg/harbor.webp",
 };
 

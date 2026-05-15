@@ -38,7 +38,6 @@ const CATEGORIES = [
   { value: "casual", label: "Casual" },
   { value: "formal", label: "Formal" },
   { value: "sporty", label: "Sporty" },
-  { value: "bohemian", label: "Bohemian" },
   { value: "preppy", label: "Preppy" },
 ];
 

@@ -18,7 +18,6 @@ export const OUTFIT_CATEGORIES = [
   "casual",
   "formal",
   "sporty",
-  "bohemian",
   "preppy",
 ] as const;
 
@@ -42,7 +41,7 @@ function userPrompt(categoryHint?: string | null): string {
 - meta_description: svenska, 140–155 tecken inklusive mellanslag. Börja med stil/plagg, väv in ett känslo- eller säsongsord, avsluta naturligt. Inga utropstecken.
 - keywords: array med 5–8 svenska keywords. Blanda bred (outfit-inspiration, minimalism) med smal (linnedress, beige-look, sommar-outfit).
 - alt_text: svenska, beskrivande, en mening. Inkludera plaggtyper och färger så Google Images förstår vad bilden visar.
-- category: välj EN av: streetwear, minimalism, vintage, casual, formal, sporty, bohemian, preppy.
+- category: välj EN av: streetwear, minimalism, vintage, casual, formal, sporty, preppy.
 - suggested_items: array med 3–6 strängar som beskriver plaggen som syns (t.ex. "vit linnedress", "beigea espadriller"). Detta är hint till admin för att tagga senare — inga brands, bara plaggtyp + färg.
 
 Om en kategori-hint ges, prioritera den om bilden tillåter.
