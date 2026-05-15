@@ -130,6 +130,7 @@ export function productJsonLd(item: {
     "@type": "Product",
     "@id": `${SITE_BASE}/produkt/${item.id}#product`,
     name: item.name,
+    description: `${item.brand} ${item.name} — taggat plagg från en outfit på ${SITE_NAME}.`,
     brand: { "@type": "Brand", name: item.brand },
     image: abs(item.image),
     url: abs(`/produkt/${item.id}`),
