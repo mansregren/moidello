@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { Bookmark, ExternalLink, Send } from "lucide-react";
@@ -24,9 +23,6 @@ function isUsableBuyUrl(url: string | undefined): url is string {
 interface TaggedItemProps {
   item: TaggedItemType;
   outfitId?: string;
-  /** Parent outfit image used to render a 80x80 thumbnail focused on
-   *  the tag's position in the photo. */
-  outfitImage?: string;
   region?: Region;
   initiallySaved?: boolean;
 }
@@ -34,7 +30,6 @@ interface TaggedItemProps {
 export function TaggedItemCard({
   item,
   outfitId,
-  outfitImage,
   region,
   initiallySaved = false,
 }: TaggedItemProps) {
@@ -65,36 +60,18 @@ export function TaggedItemCard({
     setShareOpen(true);
   };
 
-  // Crop the parent outfit image to the tag's pinned position for a
-  // unique thumbnail per garment without uploading per-item images.
-  const thumbStyle = outfitImage
-    ? { objectPosition: `${item.x}% ${item.y}%` }
-    : undefined;
-
   return (
     <>
       <article className="flex items-center gap-3 py-3 border-b border-border last:border-0">
-        {/* Thumbnail (clickable → product page) */}
+        {/* Garment chip (clickable → product page) */}
         <Link
           href={`/produkt/${item.id}`}
           aria-label={`${item.brand} ${item.name}`}
-          className="relative h-[72px] w-[72px] sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-xl bg-background-tertiary"
+          className="relative h-[72px] w-[72px] sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-xl bg-background-tertiary border border-border flex items-center justify-center px-2 text-center"
         >
-          {outfitImage ? (
-            <Image
-              src={outfitImage}
-              alt=""
-              fill
-              sizes="80px"
-              style={thumbStyle}
-              className="object-cover"
-              unoptimized={outfitImage.startsWith("http")}
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-foreground-subtle text-[10px] uppercase tracking-wider">
-              {item.brand?.slice(0, 2) ?? "?"}
-            </div>
-          )}
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-foreground-muted leading-tight">
+            {item.garment}
+          </span>
         </Link>
 
         {/* Brand / name / price */}
