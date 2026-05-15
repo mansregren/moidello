@@ -23,13 +23,17 @@ interface TrendingBrand {
 export default function TrendigtClient({
   outfits,
   creators,
-  brands,
+  brandsAll,
+  brandsDam,
+  brandsHerr,
   likedIds = [],
   savedIds = [],
 }: {
   outfits: Outfit[];
   creators: User[];
-  brands: TrendingBrand[];
+  brandsAll: TrendingBrand[];
+  brandsDam: TrendingBrand[];
+  brandsHerr: TrendingBrand[];
   likedIds?: string[];
   savedIds?: string[];
 }) {
@@ -40,6 +44,11 @@ export default function TrendigtClient({
   const genderOutfits = outfits.filter((o) =>
     matchesGenderFilter(o.gender, gender),
   );
+
+  // Brand-listan följer kön-filtret. Server skickar tre cache-vänliga
+  // varianter; vi byter mellan dem utan att rendera om något extra.
+  const brands =
+    gender === "dam" ? brandsDam : gender === "herr" ? brandsHerr : brandsAll;
 
   const trendingNow = [...genderOutfits]
     .sort((a, b) => b.likes - a.likes)
@@ -103,15 +112,7 @@ export default function TrendigtClient({
                       aria-label={`${user.displayName} — ${user.followers.toLocaleString("sv-SE")} följare`}
                       className="flex flex-col items-center gap-3 w-32 group"
                     >
-                      <div className="relative">
-                        <UserAvatar src={user.avatar} alt="" size="lg" />
-                        <span
-                          aria-hidden="true"
-                          className="absolute -top-1 -right-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-foreground text-background text-[10px] font-bold"
-                        >
-                          {i + 1}
-                        </span>
-                      </div>
+                      <UserAvatar src={user.avatar} alt="" size="lg" />
                       <div className="text-center">
                         <p className="text-sm font-medium text-foreground truncate max-w-[8rem]">
                           {user.displayName}
