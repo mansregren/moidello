@@ -357,6 +357,30 @@ export function brandPageJsonLd(brand: {
 }
 
 /**
+ * FAQPage schema for the /faq page. AI search models (ChatGPT,
+ * Perplexity, Claude) lean heavily on FAQPage data to extract quotable
+ * answers. Keep each answer short and standalone so a model can lift
+ * it verbatim without needing surrounding context.
+ */
+export function faqPageJsonLd(qa: { question: string; answer: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${SITE_BASE}/faq#faq`,
+    url: abs("/faq"),
+    isPartOf: { "@id": `${SITE_BASE}/#website` },
+    mainEntity: qa.map(({ question, answer }) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: answer,
+      },
+    })),
+  };
+}
+
+/**
  * CollectionPage + ItemList for index/discovery pages.
  * Used by the home page (curated front) and /upptack (full catalog) so
  * each can show as a rich result with a carousel of outfits in Google.

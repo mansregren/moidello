@@ -11,6 +11,7 @@ const footerLinks = {
   ],
   Företag: [
     { href: "/om", label: "Om Moidello" },
+    { href: "/faq", label: "Vanliga frågor" },
     { href: "/kontakt", label: "Kontakt" },
   ],
   Juridik: [
