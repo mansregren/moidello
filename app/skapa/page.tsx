@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload, Eye, X, CheckCircle2, Plus, AlertTriangle, Loader2 } from "lucide-react";
+import { Upload, Eye, X, CheckCircle2, Plus, AlertTriangle, Loader2, Link as LinkIcon, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
@@ -99,6 +99,12 @@ export default function SkapaPage() {
   const [topError, setTopError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const addMoreInputRef = useRef<HTMLInputElement>(null);
+
+  // Paste-URL → autofill för nya taggar. Anropar samma preview-API som
+  // admin-editorn. Inga AI-anrop — bara OG-taggar + retailer-parsers.
+  const [pasteUrl, setPasteUrl] = useState("");
+  const [pasting, setPasting] = useState(false);
+  const [pasteError, setPasteError] = useState<string | null>(null);
 
   // Reset preview mode when switching drafts so a half-edited tag form
   // doesn't leak over.
@@ -259,6 +265,66 @@ export default function SkapaPage() {
       showRegions: false,
     };
     updateActive({ tags: [...active.tags, tag] });
+  };
+
+  const addTagFromUrl = async (raw: string) => {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+    setPasteError(null);
+    setPasting(true);
+    try {
+      const res = await fetch("/api/admin/items/preview-from-url", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ url: trimmed }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error((j as { error?: string }).error ?? `HTTP ${res.status}`);
+      }
+      const data = (await res.json()) as {
+        brand: string | null;
+        product_name: string | null;
+        price: number | null;
+        currency: string | null;
+        color: string | null;
+        image_url: string | null;
+        is_affiliate: boolean;
+      };
+
+      // Skapa en ny tagg i mitten av bilden — användaren kan dra den
+      // till rätt plats efter. Tom data fylls in manuellt.
+      const tag: DemoTag = {
+        id: Date.now() + Math.random(),
+        x: 50,
+        y: 50,
+        brand: data.brand ?? "",
+        name: data.product_name ?? "",
+        url: trimmed,
+        garment: garmentsForGender(active.gender)[0],
+        price: data.price != null ? String(data.price) : "",
+        currency: (data.currency ?? "SEK").toUpperCase(),
+        color: data.color ?? "",
+        imageUrl: data.image_url ?? "",
+        isAffiliate: !!data.is_affiliate,
+        regionUrls: {},
+        showRegions: false,
+      };
+      updateActive({ tags: [...active.tags, tag] });
+      setPasteUrl("");
+
+      if (!data.brand && !data.product_name) {
+        setPasteError(
+          "Sidan svarade men vi hittade ingen produktdata — fyll i fälten manuellt.",
+        );
+      }
+    } catch (e) {
+      setPasteError(
+        e instanceof Error ? e.message : "Kunde inte hämta från URL:en.",
+      );
+    } finally {
+      setPasting(false);
+    }
   };
 
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -886,10 +952,60 @@ export default function SkapaPage() {
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
                   Taggade plagg ({active.tags.length})
                 </label>
+
+                {/* Paste-URL → autofill. Tagg läggs i mitten av bilden,
+                    användaren drar dit den ska. Ingen AI — bara OG-taggar +
+                    retailer-parsers, så ~80–90% träffsäkert på stora butiker. */}
+                <div className="mb-4 rounded-xl border border-border bg-background-secondary p-4">
+                  <p className="text-xs uppercase tracking-[0.14em] text-foreground-muted mb-2 flex items-center gap-1.5">
+                    <Sparkles className="h-3 w-3" />
+                    Snabb-tagg från produkt-URL
+                  </p>
+                  <p className="text-xs text-foreground-subtle mb-3">
+                    Klistra in en länk till plagget — vi fyller i märke, namn,
+                    pris och bild automatiskt. Ändra fritt sedan.
+                  </p>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-subtle" />
+                      <input
+                        type="url"
+                        placeholder="https://..."
+                        value={pasteUrl}
+                        onChange={(e) => setPasteUrl(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            addTagFromUrl(pasteUrl);
+                          }
+                        }}
+                        disabled={pasting}
+                        className="w-full rounded-lg bg-background-tertiary border border-border pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 disabled:opacity-60"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => addTagFromUrl(pasteUrl)}
+                      disabled={pasting || !pasteUrl.trim()}
+                      className="inline-flex items-center gap-2 rounded-lg bg-foreground text-background px-4 py-2 text-sm font-medium hover:bg-foreground/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {pasting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4 w-4" />
+                      )}
+                      Hämta info
+                    </button>
+                  </div>
+                  {pasteError && (
+                    <p className="mt-2 text-xs text-red-500">{pasteError}</p>
+                  )}
+                </div>
+
                 {active.tags.length === 0 ? (
                   <p className="text-sm text-foreground-subtle">
-                    Klicka direkt på bilden för att placera en tagg på det
-                    plagget.
+                    Klicka direkt på bilden för att placera en tagg, eller
+                    klistra in en produkt-URL ovan.
                   </p>
                 ) : (
                   <div className="space-y-3">

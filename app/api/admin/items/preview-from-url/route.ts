@@ -9,7 +9,6 @@ import { NextResponse } from "next/server";
 import { LRUCache } from "lru-cache";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
-import { isCurrentUserAdmin } from "@/lib/admin";
 import { findRetailer, openGraphFallback } from "@/lib/retailers";
 import type { ProductMeta } from "@/lib/retailers";
 import { detectAffiliate } from "@/lib/affiliate/detect";
@@ -113,16 +112,22 @@ async function fetchHtml(url: string): Promise<string | null> {
 }
 
 export async function POST(request: Request) {
-  if (!(await isCurrentUserAdmin())) {
-    return NextResponse.json({ error: "Inte behörig." }, { status: 403 });
-  }
-
-  // Rate-limit per-admin-user so a runaway script doesn't spam upstream
-  // retailers (and incidentally DoS them on our IP). Limit: 10/min.
+  // Vem som helst inloggad får använda preview — /skapa behöver samma
+  // autofyll-flöde som admin-editorn. Skyddet vi förlitar oss på:
+  // rate-limit per användare (10/min), SSRF-validering på hostname/IP,
+  // 5 s timeout, 1.5 MB HTML-cap. Routen returnerar bara OG-data som
+  // användaren ändå kan se i sin webbläsares dev-tools.
   const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const rateKey =
-    user?.id ?? request.headers.get("x-forwarded-for") ?? "anon";
+  if (!user) {
+    return NextResponse.json(
+      { error: "Du måste vara inloggad." },
+      { status: 401 },
+    );
+  }
+
+  // Rate-limit per user. Limit: 10/min.
+  const rateKey = user.id;
   const rl = await checkRateLimit("preview", rateKey);
   if (!rl.ok) {
     return NextResponse.json(
