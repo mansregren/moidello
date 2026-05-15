@@ -198,18 +198,6 @@ function brandFallbackJsx() {
       >
         Moidello
       </div>
-      <div
-        style={{
-          fontSize: 28,
-          color: "#999",
-          marginTop: 24,
-          letterSpacing: "0.25em",
-          textTransform: "uppercase",
-          fontFamily: "Inter",
-        }}
-      >
-        Inspiration för varje outfit
-      </div>
     </div>
   );
 }

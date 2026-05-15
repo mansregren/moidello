@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Moidello — Inspiration för varje outfit";
+export const alt = "Moidello";
 
 async function loadAnton(): Promise<ArrayBuffer> {
   // Satori needs TTF; Google Fonts CSS endpoint serves WOFF2 to modern UAs.
@@ -41,18 +41,6 @@ export default async function Image() {
           }}
         >
           Moidello
-        </div>
-        <div
-          style={{
-            fontSize: 28,
-            color: "#999",
-            marginTop: 36,
-            letterSpacing: "10px",
-            textTransform: "uppercase",
-            fontFamily: "Anton",
-          }}
-        >
-          Inspiration för varje outfit
         </div>
       </div>
     ),

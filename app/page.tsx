@@ -51,7 +51,7 @@ export default async function HomePage() {
       <JsonLd
         data={collectionPageJsonLd({
           path: "/",
-          name: "Moidello — Inspiration för varje outfit",
+          name: "Moidello",
           description:
             "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
           outfits,

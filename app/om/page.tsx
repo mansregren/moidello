@@ -34,9 +34,9 @@ export default async function OmPage() {
                 Om Moidello
               </h1>
               <p className="mt-5 max-w-xl text-base md:text-lg text-white/80 leading-relaxed">
-                Inspiration för varje outfit. En plattform för att upptäcka,
-                dela och inspireras av outfits — där stil är enkelt att hitta
-                och ännu enklare att köpa.
+                En plattform för att upptäcka, dela och inspireras av
+                outfits — där stil är enkelt att hitta och ännu enklare
+                att köpa.
               </p>
             </Container>
           </div>

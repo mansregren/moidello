@@ -27,7 +27,7 @@ function wrap(body: string, footerNote?: string): string {
             <tr>
               <td style="padding:18px 32px;background:#fafaf8;border-top:1px solid #ececec;font-size:12px;color:#6e6e6e;">
                 ${footerNote ?? ""}
-                <p style="margin:0;">Moidello · Inspiration för varje outfit · <a href="https://moidello.com" style="color:#0b0b0b;text-decoration:none;">moidello.com</a></p>
+                <p style="margin:0;">Moidello · <a href="https://moidello.com" style="color:#0b0b0b;text-decoration:none;">moidello.com</a></p>
               </td>
             </tr>
           </table>

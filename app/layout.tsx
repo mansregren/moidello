@@ -29,7 +29,7 @@ const anton = Anton({
 export const metadata: Metadata = {
   metadataBase: new URL("https://moidello.com"),
   title: {
-    default: "Moidello — Inspiration för varje outfit",
+    default: "Moidello",
     template: "%s | Moidello",
   },
   description:
@@ -51,13 +51,13 @@ export const metadata: Metadata = {
     locale: "sv_SE",
     url: "https://moidello.com",
     siteName: "Moidello",
-    title: "Moidello — Inspiration för varje outfit",
+    title: "Moidello",
     description:
       "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Moidello — Inspiration för varje outfit",
+    title: "Moidello",
     description:
       "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
   },
