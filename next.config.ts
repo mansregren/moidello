@@ -41,6 +41,13 @@ const nextConfig: NextConfig = {
       { hostname: "cqarmynxrewurcbrrftn.supabase.co" },
     ],
   },
+  experimental: {
+    // /skapa accepterar bilder upp till 10MB; default 1MB-gränsen gör
+    // att server-action svaret blir "An unexpected response was received".
+    serverActions: {
+      bodySizeLimit: "12mb",
+    },
+  },
   async headers() {
     return [
       {
