@@ -16,7 +16,7 @@ export default function VillkorPage() {
               Användarvillkor
             </h1>
             <p className="mt-6 text-sm text-foreground-muted">
-              Senast uppdaterad 8 maj 2026
+              Senast uppdaterad 15 maj 2026
             </p>
           </div>
 
@@ -128,7 +128,41 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                8. Moderation
+                8. Anmälan av intrång
+              </h2>
+              <p>
+                Om du anser att innehåll på Moidello gör intrång i din
+                upphovsrätt, ditt varumärke eller annan rättighet, kan du
+                anmäla detta till{" "}
+                <a
+                  href="mailto:hello@moidello.com"
+                  className="text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"
+                >
+                  hello@moidello.com
+                </a>
+                .
+              </p>
+              <p className="mt-4">En anmälan bör innehålla:</p>
+              <ul className="mt-4 space-y-2 list-disc list-outside pl-6">
+                <li>länk till det innehåll som anses göra intrång</li>
+                <li>beskrivning av den rättighet som gjorts intrång i</li>
+                <li>
+                  dina kontaktuppgifter och en försäkran om att uppgifterna är
+                  korrekta
+                </li>
+              </ul>
+              <p className="mt-4">
+                Vi granskar anmälningar utan onödigt dröjsmål, normalt inom
+                fem arbetsdagar, och tar bort innehåll som vid en första
+                bedömning verkar göra intrång. Användaren som publicerat
+                innehållet informeras om åtgärden och kan inkomma med
+                motanmälan om de anser att borttagningen är felaktig.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
+                9. Moderation
               </h2>
               <p>
                 Moidello förbehåller sig rätten att ta bort innehåll, begränsa
@@ -136,11 +170,16 @@ export default function VillkorPage() {
                 ersättningsskyldighet. Innehåll som rapporteras granskas inom
                 rimlig tid.
               </p>
+              <p className="mt-4">
+                Användare som upprepat publicerar innehåll som gör intrång i
+                tredje parts rättigheter kan stängas av permanent utan
+                föregående varning.
+              </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                9. Immateriella rättigheter
+                10. Immateriella rättigheter
               </h2>
               <p>
                 Moidello, logotyp, varumärken och plattformens design tillhör
@@ -151,7 +190,7 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                10. Ansvarsbegränsning
+                11. Ansvarsbegränsning
               </h2>
               <p>
                 Tjänsten tillhandahålls i befintligt skick utan garantier av
@@ -164,7 +203,7 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                11. Ändringar
+                12. Ändringar
               </h2>
               <p>
                 Villkoren kan uppdateras. Vid väsentliga ändringar informeras
@@ -175,7 +214,7 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                12. Tillämplig lag
+                13. Tillämplig lag
               </h2>
               <p>
                 Svensk lag tillämpas på Villkoren. Tvister avgörs av svensk
@@ -185,7 +224,7 @@ export default function VillkorPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                13. Kontakt
+                14. Kontakt
               </h2>
               <p>
                 Frågor om Villkoren skickas till{" "}
