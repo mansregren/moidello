@@ -62,32 +62,23 @@ export function TaggedItemCard({
 
   return (
     <>
-      <article className="flex items-center gap-3 py-3 border-b border-border last:border-0">
-        {/* Garment chip (clickable → product page) */}
-        <Link
-          href={`/produkt/${item.id}`}
-          aria-label={`${item.brand} ${item.name}`}
-          className="relative h-[72px] w-[72px] sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-xl bg-background-tertiary border border-border flex items-center justify-center px-2 text-center"
-        >
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-foreground-muted leading-tight">
-            {item.garment}
-          </span>
-        </Link>
-
-        {/* Brand / name / price */}
+      <article className="flex items-center gap-4 py-4 border-b border-border last:border-0">
+        {/* Brand / garment / name / price — typografisk, ingen thumbnail */}
         <Link
           href={`/produkt/${item.id}`}
           className="flex-1 min-w-0 hover:opacity-90 transition-opacity"
         >
-          <p className="text-[10px] text-foreground-muted uppercase tracking-wider truncate">
-            {item.brand}
+          <p className="text-[10px] text-foreground-muted uppercase tracking-[0.14em] truncate">
+            <span>{item.brand}</span>
+            <span className="mx-1.5 text-foreground-subtle">·</span>
+            <span>{item.garment}</span>
             {item.isAffiliate && (
               <span className="ml-2 inline-flex rounded-full bg-foreground/10 text-foreground-muted px-1.5 py-0.5 text-[9px] font-semibold tracking-wider">
                 REKLAM
               </span>
             )}
           </p>
-          <p className="text-sm font-medium text-foreground mt-0.5 line-clamp-1">
+          <p className="text-sm font-medium text-foreground mt-1 line-clamp-1">
             {item.name}
           </p>
           {item.price > 0 && (
