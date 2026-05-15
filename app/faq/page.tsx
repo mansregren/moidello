@@ -48,7 +48,7 @@ const FAQ: { question: string; answer: string }[] = [
   {
     question: "Vilka märken finns på Moidello?",
     answer:
-      "Märken läggs till av kreatörer när de taggar plagg i sina outfits. Bland nuvarande märken finns Djerf Avenue, Nelly, NA-KD, Aimé Leon Dore samt flera mindre svenska och internationella märken.",
+      "Märken läggs till av kreatörer när de taggar plagg i sina outfits. Sortimentet spänner från svenska designermärken till etablerade internationella mode-företag inom hela prisspannet.",
   },
   {
     question: "Kan ett märke skapa en egen profil?",
