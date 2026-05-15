@@ -7,9 +7,15 @@ import {
 import { fetchTopCreatorsCached } from "@/lib/queries-cached";
 import { createClient } from "@/lib/supabase/server";
 import { pickBgs, HERO_POOL } from "@/lib/session-background";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { collectionPageJsonLd } from "@/lib/json-ld";
 import HomeClient from "./HomeClient";
 
 export const dynamic = "force-dynamic";
+
+export const metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -41,15 +47,26 @@ export default async function HomePage() {
   const { liked, saved } = await fetchEngagementForViewer(allIds);
 
   return (
-    <HomeClient
-      outfits={outfits}
-      following={following}
-      creators={creators}
-      categoryCovers={categoryCovers}
-      likedIds={Array.from(liked)}
-      savedIds={Array.from(saved)}
-      heroBg={heroBg}
-      lifestyleBg={lifestyleBg}
-    />
+    <>
+      <JsonLd
+        data={collectionPageJsonLd({
+          path: "/",
+          name: "Moidello — Inspiration för varje outfit",
+          description:
+            "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
+          outfits,
+        })}
+      />
+      <HomeClient
+        outfits={outfits}
+        following={following}
+        creators={creators}
+        categoryCovers={categoryCovers}
+        likedIds={Array.from(liked)}
+        savedIds={Array.from(saved)}
+        heroBg={heroBg}
+        lifestyleBg={lifestyleBg}
+      />
+    </>
   );
 }

@@ -131,6 +131,40 @@ export default function OutfitDetail({
       )}
       <main id="main" tabIndex={-1} className="flex-1 pt-20 md:pt-24">
         <Container>
+          <nav
+            aria-label="Brödsmulor"
+            className="mb-6 text-[11px] uppercase tracking-[0.18em] text-foreground-subtle"
+          >
+            <ol className="flex items-center gap-2 flex-wrap">
+              <li>
+                <Link
+                  href="/"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Moidello
+                </Link>
+              </li>
+              <li aria-hidden="true" className="text-foreground-subtle/60">
+                /
+              </li>
+              <li>
+                <Link
+                  href="/upptack"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Outfits
+                </Link>
+              </li>
+              {outfit.category && (
+                <>
+                  <li aria-hidden="true" className="text-foreground-subtle/60">
+                    /
+                  </li>
+                  <li className="text-foreground-muted">{outfit.category}</li>
+                </>
+              )}
+            </ol>
+          </nav>
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
             <motion.div
               initial={{ opacity: 0, x: -30 }}

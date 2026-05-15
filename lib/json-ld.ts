@@ -343,5 +343,52 @@ export function brandPageJsonLd(brand: {
   };
 }
 
+/**
+ * CollectionPage + ItemList for index/discovery pages.
+ * Used by the home page (curated front) and /upptack (full catalog) so
+ * each can show as a rich result with a carousel of outfits in Google.
+ */
+export function collectionPageJsonLd({
+  path,
+  name,
+  description,
+  outfits,
+}: {
+  path: string;
+  name: string;
+  description: string;
+  outfits: Outfit[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": `${SITE_BASE}${path}#collection`,
+        url: abs(path),
+        name,
+        description,
+        isPartOf: { "@id": `${SITE_BASE}/#website` },
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${SITE_BASE}${path}#outfits`,
+        numberOfItems: outfits.length,
+        itemListElement: outfits.slice(0, 50).map((o, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          url: abs(
+            o.slug && o.creator.username
+              ? `/${o.creator.username.toLowerCase()}/${o.slug}`
+              : `/outfit/${o.id}`,
+          ),
+          name: o.title,
+          image: abs(o.image),
+        })),
+      },
+    ],
+  };
+}
+
 // Re-export TaggedItem for ergonomics
 export type { TaggedItem };
