@@ -115,14 +115,26 @@ export function productJsonLd(item: {
   buyUrl?: string;
   image: string;
 }) {
-  const offers: Record<string, unknown> = {
-    "@type": "Offer",
-    priceCurrency: item.currency,
-    price: item.price > 0 ? item.price : undefined,
-    availability: "https://schema.org/InStock",
-  };
-  if (item.buyUrl && item.buyUrl !== "#") {
-    offers.url = item.buyUrl;
+  // Only emit Offer when we have a real price — Google flags an Offer
+  // with priceCurrency but no price as invalid ("Ange antingen price
+  // eller priceSpecification.price"). A Product without an Offer is
+  // still valid; it just won't show price in rich results.
+  //
+  // seller is set to the brand because Moidello is *not* the merchant —
+  // we link out to the brand's own site. Without seller, Google assumes
+  // the page owner (Moidello) is selling, which is misleading.
+  let offers: Record<string, unknown> | undefined;
+  if (item.price > 0) {
+    offers = {
+      "@type": "Offer",
+      priceCurrency: item.currency,
+      price: item.price,
+      availability: "https://schema.org/InStock",
+      seller: { "@type": "Organization", name: item.brand },
+    };
+    if (item.buyUrl && item.buyUrl !== "#") {
+      offers.url = item.buyUrl;
+    }
   }
 
   return {
