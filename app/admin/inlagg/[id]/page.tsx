@@ -22,6 +22,7 @@ import {
   type TagPosition,
 } from "./OutfitEditor";
 import { PasteTagForm } from "./PasteTagForm";
+import { ShareImageButton } from "./ShareImageButton";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +37,7 @@ export default async function AdminOutfitDetailPage({
   const { data: outfit } = await supabase
     .from("outfits")
     .select(
-      "id, slug, user_id, title, description, keywords, category, gender, is_published, scheduled_for, image_url, image_path, created_at",
+      "id, slug, user_id, title, description, keywords, category, gender, is_published, scheduled_for, image_url, image_path, code, created_at",
     )
     .eq("id", id)
     .maybeSingle();
@@ -192,6 +193,13 @@ export default async function AdminOutfitDetailPage({
               Publik vy
               <ExternalLink className="h-3 w-3" />
             </Link>
+          </div>
+
+          <div className="mt-4">
+            <ShareImageButton
+              outfitId={outfit.id as string}
+              code={(outfit.code as string | null) ?? null}
+            />
           </div>
 
           <section className="mt-8 grid grid-cols-3 sm:grid-cols-6 gap-2">
