@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Download, Hash, Check, Sparkles } from "lucide-react";
 import { PaketModal } from "./PaketModal";
+import { BulkPaketModal } from "./BulkPaketModal";
 
 interface OutfitTagLite {
   id: string;
@@ -79,6 +80,7 @@ export function TikTokBilderClient({ outfits }: Props) {
   const [bulkBusy, setBulkBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paketOutfit, setPaketOutfit] = useState<OutfitListRow | null>(null);
+  const [bulkPaketOpen, setBulkPaketOpen] = useState(false);
 
   function toggle(id: string) {
     setSelected((prev) => {
@@ -154,16 +156,35 @@ export function TikTokBilderClient({ outfits }: Props) {
           )}
           <button
             type="button"
+            onClick={() => {
+              if (selected.size === 1) {
+                const id = Array.from(selected)[0];
+                const o = outfits.find((x) => x.id === id);
+                if (o) setPaketOutfit(o);
+              } else if (selected.size > 1) {
+                setBulkPaketOpen(true);
+              }
+            }}
+            disabled={selected.size === 0}
+            className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-4 py-2 text-xs font-semibold hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            {selected.size > 1
+              ? `Paket (${selected.size})`
+              : "Paket"}
+          </button>
+          <button
+            type="button"
             onClick={downloadSelected}
             disabled={bulkBusy || selected.size === 0}
-            className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-4 py-2 text-xs font-semibold hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background-secondary px-4 py-2 text-xs font-semibold text-foreground hover:border-foreground/30 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="h-3.5 w-3.5" />
             {bulkBusy
               ? "Hämtar…"
               : selected.size > 1
-                ? `Spara ${selected.size} bilder`
-                : "Spara valda"}
+                ? `Hero × ${selected.size}`
+                : "Hero"}
           </button>
         </div>
       </div>
@@ -264,6 +285,14 @@ export function TikTokBilderClient({ outfits }: Props) {
           outfit={paketOutfit}
           tags={paketOutfit.tags}
           onClose={() => setPaketOutfit(null)}
+        />
+      )}
+
+      {bulkPaketOpen && (
+        <BulkPaketModal
+          open={bulkPaketOpen}
+          outfits={outfits.filter((o) => selected.has(o.id))}
+          onClose={() => setBulkPaketOpen(false)}
         />
       )}
     </>
