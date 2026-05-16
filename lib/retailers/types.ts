@@ -26,6 +26,10 @@ export interface Retailer {
   domains: string[];
   /** Locales this retailer can be rewritten to */
   supportedLocales: Locale[];
+  /** True när retailern blockerar server-side fetch (Akamai osv). Routen
+   * hoppar då över HTML-hämtningen och anropar extract med tom HTML —
+   * modulen får göra det bästa den kan av URL:en. */
+  skipFetch?: boolean;
   /** Quick check used to route a URL to this module */
   match(url: URL): boolean;
   /** Extract product meta from fetched HTML */

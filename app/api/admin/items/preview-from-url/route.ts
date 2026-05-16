@@ -198,10 +198,19 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   }
 
-  const html = await fetchHtml(url.toString());
+  // Retailers med skipFetch (t.ex. ASOS bakom Akamai) hoppar över HTML-
+  // hämtningen — annars äter timeout:en 5 s av användarens tid till noll
+  // nytta. Extract får tom HTML och får göra det bästa den kan av URL:en.
+  const html = retailer?.skipFetch ? "" : await fetchHtml(url.toString());
   let meta: Partial<ProductMeta> = {};
 
-  if (html) {
+  if (retailer?.skipFetch) {
+    try {
+      meta = await retailer.extract("", url);
+    } catch {
+      meta = {};
+    }
+  } else if (html) {
     try {
       meta = retailer
         ? await retailer.extract(html, url)
