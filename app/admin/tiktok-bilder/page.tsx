@@ -17,6 +17,12 @@ interface OutfitFetchRow {
     username: string;
     display_name: string | null;
   } | null;
+  tagged_items: Array<{
+    id: string;
+    brand: string;
+    name: string;
+    garment: string;
+  }> | null;
 }
 
 export default async function AdminTikTokBilderPage() {
@@ -26,7 +32,8 @@ export default async function AdminTikTokBilderPage() {
     .from("outfits")
     .select(
       `id, title, image_url, code, created_at,
-       profiles:profiles!outfits_user_id_fkey ( username, display_name )`,
+       profiles:profiles!outfits_user_id_fkey ( username, display_name ),
+       tagged_items ( id, brand, name, garment )`,
     )
     .eq("is_published", true)
     .order("created_at", { ascending: false });
@@ -37,6 +44,12 @@ export default async function AdminTikTokBilderPage() {
     image_url: o.image_url,
     code: o.code,
     username: o.profiles?.username ?? "okänd",
+    tags: (o.tagged_items ?? []).map((t) => ({
+      id: t.id,
+      brand: t.brand,
+      name: t.name,
+      garment: t.garment,
+    })),
   }));
 
   return (
@@ -48,10 +61,10 @@ export default async function AdminTikTokBilderPage() {
         TikTok-bilder
       </h1>
       <p className="mt-4 text-foreground-muted max-w-2xl">
-        Ladda ner en 9:16-bild per outfit för delning på TikTok eller
-        Stories. Markera flera kort och tryck Spara — på iPhone öppnas
-        delningsmenyn med “Save to Photos” så bilderna hamnar i
-        kamerarullen.
+        Per outfit får du ett TikTok-paket: hero-bild + en bild per plagg
+        (max 5), AI-genererad rubrik + beskrivning + 5 hashtags. Tryck
+        Paket på ett kort. På iPhone öppnas delningsmenyn så bilderna
+        landar i kamerarullen.
       </p>
 
       <div className="mt-8">

@@ -3,7 +3,15 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Download, Hash, Check } from "lucide-react";
+import { Download, Hash, Check, Sparkles } from "lucide-react";
+import { PaketModal } from "./PaketModal";
+
+interface OutfitTagLite {
+  id: string;
+  brand: string;
+  name: string;
+  garment: string;
+}
 
 interface OutfitListRow {
   id: string;
@@ -11,6 +19,7 @@ interface OutfitListRow {
   image_url: string;
   code: string | null;
   username: string;
+  tags: OutfitTagLite[];
 }
 
 interface Props {
@@ -69,6 +78,7 @@ export function TikTokBilderClient({ outfits }: Props) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paketOutfit, setPaketOutfit] = useState<OutfitListRow | null>(null);
 
   function toggle(id: string) {
     setSelected((prev) => {
@@ -215,28 +225,47 @@ export function TikTokBilderClient({ outfits }: Props) {
                 <p className="text-[11px] text-foreground-subtle line-clamp-1">
                   @{o.username}
                 </p>
-                <div className="mt-auto flex items-center gap-2">
+                <div className="mt-auto flex flex-col gap-1.5">
                   <button
                     type="button"
-                    onClick={() => downloadOne(o)}
-                    disabled={isBusy}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:border-foreground/30 disabled:opacity-50"
+                    onClick={() => setPaketOutfit(o)}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1.5 text-xs font-semibold hover:bg-foreground/90"
                   >
-                    <Download className="h-3.5 w-3.5" />
-                    {isBusy ? "Hämtar…" : "Spara"}
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Paket
                   </button>
-                  <Link
-                    href={`/admin/inlagg/${o.id}`}
-                    className="text-[11px] text-foreground-muted hover:text-foreground"
-                  >
-                    Öppna →
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => downloadOne(o)}
+                      disabled={isBusy}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:border-foreground/30 disabled:opacity-50"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      {isBusy ? "Hämtar…" : "Hero"}
+                    </button>
+                    <Link
+                      href={`/admin/inlagg/${o.id}`}
+                      className="text-[11px] text-foreground-muted hover:text-foreground"
+                    >
+                      Öppna →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </li>
           );
         })}
       </ul>
+
+      {paketOutfit && (
+        <PaketModal
+          open={!!paketOutfit}
+          outfit={paketOutfit}
+          tags={paketOutfit.tags}
+          onClose={() => setPaketOutfit(null)}
+        />
+      )}
     </>
   );
 }
