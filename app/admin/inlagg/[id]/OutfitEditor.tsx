@@ -621,6 +621,9 @@ export function TagPositionEditor({
   const [savingId, setSavingId] = useState<string | null>(null);
   const [justSavedId, setJustSavedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Pricken som just nu interageras med lyfts över alla andra så den
+  // inte hamnar bakom en granne när du drar två pinnar nära varandra.
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   // Reset state if server data changes after a router.refresh()
   useEffect(() => {
@@ -655,6 +658,8 @@ export function TagPositionEditor({
     const container = containerRef.current;
     if (!container) return;
 
+    setActiveId(tagId);
+
     const startX = e.clientX;
     const startY = e.clientY;
     let dragging = false;
@@ -685,6 +690,7 @@ export function TagPositionEditor({
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
+      setActiveId(null);
       if (!dragging) focusTagCard(tagId);
     };
     window.addEventListener("pointermove", onMove);
@@ -751,7 +757,11 @@ export function TagPositionEditor({
             <div
               key={tag.id}
               className="absolute"
-              style={{ left: `${tag.x}%`, top: `${tag.y}%` }}
+              style={{
+                left: `${tag.x}%`,
+                top: `${tag.y}%`,
+                zIndex: activeId === tag.id ? 20 : 10,
+              }}
             >
               <div
                 onPointerDown={(e) => startPointer(e, tag.id)}
