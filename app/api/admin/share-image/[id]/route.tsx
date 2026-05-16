@@ -13,20 +13,37 @@ const CANVAS_W = 1080;
 const CANVAS_H = 1920;
 
 // Inner outfit-frame matchar sajtens 800×1100-cover (≈ 8:11). Centrerad
-// horisontellt med generöst luft över + plats för stor outfit-kod under.
-const FRAME_W = 880;
-const FRAME_H = 1210;
+// horisontellt med smal marginal — bilden får ta plats.
+const FRAME_W = 960;
+const FRAME_H = 1320;
 const FRAME_X = (CANVAS_W - FRAME_W) / 2;
-const FRAME_Y = 110;
+const FRAME_Y = 90;
 
-const BG = "#F7F6F3"; // Moidello kräm/off-white
 const INK = "#1A1A1A";
 const INK_MUTED = "rgba(26,26,26,0.55)";
+
+// Samma pool som hero-rotationen på sajten — Måns egna bilder. Speglar
+// HERO_POOL i lib/session-background.ts. Hålls inline för att slippa
+// importera cookies-baserad helper i en route handler.
+const BG_POOL = [
+  "/images/bg/positano.webp",
+  "/images/bg/parasols.webp",
+  "/images/bg/harbor.webp",
+  "/images/bg/ocean.webp",
+  "/images/bg/boats.webp",
+  "/images/bg/cafe.webp",
+] as const;
 
 function absUrl(src: string): string {
   if (!src) return "";
   if (src.startsWith("http")) return src;
   return `${SITE_BASE}${src.startsWith("/") ? src : `/${src}`}`;
+}
+
+function hashStr(s: string): number {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) | 0;
+  return h < 0 ? -h : h;
 }
 
 function shortLabel(brand: string, name: string): string {
@@ -58,6 +75,7 @@ export async function GET(
 
   const code = outfit.code ?? "—";
   const imageUrl = absUrl(outfit.image);
+  const bgUrl = absUrl(BG_POOL[hashStr(outfit.id) % BG_POOL.length]);
 
   // Prick-positionerna är i procent av sajt-bilden (objekt-cover på
   // 800×1100). Vi mappar dem direkt till frame-px. Label-sida väljs så
@@ -81,7 +99,6 @@ export async function GET(
         style={{
           width: "100%",
           height: "100%",
-          background: BG,
           display: "flex",
           flexDirection: "column",
           fontFamily: "Inter",
@@ -89,6 +106,32 @@ export async function GET(
           position: "relative",
         }}
       >
+        {/* Bakgrund — en av Måns hero-bilder, hash-stabil per outfit */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={bgUrl}
+          alt=""
+          width={CANVAS_W}
+          height={CANVAS_H}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: CANVAS_W,
+            height: CANVAS_H,
+            objectFit: "cover",
+          }}
+        />
+        {/* Kräm-tonad overlay så bg lugnar ned sig och outfit-bilden + texten lyfter */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(180deg, rgba(247,246,243,0.78) 0%, rgba(247,246,243,0.7) 55%, rgba(247,246,243,0.85) 100%)",
+            display: "flex",
+          }}
+        />
+
         {/* Outfit-frame */}
         <div
           style={{
@@ -147,13 +190,13 @@ export async function GET(
                 <div
                   style={{
                     position: "absolute",
-                    [d.labelRight ? "left" : "right"]: 30,
+                    [d.labelRight ? "left" : "right"]: 26,
                     display: "flex",
                     background: "rgba(255,255,255,0.95)",
                     color: INK,
-                    padding: "6px 12px",
+                    padding: "5px 10px",
                     borderRadius: 999,
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: 500,
                     letterSpacing: "0.01em",
                     whiteSpace: "nowrap",
@@ -173,28 +216,28 @@ export async function GET(
             position: "absolute",
             left: 0,
             right: 0,
-            bottom: 110,
+            bottom: 90,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 14,
+            gap: 10,
           }}
         >
           <div
             style={{
-              fontSize: 28,
+              fontSize: 20,
               letterSpacing: "0.32em",
               textTransform: "uppercase",
               color: INK_MUTED,
               display: "flex",
             }}
           >
-            Outfit-kod
+            Code
           </div>
           <div
             style={{
               fontFamily: "Anton",
-              fontSize: 240,
+              fontSize: 180,
               lineHeight: 0.92,
               letterSpacing: "0.04em",
               color: INK,
@@ -205,12 +248,12 @@ export async function GET(
           </div>
           <div
             style={{
-              fontSize: 30,
+              fontSize: 22,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
               color: INK_MUTED,
               display: "flex",
-              marginTop: 6,
+              marginTop: 4,
             }}
           >
             moidello.com
