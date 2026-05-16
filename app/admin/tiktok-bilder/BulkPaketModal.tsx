@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X, Copy, Check, RefreshCw, Download } from "lucide-react";
+import { shareOrSavePhotos } from "./share-files";
 
 interface OutfitInput {
   id: string;
@@ -26,32 +27,6 @@ function heroFileName(o: OutfitInput): string {
   return `moidello-${o.code ?? o.id.slice(0, 8)}-hero.png`;
 }
 
-async function deliverFiles(files: File[]) {
-  if (
-    typeof navigator !== "undefined" &&
-    typeof navigator.canShare === "function" &&
-    navigator.canShare({ files })
-  ) {
-    try {
-      await navigator.share({ files });
-      return;
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return;
-    }
-  }
-  for (const file of files) {
-    const url = URL.createObjectURL(file);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    await new Promise((r) => setTimeout(r, 150));
-  }
-}
-
 export function BulkPaketModal({ open, outfits, onClose }: Props) {
   const [caption, setCaption] = useState<Caption | null>(null);
   const [loading, setLoading] = useState(false);
@@ -61,6 +36,38 @@ export function BulkPaketModal({ open, outfits, onClose }: Props) {
   const [copiedBody, setCopiedBody] = useState(false);
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkError, setBulkError] = useState<string | null>(null);
+  // Pre-fetchade File-objekt så Save-klicket kan dela direkt utan await.
+  const [files, setFiles] = useState<File[] | null>(null);
+  const [filesLoading, setFilesLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open || outfits.length === 0) return;
+    let cancelled = false;
+    setFiles(null);
+    setFilesLoading(true);
+    Promise.all(
+      outfits.map(async (o) => {
+        const res = await fetch(`/api/admin/share-image/${o.id}`, {
+          cache: "no-store",
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status} på ${o.id}`);
+        const blob = await res.blob();
+        return new File([blob], heroFileName(o), { type: "image/png" });
+      }),
+    )
+      .then((fs) => {
+        if (!cancelled) setFiles(fs);
+      })
+      .catch((e) => {
+        if (!cancelled) setBulkError(String(e));
+      })
+      .finally(() => {
+        if (!cancelled) setFilesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, outfits]);
 
   useEffect(() => {
     if (!open || outfits.length === 0) return;
@@ -143,21 +150,11 @@ export function BulkPaketModal({ open, outfits, onClose }: Props) {
   }
 
   async function downloadAll() {
-    if (bulkBusy || outfits.length === 0) return;
+    if (bulkBusy || !files) return;
     setBulkBusy(true);
     setBulkError(null);
     try {
-      const files = await Promise.all(
-        outfits.map(async (o) => {
-          const res = await fetch(`/api/admin/share-image/${o.id}`, {
-            cache: "no-store",
-          });
-          if (!res.ok) throw new Error(`HTTP ${res.status} på ${o.id}`);
-          const blob = await res.blob();
-          return new File([blob], heroFileName(o), { type: "image/png" });
-        }),
-      );
-      await deliverFiles(files);
+      await shareOrSavePhotos(files);
     } catch (e) {
       setBulkError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -291,13 +288,22 @@ export function BulkPaketModal({ open, outfits, onClose }: Props) {
               <button
                 type="button"
                 onClick={downloadAll}
-                disabled={bulkBusy}
+                disabled={bulkBusy || !files}
                 className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-4 py-2 text-xs font-semibold hover:bg-foreground/90 disabled:opacity-50"
               >
                 <Download className="h-3.5 w-3.5" />
-                {bulkBusy ? "Hämtar…" : `Spara alla ${outfits.length}`}
+                {bulkBusy
+                  ? "Hämtar…"
+                  : filesLoading || !files
+                    ? "Förbereder…"
+                    : `Spara alla ${outfits.length}`}
               </button>
             </div>
+            <p className="mb-3 text-[11px] text-foreground-subtle">
+              På iPhone: tryck Spara → välj <strong>Spara bild</strong> i
+              delningsmenyn (inte “Spara i Filer”). Om inget händer, håll
+              fingret på en thumbnail nedan → <strong>Lägg till i Bilder</strong>.
+            </p>
             {bulkError && (
               <p className="mb-3 text-sm text-red-400">{bulkError}</p>
             )}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X, Copy, Check, RefreshCw, Download } from "lucide-react";
+import { shareOrSavePhotos } from "./share-files";
 
 interface OutfitInput {
   id: string;
@@ -35,32 +36,6 @@ function fileName(o: OutfitInput, suffix: string): string {
   return `moidello-${base}-${suffix}.png`;
 }
 
-async function deliverFiles(files: File[]) {
-  if (
-    typeof navigator !== "undefined" &&
-    typeof navigator.canShare === "function" &&
-    navigator.canShare({ files })
-  ) {
-    try {
-      await navigator.share({ files });
-      return;
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return;
-    }
-  }
-  for (const file of files) {
-    const url = URL.createObjectURL(file);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    await new Promise((r) => setTimeout(r, 150));
-  }
-}
-
 export function PaketModal({ open, outfit, tags, onClose }: Props) {
   const [caption, setCaption] = useState<Caption | null>(null);
   const [captionLoading, setCaptionLoading] = useState(false);
@@ -69,8 +44,52 @@ export function PaketModal({ open, outfit, tags, onClose }: Props) {
   const [copied, setCopied] = useState(false);
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkError, setBulkError] = useState<string | null>(null);
+  // Pre-fetchade File-objekt så navigator.share kan kallas utan await
+  // mellan klick och share — iOS Safari förlorar user-aktivering annars
+  // och faller då tillbaka till download-till-Files istället för Photos.
+  const [files, setFiles] = useState<File[] | null>(null);
+  const [filesLoading, setFilesLoading] = useState(false);
 
   const limitedTags = tags.slice(0, 5); // hero + max 5 plagg = 6 bilder
+
+  // Pre-fetch alla 6 bilder så Save-knappen kan dela utan att vänta.
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setFiles(null);
+    setFilesLoading(true);
+    const urls: Array<{ url: string; name: string }> = [
+      {
+        url: `/api/admin/share-image/${outfit.id}`,
+        name: fileName(outfit, "1-hero"),
+      },
+      ...limitedTags.map((t, i) => ({
+        url: `/api/admin/share-image/${outfit.id}?variant=plagg&tag=${t.id}`,
+        name: fileName(outfit, `${i + 2}-${t.garment.toLowerCase()}`),
+      })),
+    ];
+    Promise.all(
+      urls.map(async ({ url, name }) => {
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const blob = await res.blob();
+        return new File([blob], name, { type: "image/png" });
+      }),
+    )
+      .then((fs) => {
+        if (!cancelled) setFiles(fs);
+      })
+      .catch((e) => {
+        if (!cancelled) setBulkError(String(e));
+      })
+      .finally(() => {
+        if (!cancelled) setFilesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, outfit.id]);
 
   useEffect(() => {
     if (!open) return;
@@ -140,29 +159,13 @@ export function PaketModal({ open, outfit, tags, onClose }: Props) {
   }
 
   async function downloadAll() {
-    if (bulkBusy) return;
+    if (bulkBusy || !files) return;
     setBulkBusy(true);
     setBulkError(null);
     try {
-      const urls: Array<{ url: string; name: string }> = [
-        {
-          url: `/api/admin/share-image/${outfit.id}`,
-          name: fileName(outfit, "1-hero"),
-        },
-        ...limitedTags.map((t, i) => ({
-          url: `/api/admin/share-image/${outfit.id}?variant=plagg&tag=${t.id}`,
-          name: fileName(outfit, `${i + 2}-${t.garment.toLowerCase()}`),
-        })),
-      ];
-      const files = await Promise.all(
-        urls.map(async ({ url, name }) => {
-          const res = await fetch(url, { cache: "no-store" });
-          if (!res.ok) throw new Error(`HTTP ${res.status} på ${url}`);
-          const blob = await res.blob();
-          return new File([blob], name, { type: "image/png" });
-        }),
-      );
-      await deliverFiles(files);
+      // Filer är redan pre-hämtade — bara skicka. iOS Safari behåller
+      // user-aktivering så share-sheet öppnas med "Save N Images" → Photos.
+      await shareOrSavePhotos(files);
     } catch (e) {
       setBulkError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -278,15 +281,22 @@ export function PaketModal({ open, outfit, tags, onClose }: Props) {
               <button
                 type="button"
                 onClick={downloadAll}
-                disabled={bulkBusy}
+                disabled={bulkBusy || !files}
                 className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-4 py-2 text-xs font-semibold hover:bg-foreground/90 disabled:opacity-50"
               >
                 <Download className="h-3.5 w-3.5" />
                 {bulkBusy
                   ? "Hämtar…"
-                  : `Spara alla ${limitedTags.length + 1}`}
+                  : filesLoading || !files
+                    ? "Förbereder…"
+                    : `Spara alla ${limitedTags.length + 1}`}
               </button>
             </div>
+            <p className="mb-3 text-[11px] text-foreground-subtle">
+              På iPhone: tryck Spara → välj <strong>Spara bild</strong> i
+              delningsmenyn (inte “Spara i Filer”). Om inget händer, håll
+              fingret på en thumbnail nedan → <strong>Lägg till i Bilder</strong>.
+            </p>
             {bulkError && (
               <p className="mb-3 text-sm text-red-400">{bulkError}</p>
             )}

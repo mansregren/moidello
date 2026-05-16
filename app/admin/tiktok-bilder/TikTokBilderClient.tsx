@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Download, Hash, Check, Sparkles } from "lucide-react";
 import { PaketModal } from "./PaketModal";
 import { BulkPaketModal } from "./BulkPaketModal";
+import { shareOrSavePhotos } from "./share-files";
 
 interface OutfitTagLite {
   id: string;
@@ -40,40 +41,6 @@ async function fetchPng(o: OutfitListRow): Promise<File> {
   return new File([blob], fileNameFor(o), { type: "image/png" });
 }
 
-/**
- * iOS-Safari kräver Web Share API för att en bild ska kunna landa i
- * Photos (annars hamnar den i Files via <a download>). På desktop
- * stödjer ingen browser canShare-files än, så vi faller tillbaka till
- * sekventiell nedladdning. Cancel från share-sheet är inte ett fel.
- */
-async function deliverFiles(files: File[]): Promise<void> {
-  if (
-    typeof navigator !== "undefined" &&
-    typeof navigator.canShare === "function" &&
-    navigator.canShare({ files })
-  ) {
-    try {
-      await navigator.share({ files });
-      return;
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return;
-      // Annat share-fel — falla tillbaka till download
-    }
-  }
-  for (const file of files) {
-    const url = URL.createObjectURL(file);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    // Lite andrum mellan downloads — annars klipps browsern av efter ~10
-    await new Promise((r) => setTimeout(r, 150));
-  }
-}
-
 export function TikTokBilderClient({ outfits }: Props) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -105,7 +72,7 @@ export function TikTokBilderClient({ outfits }: Props) {
     setError(null);
     try {
       const file = await fetchPng(o);
-      await deliverFiles([file]);
+      await shareOrSavePhotos([file]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Kunde inte hämta bilden");
     } finally {
@@ -121,7 +88,7 @@ export function TikTokBilderClient({ outfits }: Props) {
       const targets = outfits.filter((o) => selected.has(o.id));
       // Hämta alla parallellt — share-API och download tolererar batchen
       const files = await Promise.all(targets.map(fetchPng));
-      await deliverFiles(files);
+      await shareOrSavePhotos(files);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Kunde inte hämta bilderna");
     } finally {
