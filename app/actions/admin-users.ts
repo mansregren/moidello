@@ -159,6 +159,18 @@ const DUMMY_CREATORS: DummySpec[] = [
     bio: "Färg som signatur. Mjuk skärning, hårda accessoarer.",
     avatarUrl: "https://i.pravatar.cc/300?img=17",
   },
+  {
+    username: "sagabohlin",
+    displayName: "Saga Bohlin",
+    bio: "Stillsamma toner, hantverk, en kopp espresso.",
+    avatarUrl: "https://i.pravatar.cc/300?img=20",
+  },
+  {
+    username: "hugolindqvist",
+    displayName: "Hugo Lindqvist",
+    bio: "Tailoring för verkliga liv. Ull och linne.",
+    avatarUrl: "https://i.pravatar.cc/300?img=33",
+  },
 ];
 
 const USERNAME_RE = /^[a-z0-9_]{2,30}$/;
