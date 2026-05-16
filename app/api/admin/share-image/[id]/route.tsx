@@ -12,27 +12,16 @@ const SITE_BASE = "https://moidello.com";
 const CANVAS_W = 1080;
 const CANVAS_H = 1920;
 
-// Inner outfit-frame matchar sajtens 800×1100-cover (≈ 8:11). Centrerad
-// horisontellt med smal marginal — bilden får ta plats.
-const FRAME_W = 960;
-const FRAME_H = 1320;
+// Inner outfit-frame matchar sajtens 800×1100-cover (≈ 8:11). Stor frame
+// med smal sidomarginal så det vita utrymmet på canvas minimeras.
+const FRAME_W = 1000;
+const FRAME_H = 1375;
 const FRAME_X = (CANVAS_W - FRAME_W) / 2;
-const FRAME_Y = 90;
+const FRAME_Y = 70;
 
+const BG = "#F7F6F3"; // Moidello kräm/off-white
 const INK = "#1A1A1A";
 const INK_MUTED = "rgba(26,26,26,0.55)";
-
-// Samma pool som hero-rotationen på sajten — Måns egna bilder. Speglar
-// HERO_POOL i lib/session-background.ts. Hålls inline för att slippa
-// importera cookies-baserad helper i en route handler.
-const BG_POOL = [
-  "/images/bg/positano.webp",
-  "/images/bg/parasols.webp",
-  "/images/bg/harbor.webp",
-  "/images/bg/ocean.webp",
-  "/images/bg/boats.webp",
-  "/images/bg/cafe.webp",
-] as const;
 
 function absUrl(src: string): string {
   if (!src) return "";
@@ -40,17 +29,10 @@ function absUrl(src: string): string {
   return `${SITE_BASE}${src.startsWith("/") ? src : `/${src}`}`;
 }
 
-function hashStr(s: string): number {
-  let h = 5381;
-  for (let i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) | 0;
-  return h < 0 ? -h : h;
-}
-
 function shortLabel(brand: string, name: string): string {
   const b = brand?.trim() ?? "";
   const n = name?.trim() ?? "";
   const combined = b && n ? `${b} ${n}` : b || n;
-  // Kapa hårt så labels inte rinner över ramen
   return combined.length > 22 ? `${combined.slice(0, 21).trim()}…` : combined;
 }
 
@@ -75,15 +57,11 @@ export async function GET(
 
   const code = outfit.code ?? "—";
   const imageUrl = absUrl(outfit.image);
-  const bgUrl = absUrl(BG_POOL[hashStr(outfit.id) % BG_POOL.length]);
 
-  // Prick-positionerna är i procent av sajt-bilden (objekt-cover på
-  // 800×1100). Vi mappar dem direkt till frame-px. Label-sida väljs så
-  // den hamnar mot frame-centern.
   const dots = outfit.tags.map((tag) => {
     const xPx = (tag.x / 100) * FRAME_W;
     const yPx = (tag.y / 100) * FRAME_H;
-    const labelRight = tag.x < 50; // label sticks ut mot center
+    const labelRight = tag.x < 50;
     return {
       id: tag.id,
       xPx,
@@ -99,6 +77,7 @@ export async function GET(
         style={{
           width: "100%",
           height: "100%",
+          background: BG,
           display: "flex",
           flexDirection: "column",
           fontFamily: "Inter",
@@ -106,32 +85,6 @@ export async function GET(
           position: "relative",
         }}
       >
-        {/* Bakgrund — en av Måns hero-bilder, hash-stabil per outfit */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={bgUrl}
-          alt=""
-          width={CANVAS_W}
-          height={CANVAS_H}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: CANVAS_W,
-            height: CANVAS_H,
-            objectFit: "cover",
-          }}
-        />
-        {/* Kräm-tonad overlay så bg lugnar ned sig och outfit-bilden + texten lyfter */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(180deg, rgba(247,246,243,0.78) 0%, rgba(247,246,243,0.7) 55%, rgba(247,246,243,0.85) 100%)",
-            display: "flex",
-          }}
-        />
-
         {/* Outfit-frame */}
         <div
           style={{
@@ -159,7 +112,6 @@ export async function GET(
             }}
           />
 
-          {/* Prickar + labels — absolut inom frame */}
           {dots.map((d) => (
             <div
               key={d.id}
@@ -169,11 +121,9 @@ export async function GET(
                 top: d.yPx,
                 display: "flex",
                 alignItems: "center",
-                // Centrera pricken över koordinaten
                 transform: "translate(-50%, -50%)",
               }}
             >
-              {/* Vit prick */}
               <div
                 style={{
                   width: 22,
@@ -185,7 +135,6 @@ export async function GET(
                   flexShrink: 0,
                 }}
               />
-              {/* Label */}
               {d.label && (
                 <div
                   style={{
@@ -210,17 +159,18 @@ export async function GET(
           ))}
         </div>
 
-        {/* Footer: outfit-kod + moidello.com */}
+        {/* Footer: outfit-kod + moidello.com — packad nära bildens
+            underkant så det inte blir för mycket vitt */}
         <div
           style={{
             position: "absolute",
             left: 0,
             right: 0,
-            bottom: 90,
+            top: FRAME_Y + FRAME_H + 40,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 10,
+            gap: 8,
           }}
         >
           <div
@@ -232,12 +182,12 @@ export async function GET(
               display: "flex",
             }}
           >
-            Code
+            Outfit Code
           </div>
           <div
             style={{
               fontFamily: "Anton",
-              fontSize: 180,
+              fontSize: 170,
               lineHeight: 0.92,
               letterSpacing: "0.04em",
               color: INK,
@@ -248,12 +198,12 @@ export async function GET(
           </div>
           <div
             style={{
-              fontSize: 22,
+              fontSize: 20,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
               color: INK_MUTED,
               display: "flex",
-              marginTop: 4,
+              marginTop: 2,
             }}
           >
             moidello.com

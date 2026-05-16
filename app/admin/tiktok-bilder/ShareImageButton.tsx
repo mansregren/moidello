@@ -41,10 +41,10 @@ export function ShareImageButton({ outfitId, code }: Props) {
       type="button"
       onClick={handleDownload}
       disabled={busy}
-      className="inline-flex items-center gap-2 rounded-full border border-border bg-background-secondary px-4 py-2 text-sm font-medium text-foreground hover:border-foreground/30 disabled:opacity-50"
+      className="w-full inline-flex items-center justify-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:border-foreground/30 disabled:opacity-50"
     >
-      <Download className="h-4 w-4" />
-      {busy ? "Hämtar…" : "TikTok-bild (9:16)"}
+      <Download className="h-3.5 w-3.5" />
+      {busy ? "Hämtar…" : "9:16 PNG"}
     </button>
   );
 }
