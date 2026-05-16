@@ -621,8 +621,9 @@ export function TagPositionEditor({
   const [savingId, setSavingId] = useState<string | null>(null);
   const [justSavedId, setJustSavedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // Pricken som just nu interageras med lyfts över alla andra så den
-  // inte hamnar bakom en granne när du drar två pinnar nära varandra.
+  // Senast vidrörda pinnen — sätts vid pointerdown och behålls. Lyfts
+  // över alla andra med z-20 så den inte gömmer sig bakom en granne
+  // vid drag, släpp eller efter spara.
   const [activeId, setActiveId] = useState<string | null>(null);
 
   // Reset state if server data changes after a router.refresh()
@@ -690,7 +691,9 @@ export function TagPositionEditor({
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
-      setActiveId(null);
+      // Behåll activeId — den senast vidrörda pinnen ska fortsätta ligga
+      // över sina grannar även efter pointerup + spara, så glasögon-pinnen
+      // inte gömmer sig bakom ansiktet-pinnen när du släpper.
       if (!dragging) focusTagCard(tagId);
     };
     window.addEventListener("pointermove", onMove);
@@ -760,7 +763,11 @@ export function TagPositionEditor({
               style={{
                 left: `${tag.x}%`,
                 top: `${tag.y}%`,
-                zIndex: activeId === tag.id ? 20 : 10,
+                // Lyft pinnen så länge den drags, har osparade ändringar
+                // eller precis sparats — annars hamnar den bakom grannar
+                // som råkar ligga senare i DOM-ordningen.
+                zIndex:
+                  activeId === tag.id || isDirty || isSaved ? 20 : 10,
               }}
             >
               <div
