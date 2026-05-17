@@ -42,7 +42,6 @@ export default function HomeClient({
   following = [],
   creators,
   categoryCovers = [],
-  topColors = [],
   likedIds = [],
   savedIds = [],
   heroBg = "/images/bg/positano.webp",
@@ -52,8 +51,6 @@ export default function HomeClient({
   following?: Outfit[];
   creators: User[];
   categoryCovers?: CategoryCover[];
-  /** Top color slugs (lowercase) for the browse-rad below kategorier. */
-  topColors?: string[];
   likedIds?: string[];
   savedIds?: string[];
   heroBg?: string;
@@ -200,23 +197,6 @@ export default function HomeClient({
               ))}
             </div>
           </Section>
-
-          {topColors.length > 0 && (
-            <Section title="Bläddra på färg" href="/upptack">
-              <ul className="flex flex-wrap gap-2">
-                {topColors.slice(0, 12).map((c) => (
-                  <li key={c}>
-                    <Link
-                      href={`/farg/${c}`}
-                      className="inline-block rounded-full border border-border bg-background-secondary px-4 py-2 text-sm text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors capitalize"
-                    >
-                      {c}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </Section>
-          )}
 
           <Section title="Senast på Moidello" href="/upptack">
             {recent.length > 0 ? (
