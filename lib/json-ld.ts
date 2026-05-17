@@ -105,7 +105,22 @@ export function personJsonLd({ user, url }: PersonInput) {
   };
 }
 
-/** Product schema for an individual tagged garment. */
+/**
+ * Product schema for an individual tagged garment. Returns null when
+ * the item has no price — Google's rich-results validator requires a
+ * Product to carry offers, review or aggregateRating, and emitting a
+ * Product with none of those triggers an "Ogiltigt objekt"-error in
+ * Search Console even though the markup is valid schema.org.
+ *
+ * seller is set to the brand because Moidello is *not* the merchant —
+ * we link out to the brand's own site. Without seller, Google assumes
+ * the page owner (Moidello) is selling, which is misleading.
+ *
+ * shippingDetails and hasMerchantReturnPolicy are deliberately omitted
+ * for the same reason — we have no authority to make those claims on
+ * the brand's behalf. They surface as Search Console *warnings* (not
+ * errors) and ignoring them is the correct call.
+ */
 export function productJsonLd(item: {
   id: string;
   brand: string;
@@ -114,41 +129,28 @@ export function productJsonLd(item: {
   currency: string;
   buyUrl?: string;
   image: string;
-  /** AI-generated long-form description (preferred over auto-fallback). */
   description?: string | null;
-  /** Material (linne, ull, denim, …) — emitted as additionalProperty. */
   material?: string | null;
-  /** Color — emitted as schema.org/color when present. */
   color?: string | null;
-  /** AI-generated keywords — emitted as schema.org/keywords (comma-sep). */
   keywords?: string[];
-}) {
-  // Only emit Offer when we have a real price — Google flags an Offer
-  // with priceCurrency but no price as invalid ("Ange antingen price
-  // eller priceSpecification.price"). A Product without an Offer is
-  // still valid; it just won't show price in rich results.
-  //
-  // seller is set to the brand because Moidello is *not* the merchant —
-  // we link out to the brand's own site. Without seller, Google assumes
-  // the page owner (Moidello) is selling, which is misleading.
-  let offers: Record<string, unknown> | undefined;
-  if (item.price > 0) {
-    offers = {
-      "@type": "Offer",
-      priceCurrency: item.currency,
-      price: item.price,
-      availability: "https://schema.org/InStock",
-      seller: { "@type": "Organization", name: item.brand },
-    };
-    if (item.buyUrl && item.buyUrl !== "#") {
-      offers.url = item.buyUrl;
-    }
+}): Record<string, unknown> | null {
+  if (item.price <= 0) return null;
+
+  const offers: Record<string, unknown> = {
+    "@type": "Offer",
+    priceCurrency: item.currency,
+    price: item.price,
+    availability: "https://schema.org/InStock",
+    seller: { "@type": "Organization", name: item.brand },
+  };
+  if (item.buyUrl && item.buyUrl !== "#") {
+    offers.url = item.buyUrl;
   }
 
-  // Prefer AI-generated description over the auto-fallback. The fallback
-  // is intentionally short so duplicate-content checks don't penalize
-  // unbackfilled rows; once 0036-backfill runs, every product page gets
-  // a unique long-form description for the rich-result snippet.
+  // Prefer AI-generated description over the auto-fallback. Backfill
+  // (migration 0036) populates the long-form description on every item
+  // with a price; the fallback is just insurance for items that haven't
+  // been processed yet.
   const description =
     item.description?.trim() ||
     `${item.brand} ${item.name} — taggat plagg från en outfit på ${SITE_NAME}.`;
@@ -232,21 +234,20 @@ export function outfitPageJsonLd(outfit: Outfit) {
   ];
 
   for (const tag of outfit.tags) {
-    graph.push(
-      productJsonLd({
-        id: tag.id,
-        brand: tag.brand,
-        name: tag.name,
-        price: tag.price,
-        currency: tag.currency,
-        buyUrl: tag.buyUrl,
-        image: outfit.image,
-        description: tag.description,
-        material: tag.material,
-        color: tag.color,
-        keywords: tag.keywords,
-      }),
-    );
+    const product = productJsonLd({
+      id: tag.id,
+      brand: tag.brand,
+      name: tag.name,
+      price: tag.price,
+      currency: tag.currency,
+      buyUrl: tag.buyUrl,
+      image: outfit.image,
+      description: tag.description,
+      material: tag.material,
+      color: tag.color,
+      keywords: tag.keywords,
+    });
+    if (product) graph.push(product);
   }
 
   return {
@@ -303,41 +304,46 @@ export function produktPageJsonLd(item: {
     item.outfitSlug && item.outfitCreatorUsername
       ? `/${item.outfitCreatorUsername.toLowerCase()}/${item.outfitSlug}`
       : `/outfit/${item.outfitId}`;
-  return {
-    "@context": "https://schema.org",
-    "@graph": [
-      productJsonLd({
-        id: item.id,
-        brand: item.brand,
-        name: item.name,
-        price: item.price,
-        currency: item.currency,
-        buyUrl: item.buyUrl,
-        image: item.outfitImage,
-        description: item.description,
-        material: item.material,
-        color: item.color,
-        keywords: item.keywords,
-      }),
+
+  // productJsonLd returns null when there's no price — the layout
+  // already noindex:ar prislösa produktsidor, så att utelämna Product
+  // från @graph håller markup-validatorn ren utan att bryta breadcrumben.
+  const product = productJsonLd({
+    id: item.id,
+    brand: item.brand,
+    name: item.name,
+    price: item.price,
+    currency: item.currency,
+    buyUrl: item.buyUrl,
+    image: item.outfitImage,
+    description: item.description,
+    material: item.material,
+    color: item.color,
+    keywords: item.keywords,
+  });
+
+  const breadcrumb = {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: SITE_NAME, item: SITE_BASE },
       {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: SITE_NAME, item: SITE_BASE },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: item.outfitTitle,
-            item: abs(outfitPath),
-          },
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: `${item.brand} ${item.name}`,
-            item: abs(`/produkt/${item.id}`),
-          },
-        ],
+        "@type": "ListItem",
+        position: 2,
+        name: item.outfitTitle,
+        item: abs(outfitPath),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `${item.brand} ${item.name}`,
+        item: abs(`/produkt/${item.id}`),
       },
     ],
+  };
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": product ? [product, breadcrumb] : [breadcrumb],
   };
 }
 
