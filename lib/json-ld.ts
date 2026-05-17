@@ -412,6 +412,57 @@ export function brandPageJsonLd(brand: {
 }
 
 /**
+ * HowTo schema for a step-by-step style guide. AI-sökmotorer favoriserar
+ * HowTo-objekt när de svarar på handlings-frågor ("hur stylar man X")
+ * eftersom stegen ger en färdig konsumerbar struktur.
+ */
+export function howToJsonLd(input: {
+  path: string;
+  name: string;
+  description: string;
+  steps: { name: string; text: string }[];
+  totalTime?: string;
+  image?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "@id": `${SITE_BASE}${input.path}#howto`,
+    url: abs(input.path),
+    name: input.name,
+    description: input.description,
+    image: input.image ? abs(input.image) : undefined,
+    totalTime: input.totalTime,
+    step: input.steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+    })),
+  };
+}
+
+/**
+ * DefinedTermSet for /ordlista — schema-baserad ordlista. AI-sök kan
+ * lifta en hel definition utan att förstå sidans struktur.
+ */
+export function definedTermSetJsonLd(terms: { term: string; description: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "DefinedTermSet",
+    "@id": `${SITE_BASE}/ordlista#terms`,
+    name: "Mode-ordlista",
+    url: abs("/ordlista"),
+    hasDefinedTerm: terms.map((t) => ({
+      "@type": "DefinedTerm",
+      name: t.term,
+      description: t.description,
+      inDefinedTermSet: `${SITE_BASE}/ordlista#terms`,
+    })),
+  };
+}
+
+/**
  * FAQPage schema for the /faq page. AI search models (ChatGPT,
  * Perplexity, Claude) lean heavily on FAQPage data to extract quotable
  * answers. Keep each answer short and standalone so a model can lift
