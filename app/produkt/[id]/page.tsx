@@ -11,6 +11,7 @@ import { UserLink } from "@/components/shared/UserLink";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { produktPageJsonLd } from "@/lib/json-ld";
 import { outfitPathFromParts } from "@/lib/outfit-url";
+import { slugify } from "@/lib/slug";
 import { ProduktSaveAndShare } from "./ProduktSaveAndShare";
 
 function isUsableBuyUrl(url: string | undefined): url is string {
@@ -84,6 +85,10 @@ export default async function ProduktPage({
           outfitSlug: item.outfitSlug,
           outfitTitle: item.outfitTitle,
           outfitCreatorUsername: item.creator.username,
+          description: item.description,
+          material: item.material,
+          color: item.color,
+          keywords: item.keywords,
         })}
       />
       <main id="main" tabIndex={-1} className="flex-1 pt-6 md:pt-10">
@@ -103,7 +108,10 @@ export default async function ProduktPage({
             <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-background-tertiary">
               <Image
                 src={item.outfitImage}
-                alt={`${item.brand} ${item.name}`}
+                alt={
+                  item.altText?.trim() ||
+                  `${item.color ? `${item.color.toLowerCase()} ` : ""}${item.garment?.toLowerCase() ?? "plagg"} från ${item.brand} — ${item.name}`
+                }
                 fill
                 priority
                 sizes="(min-width: 1024px) 50vw, 100vw"
@@ -204,6 +212,97 @@ export default async function ProduktPage({
               </div>
             </div>
           </div>
+
+          {/* Long-form content + structured facts. Renders when AI-backfill
+              has populated the new SEO fields (migration 0036). Skipped
+              entirely if there's nothing to say, so unbackfilled items
+              don't render a sad-empty block. */}
+          {(item.description ||
+            item.material ||
+            item.color ||
+            (item.keywords && item.keywords.length > 0)) && (
+            <section className="mt-16 md:mt-20 max-w-3xl">
+              {item.description && (
+                <>
+                  <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-3">
+                    Om plagget
+                  </h2>
+                  <p className="text-foreground/90 leading-relaxed text-[15px] md:text-base whitespace-pre-line">
+                    {item.description}
+                  </p>
+                </>
+              )}
+
+              <dl className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-5 text-sm">
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wider text-foreground-subtle">
+                    Märke
+                  </dt>
+                  <dd className="mt-1 text-foreground font-medium">
+                    <Link
+                      href={`/brand/${item.brand.toLowerCase()}`}
+                      className="hover:underline underline-offset-4"
+                    >
+                      {item.brand}
+                    </Link>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wider text-foreground-subtle">
+                    Kategori
+                  </dt>
+                  <dd className="mt-1 text-foreground font-medium capitalize">
+                    {item.garment?.toLowerCase() ?? "—"}
+                  </dd>
+                </div>
+                {item.color && (
+                  <div>
+                    <dt className="text-[11px] uppercase tracking-wider text-foreground-subtle">
+                      Färg
+                    </dt>
+                    <dd className="mt-1 text-foreground font-medium capitalize">
+                      <Link
+                        href={`/farg/${slugify(item.color)}`}
+                        className="hover:underline underline-offset-4"
+                      >
+                        {item.color}
+                      </Link>
+                    </dd>
+                  </div>
+                )}
+                {item.material && (
+                  <div>
+                    <dt className="text-[11px] uppercase tracking-wider text-foreground-subtle">
+                      Material
+                    </dt>
+                    <dd className="mt-1 text-foreground font-medium capitalize">
+                      {item.material}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+
+              {item.keywords && item.keywords.length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-[11px] uppercase tracking-wider text-foreground-subtle mb-3">
+                    Nyckelord
+                  </h3>
+                  <ul className="flex flex-wrap gap-2">
+                    {item.keywords.slice(0, 10).map((kw) => (
+                      <li key={kw}>
+                        <Link
+                          href={`/sok?q=${encodeURIComponent(kw)}`}
+                          className="inline-block rounded-full border border-border bg-background-secondary px-3 py-1 text-xs text-foreground-muted hover:text-foreground hover:border-foreground/40 transition-colors"
+                        >
+                          {kw}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
+          )}
 
           {/* Other outfits styling this item */}
           <section className="mt-16 md:mt-24 mb-16">

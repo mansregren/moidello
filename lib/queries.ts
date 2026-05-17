@@ -87,6 +87,11 @@ interface TaggedItemRow {
   position_x: number;
   position_y: number;
   is_affiliate: boolean;
+  description: string | null;
+  keywords: string[] | null;
+  alt_text: string | null;
+  material: string | null;
+  color: string | null;
 }
 
 interface CommentRow {
@@ -144,6 +149,11 @@ function rowToOutfit(row: OutfitRow): Outfit {
     x: Number(t.position_x),
     y: Number(t.position_y),
     isAffiliate: t.is_affiliate,
+    description: t.description,
+    keywords: Array.isArray(t.keywords) ? t.keywords : undefined,
+    altText: t.alt_text,
+    material: t.material,
+    color: t.color,
   }));
 
   return {
@@ -174,7 +184,7 @@ function rowToOutfit(row: OutfitRow): Outfit {
 const OUTFIT_COLUMNS = `
   id, slug, user_id, image_url, type, gender, code, title, description, meta_description, category, created_at, is_hidden,
   profiles!outfits_user_id_fkey ( id, username, display_name, avatar_url, bio, region ),
-  tagged_items ( id, brand, name, price, currency, buy_url, buy_urls, garment, position_x, position_y, is_affiliate )
+  tagged_items ( id, brand, name, price, currency, buy_url, buy_urls, garment, position_x, position_y, is_affiliate, description, keywords, alt_text, material, color )
 `;
 
 /**
@@ -666,6 +676,17 @@ export interface TaggedItemDetail {
   buyUrls?: Record<string, string>;
   garment: string;
   isAffiliate: boolean;
+  /** AI-generated long-form description (migration 0036). */
+  description: string | null;
+  /** AI-generated SEO keywords; drives long-tail rank + future filters. */
+  keywords: string[];
+  /** AI-generated alt text used on the product image. */
+  altText: string | null;
+  /** Self-reported or AI-inferred material (linne, ull, denim, …). */
+  material: string | null;
+  /** color stored on tagged_items since 0031. Surfaced here so the
+   *  product page and JSON-LD can use it without a second fetch. */
+  color: string | null;
   outfitId: string;
   outfitSlug: string | null;
   outfitImage: string;
@@ -693,6 +714,11 @@ interface TaggedItemDetailRow {
   position_x: number;
   position_y: number;
   is_affiliate: boolean;
+  description: string | null;
+  keywords: string[] | null;
+  alt_text: string | null;
+  material: string | null;
+  color: string | null;
   outfit_id: string;
   outfits: {
     id: string;
@@ -717,7 +743,9 @@ export async function fetchTaggedItemById(
     .from("tagged_items")
     .select(
       `id, brand, name, price, currency, buy_url, buy_urls, garment,
-       position_x, position_y, is_affiliate, outfit_id,
+       position_x, position_y, is_affiliate,
+       description, keywords, alt_text, material, color,
+       outfit_id,
        outfits(
          id, slug, image_url, title,
          profiles!outfits_user_id_fkey(id, username, display_name, avatar_url)
@@ -741,6 +769,11 @@ export async function fetchTaggedItemById(
     buyUrls: r.buy_urls ?? undefined,
     garment: r.garment,
     isAffiliate: r.is_affiliate,
+    description: r.description,
+    keywords: Array.isArray(r.keywords) ? r.keywords : [],
+    altText: r.alt_text,
+    material: r.material,
+    color: r.color,
     outfitId: r.outfit_id,
     outfitSlug: r.outfits.slug,
     outfitImage: r.outfits.image_url,

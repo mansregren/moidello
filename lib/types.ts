@@ -54,6 +54,16 @@ export interface TaggedItem {
   /** Position on image as percentage (0-100) */
   x: number;
   y: number;
+  /** AI-generated long-form description (migration 0036). */
+  description?: string | null;
+  /** AI-generated SEO keywords. */
+  keywords?: string[];
+  /** AI-generated alt-text for the product image. */
+  altText?: string | null;
+  /** Material (linne, ull, denim, …). */
+  material?: string | null;
+  /** Color (beige, svart, …). */
+  color?: string | null;
 }
 
 export interface Comment {

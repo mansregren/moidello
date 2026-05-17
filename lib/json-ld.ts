@@ -114,6 +114,14 @@ export function productJsonLd(item: {
   currency: string;
   buyUrl?: string;
   image: string;
+  /** AI-generated long-form description (preferred over auto-fallback). */
+  description?: string | null;
+  /** Material (linne, ull, denim, …) — emitted as additionalProperty. */
+  material?: string | null;
+  /** Color — emitted as schema.org/color when present. */
+  color?: string | null;
+  /** AI-generated keywords — emitted as schema.org/keywords (comma-sep). */
+  keywords?: string[];
 }) {
   // Only emit Offer when we have a real price — Google flags an Offer
   // with priceCurrency but no price as invalid ("Ange antingen price
@@ -137,15 +145,44 @@ export function productJsonLd(item: {
     }
   }
 
+  // Prefer AI-generated description over the auto-fallback. The fallback
+  // is intentionally short so duplicate-content checks don't penalize
+  // unbackfilled rows; once 0036-backfill runs, every product page gets
+  // a unique long-form description for the rich-result snippet.
+  const description =
+    item.description?.trim() ||
+    `${item.brand} ${item.name} — taggat plagg från en outfit på ${SITE_NAME}.`;
+
+  const additionalProperty: Array<{
+    "@type": "PropertyValue";
+    name: string;
+    value: string;
+  }> = [];
+  if (item.material?.trim()) {
+    additionalProperty.push({
+      "@type": "PropertyValue",
+      name: "Material",
+      value: item.material.trim(),
+    });
+  }
+
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     "@id": `${SITE_BASE}/produkt/${item.id}#product`,
-    name: item.name,
-    description: `${item.brand} ${item.name} — taggat plagg från en outfit på ${SITE_NAME}.`,
+    name: `${item.brand} ${item.name}`,
+    description,
     brand: { "@type": "Brand", name: item.brand },
     image: abs(item.image),
     url: abs(`/produkt/${item.id}`),
+    color: item.color?.trim() || undefined,
+    material: item.material?.trim() || undefined,
+    keywords:
+      item.keywords && item.keywords.length > 0
+        ? item.keywords.join(", ")
+        : undefined,
+    additionalProperty:
+      additionalProperty.length > 0 ? additionalProperty : undefined,
     offers,
   };
 }
@@ -204,6 +241,10 @@ export function outfitPageJsonLd(outfit: Outfit) {
         currency: tag.currency,
         buyUrl: tag.buyUrl,
         image: outfit.image,
+        description: tag.description,
+        material: tag.material,
+        color: tag.color,
+        keywords: tag.keywords,
       }),
     );
   }
@@ -253,6 +294,10 @@ export function produktPageJsonLd(item: {
   outfitSlug?: string | null;
   outfitTitle: string;
   outfitCreatorUsername?: string;
+  description?: string | null;
+  material?: string | null;
+  color?: string | null;
+  keywords?: string[];
 }) {
   const outfitPath =
     item.outfitSlug && item.outfitCreatorUsername
@@ -269,6 +314,10 @@ export function produktPageJsonLd(item: {
         currency: item.currency,
         buyUrl: item.buyUrl,
         image: item.outfitImage,
+        description: item.description,
+        material: item.material,
+        color: item.color,
+        keywords: item.keywords,
       }),
       {
         "@type": "BreadcrumbList",
