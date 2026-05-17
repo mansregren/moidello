@@ -939,6 +939,30 @@ export async function fetchOutfitsByGarment(
   return attachOutfitStats(mapped, supabase);
 }
 
+/**
+ * Outfits matching a given category (minimalism, vintage, casual, …),
+ * gender-filtered. Drives /stil/[slug] landing pages.
+ */
+export async function fetchOutfitsByCategory(
+  category: string,
+  gender?: "dam" | "herr",
+  client?: QueryClient,
+): Promise<Outfit[]> {
+  const supabase = await resolveClient(client);
+  let query = supabase
+    .from("outfits")
+    .select(OUTFIT_COLUMNS)
+    .ilike("category", category)
+    .eq("is_published", true);
+  if (gender) query = query.eq("gender", gender);
+  const { data } = await query
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  return attachOutfitStats(mapped, supabase);
+}
+
 export async function fetchBrandOutfits(
   brandName: string,
   gender?: "dam" | "herr",

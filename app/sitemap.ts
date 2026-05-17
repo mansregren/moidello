@@ -168,6 +168,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       };
     });
 
+  // Hard-coded list of canonical outfit-styles. We don't gate on count
+  // here — these are top-level taxonomy nodes; the page itself does a
+  // notFound() if zero outfits match, so unused slugs just return 404
+  // instead of being broken sitemap entries.
+  const styleSlugs = [
+    "minimalism",
+    "vintage",
+    "casual",
+    "streetwear",
+    "formal",
+    "sporty",
+    "preppy",
+  ];
+  const styleRoutes: MetadataRoute.Sitemap = styleSlugs.map((s) => ({
+    url: `${BASE_URL}/stil/${s}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.65,
+  }));
+
   return [
     ...staticRoutes,
     ...outfitRoutes,
@@ -175,5 +195,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...brandRoutes,
     ...colorRoutes,
     ...typeRoutes,
+    ...styleRoutes,
   ];
 }

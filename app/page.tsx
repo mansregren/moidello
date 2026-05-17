@@ -3,6 +3,7 @@ import {
   fetchEngagementForViewer,
   fetchFollowingFeed,
   fetchCategoryCovers,
+  fetchAllColors,
 } from "@/lib/queries";
 import { fetchTopCreatorsCached } from "@/lib/queries-cached";
 import { createClient } from "@/lib/supabase/server";
@@ -33,13 +34,23 @@ export default async function HomePage() {
     [heroBg, lifestyleBg],
     following,
     categoryCovers,
+    colorRows,
   ] = await Promise.all([
     fetchOutfits(12),
     fetchTopCreatorsCached(6),
     pickBgs(["home-hero", "home-lifestyle"], HERO_POOL),
     followingPromise,
     fetchCategoryCovers(),
+    fetchAllColors(),
   ]);
+
+  // Top colors by tagged-item count — only include slugs we know lead
+  // to non-empty /farg/[slug] pages so the home-row never points at a
+  // 404.
+  const topColors = colorRows
+    .filter((r) => r.count >= 2)
+    .slice(0, 12)
+    .map((r) => r.color);
 
   const allIds = Array.from(
     new Set([...outfits.map((o) => o.id), ...following.map((o) => o.id)]),
@@ -62,6 +73,7 @@ export default async function HomePage() {
         following={following}
         creators={creators}
         categoryCovers={categoryCovers}
+        topColors={topColors}
         likedIds={Array.from(liked)}
         savedIds={Array.from(saved)}
         heroBg={heroBg}

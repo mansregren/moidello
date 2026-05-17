@@ -10,6 +10,7 @@ import { slugify } from "@/lib/slug";
 import {
   fetchOutfitsByColor,
   fetchEngagementForViewer,
+  fetchAllColors,
 } from "@/lib/queries";
 import { getViewerGender } from "@/lib/gender-server";
 
@@ -31,7 +32,10 @@ export default async function FargPage({
   if (!color) notFound();
 
   const gender = await getViewerGender();
-  const outfits = await fetchOutfitsByColor(color, gender);
+  const [outfits, otherColors] = await Promise.all([
+    fetchOutfitsByColor(color, gender),
+    fetchAllColors(),
+  ]);
   if (outfits.length === 0) notFound();
 
   const { liked, saved } = await fetchEngagementForViewer(
@@ -41,6 +45,10 @@ export default async function FargPage({
   const colorLower = color.toLowerCase();
   const heading = `${color}a outfits`;
   const intro = `Outfit-inspiration med ${colorLower}a plagg från svenska kreatörer. ${outfits.length} stylade looks att hämta idéer från.`;
+
+  const relatedColors = otherColors
+    .filter((c) => c.color !== colorLower && c.count >= 2)
+    .slice(0, 12);
 
   return (
     <>
@@ -95,6 +103,26 @@ export default async function FargPage({
           </div>
 
           <OutfitGrid outfits={outfits} columns={3} liked={liked} saved={saved} />
+
+          {relatedColors.length > 0 && (
+            <section className="mt-20 mb-16 border-t border-border pt-10">
+              <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-5">
+                Andra färger
+              </h2>
+              <ul className="flex flex-wrap gap-2">
+                {relatedColors.map((c) => (
+                  <li key={c.color}>
+                    <Link
+                      href={`/farg/${slugify(c.color)}`}
+                      className="inline-block rounded-full border border-border bg-background-secondary px-4 py-2 text-sm text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors capitalize"
+                    >
+                      {c.color}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </Container>
       </main>
     </>

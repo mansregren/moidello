@@ -110,6 +110,26 @@ export default async function TypPage({
           </div>
 
           <OutfitGrid outfits={outfits} columns={3} liked={liked} saved={saved} />
+
+          <section className="mt-20 mb-16 border-t border-border pt-10">
+            <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-5">
+              Andra kategorier för {audience}
+            </h2>
+            <ul className="flex flex-wrap gap-2">
+              {garmentsForGender(gender)
+                .filter((g) => g.toLowerCase() !== garment.toLowerCase())
+                .map((g) => (
+                  <li key={g}>
+                    <Link
+                      href={`/typ/${gender}/${g.toLowerCase()}`}
+                      className="inline-block rounded-full border border-border bg-background-secondary px-3.5 py-1.5 text-xs text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors capitalize"
+                    >
+                      {g.toLowerCase()}
+                    </Link>
+                  </li>
+                ))}
+            </ul>
+          </section>
         </Container>
       </main>
     </>

@@ -20,6 +20,34 @@ interface OutfitCardProps {
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/**
+ * Build a SEO-rich alt for the outfit thumbnail. Title alone is too
+ * thin — we mix in gender, category, and the first two distinct garment
+ * types so Google Images can match the thumb against more queries.
+ */
+function buildOutfitAlt(outfit: Outfit): string {
+  const parts: string[] = [outfit.title];
+  const gender = outfit.gender === "herr" ? "herr" : "dam";
+  const cat = outfit.category?.trim();
+  if (cat) parts.push(cat.toLowerCase());
+  parts.push(`outfit ${gender}`);
+
+  const garments = Array.from(
+    new Set(
+      outfit.tags
+        .map((t) => t.garment?.toLowerCase().trim())
+        .filter((g): g is string => !!g),
+    ),
+  ).slice(0, 2);
+  if (garments.length > 0) parts.push(`med ${garments.join(" och ")}`);
+
+  if (outfit.creator?.displayName) {
+    parts.push(`av ${outfit.creator.displayName}`);
+  }
+
+  return parts.join(" — ");
+}
+
 export function OutfitCard({
   outfit,
   initiallyLiked = false,
@@ -103,7 +131,7 @@ export function OutfitCard({
         >
           <Image
             src={outfit.image}
-            alt={outfit.title}
+            alt={buildOutfitAlt(outfit)}
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
