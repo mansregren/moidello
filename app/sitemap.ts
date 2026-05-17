@@ -32,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // public-readable subset (published outfits, named profiles, etc.).
   const supabase = createPublicClient();
 
-  const [outfitsRes, profilesRes, brandsRes] = await Promise.all([
+  const [outfitsRes, profilesRes, brandsRes, tagDimsRes] = await Promise.all([
     supabase
       .from("outfits")
       .select(
@@ -48,6 +48,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     supabase
       .from("tagged_items")
       .select("brand"),
+    supabase
+      .from("tagged_items")
+      .select("color, garment, outfit_id, outfits!inner(gender, is_published)")
+      .eq("is_active", true)
+      .eq("outfits.is_published", true),
   ]);
 
   type OutfitRow = {
@@ -109,5 +114,66 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...outfitRoutes, ...profileRoutes, ...brandRoutes];
+  // Färg- och typ-landningssidor — long-tail-magneter. En route per
+  // distinkt color resp. (gender, garment)-kombo som har minst 2 outfits
+  // (under det blir det thin content och inte värt att indexera).
+  type TagDim = {
+    color: string | null;
+    garment: string | null;
+    outfits: { gender: "dam" | "herr" } | null;
+  };
+  const tagDims = (tagDimsRes.data ?? []) as unknown as TagDim[];
+
+  const colorCounts = new Map<string, number>();
+  const garmentCounts = new Map<string, number>(); // key = "gender|garment"
+  for (const r of tagDims) {
+    if (r.color) {
+      const c = r.color.toLowerCase().trim();
+      if (c) colorCounts.set(c, (colorCounts.get(c) ?? 0) + 1);
+    }
+    if (r.outfits && r.garment) {
+      const g = r.garment.toLowerCase().trim();
+      const key = `${r.outfits.gender}|${g}`;
+      garmentCounts.set(key, (garmentCounts.get(key) ?? 0) + 1);
+    }
+  }
+
+  function slug(s: string): string {
+    return s
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  }
+
+  const colorRoutes: MetadataRoute.Sitemap = Array.from(colorCounts.entries())
+    .filter(([, count]) => count >= 2)
+    .map(([color]) => ({
+      url: `${BASE_URL}/farg/${slug(color)}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.65,
+    }));
+
+  const typeRoutes: MetadataRoute.Sitemap = Array.from(garmentCounts.entries())
+    .filter(([, count]) => count >= 2)
+    .map(([key]) => {
+      const [gender, garment] = key.split("|");
+      return {
+        url: `${BASE_URL}/typ/${gender}/${slug(garment)}`,
+        lastModified: now,
+        changeFrequency: "weekly" as const,
+        priority: 0.65,
+      };
+    });
+
+  return [
+    ...staticRoutes,
+    ...outfitRoutes,
+    ...profileRoutes,
+    ...brandRoutes,
+    ...colorRoutes,
+    ...typeRoutes,
+  ];
 }

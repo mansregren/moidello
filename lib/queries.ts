@@ -832,6 +832,113 @@ export async function fetchOutfitsByItem(
   return attachOutfitStats(mapped);
 }
 
+/**
+ * Outfits where any tagged_item has the given color. Color match is
+ * case-insensitive. Used by /farg/[slug] landing pages.
+ */
+export async function fetchOutfitsByColor(
+  color: string,
+  gender?: "dam" | "herr",
+  client?: QueryClient,
+): Promise<Outfit[]> {
+  const supabase = await resolveClient(client);
+  const targetKey = color.toLowerCase().trim();
+  if (!targetKey) return [];
+
+  const { data: tagRows } = await supabase
+    .from("tagged_items")
+    .select("outfit_id, color")
+    .not("color", "is", null);
+  if (!tagRows) return [];
+
+  const outfitIds = Array.from(
+    new Set(
+      (tagRows as Array<{ outfit_id: string; color: string | null }>)
+        .filter((r) => (r.color ?? "").toLowerCase() === targetKey)
+        .map((r) => r.outfit_id),
+    ),
+  );
+  if (outfitIds.length === 0) return [];
+
+  let query = supabase
+    .from("outfits")
+    .select(OUTFIT_COLUMNS)
+    .in("id", outfitIds)
+    .eq("is_published", true);
+  if (gender) query = query.eq("gender", gender);
+  const { data } = await query
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  return attachOutfitStats(mapped, supabase);
+}
+
+/**
+ * Distinct color slugs across all active tagged_items. Used by /farg/
+ * route generation + sitemap.
+ */
+export async function fetchAllColors(
+  client?: QueryClient,
+): Promise<Array<{ color: string; count: number }>> {
+  const supabase = await resolveClient(client);
+  const { data } = await supabase
+    .from("tagged_items")
+    .select("color")
+    .eq("is_active", true)
+    .not("color", "is", null);
+  if (!data) return [];
+  const counts = new Map<string, number>();
+  for (const r of data as Array<{ color: string }>) {
+    const c = r.color?.toLowerCase().trim();
+    if (!c) continue;
+    counts.set(c, (counts.get(c) ?? 0) + 1);
+  }
+  return Array.from(counts.entries())
+    .map(([color, count]) => ({ color, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+/**
+ * Outfits where any tagged_item has the given garment-type, for the
+ * given gender. Drives /typ/[gender]/[garment] landing pages.
+ */
+export async function fetchOutfitsByGarment(
+  gender: "dam" | "herr",
+  garment: string,
+  client?: QueryClient,
+): Promise<Outfit[]> {
+  const supabase = await resolveClient(client);
+  const garmentKey = garment.toLowerCase().trim();
+  if (!garmentKey) return [];
+
+  const { data: tagRows } = await supabase
+    .from("tagged_items")
+    .select("outfit_id, garment");
+  if (!tagRows) return [];
+
+  const outfitIds = Array.from(
+    new Set(
+      (tagRows as Array<{ outfit_id: string; garment: string }>)
+        .filter((r) => (r.garment ?? "").toLowerCase() === garmentKey)
+        .map((r) => r.outfit_id),
+    ),
+  );
+  if (outfitIds.length === 0) return [];
+
+  const { data } = await supabase
+    .from("outfits")
+    .select(OUTFIT_COLUMNS)
+    .in("id", outfitIds)
+    .eq("is_published", true)
+    .eq("gender", gender)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  return attachOutfitStats(mapped, supabase);
+}
+
 export async function fetchBrandOutfits(
   brandName: string,
   gender?: "dam" | "herr",

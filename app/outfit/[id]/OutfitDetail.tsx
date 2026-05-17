@@ -30,6 +30,7 @@ import { ReportButton } from "@/components/shared/ReportButton";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { outfitPageJsonLd } from "@/lib/json-ld";
 import { outfitPath } from "@/lib/outfit-url";
+import { slugify } from "@/lib/slug";
 import { OutfitOwnerActions } from "@/components/outfit/OutfitOwnerActions";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Send } from "lucide-react";
@@ -365,6 +366,8 @@ export default function OutfitDetail({
             </motion.div>
           </div>
 
+          <ExploreLinks outfit={outfit} />
+
           <section className="mt-16 md:mt-24 mb-16">
             <h2 className="font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-8">
               Liknande <span className="text-foreground-subtle">outfits</span>
@@ -588,5 +591,67 @@ function CommentsSection({
         {error && <p className="text-xs text-red-400">{error}</p>}
       </div>
     </div>
+  );
+}
+
+/**
+ * Discreet internal-link strip — distinct färger och kategorier som
+ * finns i outfit-taggarna, länkade till /farg/<slug> resp.
+ * /typ/<gender>/<garment>. Renderar bara när det finns minst en chip
+ * att visa så outfits utan backfill inte får en tom rubrik.
+ */
+function ExploreLinks({ outfit }: { outfit: Outfit }) {
+  const colors = Array.from(
+    new Set(
+      outfit.tags
+        .map((t) => t.color?.toLowerCase().trim())
+        .filter((c): c is string => !!c && c.length > 0),
+    ),
+  ).slice(0, 5);
+
+  const garments = Array.from(
+    new Set(
+      outfit.tags
+        .map((t) => t.garment?.toLowerCase().trim())
+        .filter((g): g is string => !!g && g.length > 0),
+    ),
+  ).slice(0, 5);
+
+  if (colors.length === 0 && garments.length === 0) return null;
+
+  return (
+    <section className="mt-16 md:mt-20 pb-2 border-t border-border pt-10">
+      <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-4">
+        Utforska liknande
+      </h2>
+      <div className="space-y-3">
+        {garments.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {garments.map((g) => (
+              <Link
+                key={`g-${g}`}
+                href={`/typ/${outfit.gender}/${slugify(g)}`}
+                className="inline-block rounded-full border border-border bg-background-secondary px-3.5 py-1.5 text-xs text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors capitalize"
+              >
+                {g} {outfit.gender === "herr" ? "herr" : "dam"}
+              </Link>
+            ))}
+          </div>
+        )}
+        {colors.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {colors.map((c) => (
+              <Link
+                key={`c-${c}`}
+                href={`/farg/${slugify(c)}`}
+                className="inline-block rounded-full border border-border bg-background-secondary px-3.5 py-1.5 text-xs text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors capitalize"
+              >
+                {c} outfits
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
