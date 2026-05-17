@@ -171,7 +171,10 @@ export default function OutfitDetail({
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="relative overflow-hidden rounded-2xl bg-background-tertiary"
+              className="relative overflow-hidden rounded-2xl"
+              // Matchar upload-padding-färgen (#F7F6F3 i lib/image-resize.ts)
+              // så ev. kräm-band runt portrait-bilder smälter in i bakgrunden.
+              style={{ backgroundColor: "#F7F6F3" }}
             >
               <Image
                 src={outfit.image}

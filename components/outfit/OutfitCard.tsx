@@ -123,9 +123,14 @@ export function OutfitCard({
         aria-label={`${outfit.title} av ${outfit.creator.displayName}, ${outfit.tags.length} taggade plagg`}
       >
         <div
-          className={`relative overflow-hidden rounded-2xl aspect-[3/4] ${
-            outfit.type === "flatlay" ? "bg-white" : "bg-background-tertiary"
-          }`}
+          className="relative overflow-hidden rounded-2xl aspect-[3/4]"
+          // Padding-färgen som upload-flowet skriver runt icke-3:4-bilder
+          // (#F7F6F3, se lib/image-resize.ts). Kortets background måste
+          // matcha för att paddingen ska smälta in — annars ser portrait-
+          // bilder med top/botten-padd ut som om de har vit kant.
+          style={{
+            backgroundColor: outfit.type === "flatlay" ? "#ffffff" : "#F7F6F3",
+          }}
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
         >
