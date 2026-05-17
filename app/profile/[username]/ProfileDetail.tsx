@@ -18,7 +18,8 @@ import { OutfitOwnerActions } from "@/components/outfit/OutfitOwnerActions";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { profilePageJsonLd } from "@/lib/json-ld";
 import { useAuth } from "@/lib/auth-context";
-import { useGender, matchesGenderFilter } from "@/lib/gender-context";
+// gender-context används inte längre här — profilen visar alla outfits
+// oavsett besökarens filter.
 import { motion } from "framer-motion";
 import type { Outfit, User as MoidelloUser } from "@/lib/types";
 import { toggleFollow } from "@/app/actions/engagement";
@@ -52,7 +53,6 @@ export default function ProfileDetail({
   publicBoards?: PublicBoardSummary[];
 }) {
   const { user: viewer, isLoggedIn, requireAuth } = useAuth();
-  const { gender } = useGender();
   const [activeTab, setActiveTab] = useState<
     "outfits" | "boards" | "followers" | "following" | "about"
   >("outfits");
@@ -65,15 +65,12 @@ export default function ProfileDetail({
   const saved = useMemo(() => new Set(savedIds), [savedIds]);
 
   const isOwnProfile = viewer?.id === user.id;
-  // Owner sees ALL their own outfits regardless of gender toggle — otherwise
-  // a Herr user would be unable to find their own Dam-tagged drafts.
-  const outfits = useMemo(
-    () =>
-      isOwnProfile
-        ? allOutfits
-        : allOutfits.filter((o) => matchesGenderFilter(o.gender, gender)),
-    [allOutfits, isOwnProfile, gender],
-  );
+  // En kreatörs profil visar ALLA deras publikationer oavsett besökarens
+  // gender-toggle. Filtret hör hemma i feeds (/upptack, /, /foljer) där
+  // användaren bläddrar — på en specifik profil vill man se vad just den
+  // personen publicerat. Tidigare logik filtrerade bort herr-kreatörers
+  // outfits för besökare med dam-filter, vilket gjorde profiler tomma.
+  const outfits = allOutfits;
 
   const handleFollow = () => {
     if (!isLoggedIn) {
