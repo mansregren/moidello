@@ -17,8 +17,10 @@ export const primaryNav: NavItem[] = [
   { href: "/profil", label: "Profil", icon: User, authAction: "profile" },
 ];
 
-export function isLandingRoute(pathname: string | null): boolean {
-  return pathname === "/welcome";
+export function isLandingRoute(_pathname: string | null): boolean {
+  // /welcome togs bort 2026-05-17 — funktionen behålls som no-op tills
+  // alla callers ersatt sina shouldShow*-check.
+  return false;
 }
 
 function isOnboardingRoute(pathname: string | null): boolean {

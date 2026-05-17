@@ -329,7 +329,7 @@ export default function HomeClient({
                 Skapa outfit
               </Link>
               <Link
-                href="/welcome"
+                href="/om"
                 className="inline-flex items-center rounded-full border border-border text-foreground px-5 py-2.5 text-sm font-medium hover:border-foreground/30 transition-colors"
               >
                 Lär dig mer

@@ -56,6 +56,13 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      // /welcome togs bort 2026-05-17 — hemsidan täcker samma syfte.
+      // 308 (permanent) så Google flyttar ev. indexerad signal vidare.
+      { source: "/welcome", destination: "/", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;
