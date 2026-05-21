@@ -17,7 +17,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/`, lastModified: now, changeFrequency: "daily", priority: 1.0 },
     { url: `${BASE_URL}/upptack`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
-    { url: `${BASE_URL}/trendigt`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
     { url: `${BASE_URL}/brands`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${BASE_URL}/guider`, lastModified: now, changeFrequency: "weekly", priority: 0.75 },
     { url: `${BASE_URL}/ordlista`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
@@ -73,22 +72,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   };
   const outfitRoutes: MetadataRoute.Sitemap = (
     (outfitsRes.data ?? []) as unknown as OutfitRow[]
-  ).map((o) => {
+  ).flatMap((o) => {
     const username = o.profiles?.username?.toLowerCase();
+    // Mirror the profile-route filter below: outfits owned by half-set-up
+    // profiles (trigger-default "user_xxx" usernames) shouldn't be
+    // advertised. Their /<username>/<slug> URL exposes an ugly path, and
+    // the /outfit/<id> fallback 301-redirects straight back to it — so a
+    // sitemap entry would just be a redirect Google reports as noise.
+    if (username?.startsWith("user_")) return [];
     const path =
       o.slug && username
         ? `/${username}/${o.slug}`
         : `/outfit/${o.id}`;
-    return {
-      url: `${BASE_URL}${path}`,
-      lastModified: o.updated_at
-        ? new Date(o.updated_at)
-        : o.created_at
-          ? new Date(o.created_at)
-          : now,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    };
+    return [
+      {
+        url: `${BASE_URL}${path}`,
+        lastModified: o.updated_at
+          ? new Date(o.updated_at)
+          : o.created_at
+            ? new Date(o.created_at)
+            : now,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      },
+    ];
   });
 
   // Skip the trigger-default usernames ("user_xxx") so we don't index
