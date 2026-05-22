@@ -6,6 +6,8 @@ import {
   isFollowing,
 } from "@/lib/queries";
 import { createClient } from "@/lib/supabase/server";
+import { isCurrentUserAdmin } from "@/lib/admin";
+import { homeVerticalVisible } from "@/lib/flags";
 import ProfileDetail, { type PublicBoardSummary } from "./ProfileDetail";
 
 export const dynamic = "force-dynamic";
@@ -29,10 +31,12 @@ export default async function ProfilePage({
 
   const userOutfits = await fetchOutfitsByUser(profile.id);
 
-  const [{ liked, saved }, alreadyFollowing] = await Promise.all([
+  const [{ liked, saved }, alreadyFollowing, viewerIsAdmin] = await Promise.all([
     fetchEngagementForViewer(userOutfits.map((o) => o.id)),
     isFollowing(profile.id),
+    isCurrentUserAdmin(),
   ]);
+  const showHome = homeVerticalVisible(viewerIsAdmin);
 
   let publicBoards: PublicBoardSummary[] = [];
   {
@@ -99,6 +103,7 @@ export default async function ProfilePage({
       savedIds={Array.from(saved)}
       initiallyFollowing={alreadyFollowing}
       publicBoards={publicBoards}
+      showHome={showHome}
     />
   );
 }

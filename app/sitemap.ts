@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { createPublicClient } from "@/lib/supabase/public";
 import { GUIDES } from "@/lib/guides";
+import { HOME_VERTICAL_PUBLIC } from "@/lib/flags";
+import { HOME_ROOMS } from "@/lib/home-data";
 
 const BASE_URL = "https://moidello.com";
 
@@ -17,7 +19,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/`, lastModified: now, changeFrequency: "daily", priority: 1.0 },
     { url: `${BASE_URL}/upptack`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
-    { url: `${BASE_URL}/home`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: `${BASE_URL}/brands`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${BASE_URL}/guider`, lastModified: now, changeFrequency: "weekly", priority: 0.75 },
     { url: `${BASE_URL}/ordlista`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
@@ -34,6 +35,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
+
+  // Home vertical is excluded from the sitemap until it's launched.
+  const homeRoutes: MetadataRoute.Sitemap = HOME_VERTICAL_PUBLIC
+    ? [
+        {
+          url: `${BASE_URL}/home`,
+          lastModified: now,
+          changeFrequency: "daily" as const,
+          priority: 0.8,
+        },
+        ...HOME_ROOMS.map((r) => ({
+          url: `${BASE_URL}/home/${r.slug}`,
+          lastModified: now,
+          changeFrequency: "weekly" as const,
+          priority: 0.65,
+        })),
+      ]
+    : [];
 
   // Sitemap runs at build time (and revalidation) without an HTTP
   // request, so we can't use the cookie-based server client. The
@@ -209,6 +228,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticRoutes,
     ...guideRoutes,
+    ...homeRoutes,
     ...outfitRoutes,
     ...profileRoutes,
     ...brandRoutes,

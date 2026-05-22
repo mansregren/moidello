@@ -28,6 +28,7 @@ export interface AuthProfile {
   username: string;
   displayName: string | null;
   avatarUrl: string | null;
+  isAdmin: boolean;
 }
 
 const PROMPTS: Record<AuthAction, { title: string; icon: typeof Heart }> = {
@@ -109,7 +110,7 @@ export function AuthProvider({
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("username, display_name, avatar_url")
+        .select("username, display_name, avatar_url, is_admin")
         .eq("id", user.id)
         .maybeSingle();
       if (cancelled || !data) return;
@@ -117,6 +118,7 @@ export function AuthProvider({
         username: data.username as string,
         displayName: (data.display_name as string | null) ?? null,
         avatarUrl: (data.avatar_url as string | null) ?? null,
+        isAdmin: !!(data.is_admin as boolean | null),
       });
     })();
     return () => {

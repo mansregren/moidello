@@ -13,6 +13,7 @@
  */
 
 import { fetchOutfits, fetchAllColors } from "@/lib/queries";
+import { HOME_VERTICAL_PUBLIC } from "@/lib/flags";
 
 export const revalidate = 3600;
 
@@ -77,7 +78,7 @@ export async function GET(): Promise<Response> {
   }
   lines.push("## Bläddra alla outfits");
   lines.push(`- [Upptäck-sidan](${BASE}/upptack)`);
-  lines.push(`- [Heminredning](${BASE}/home)`);
+  if (HOME_VERTICAL_PUBLIC) lines.push(`- [Heminredning](${BASE}/home)`);
   lines.push(`- [Märken-katalog](${BASE}/brands)`);
   lines.push(`- [Sitemap (XML)](${BASE}/sitemap.xml)`);
   lines.push("");

@@ -44,6 +44,7 @@ export default function ProfileDetail({
   savedIds = [],
   initiallyFollowing = false,
   publicBoards = [],
+  showHome = false,
 }: {
   user: MoidelloUser;
   outfits: Outfit[];
@@ -51,10 +52,11 @@ export default function ProfileDetail({
   savedIds?: string[];
   initiallyFollowing?: boolean;
   publicBoards?: PublicBoardSummary[];
+  showHome?: boolean;
 }) {
   const { user: viewer, isLoggedIn, requireAuth } = useAuth();
   const [activeTab, setActiveTab] = useState<
-    "outfits" | "boards" | "followers" | "following" | "about"
+    "outfits" | "hem" | "boards" | "followers" | "following" | "about"
   >("outfits");
   const [following, setFollowing] = useState(initiallyFollowing);
   useEffect(() => {
@@ -70,7 +72,47 @@ export default function ProfileDetail({
   // användaren bläddrar — på en specifik profil vill man se vad just den
   // personen publicerat. Tidigare logik filtrerade bort herr-kreatörers
   // outfits för besökare med dam-filter, vilket gjorde profiler tomma.
-  const outfits = allOutfits;
+  //
+  // Mode och hem separeras i flikar. Medan hem-vertikalen är dold
+  // (showHome=false) exkluderas hem-poster helt så de inte läcker.
+  const outfits = useMemo(
+    () => allOutfits.filter((o) => o.vertical !== "hem"),
+    [allOutfits],
+  );
+  const homeOutfits = useMemo(
+    () => (showHome ? allOutfits.filter((o) => o.vertical === "hem") : []),
+    [allOutfits, showHome],
+  );
+
+  const renderGrid = (list: Outfit[], emptyText: string) => {
+    if (list.length === 0) {
+      return (
+        <p className="py-16 text-center text-foreground-muted">{emptyText}</p>
+      );
+    }
+    if (isOwnProfile) {
+      return (
+        <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-3">
+          {list.map((outfit) => (
+            <div key={outfit.id} className="space-y-2">
+              <OutfitCard
+                outfit={outfit}
+                initiallyLiked={liked.has(outfit.id)}
+                initiallySaved={saved.has(outfit.id)}
+              />
+              <OutfitOwnerActions
+                outfitId={outfit.id}
+                isHidden={!!outfit.isHidden}
+                isAdmin={false}
+                editHref={`/profil/inlagg/${outfit.id}`}
+              />
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return <OutfitGrid outfits={list} columns={3} liked={liked} saved={saved} />;
+  };
 
   const handleFollow = () => {
     if (!isLoggedIn) {
@@ -87,11 +129,14 @@ export default function ProfileDetail({
   };
 
   const tabs: Array<{
-    key: "outfits" | "boards" | "followers" | "following" | "about";
+    key: "outfits" | "hem" | "boards" | "followers" | "following" | "about";
     label: string;
     count?: number;
   }> = [
     { key: "outfits", label: "Outfits", count: outfits.length },
+    ...(homeOutfits.length > 0
+      ? [{ key: "hem" as const, label: "Hem", count: homeOutfits.length }]
+      : []),
     ...(publicBoards.length > 0
       ? [{ key: "boards" as const, label: "Samlingar", count: publicBoards.length }]
       : []),
@@ -245,38 +290,8 @@ export default function ProfileDetail({
             className="pb-16"
           >
             {activeTab === "outfits" &&
-              (outfits.length > 0 ? (
-                isOwnProfile ? (
-                  <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-3">
-                    {outfits.map((outfit) => (
-                      <div key={outfit.id} className="space-y-2">
-                        <OutfitCard
-                          outfit={outfit}
-                          initiallyLiked={liked.has(outfit.id)}
-                          initiallySaved={saved.has(outfit.id)}
-                        />
-                        <OutfitOwnerActions
-                          outfitId={outfit.id}
-                          isHidden={!!outfit.isHidden}
-                          isAdmin={false}
-                          editHref={`/profil/inlagg/${outfit.id}`}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <OutfitGrid
-                    outfits={outfits}
-                    columns={3}
-                    liked={liked}
-                    saved={saved}
-                  />
-                )
-              ) : (
-                <p className="py-16 text-center text-foreground-muted">
-                  Inga outfits ännu.
-                </p>
-              ))}
+              renderGrid(outfits, "Inga outfits ännu.")}
+            {activeTab === "hem" && renderGrid(homeOutfits, "Inga rum ännu.")}
             {activeTab === "boards" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {publicBoards.map((b) => (

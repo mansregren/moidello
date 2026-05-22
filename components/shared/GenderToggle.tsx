@@ -2,7 +2,9 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useGender } from "@/lib/gender-context";
+import { useAuth } from "@/lib/auth-context";
 import { useToast, haptic } from "@/lib/toast-context";
+import { HOME_VERTICAL_PUBLIC } from "@/lib/flags";
 import { GenderFilter } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -30,10 +32,13 @@ export function GenderToggle({
   className?: string;
 }) {
   const { gender, setGender } = useGender();
+  const { profile } = useAuth();
   const { showToast } = useToast();
   const router = useRouter();
   const pathname = usePathname();
   const isHome = pathname?.startsWith(HOME_PATH) ?? false;
+  // While the vertical is unlaunched, only admins see the Hem entry.
+  const showHome = HOME_VERTICAL_PUBLIC || !!profile?.isAdmin;
 
   const handleGender = (opt: (typeof GENDER_OPTIONS)[number]) => {
     const alreadyActive = !isHome && opt.id === gender;
@@ -93,19 +98,21 @@ export function GenderToggle({
           </button>
         );
       })}
-      <button
-        role="radio"
-        aria-checked={isHome}
-        onClick={handleHome}
-        className={cn(
-          pillBase,
-          isHome
-            ? "bg-foreground text-background"
-            : "text-foreground-muted hover:text-foreground",
-        )}
-      >
-        Hem
-      </button>
+      {showHome && (
+        <button
+          role="radio"
+          aria-checked={isHome}
+          onClick={handleHome}
+          className={cn(
+            pillBase,
+            isHome
+              ? "bg-foreground text-background"
+              : "text-foreground-muted hover:text-foreground",
+          )}
+        >
+          Hem
+        </button>
+      )}
     </div>
   );
 }

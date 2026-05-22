@@ -10,6 +10,86 @@
  * discriminator (see migration 0038).
  */
 
+/** Canonical room taxonomy with URL slugs + SEO descriptions. Drives the
+ *  /home/[rum] landing pages (mirror of /stil/[slug]). Slugs are ASCII so
+ *  URLs stay clean (kok, forvaring, balkong). */
+export interface HomeRoom {
+  slug: string;
+  label: string;
+  description: string;
+}
+
+export const HOME_ROOMS: HomeRoom[] = [
+  {
+    slug: "vardagsrum",
+    label: "Vardagsrum",
+    description:
+      "Soffor, belysning och textil som gör vardagsrummet till hemmets hjärta. Se hela rum och hitta var varje möbel köps.",
+  },
+  {
+    slug: "sovrum",
+    label: "Sovrum",
+    description:
+      "Sängkläder, nattduksbord och lugn. Inredning för sovrummet — tagga varje detalj och hitta butiken.",
+  },
+  {
+    slug: "kok",
+    label: "Kök",
+    description:
+      "Köksinredning, servis och förvaring. Rum att inspireras av, med köplänkar till varje sak som syns.",
+  },
+  {
+    slug: "matplats",
+    label: "Matplats",
+    description:
+      "Matbord, stolar och dukning. Inred matplatsen och se var möblerna kommer ifrån.",
+  },
+  {
+    slug: "badrum",
+    label: "Badrum",
+    description:
+      "Badrumsinredning, textil och förvaring för ett lugnt badrum med spa-känsla.",
+  },
+  {
+    slug: "hall",
+    label: "Hall",
+    description:
+      "Första intrycket — hallmöbler, krokar och speglar. Inredning för entrén.",
+  },
+  {
+    slug: "arbetsrum",
+    label: "Arbetsrum",
+    description:
+      "Skrivbord, stol och belysning för hemmakontoret. Fokus och form i ett rum.",
+  },
+  {
+    slug: "barnrum",
+    label: "Barnrum",
+    description:
+      "Inredning för barnrummet — möbler, textil och förvaring med stil och lek.",
+  },
+  {
+    slug: "balkong",
+    label: "Balkong & uteplats",
+    description:
+      "Utemöbler, krukor och textil för balkong och uteplats. Ute som inne.",
+  },
+  {
+    slug: "forvaring",
+    label: "Förvaring",
+    description:
+      "Hyllor, lådor och smarta lösningar — förvaring som får synas.",
+  },
+];
+
+export function roomBySlug(slug: string): HomeRoom | undefined {
+  return HOME_ROOMS.find((r) => r.slug === slug.toLowerCase());
+}
+
+export function slugForRoom(label: string): string | undefined {
+  return HOME_ROOMS.find((r) => r.label === label)?.slug;
+}
+
 /** Per-room categories, shown as the home browse cards + the create-form
  *  category picker. Order is the display order. */
 export const HOME_CATEGORIES = [

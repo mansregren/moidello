@@ -107,7 +107,7 @@ export default async function RootLayout({
   if (user) {
     const { data: profileRow } = await supabase
       .from("profiles")
-      .select("username, display_name, avatar_url")
+      .select("username, display_name, avatar_url, is_admin")
       .eq("id", user.id)
       .maybeSingle();
     if (profileRow) {
@@ -115,6 +115,7 @@ export default async function RootLayout({
         username: profileRow.username as string,
         displayName: (profileRow.display_name as string | null) ?? null,
         avatarUrl: (profileRow.avatar_url as string | null) ?? null,
+        isAdmin: !!(profileRow.is_admin as boolean | null),
       };
     }
   }
