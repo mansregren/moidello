@@ -68,9 +68,13 @@ export function Header() {
       )}
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      <Container className="relative flex items-center h-14 md:h-20 gap-2 md:gap-4">
-        {/* Mobile: gender toggle (left) */}
-        <div className="md:hidden flex items-center shrink-0">
+      {/* Mobile: 3-col grid [toggle | logo | icons]. The center column is
+          viewport-centered because the two 1fr side columns are equal, so
+          the logo stays exactly centered without absolute positioning (no
+          overlap with the 3-pill toggle). Desktop switches to flex. */}
+      <Container className="relative grid grid-cols-[1fr_auto_1fr] items-center h-14 gap-2 md:flex md:h-20 md:gap-4">
+        {/* Mobile: gender toggle (left column) */}
+        <div className="md:hidden flex items-center justify-self-start">
           <GenderToggle orientation="horizontal" />
         </div>
 
@@ -82,12 +86,10 @@ export function Header() {
           Moidello
         </Link>
 
-        {/* Mobile: logo centered in the space between toggle and icons.
-            In-flow flex (not absolute) so the 3-pill toggle can never
-            overlap it; truncates on very narrow screens instead. */}
+        {/* Mobile: logo (center column, truly viewport-centered) */}
         <Link
           href="/"
-          className="md:hidden flex-1 min-w-0 text-center font-heading text-xl uppercase tracking-tight text-foreground truncate"
+          className="md:hidden justify-self-center font-heading text-lg uppercase tracking-tight text-foreground whitespace-nowrap"
         >
           Moidello
         </Link>
@@ -122,7 +124,7 @@ export function Header() {
         <div className="hidden md:flex flex-1" />
 
         {/* Right: gender toggle (desktop), search, login */}
-        <div className="ml-auto md:ml-0 flex items-center gap-1 sm:gap-2 shrink-0">
+        <div className="justify-self-end flex items-center gap-1 sm:gap-2 shrink-0">
           <div className="hidden md:block">
             <GenderToggle orientation="horizontal" />
           </div>

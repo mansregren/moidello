@@ -54,10 +54,12 @@ export function GenderToggle({
   };
 
   const pillBase = cn(
-    "rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all duration-300",
+    // transition-colors (not transition-all) so only the bg/text animate —
+    // transition-all also tweens layout and felt laggy on mobile.
+    "rounded-full font-semibold uppercase tracking-wide transition-colors duration-150",
     orientation === "horizontal"
-      ? "px-2.5 py-1.5 sm:px-3"
-      : "px-2 py-1.5 text-center",
+      ? "px-2 py-1 text-[10px] sm:px-3 sm:py-1.5 sm:text-[11px]"
+      : "px-2 py-1.5 text-center text-[11px]",
   );
 
   return (
