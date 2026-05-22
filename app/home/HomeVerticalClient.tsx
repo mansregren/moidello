@@ -11,7 +11,6 @@ import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import {
   HOME_CATEGORIES,
   HOME_CATEGORY_DESCRIPTIONS,
-  HOME_CATEGORY_COVER,
 } from "@/lib/home-data";
 import type { Outfit } from "@/lib/types";
 
@@ -34,12 +33,12 @@ export default function HomeVerticalClient({
   const saved = useMemo(() => new Set(savedIds), [savedIds]);
   const [active, setActive] = useState<string | null>(null);
 
-  // Real cover for a room card — newest home post in that room, else a
-  // static fallback so empty rooms still read as designed.
-  const categoryImage = (cat: string): string => {
+  // Real cover for a room card — newest home post in that room. Returns
+  // null when the room has no post yet, so we render a clean typographic
+  // placeholder instead of a misleading travel photo (premium voice).
+  const categoryImage = (cat: string): string | null => {
     const match = categoryCovers.find((c) => c.category === cat);
-    if (match) return match.image;
-    return HOME_CATEGORY_COVER[cat] ?? "/images/bg/riviera.webp";
+    return match ? match.image : null;
   };
 
   const visible = useMemo(
@@ -94,6 +93,7 @@ export default function HomeVerticalClient({
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
               {HOME_CATEGORIES.map((cat, i) => {
                 const isActive = active === cat;
+                const cover = categoryImage(cat);
                 return (
                   <motion.button
                     key={cat}
@@ -104,31 +104,53 @@ export default function HomeVerticalClient({
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
                     transition={{ duration: 0.35, delay: i * 0.03 }}
-                    className="group relative block aspect-[4/5] rounded-2xl overflow-hidden text-left"
+                    className="group relative block aspect-[4/5] rounded-2xl overflow-hidden text-left border border-border"
                   >
-                    <Image
-                      src={categoryImage(cat)}
-                      alt=""
-                      fill
-                      sizes="(min-width: 1024px) 18vw, (min-width: 640px) 33vw, 50vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      unoptimized={categoryImage(cat).startsWith("http")}
-                    />
-                    <div
-                      className={
-                        isActive
-                          ? "absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 ring-2 ring-inset ring-white/80"
-                          : "absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"
-                      }
-                    />
-                    <div className="absolute inset-x-3 bottom-3">
-                      <p className="font-heading text-base md:text-lg uppercase tracking-tight text-white leading-tight">
-                        {cat}
-                      </p>
-                      <p className="text-[11px] text-white/70 mt-0.5">
-                        {HOME_CATEGORY_DESCRIPTIONS[cat]}
-                      </p>
-                    </div>
+                    {cover ? (
+                      <>
+                        <Image
+                          src={cover}
+                          alt=""
+                          fill
+                          sizes="(min-width: 1024px) 18vw, (min-width: 640px) 33vw, 50vw"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          unoptimized={cover.startsWith("http")}
+                        />
+                        <div
+                          className={
+                            isActive
+                              ? "absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 ring-2 ring-inset ring-white/80"
+                              : "absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"
+                          }
+                        />
+                        <div className="absolute inset-x-3 bottom-3">
+                          <p className="font-heading text-base md:text-lg uppercase tracking-tight text-white leading-tight">
+                            {cat}
+                          </p>
+                          <p className="text-[11px] text-white/70 mt-0.5">
+                            {HOME_CATEGORY_DESCRIPTIONS[cat]}
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      // No post for this room yet → clean typographic card
+                      // on the brand cream, not a misleading travel photo.
+                      <div
+                        className={
+                          isActive
+                            ? "absolute inset-0 flex flex-col justify-end p-3 ring-2 ring-inset ring-foreground transition-transform group-hover:scale-[1.02]"
+                            : "absolute inset-0 flex flex-col justify-end p-3 transition-transform group-hover:scale-[1.02]"
+                        }
+                        style={{ backgroundColor: "#F7F6F3" }}
+                      >
+                        <p className="font-heading text-base md:text-lg uppercase tracking-tight text-neutral-900 leading-tight">
+                          {cat}
+                        </p>
+                        <p className="text-[11px] text-neutral-500 mt-0.5">
+                          {HOME_CATEGORY_DESCRIPTIONS[cat]}
+                        </p>
+                      </div>
+                    )}
                   </motion.button>
                 );
               })}

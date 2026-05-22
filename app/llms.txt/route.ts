@@ -77,6 +77,7 @@ export async function GET(): Promise<Response> {
   }
   lines.push("## Bläddra alla outfits");
   lines.push(`- [Upptäck-sidan](${BASE}/upptack)`);
+  lines.push(`- [Heminredning](${BASE}/home)`);
   lines.push(`- [Märken-katalog](${BASE}/brands)`);
   lines.push(`- [Sitemap (XML)](${BASE}/sitemap.xml)`);
   lines.push("");
