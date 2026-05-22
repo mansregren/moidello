@@ -2,6 +2,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import {
   fetchOutfitById,
   fetchOutfits,
+  fetchHomePosts,
   fetchOutfitComments,
   fetchEngagementForViewer,
   isFollowing,
@@ -33,17 +34,21 @@ export default async function OutfitPage({
     );
   }
 
-  const [allOutfits, comments, engagement, followingCreator] = await Promise.all([
-    fetchOutfits(20),
+  const isHome = outfit.vertical === "hem";
+  const [pool, comments, engagement, followingCreator] = await Promise.all([
+    // Pull "similar" from the same vertical — a home post must never
+    // surface fashion outfits (its gender is a "dam" fallback).
+    isHome ? fetchHomePosts(20) : fetchOutfits(20),
     fetchOutfitComments(outfit.id),
     fetchEngagementForViewer([outfit.id]),
     isFollowing(outfit.creator.id),
   ]);
 
-  // Same-gender only — a herr outfit shouldn't surface dam "liknande".
-  const similar = allOutfits
-    .filter((o) => o.id !== outfit.id && o.gender === outfit.gender)
-    .slice(0, 3);
+  const similar = (
+    isHome
+      ? pool.filter((o) => o.id !== outfit.id)
+      : pool.filter((o) => o.id !== outfit.id && o.gender === outfit.gender)
+  ).slice(0, 3);
 
   const similarEngagement = await fetchEngagementForViewer(
     similar.map((o) => o.id),

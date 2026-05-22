@@ -197,6 +197,7 @@ export function outfitPageJsonLd(outfit: Outfit) {
     outfit.slug && outfit.creator.username
       ? `/${outfit.creator.username.toLowerCase()}/${outfit.slug}`
       : `/outfit/${outfit.id}`;
+  const isHome = outfit.vertical === "hem";
   const graph: object[] = [
     {
       "@type": "ImageObject",
@@ -220,8 +221,8 @@ export function outfitPageJsonLd(outfit: Outfit) {
         {
           "@type": "ListItem",
           position: 2,
-          name: "Outfits",
-          item: `${SITE_BASE}/upptack`,
+          name: isHome ? "Heminredning" : "Outfits",
+          item: `${SITE_BASE}${isHome ? "/home" : "/upptack"}`,
         },
         {
           "@type": "ListItem",

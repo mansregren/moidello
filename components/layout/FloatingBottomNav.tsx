@@ -17,6 +17,8 @@ export function FloatingBottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { isLoggedIn, requireAuth } = useAuth();
+  // On /home, the create button should open the home-vertical create form.
+  const isHomeArea = pathname?.startsWith("/home") ?? false;
 
   const handleClick = (
     e: MouseEvent<HTMLAnchorElement>,
@@ -42,12 +44,16 @@ export function FloatingBottomNav() {
           {primaryNav.map((item) => {
             const active = isActive(pathname, item.href);
             const Icon = item.icon;
+            const href =
+              item.authAction === "create" && isHomeArea
+                ? "/skapa?vertical=hem"
+                : item.href;
 
             if (item.primary) {
               return (
                 <li key={item.href} className="flex-1">
                   <Link
-                    href={item.href}
+                    href={href}
                     aria-current={active ? "page" : undefined}
                     onClick={(e) => handleClick(e, item.authAction)}
                     className="flex flex-col items-center gap-0.5 py-1 transition-transform active:scale-95"
@@ -70,7 +76,7 @@ export function FloatingBottomNav() {
             return (
               <li key={item.href} className="flex-1">
                 <Link
-                  href={item.href}
+                  href={href}
                   aria-current={active ? "page" : undefined}
                   onClick={(e) => handleClick(e, item.authAction)}
                   className={cn(

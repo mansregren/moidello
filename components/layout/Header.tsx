@@ -101,10 +101,14 @@ export function Header() {
         >
           {primaryNav.map((item) => {
             const active = isActive(pathname, item.href);
+            const href =
+              item.authAction === "create" && pathname?.startsWith("/home")
+                ? "/skapa?vertical=hem"
+                : item.href;
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={href}
                 aria-current={active ? "page" : undefined}
                 onClick={(e) => handleNavClick(e, item.authAction)}
                 className={cn(

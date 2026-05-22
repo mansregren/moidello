@@ -61,6 +61,7 @@ export default function OutfitDetail({
   viewerIsAdmin?: boolean;
 }) {
   const { isLoggedIn, requireAuth, user } = useAuth();
+  const isHome = outfit.vertical === "hem";
   const [, startTransition] = useTransition();
   const similarLiked = useMemo(() => new Set(similarLikedIds), [similarLikedIds]);
   const similarSaved = useMemo(() => new Set(similarSavedIds), [similarSavedIds]);
@@ -150,10 +151,10 @@ export default function OutfitDetail({
               </li>
               <li>
                 <Link
-                  href="/upptack"
+                  href={isHome ? "/home" : "/upptack"}
                   className="hover:text-foreground transition-colors"
                 >
-                  Outfits
+                  {isHome ? "Heminredning" : "Outfits"}
                 </Link>
               </li>
               {outfit.category && (
@@ -187,11 +188,12 @@ export default function OutfitDetail({
                     .map((t) => `${t.brand} ${t.name}`)
                     .join(", ");
                   const cat = outfit.category?.trim();
+                  const noun = isHome ? "" : "-outfit";
                   if (top && cat) {
-                    return `${cat}-outfit med ${top} av ${outfit.creator.displayName}`;
+                    return `${cat}${noun} med ${top} av ${outfit.creator.displayName}`;
                   }
                   if (top) {
-                    return `Outfit med ${top} av ${outfit.creator.displayName}`;
+                    return `${isHome ? "Rum" : "Outfit"} med ${top} av ${outfit.creator.displayName}`;
                   }
                   return `${outfit.title} av ${outfit.creator.displayName}`;
                 })()}
@@ -335,12 +337,12 @@ export default function OutfitDetail({
 
               <div className="mb-8">
                 <h3 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-4">
-                  Taggade plagg
+                  {isHome ? "Taggade saker" : "Taggade plagg"}
                 </h3>
                 <div className="rounded-2xl border border-border bg-background-secondary p-4">
                   {outfit.tags.length === 0 ? (
                     <p className="text-sm text-foreground-subtle">
-                      Inga taggade plagg.
+                      {isHome ? "Inga taggade saker." : "Inga taggade plagg."}
                     </p>
                   ) : (
                     outfit.tags.map((tag) => (
@@ -369,11 +371,17 @@ export default function OutfitDetail({
             </motion.div>
           </div>
 
-          <ExploreLinks outfit={outfit} />
+          {/* ExploreLinks links garments→/typ and colors→/farg, both mode
+              taxonomies — hide for home posts to avoid broken links. */}
+          {!isHome && <ExploreLinks outfit={outfit} />}
 
+          {similar.length > 0 && (
           <section className="mt-16 md:mt-24 mb-16">
             <h2 className="font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-8">
-              Liknande <span className="text-foreground-subtle">outfits</span>
+              Liknande{" "}
+              <span className="text-foreground-subtle">
+                {isHome ? "rum" : "outfits"}
+              </span>
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {similar.map((o) => (
@@ -386,6 +394,7 @@ export default function OutfitDetail({
               ))}
             </div>
           </section>
+          )}
         </Container>
       </main>
     </>
