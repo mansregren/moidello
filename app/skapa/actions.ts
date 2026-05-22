@@ -59,6 +59,10 @@ export async function createOutfit(
   const description = ((formData.get("description") as string | null) ?? "").trim();
   const category = (formData.get("category") as string | null) ?? "";
   const gender = (formData.get("gender") as string | null) ?? "dam";
+  // Which vertical this post belongs to. Home posts ("hem") carry no
+  // gender; everything else defaults to the fashion vertical ("mode").
+  const vertical =
+    (formData.get("vertical") as string | null) === "hem" ? "hem" : "mode";
   const keywordsRaw = (formData.get("keywords") as string | null) ?? "[]";
   const tagsRaw = (formData.get("tags") as string | null) ?? "[]";
 
@@ -74,7 +78,7 @@ export async function createOutfit(
   if (!title) {
     return { error: "Skriv en titel." };
   }
-  if (gender !== "dam" && gender !== "herr") {
+  if (vertical === "mode" && gender !== "dam" && gender !== "herr") {
     return { error: "Välj kön." };
   }
 
@@ -148,7 +152,9 @@ export async function createOutfit(
         slug: chosenSlug,
         description: description || null,
         category: category || null,
-        gender,
+        gender:
+          vertical === "hem" ? null : gender === "herr" ? "herr" : "dam",
+        vertical,
         // No separate meta_description / alt_text from /skapa — the SEO
         // layer derives the Google snippet from `description` (see
         // buildDescription in the outfit layouts). The admin editor can
@@ -194,7 +200,7 @@ export async function createOutfit(
         buy_url: t.buyUrl.trim() || null,
         buy_urls:
           t.buyUrls && Object.keys(t.buyUrls).length > 0 ? t.buyUrls : null,
-        garment: t.garment || "Toppar",
+        garment: t.garment || (vertical === "hem" ? "Dekoration" : "Toppar"),
         price:
           typeof t.price === "number" &&
           Number.isFinite(t.price) &&

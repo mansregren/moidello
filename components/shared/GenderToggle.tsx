@@ -1,15 +1,27 @@
 "use client";
 
+import { usePathname, useRouter } from "next/navigation";
 import { useGender } from "@/lib/gender-context";
 import { useToast, haptic } from "@/lib/toast-context";
 import { GenderFilter } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const OPTIONS: { id: GenderFilter; label: string; toast: string }[] = [
+const GENDER_OPTIONS: { id: GenderFilter; label: string; toast: string }[] = [
   { id: "dam", label: "Dam", toast: "Visar Dam-outfits" },
   { id: "herr", label: "Herr", toast: "Visar Herr-outfits" },
 ];
 
+// Where Dam/Herr send you when you tap them while inside the home vertical.
+const MODE_EXIT_PATH = "/upptack";
+const HOME_PATH = "/home";
+
+/**
+ * Dam / Herr / Hem. Dam and Herr are the real gender filter (binary, lives
+ * in gender-context). "Hem" is NOT a gender value — it's a navigation into
+ * the heminredning vertical at /home. Inside /home the Hem pill is active
+ * and tapping Dam/Herr sets the gender and routes back to the fashion side,
+ * so the mode filter logic never sees a third value.
+ */
 export function GenderToggle({
   orientation = "horizontal",
   className,
@@ -19,48 +31,77 @@ export function GenderToggle({
 }) {
   const { gender, setGender } = useGender();
   const { showToast } = useToast();
+  const router = useRouter();
+  const pathname = usePathname();
+  const isHome = pathname?.startsWith(HOME_PATH) ?? false;
 
-  const handleSelect = (opt: (typeof OPTIONS)[number]) => {
-    if (opt.id === gender) return;
+  const handleGender = (opt: (typeof GENDER_OPTIONS)[number]) => {
+    const alreadyActive = !isHome && opt.id === gender;
     setGender(opt.id);
-    showToast(opt.toast);
     haptic(8);
+    if (isHome) {
+      // Leaving the home vertical back to the fashion browse.
+      router.push(MODE_EXIT_PATH);
+      return;
+    }
+    if (!alreadyActive) showToast(opt.toast);
   };
+
+  const handleHome = () => {
+    if (isHome) return;
+    haptic(8);
+    router.push(HOME_PATH);
+  };
+
+  const pillBase = cn(
+    "rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all duration-300",
+    orientation === "horizontal" ? "px-3 py-1.5" : "px-2 py-1.5 text-center",
+  );
 
   return (
     <div
       role="radiogroup"
-      aria-label="Visa kön"
+      aria-label="Visa kategori"
       className={cn(
         "rounded-full border border-border bg-background-secondary p-0.5",
         orientation === "horizontal"
           ? "inline-flex items-center"
           : "flex flex-col items-stretch gap-0.5",
-        className
+        className,
       )}
     >
-      {OPTIONS.map((opt) => {
-        const active = gender === opt.id;
+      {GENDER_OPTIONS.map((opt) => {
+        const active = !isHome && gender === opt.id;
         return (
           <button
             key={opt.id}
             role="radio"
             aria-checked={active}
-            onClick={() => handleSelect(opt)}
+            onClick={() => handleGender(opt)}
             className={cn(
-              "rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all duration-300",
-              orientation === "horizontal"
-                ? "px-3 py-1.5"
-                : "px-2 py-1.5 text-center",
+              pillBase,
               active
                 ? "bg-foreground text-background"
-                : "text-foreground-muted hover:text-foreground"
+                : "text-foreground-muted hover:text-foreground",
             )}
           >
             {opt.label}
           </button>
         );
       })}
+      <button
+        role="radio"
+        aria-checked={isHome}
+        onClick={handleHome}
+        className={cn(
+          pillBase,
+          isHome
+            ? "bg-foreground text-background"
+            : "text-foreground-muted hover:text-foreground",
+        )}
+      >
+        Hem
+      </button>
     </div>
   );
 }

@@ -16,9 +16,15 @@ import { resizeImageForUpload } from "@/lib/image-resize";
 import { BrandAutocomplete } from "@/components/skapa/BrandAutocomplete";
 import { ColorPicker } from "@/components/shared/ColorPicker";
 import { garmentOptions, garmentsForGender } from "@/lib/garments";
+import {
+  HOME_CATEGORIES,
+  HOME_ITEM_TYPES,
+  homeItemTypeOptions,
+} from "@/lib/home-data";
 import { createOutfit, type PublishedOutfit } from "./actions";
 
 type Gender = "dam" | "herr";
+type Vertical = "mode" | "hem";
 
 interface DemoTag {
   id: number;
@@ -91,6 +97,19 @@ export default function SkapaPage() {
   const router = useRouter();
   const { isLoggedIn, loading } = useAuth();
   const { gender } = useGender();
+
+  // Which vertical we're creating in. Driven by ?vertical=hem from the
+  // /home CTAs. Read from the URL directly (not useSearchParams) so we
+  // don't trigger the Next 16 SSR bailout — this page is client-only
+  // anyway (it redirects to /login when logged out).
+  const [vertical] = useState<Vertical>(() => {
+    if (typeof window === "undefined") return "mode";
+    return new URLSearchParams(window.location.search).get("vertical") === "hem"
+      ? "hem"
+      : "mode";
+  });
+  const isHome = vertical === "hem";
+  const categoryOptions = isHome ? HOME_CATEGORIES : CATEGORIES;
 
   const [drafts, setDrafts] = useState<Draft[]>([makeDraft()]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -255,7 +274,7 @@ export default function SkapaPage() {
       brand: "",
       name: "",
       url: "",
-      garment: garmentsForGender(active.gender)[0],
+      garment: isHome ? HOME_ITEM_TYPES[0] : garmentsForGender(active.gender)[0],
       price: "",
       currency: "SEK",
       color: "",
@@ -301,7 +320,7 @@ export default function SkapaPage() {
         brand: data.brand ?? "",
         name: data.product_name ?? "",
         url: trimmed,
-        garment: garmentsForGender(active.gender)[0],
+        garment: isHome ? HOME_ITEM_TYPES[0] : garmentsForGender(active.gender)[0],
         price: data.price != null ? String(data.price) : "",
         currency: (data.currency ?? "SEK").toUpperCase(),
         color: data.color ?? "",
@@ -448,6 +467,7 @@ export default function SkapaPage() {
         fd.set("description", draft.description);
         fd.set("category", draft.category);
         fd.set("gender", draft.gender);
+        fd.set("vertical", vertical);
         fd.set("keywords", JSON.stringify(draft.keywords));
         fd.set("tags", JSON.stringify(tagsForSubmit(draft.tags)));
 
@@ -499,11 +519,15 @@ export default function SkapaPage() {
             transition={{ duration: 0.5 }}
           >
             <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-2">
-              Skapa <span className="text-foreground-subtle">Outfit</span>
+              Skapa{" "}
+              <span className="text-foreground-subtle">
+                {isHome ? "Rum" : "Outfit"}
+              </span>
             </h1>
             <p className="text-foreground-muted mb-6">
-              Ladda upp en eller flera bilder. Tagga plagg på varje, publicera
-              allt samtidigt — varje outfit får sin egen URL.
+              {isHome
+                ? "Ladda upp en eller flera bilder. Tagga möblerna på varje, publicera allt samtidigt — varje rum får sin egen URL."
+                : "Ladda upp en eller flera bilder. Tagga plagg på varje, publicera allt samtidigt — varje outfit får sin egen URL."}
             </p>
           </motion.div>
 
@@ -853,7 +877,7 @@ export default function SkapaPage() {
                   htmlFor="category"
                   className="text-sm font-medium text-foreground-muted block mb-2"
                 >
-                  Kategori
+                  {isHome ? "Rum" : "Kategori"}
                 </label>
                 <select
                   id="category"
@@ -862,8 +886,10 @@ export default function SkapaPage() {
                   disabled={active.status === "published" || publishing}
                   className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-foreground-subtle outline-none focus:border-foreground/30 transition-colors disabled:opacity-60"
                 >
-                  <option value="">Välj kategori...</option>
-                  {CATEGORIES.map((c) => (
+                  <option value="">
+                    {isHome ? "Välj rum..." : "Välj kategori..."}
+                  </option>
+                  {categoryOptions.map((c) => (
                     <option key={c} value={c}>
                       {c}
                     </option>
@@ -871,28 +897,30 @@ export default function SkapaPage() {
                 </select>
               </div>
 
-              <div>
-                <label className="text-sm font-medium text-foreground-muted block mb-2">
-                  Kön
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {(["dam", "herr"] as const).map((g) => (
-                    <button
-                      key={g}
-                      type="button"
-                      onClick={() => updateActive({ gender: g })}
-                      disabled={active.status === "published" || publishing}
-                      className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors disabled:opacity-60 ${
-                        active.gender === g
-                          ? "border-foreground bg-foreground text-background"
-                          : "border-border bg-background-secondary text-foreground-muted hover:border-foreground/30"
-                      }`}
-                    >
-                      {g === "dam" ? "Dam" : "Herr"}
-                    </button>
-                  ))}
+              {!isHome && (
+                <div>
+                  <label className="text-sm font-medium text-foreground-muted block mb-2">
+                    Kön
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(["dam", "herr"] as const).map((g) => (
+                      <button
+                        key={g}
+                        type="button"
+                        onClick={() => updateActive({ gender: g })}
+                        disabled={active.status === "published" || publishing}
+                        className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors disabled:opacity-60 ${
+                          active.gender === g
+                            ? "border-foreground bg-foreground text-background"
+                            : "border-border bg-background-secondary text-foreground-muted hover:border-foreground/30"
+                        }`}
+                      >
+                        {g === "dam" ? "Dam" : "Herr"}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div>
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
@@ -950,7 +978,8 @@ export default function SkapaPage() {
 
               <div>
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
-                  Taggade plagg ({active.tags.length})
+                  {isHome ? "Taggade saker" : "Taggade plagg"} (
+                  {active.tags.length})
                 </label>
 
                 {/* Paste-URL → autofill. Tagg läggs i mitten av bilden,
@@ -1016,7 +1045,7 @@ export default function SkapaPage() {
                       >
                         <div className="flex items-center justify-between">
                           <p className="text-sm font-medium text-foreground">
-                            Plagg {i + 1}
+                            {isHome ? "Sak" : "Plagg"} {i + 1}
                           </p>
                           <IconButton
                             size="sm"
@@ -1034,7 +1063,10 @@ export default function SkapaPage() {
                           }
                           className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-foreground outline-none"
                         >
-                          {garmentOptions(active.gender, tag.garment).map((g) => (
+                          {(isHome
+                            ? homeItemTypeOptions(tag.garment)
+                            : garmentOptions(active.gender, tag.garment)
+                          ).map((g) => (
                             <option key={g} value={g}>
                               {g}
                             </option>
