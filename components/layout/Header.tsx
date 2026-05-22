@@ -68,9 +68,9 @@ export function Header() {
       )}
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      <Container className="relative flex items-center h-14 md:h-20 gap-4">
+      <Container className="relative flex items-center h-14 md:h-20 gap-2 md:gap-4">
         {/* Mobile: gender toggle (left) */}
-        <div className="md:hidden flex items-center min-w-0">
+        <div className="md:hidden flex items-center shrink-0">
           <GenderToggle orientation="horizontal" />
         </div>
 
@@ -82,10 +82,12 @@ export function Header() {
           Moidello
         </Link>
 
-        {/* Mobile: logo (center, absolute) */}
+        {/* Mobile: logo centered in the space between toggle and icons.
+            In-flow flex (not absolute) so the 3-pill toggle can never
+            overlap it; truncates on very narrow screens instead. */}
         <Link
           href="/"
-          className="md:hidden absolute left-1/2 -translate-x-1/2 font-heading text-2xl uppercase tracking-tight text-foreground"
+          className="md:hidden flex-1 min-w-0 text-center font-heading text-xl uppercase tracking-tight text-foreground truncate"
         >
           Moidello
         </Link>
@@ -120,7 +122,7 @@ export function Header() {
         <div className="hidden md:flex flex-1" />
 
         {/* Right: gender toggle (desktop), search, login */}
-        <div className="ml-auto md:ml-0 flex items-center gap-2">
+        <div className="ml-auto md:ml-0 flex items-center gap-1 sm:gap-2 shrink-0">
           <div className="hidden md:block">
             <GenderToggle orientation="horizontal" />
           </div>

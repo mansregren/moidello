@@ -55,7 +55,9 @@ export function GenderToggle({
 
   const pillBase = cn(
     "rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all duration-300",
-    orientation === "horizontal" ? "px-3 py-1.5" : "px-2 py-1.5 text-center",
+    orientation === "horizontal"
+      ? "px-2.5 py-1.5 sm:px-3"
+      : "px-2 py-1.5 text-center",
   );
 
   return (
