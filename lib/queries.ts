@@ -62,7 +62,8 @@ interface OutfitRow {
   user_id: string;
   image_url: string;
   type: "photo" | "flatlay";
-  gender: "herr" | "dam";
+  vertical: "mode" | "hem" | null;
+  gender: "herr" | "dam" | null;
   code: string | null;
   title: string;
   description: string | null;
@@ -161,7 +162,10 @@ function rowToOutfit(row: OutfitRow): Outfit {
     slug: row.slug ?? undefined,
     image: row.image_url,
     type: row.type,
-    gender: row.gender,
+    vertical: row.vertical ?? "mode",
+    // Home posts carry no gender; fall back so mode-only code stays
+    // non-nullable. Never read this in a home flow.
+    gender: row.gender ?? "dam",
     title: row.title,
     code: row.code ?? undefined,
     description: row.description ?? "",
@@ -182,7 +186,7 @@ function rowToOutfit(row: OutfitRow): Outfit {
 // the !fkey hint. Comments on the outfit detail page get a similar
 // hint when fetched separately.
 const OUTFIT_COLUMNS = `
-  id, slug, user_id, image_url, type, gender, code, title, description, meta_description, category, created_at, is_hidden,
+  id, slug, user_id, image_url, type, vertical, gender, code, title, description, meta_description, category, created_at, is_hidden,
   profiles!outfits_user_id_fkey ( id, username, display_name, avatar_url, bio, region ),
   tagged_items ( id, brand, name, price, currency, buy_url, buy_urls, garment, position_x, position_y, is_affiliate, description, keywords, alt_text, material, color )
 `;
@@ -227,6 +231,7 @@ export async function fetchOutfits(
     .from("outfits")
     .select(OUTFIT_COLUMNS)
     .eq("is_published", true)
+    .eq("vertical", "mode")
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -255,6 +260,7 @@ export async function fetchCategoryCovers(
     .from("outfits")
     .select("category, gender, image_url")
     .eq("is_published", true)
+    .eq("vertical", "mode")
     .not("category", "is", null)
     .order("created_at", { ascending: false })
     .limit(500);
@@ -267,6 +273,80 @@ export async function fetchCategoryCovers(
     gender: r.gender === "herr" ? "herr" : "dam",
     image: r.image_url,
   }));
+}
+
+// ── Home vertical (heminredning) ───────────────────────────────────────
+// Mirror of fetchOutfits / fetchCategoryCovers but scoped to vertical='hem'
+// and gender-agnostic. Everything else (stats, engagement, mapping) is
+// shared with the mode vertical.
+
+/** Published home posts, newest first. Empty array if the column/table
+ *  isn't there yet (migration 0038 not applied) — caller falls back to an
+ *  empty state rather than crashing. */
+export async function fetchHomePosts(
+  limit = 60,
+  client?: QueryClient,
+): Promise<Outfit[]> {
+  const supabase = await resolveClient(client);
+  const { data, error } = await supabase
+    .from("outfits")
+    .select(OUTFIT_COLUMNS)
+    .eq("is_published", true)
+    .eq("vertical", "hem")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    // 42P01 = table missing, 42703 = column missing (pre-migration).
+    if (error.code === "42P01" || error.code === "42703") return [];
+    console.error("fetchHomePosts failed:", error);
+    return [];
+  }
+
+  const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
+  return attachOutfitStats(mapped, supabase);
+}
+
+/** Cover lookup for the /home category cards: every published home post's
+ *  category + image, newest first. */
+export async function fetchHomeCategoryCovers(
+  client?: QueryClient,
+): Promise<Array<{ category: string; image: string }>> {
+  const supabase = await resolveClient(client);
+  const { data, error } = await supabase
+    .from("outfits")
+    .select("category, image_url")
+    .eq("is_published", true)
+    .eq("vertical", "hem")
+    .not("category", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(500);
+
+  if (error || !data) return [];
+  return (data as Array<{ category: string; image_url: string }>).map((r) => ({
+    category: r.category,
+    image: r.image_url,
+  }));
+}
+
+/** Home posts in a given room category. Drives /home category sections. */
+export async function fetchHomePostsByCategory(
+  category: string,
+  client?: QueryClient,
+): Promise<Outfit[]> {
+  const supabase = await resolveClient(client);
+  const { data, error } = await supabase
+    .from("outfits")
+    .select(OUTFIT_COLUMNS)
+    .eq("is_published", true)
+    .eq("vertical", "hem")
+    .ilike("category", category)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  if (error || !data) return [];
+  const mapped = (data as unknown as OutfitRow[]).map(rowToOutfit);
+  return attachOutfitStats(mapped, supabase);
 }
 
 export async function fetchOutfitsByUser(
@@ -316,6 +396,7 @@ export async function fetchFollowingFeed(
     .select(OUTFIT_COLUMNS)
     .in("user_id", ids)
     .eq("is_published", true)
+    .eq("vertical", "mode")
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -553,7 +634,8 @@ export async function fetchTopOutfits(limit = 12): Promise<Outfit[]> {
     .from("outfits")
     .select(OUTFIT_COLUMNS)
     .in("id", ids)
-    .eq("is_published", true);
+    .eq("is_published", true)
+    .eq("vertical", "mode");
 
   if (!outfitRows) return [];
   const byId = new Map(
@@ -610,6 +692,16 @@ export async function fetchBrandsAggregated(
     );
   }
 
+  // Brands are a fashion concept — exclude tagged items that belong to
+  // home posts so interior-decor brands don't leak into the brand index.
+  const { data: hemRows } = await supabase
+    .from("outfits")
+    .select("id")
+    .eq("vertical", "hem");
+  const hemOutfitIds = new Set(
+    ((hemRows ?? []) as Array<{ id: string }>).map((r) => r.id),
+  );
+
   const [{ data: items }, { data: claimed }] = await Promise.all([
     supabase.from("tagged_items").select("brand, outfit_id"),
     supabase
@@ -626,6 +718,7 @@ export async function fetchBrandsAggregated(
     const display = (row.brand as string).trim();
     if (!display) continue;
     const outfitId = row.outfit_id as string;
+    if (hemOutfitIds.has(outfitId)) continue;
     if (outfitGenderFilter && !outfitGenderFilter.has(outfitId)) continue;
     const key = display.toLowerCase();
     const entry = counts.get(key) ?? { display, outfits: new Set<string>() };
@@ -826,6 +919,7 @@ export async function fetchOutfitsByItem(
     .select(OUTFIT_COLUMNS)
     .in("id", ids)
     .eq("is_published", true)
+    .eq("vertical", "mode")
     .order("created_at", { ascending: false });
 
   const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
@@ -864,7 +958,8 @@ export async function fetchOutfitsByColor(
     .from("outfits")
     .select(OUTFIT_COLUMNS)
     .in("id", outfitIds)
-    .eq("is_published", true);
+    .eq("is_published", true)
+    .eq("vertical", "mode");
   if (gender) query = query.eq("gender", gender);
   const { data } = await query
     .order("created_at", { ascending: false })
@@ -931,6 +1026,7 @@ export async function fetchOutfitsByGarment(
     .select(OUTFIT_COLUMNS)
     .in("id", outfitIds)
     .eq("is_published", true)
+    .eq("vertical", "mode")
     .eq("gender", gender)
     .order("created_at", { ascending: false })
     .limit(100);
@@ -953,7 +1049,8 @@ export async function fetchOutfitsByCategory(
     .from("outfits")
     .select(OUTFIT_COLUMNS)
     .ilike("category", category)
-    .eq("is_published", true);
+    .eq("is_published", true)
+    .eq("vertical", "mode");
   if (gender) query = query.eq("gender", gender);
   const { data } = await query
     .order("created_at", { ascending: false })
@@ -989,7 +1086,8 @@ export async function fetchBrandOutfits(
     .from("outfits")
     .select(OUTFIT_COLUMNS)
     .in("id", outfitIds)
-    .eq("is_published", true);
+    .eq("is_published", true)
+    .eq("vertical", "mode");
   if (gender) query = query.eq("gender", gender);
   const { data } = await query.order("created_at", { ascending: false });
 

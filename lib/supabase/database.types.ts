@@ -798,7 +798,7 @@ export type Database = {
           created_by_admin: boolean
           deleted_at: string | null
           description: string | null
-          gender: Database["public"]["Enums"]["outfit_gender"]
+          gender: Database["public"]["Enums"]["outfit_gender"] | null
           id: string
           image_path: string
           image_url: string
@@ -812,6 +812,7 @@ export type Database = {
           type: Database["public"]["Enums"]["outfit_type"]
           updated_at: string
           user_id: string
+          vertical: string
         }
         Insert: {
           alt_text?: string | null
@@ -821,7 +822,7 @@ export type Database = {
           created_by_admin?: boolean
           deleted_at?: string | null
           description?: string | null
-          gender: Database["public"]["Enums"]["outfit_gender"]
+          gender?: Database["public"]["Enums"]["outfit_gender"] | null
           id?: string
           image_path: string
           image_url: string
@@ -835,6 +836,7 @@ export type Database = {
           type?: Database["public"]["Enums"]["outfit_type"]
           updated_at?: string
           user_id: string
+          vertical?: string
         }
         Update: {
           alt_text?: string | null
@@ -844,7 +846,7 @@ export type Database = {
           created_by_admin?: boolean
           deleted_at?: string | null
           description?: string | null
-          gender?: Database["public"]["Enums"]["outfit_gender"]
+          gender?: Database["public"]["Enums"]["outfit_gender"] | null
           id?: string
           image_path?: string
           image_url?: string
@@ -858,6 +860,7 @@ export type Database = {
           type?: Database["public"]["Enums"]["outfit_type"]
           updated_at?: string
           user_id?: string
+          vertical?: string
         }
         Relationships: [
           {

@@ -78,6 +78,14 @@ export type Gender = "herr" | "dam";
 
 export type GenderFilter = Gender;
 
+/**
+ * Content vertical. "mode" = fashion (the original product, filtered by
+ * herr/dam). "hem" = home/interior decor (no gender). The two share the
+ * same outfits + tagged_items + engagement stack; `vertical` is the only
+ * discriminator. Mode feeds scope to "mode"; /home scopes to "hem".
+ */
+export type Vertical = "mode" | "hem";
+
 export interface Outfit {
   id: string;
   /** URL-friendly slug, unique per creator. Combined with creator.username
@@ -87,6 +95,13 @@ export interface Outfit {
   image: string;
   /** "photo" = person wearing outfit, "flatlay" = clothes laid out */
   type: "photo" | "flatlay";
+  /** Which vertical this post belongs to. Absent/undefined means "mode"
+   *  (all legacy rows + mock fixtures); rowToOutfit always sets it
+   *  explicitly. Home posts are "hem". */
+  vertical?: Vertical;
+  /** herr/dam for fashion. Home posts have no gender; rowToOutfit fills a
+   *  harmless "dam" fallback so mode-only code stays non-nullable — never
+   *  read `gender` in home flows. */
   gender: Gender;
   /** Short human-readable reference code, e.g. "A271" (1 letter + 3
    *  digits). DB-assigned per outfit; absent on mock fixtures. */

@@ -58,9 +58,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .select("brand"),
     supabase
       .from("tagged_items")
-      .select("color, garment, outfit_id, outfits!inner(gender, is_published)")
+      .select("color, garment, outfit_id, outfits!inner(gender, is_published, vertical)")
       .eq("is_active", true)
-      .eq("outfits.is_published", true),
+      .eq("outfits.is_published", true)
+      .eq("outfits.vertical", "mode"),
   ]);
 
   type OutfitRow = {
