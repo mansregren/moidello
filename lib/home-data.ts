@@ -68,6 +68,12 @@ export const HOME_ROOMS: HomeRoom[] = [
     description:
       "Utemöbler, krukor och textil för balkong och uteplats. Ute som inne.",
   },
+  {
+    slug: "tavlor",
+    label: "Tavlor/konst",
+    description:
+      "Konst, posters och tavlor som ger väggarna karaktär. Se hela väggar och hitta var varje tavla köps.",
+  },
 ];
 
 export function roomBySlug(slug: string): HomeRoom | undefined {
@@ -89,6 +95,7 @@ export const HOME_CATEGORIES = [
   "Hall",
   "Arbetsrum",
   "Balkong & uteplats",
+  "Tavlor/konst",
 ] as const;
 
 export type HomeCategory = (typeof HOME_CATEGORIES)[number];
@@ -103,6 +110,7 @@ export const HOME_CATEGORY_DESCRIPTIONS: Record<string, string> = {
   Hall: "Första intrycket",
   Arbetsrum: "Fokus & form",
   "Balkong & uteplats": "Ute som inne",
+  "Tavlor/konst": "Väggar med själ",
 };
 
 /** Static fallback cover per room, reusing the existing background pool.
@@ -116,6 +124,7 @@ export const HOME_CATEGORY_COVER: Record<string, string> = {
   Hall: "/images/bg/parasols.webp",
   Arbetsrum: "/images/bg/harbor.webp",
   "Balkong & uteplats": "/images/bg/boats.webp",
+  "Tavlor/konst": "/images/bg/positano.webp",
 };
 
 /** Item types for the tag editor on home posts (≈ garment types). Stored in
