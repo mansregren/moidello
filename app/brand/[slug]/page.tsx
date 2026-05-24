@@ -4,18 +4,13 @@ import { notFound } from "next/navigation";
 import { Globe, Crown, Star, Gem, ShoppingBag, ArrowLeft, BadgeCheck, ExternalLink } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
-import { OutfitGrid } from "@/components/outfit/OutfitGrid";
+import { GenderFilteredGrid } from "@/components/outfit/GenderFilteredGrid";
 import { PremiumButton } from "@/components/shared/PremiumButton";
 import { UserLink } from "@/components/shared/UserLink";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { brandPageJsonLd } from "@/lib/json-ld";
 import { createPublicClient } from "@/lib/supabase/public";
-import { getViewerGender } from "@/lib/gender-server";
-import {
-  fetchBrandsAggregated,
-  fetchBrandOutfits,
-  fetchEngagementForViewer,
-} from "@/lib/queries";
+import { fetchBrandsAggregated, fetchBrandOutfits } from "@/lib/queries";
 
 interface BrandProduct {
   id: string;
@@ -27,7 +22,11 @@ interface BrandProduct {
   image_url: string | null;
 }
 
-export const dynamic = "force-dynamic";
+// ISR: brand pages are gender-agnostic on the server (the toggle + liked/
+// saved apply client-side). cookies() returns empty under force-static so the
+// internal Supabase clients run anon and the page caches.
+export const dynamic = "force-static";
+export const revalidate = 300;
 
 type Tier = "luxury" | "premium" | "contemporary" | "high-street";
 
@@ -49,11 +48,7 @@ export default async function BrandPage({
   const dbMatch = aggregated.find((b) => b.slug === slug);
   if (!dbMatch) notFound();
 
-  const gender = await getViewerGender();
-  const dbOutfits = await fetchBrandOutfits(dbMatch.name, gender);
-  const { liked, saved } = await fetchEngagementForViewer(
-    dbOutfits.map((o) => o.id),
-  );
+  const dbOutfits = await fetchBrandOutfits(dbMatch.name);
 
   // Fetch the brand's official catalog (uploaded via brand-dashboard/import).
   const supabase = createPublicClient();
@@ -88,8 +83,6 @@ export default async function BrandPage({
         tierLabel="Contemporary"
         TierIcon={Star}
         outfits={dbOutfits}
-        likedIds={Array.from(liked)}
-        savedIds={Array.from(saved)}
         outfitsCount={dbOutfits.length}
         verified={dbMatch.isClaimed}
         products={(productRows as BrandProduct[] | null) ?? []}
@@ -105,8 +98,6 @@ function BrandShell({
   tierLabel,
   TierIcon,
   outfits,
-  likedIds = [],
-  savedIds = [],
   outfitsCount,
   verified,
   products = [],
@@ -117,8 +108,6 @@ function BrandShell({
   tierLabel: string;
   TierIcon: typeof Crown;
   outfits: import("@/lib/types").Outfit[];
-  likedIds?: string[];
-  savedIds?: string[];
   outfitsCount: number;
   verified: boolean;
   products?: BrandProduct[];
@@ -175,12 +164,7 @@ function BrandShell({
               <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-6">
                 Outfits med {name}
               </h2>
-              <OutfitGrid
-                outfits={outfits}
-                columns={3}
-                liked={new Set(likedIds)}
-                saved={new Set(savedIds)}
-              />
+              <GenderFilteredGrid outfits={outfits} columns={3} />
             </section>
           ) : (
             <div className="py-24 text-center mb-16">
