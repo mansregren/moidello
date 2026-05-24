@@ -3,16 +3,16 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
-import { OutfitGrid } from "@/components/outfit/OutfitGrid";
+import { GenderFilteredGrid } from "@/components/outfit/GenderFilteredGrid";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { collectionPageJsonLd } from "@/lib/json-ld";
-import {
-  fetchOutfitsByCategory,
-  fetchEngagementForViewer,
-} from "@/lib/queries";
-import { getViewerGender } from "@/lib/gender-server";
+import { fetchOutfitsByCategory } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
 
-export const dynamic = "force-dynamic";
+// ISR: gender-agnostic cacheable fetch, dam/herr + liked/saved applied
+// client-side. Public client → no cookies → static render.
+export const dynamic = "force-static";
+export const revalidate = 300;
 
 const STYLES: Record<string, { label: string; description: string }> = {
   minimalism: {
@@ -61,13 +61,12 @@ export default async function StilPage({
   const style = STYLES[slug.toLowerCase()];
   if (!style) notFound();
 
-  const gender = await getViewerGender();
-  const outfits = await fetchOutfitsByCategory(style.label, gender);
-  if (outfits.length === 0) notFound();
-
-  const { liked, saved } = await fetchEngagementForViewer(
-    outfits.map((o) => o.id),
+  const outfits = await fetchOutfitsByCategory(
+    style.label,
+    undefined,
+    createPublicClient(),
   );
+  if (outfits.length === 0) notFound();
 
   return (
     <>
@@ -126,7 +125,7 @@ export default async function StilPage({
             </p>
           </div>
 
-          <OutfitGrid outfits={outfits} columns={3} liked={liked} saved={saved} />
+          <GenderFilteredGrid outfits={outfits} columns={3} />
 
           <section className="mt-20 mb-16 border-t border-border pt-10">
             <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-5">

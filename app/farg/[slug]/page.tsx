@@ -3,18 +3,18 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
-import { OutfitGrid } from "@/components/outfit/OutfitGrid";
+import { GenderFilteredGrid } from "@/components/outfit/GenderFilteredGrid";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { collectionPageJsonLd } from "@/lib/json-ld";
 import { slugify } from "@/lib/slug";
-import {
-  fetchOutfitsByColor,
-  fetchEngagementForViewer,
-  fetchAllColors,
-} from "@/lib/queries";
-import { getViewerGender } from "@/lib/gender-server";
+import { fetchOutfitsByColor, fetchAllColors } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
 
-export const dynamic = "force-dynamic";
+// ISR: fetch a gender-agnostic, cacheable set; the dam/herr toggle + liked/
+// saved are applied client-side (GenderFilteredGrid). Public client → no
+// cookies, so the page renders statically.
+export const dynamic = "force-static";
+export const revalidate = 300;
 
 function slugToColor(slug: string): string {
   const lower = slug.toLowerCase();
@@ -31,16 +31,12 @@ export default async function FargPage({
   const color = slugToColor(slug);
   if (!color) notFound();
 
-  const gender = await getViewerGender();
+  const client = createPublicClient();
   const [outfits, otherColors] = await Promise.all([
-    fetchOutfitsByColor(color, gender),
-    fetchAllColors(),
+    fetchOutfitsByColor(color, undefined, client),
+    fetchAllColors(client),
   ]);
   if (outfits.length === 0) notFound();
-
-  const { liked, saved } = await fetchEngagementForViewer(
-    outfits.map((o) => o.id),
-  );
 
   const colorLower = color.toLowerCase();
   const heading = `${color}a outfits`;
@@ -102,7 +98,7 @@ export default async function FargPage({
             <p className="mt-4 text-lg text-foreground-muted">{intro}</p>
           </div>
 
-          <OutfitGrid outfits={outfits} columns={3} liked={liked} saved={saved} />
+          <GenderFilteredGrid outfits={outfits} columns={3} />
 
           {relatedColors.length > 0 && (
             <section className="mt-20 mb-16 border-t border-border pt-10">

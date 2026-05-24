@@ -7,12 +7,13 @@ import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { collectionPageJsonLd } from "@/lib/json-ld";
 import { garmentsForGender } from "@/lib/garments";
-import {
-  fetchOutfitsByGarment,
-  fetchEngagementForViewer,
-} from "@/lib/queries";
+import { fetchOutfitsByGarment } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
 
-export const dynamic = "force-dynamic";
+// ISR: content is fully determined by the URL (gender + garment); liked/saved
+// hydrate client-side. Cache + background-refresh, public client → no cookies.
+export const dynamic = "force-static";
+export const revalidate = 300;
 
 function resolveGender(slug: string): "dam" | "herr" | null {
   const lower = slug.toLowerCase();
@@ -43,12 +44,12 @@ export default async function TypPage({
   const garment = slugToGarment(gs, gender);
   if (!garment) notFound();
 
-  const outfits = await fetchOutfitsByGarment(gender, garment);
-  if (outfits.length === 0) notFound();
-
-  const { liked, saved } = await fetchEngagementForViewer(
-    outfits.map((o) => o.id),
+  const outfits = await fetchOutfitsByGarment(
+    gender,
+    garment,
+    createPublicClient(),
   );
+  if (outfits.length === 0) notFound();
 
   const noun = garment.toLowerCase();
   const audience = gender === "herr" ? "herr" : "dam";
@@ -109,7 +110,7 @@ export default async function TypPage({
             <p className="mt-4 text-lg text-foreground-muted">{intro}</p>
           </div>
 
-          <OutfitGrid outfits={outfits} columns={3} liked={liked} saved={saved} />
+          <OutfitGrid outfits={outfits} columns={3} />
 
           <section className="mt-20 mb-16 border-t border-border pt-10">
             <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-5">
