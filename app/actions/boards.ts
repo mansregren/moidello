@@ -59,17 +59,28 @@ export async function updateBoard(
   patch: { name?: string; description?: string | null; isPublic?: boolean },
 ): Promise<{ ok: boolean; error?: string }> {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Inte inloggad" };
+
   const update: BoardUpdate = {};
   if (patch.name !== undefined) update.name = patch.name;
   if (patch.description !== undefined) update.description = patch.description;
   if (patch.isPublic !== undefined) update.is_public = patch.isPublic;
 
-  const { error } = await supabase
+  // .select() so an RLS-blocked update (not the owner) returns 0 rows rather
+  // than a silent success the client can't distinguish from a real one.
+  const { data, error } = await supabase
     .from("boards")
     .update(update)
-    .eq("id", boardId);
+    .eq("id", boardId)
+    .select("id");
 
   if (error) return { ok: false, error: error.message };
+  if (!data || data.length === 0) {
+    return { ok: false, error: "Du kan inte ändra den här samlingen." };
+  }
 
   revalidatePath("/profil/boards");
   revalidatePath(`/board/${boardId}`);
@@ -80,8 +91,20 @@ export async function deleteBoard(
   boardId: string,
 ): Promise<{ ok: boolean; error?: string }> {
   const supabase = await createClient();
-  const { error } = await supabase.from("boards").delete().eq("id", boardId);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Inte inloggad" };
+
+  const { data, error } = await supabase
+    .from("boards")
+    .delete()
+    .eq("id", boardId)
+    .select("id");
   if (error) return { ok: false, error: error.message };
+  if (!data || data.length === 0) {
+    return { ok: false, error: "Du kan inte ta bort den här samlingen." };
+  }
   revalidatePath("/profil/boards");
   return { ok: true };
 }

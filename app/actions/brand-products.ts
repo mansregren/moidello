@@ -146,8 +146,11 @@ export async function importProductsCsv(
     let price: number | null = null;
     if (priceRaw) {
       const p = Number(priceRaw);
-      if (!Number.isFinite(p) || p < 0) {
-        skipped.push({ row: idx + 2, reason: "Ogiltigt price." });
+      if (!Number.isFinite(p) || p < 0 || p > 9_999_999) {
+        skipped.push({
+          row: idx + 2,
+          reason: "Ogiltigt price (0–9999999).",
+        });
         return;
       }
       price = p;
