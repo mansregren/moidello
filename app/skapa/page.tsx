@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useGender } from "@/lib/gender-context";
-import { resizeImageForUpload } from "@/lib/image-resize";
+import { prepareUpload, cropTo34 } from "@/lib/image-resize";
 import { BrandAutocomplete } from "@/components/skapa/BrandAutocomplete";
 import { ColorPicker } from "@/components/shared/ColorPicker";
 import { garmentOptions, garmentsForGender } from "@/lib/garments";
@@ -51,8 +51,12 @@ interface DemoTag {
 
 interface Draft {
   id: number;
+  /** Full-frame downscaled image; the 3:4 crop is applied at publish using
+   *  `zoom` so the user can frame each image. */
   file: File | null;
   previewUrl: string | null;
+  /** Zoom into the 3:4 frame. 1 = fit (cover), up to 4 = tighter centre crop. */
+  zoom: number;
   title: string;
   description: string;
   category: string;
@@ -119,6 +123,7 @@ function makeDraft(file: File | null = null, gender: Gender = "dam"): Draft {
     id: nextDraftId++,
     file,
     previewUrl: file ? URL.createObjectURL(file) : null,
+    zoom: 1,
     title: "",
     description: "",
     category: "",
@@ -280,11 +285,12 @@ export default function SkapaPage() {
     setTopError(null);
     const arr = Array.from(files);
 
-    // Resize in parallel — these run in the browser, no upload yet.
+    // Downscale (full frame) in parallel — runs in the browser, no upload yet.
+    // The 3:4 crop is applied at publish using each draft's zoom.
     const resized = await Promise.all(
       arr.map(async (f) => {
         try {
-          return await resizeImageForUpload(f);
+          return (await prepareUpload(f)).file;
         } catch {
           return f;
         }
@@ -359,16 +365,18 @@ export default function SkapaPage() {
 
   const replaceActiveImage = async (file: File) => {
     try {
-      const resized = await resizeImageForUpload(file);
+      const { file: prepared } = await prepareUpload(file);
       if (active.previewUrl) URL.revokeObjectURL(active.previewUrl);
       updateActive({
-        file: resized,
-        previewUrl: URL.createObjectURL(resized),
+        file: prepared,
+        previewUrl: URL.createObjectURL(prepared),
+        zoom: 1,
       });
     } catch {
       updateActive({
         file,
         previewUrl: URL.createObjectURL(file),
+        zoom: 1,
       });
     }
   };
@@ -573,8 +581,16 @@ export default function SkapaPage() {
         setDraftStatus(i, { status: "publishing", error: undefined });
         setActiveIndex(i);
 
+        // Apply the chosen 3:4 zoom/crop now so what was framed is published.
+        let imageToUpload = draft.file;
+        try {
+          imageToUpload = await cropTo34(draft.file, draft.zoom);
+        } catch {
+          // Fall back to the full-frame file if cropping fails.
+        }
+
         const fd = new FormData();
-        fd.set("image", draft.file);
+        fd.set("image", imageToUpload);
         fd.set("title", draft.title);
         fd.set("description", draft.description);
         fd.set("category", draft.category);
@@ -841,7 +857,8 @@ export default function SkapaPage() {
                     src={active.previewUrl!}
                     alt="Förhandsvisning"
                     fill
-                    className="object-cover pointer-events-none"
+                    className="object-cover pointer-events-none transition-transform"
+                    style={{ transform: `scale(${active.zoom})` }}
                     sizes="(min-width: 1024px) 50vw, 100vw"
                     unoptimized
                     draggable={false}
@@ -940,6 +957,45 @@ export default function SkapaPage() {
                   {previewMode ? "Redigera" : "Förhandsvisa"}
                 </PremiumButton>
               </div>
+
+              {active.file && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label
+                      htmlFor="zoom"
+                      className="text-xs uppercase tracking-[0.14em] text-foreground-muted"
+                    >
+                      Zooma in bild
+                    </label>
+                    {active.zoom > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => updateActive({ zoom: 1 })}
+                        className="text-[11px] text-foreground-subtle hover:text-foreground transition-colors"
+                      >
+                        Återställ
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    id="zoom"
+                    type="range"
+                    min={1}
+                    max={3}
+                    step={0.05}
+                    value={active.zoom}
+                    onChange={(e) =>
+                      updateActive({ zoom: Number(e.target.value) })
+                    }
+                    disabled={active.status === "published" || publishing}
+                    className="w-full accent-foreground"
+                  />
+                  <p className="mt-1 text-[11px] text-foreground-subtle">
+                    Dra för att fylla rutan jämnt — alla bilder beskärs till
+                    samma format vid publicering.
+                  </p>
+                </div>
+              )}
               {active.file && !previewMode && (
                 <p className="mt-3 text-xs text-foreground-subtle">
                   Tips: dra prickarna för att flytta dem. {active.tags.length}{" "}
