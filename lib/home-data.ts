@@ -63,22 +63,10 @@ export const HOME_ROOMS: HomeRoom[] = [
       "Skrivbord, stol och belysning för hemmakontoret. Fokus och form i ett rum.",
   },
   {
-    slug: "barnrum",
-    label: "Barnrum",
-    description:
-      "Inredning för barnrummet — möbler, textil och förvaring med stil och lek.",
-  },
-  {
     slug: "balkong",
     label: "Balkong & uteplats",
     description:
       "Utemöbler, krukor och textil för balkong och uteplats. Ute som inne.",
-  },
-  {
-    slug: "forvaring",
-    label: "Förvaring",
-    description:
-      "Hyllor, lådor och smarta lösningar — förvaring som får synas.",
   },
 ];
 
@@ -100,9 +88,7 @@ export const HOME_CATEGORIES = [
   "Badrum",
   "Hall",
   "Arbetsrum",
-  "Barnrum",
   "Balkong & uteplats",
-  "Förvaring",
 ] as const;
 
 export type HomeCategory = (typeof HOME_CATEGORIES)[number];
@@ -116,9 +102,7 @@ export const HOME_CATEGORY_DESCRIPTIONS: Record<string, string> = {
   Badrum: "Spa varje dag",
   Hall: "Första intrycket",
   Arbetsrum: "Fokus & form",
-  Barnrum: "Lek med stil",
   "Balkong & uteplats": "Ute som inne",
-  Förvaring: "Ordning som syns",
 };
 
 /** Static fallback cover per room, reusing the existing background pool.
@@ -131,9 +115,7 @@ export const HOME_CATEGORY_COVER: Record<string, string> = {
   Badrum: "/images/bg/positano.webp",
   Hall: "/images/bg/parasols.webp",
   Arbetsrum: "/images/bg/harbor.webp",
-  Barnrum: "/images/bg/riviera.webp",
   "Balkong & uteplats": "/images/bg/boats.webp",
-  Förvaring: "/images/bg/positano.webp",
 };
 
 /** Item types for the tag editor on home posts (≈ garment types). Stored in
