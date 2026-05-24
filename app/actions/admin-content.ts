@@ -206,6 +206,7 @@ export async function updateTaggedItem(
     price?: number | null;
     currency?: string | null;
     color?: string | null;
+    material?: string | null;
     image_url?: string | null;
     garment?: string;
     is_affiliate?: boolean;
@@ -254,6 +255,10 @@ export async function updateTaggedItem(
   if (patch.color !== undefined) {
     const c = patch.color?.trim() ?? null;
     updates.color = c && c.length > 0 ? c.slice(0, 40) : null;
+  }
+  if (patch.material !== undefined) {
+    const m = patch.material?.trim() ?? null;
+    updates.material = m && m.length > 0 ? m.slice(0, 60) : null;
   }
   if (patch.image_url !== undefined) {
     const u = patch.image_url?.trim() ?? null;

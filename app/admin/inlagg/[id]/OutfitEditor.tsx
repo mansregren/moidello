@@ -43,6 +43,7 @@ export interface TagForm {
   garment: string;
   is_affiliate: boolean;
   color?: string | null;
+  material?: string | null;
   image_url?: string | null;
   retailer?: string | null;
   retailer_locale?: string | null;
@@ -337,6 +338,7 @@ export function TagsEditor({
         price: tag.price,
         currency: tag.currency,
         color: tag.color ?? null,
+        material: tag.material ?? null,
         image_url: tag.image_url ?? null,
         garment: tag.garment,
         is_affiliate: tag.is_affiliate,
@@ -553,6 +555,16 @@ export function TagsEditor({
                 onChange={(c) => patch(t.id, { color: c || null })}
               />
             </div>
+            <input
+              type="text"
+              placeholder="Material (t.ex. Bomull, Ull, Linne)"
+              maxLength={60}
+              value={t.material ?? ""}
+              onChange={(e) =>
+                patch(t.id, { material: e.target.value || null })
+              }
+              className={INPUT}
+            />
             <input
               type="url"
               placeholder="Bild-URL"

@@ -52,7 +52,7 @@ export default async function AdminOutfitDetailPage({
   const { data: tags } = await supabase
     .from("tagged_items")
     .select(
-      "id, brand, name, buy_url, price, currency, garment, is_affiliate, color, image_url, retailer, retailer_locale, position_x, position_y",
+      "id, brand, name, buy_url, price, currency, garment, is_affiliate, color, material, image_url, retailer, retailer_locale, position_x, position_y",
     )
     .eq("outfit_id", id)
     .order("garment", { ascending: true });
@@ -97,6 +97,14 @@ export default async function AdminOutfitDetailPage({
     currency: t.currency,
     garment: t.garment,
     is_affiliate: t.is_affiliate,
+    // Seed every persisted field — the editor always sends these back on save,
+    // so omitting them here nulled colour/material/image/retailer on every
+    // edit. (Pre-existing data-loss bug.)
+    color: t.color ?? null,
+    material: t.material ?? null,
+    image_url: t.image_url ?? null,
+    retailer: t.retailer ?? null,
+    retailer_locale: t.retailer_locale ?? null,
     click_count: tagClickCount.get(t.id) ?? 0,
   }));
   const tagPositions: TagPosition[] = tagRows.map((t) => ({
