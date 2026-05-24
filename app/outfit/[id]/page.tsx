@@ -4,15 +4,15 @@ import {
   fetchOutfits,
   fetchHomePosts,
   fetchOutfitComments,
-  fetchEngagementForViewer,
-  isFollowing,
 } from "@/lib/queries";
-import { createClient } from "@/lib/supabase/server";
-import { DEFAULT_REGION } from "@/lib/region";
-import { isCurrentUserAdmin } from "@/lib/admin";
+import { createPublicClient } from "@/lib/supabase/public";
 import OutfitDetail from "./OutfitDetail";
 
-export const dynamic = "force-dynamic";
+// ISR: legacy /outfit/<uuid> route. Real outfits 301 to /<username>/<slug>;
+// only slug-less legacy posts render here. Per-viewer state hydrates
+// client-side in OutfitDetail, so this can be static too.
+export const dynamic = "force-static";
+export const revalidate = 300;
 
 export default async function OutfitPage({
   params,
@@ -21,7 +21,8 @@ export default async function OutfitPage({
 }) {
   const { id } = await params;
 
-  const outfit = await fetchOutfitById(id);
+  const client = createPublicClient();
+  const outfit = await fetchOutfitById(id, client);
   if (!outfit) notFound();
 
   // Canonical URL is /<username>/<slug>. 301 every legacy /outfit/<uuid>
@@ -35,13 +36,9 @@ export default async function OutfitPage({
   }
 
   const isHome = outfit.vertical === "hem";
-  const [pool, comments, engagement, followingCreator] = await Promise.all([
-    // Pull "similar" from the same vertical — a home post must never
-    // surface fashion outfits (its gender is a "dam" fallback).
-    isHome ? fetchHomePosts(20) : fetchOutfits(20),
+  const [pool, comments] = await Promise.all([
+    isHome ? fetchHomePosts(20, client) : fetchOutfits(20, client),
     fetchOutfitComments(outfit.id),
-    fetchEngagementForViewer([outfit.id]),
-    isFollowing(outfit.creator.id),
   ]);
 
   const similar = (
@@ -50,54 +47,7 @@ export default async function OutfitPage({
       : pool.filter((o) => o.id !== outfit.id && o.gender === outfit.gender)
   ).slice(0, 3);
 
-  const similarEngagement = await fetchEngagementForViewer(
-    similar.map((o) => o.id),
-  );
-
-  // Resolve viewer region for region-aware buy URLs + saved-item state
-  const supabase = await createClient();
-  const {
-    data: { user: viewer },
-  } = await supabase.auth.getUser();
-  let viewerRegion = DEFAULT_REGION;
-  let savedItemIds: string[] = [];
-  if (viewer) {
-    const [{ data: profileRow }, { data: savedRows }] = await Promise.all([
-      supabase
-        .from("profiles")
-        .select("region")
-        .eq("id", viewer.id)
-        .maybeSingle(),
-      supabase
-        .from("saved_items")
-        .select("tagged_item_id")
-        .eq("user_id", viewer.id)
-        .in(
-          "tagged_item_id",
-          outfit.tags.map((t) => t.id),
-        ),
-    ]);
-    if (profileRow?.region) viewerRegion = profileRow.region as string;
-    savedItemIds = (savedRows ?? []).map(
-      (r) => r.tagged_item_id as string,
-    );
-  }
-
-  const viewerIsAdmin = await isCurrentUserAdmin();
-
   return (
-    <OutfitDetail
-      outfit={{ ...outfit, comments }}
-      similar={similar}
-      similarLikedIds={Array.from(similarEngagement.liked)}
-      similarSavedIds={Array.from(similarEngagement.saved)}
-      initiallyLiked={engagement.liked.has(outfit.id)}
-      initiallySaved={engagement.saved.has(outfit.id)}
-      initiallyFollowingCreator={followingCreator}
-      isPersisted
-      viewerRegion={viewerRegion}
-      savedItemIds={savedItemIds}
-      viewerIsAdmin={viewerIsAdmin}
-    />
+    <OutfitDetail outfit={{ ...outfit, comments }} similar={similar} isPersisted />
   );
 }

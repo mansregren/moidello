@@ -9,6 +9,7 @@ import { toggleSavedItem } from "@/app/actions/saved-items";
 import { ShareToDmSheet } from "@/components/shared/ShareToDmSheet";
 import { UserLink } from "@/components/shared/UserLink";
 import { useAuth } from "@/lib/auth-context";
+import { useViewerEngagement } from "@/lib/viewer-engagement-context";
 import { cn } from "@/lib/utils";
 
 /**
@@ -31,11 +32,14 @@ export function TaggedItemCard({
   item,
   outfitId,
   region,
-  initiallySaved = false,
 }: TaggedItemProps) {
   const { isLoggedIn, requireAuth } = useAuth();
+  const engagement = useViewerEngagement();
+  // region defaults to SE for the buy-button visibility check; the actual
+  // outgoing link routes through /go which resolves the viewer's region at
+  // click time, so this stays correct on a cached page.
   const buyUrl = resolveBuyUrl(item, region);
-  const [saved, setSaved] = useState(initiallySaved);
+  const saved = engagement.isItemSaved(item.id);
   const [shareOpen, setShareOpen] = useState(false);
   const [, startTransition] = useTransition();
 
@@ -45,10 +49,10 @@ export function TaggedItemCard({
       return;
     }
     const next = !saved;
-    setSaved(next);
+    engagement.markItemSaved(item.id, next);
     startTransition(async () => {
       const res = await toggleSavedItem(item.id);
-      if (!res.ok) setSaved(!next);
+      if (!res.ok) engagement.markItemSaved(item.id, !next);
     });
   };
 

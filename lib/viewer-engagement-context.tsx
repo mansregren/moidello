@@ -26,9 +26,11 @@ interface ViewerEngagementState {
   isLiked: (outfitId: string) => boolean;
   isSaved: (outfitId: string) => boolean;
   isFollowing: (userId: string) => boolean;
+  isItemSaved: (taggedItemId: string) => boolean;
   markLiked: (outfitId: string, liked: boolean) => void;
   markSaved: (outfitId: string, saved: boolean) => void;
   markFollowing: (userId: string, following: boolean) => void;
+  markItemSaved: (taggedItemId: string, saved: boolean) => void;
 }
 
 const ViewerEngagementContext = createContext<ViewerEngagementState | null>(
@@ -40,6 +42,7 @@ export function ViewerEngagementProvider({ children }: { children: ReactNode }) 
   const [liked, setLiked] = useState<Set<string>>(new Set());
   const [saved, setSaved] = useState<Set<string>>(new Set());
   const [follows, setFollows] = useState<Set<string>>(new Set());
+  const [savedItems, setSavedItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Logged out → nothing to show, and clear any state left from a previous
@@ -48,16 +51,23 @@ export function ViewerEngagementProvider({ children }: { children: ReactNode }) 
       setLiked(new Set());
       setSaved(new Set());
       setFollows(new Set());
+      setSavedItems(new Set());
       return;
     }
     let cancelled = false;
     (async () => {
       try {
-        const { liked: l, saved: s, follows: f } = await getViewerEngagement();
+        const {
+          liked: l,
+          saved: s,
+          follows: f,
+          savedItems: si,
+        } = await getViewerEngagement();
         if (cancelled) return;
         setLiked(new Set(l));
         setSaved(new Set(s));
         setFollows(new Set(f));
+        setSavedItems(new Set(si));
       } catch {
         // Leave empty on failure — buttons just start un-toggled.
       }
@@ -94,16 +104,36 @@ export function ViewerEngagementProvider({ children }: { children: ReactNode }) 
     });
   }, []);
 
+  const markItemSaved = useCallback((taggedItemId: string, value: boolean) => {
+    setSavedItems((prev) => {
+      const next = new Set(prev);
+      if (value) next.add(taggedItemId);
+      else next.delete(taggedItemId);
+      return next;
+    });
+  }, []);
+
   const value = useMemo<ViewerEngagementState>(
     () => ({
       isLiked: (id) => liked.has(id),
       isSaved: (id) => saved.has(id),
       isFollowing: (id) => follows.has(id),
+      isItemSaved: (id) => savedItems.has(id),
       markLiked,
       markSaved,
       markFollowing,
+      markItemSaved,
     }),
-    [liked, saved, follows, markLiked, markSaved, markFollowing],
+    [
+      liked,
+      saved,
+      follows,
+      savedItems,
+      markLiked,
+      markSaved,
+      markFollowing,
+      markItemSaved,
+    ],
   );
 
   return (
@@ -121,9 +151,11 @@ export function useViewerEngagement(): ViewerEngagementState {
       isLiked: () => false,
       isSaved: () => false,
       isFollowing: () => false,
+      isItemSaved: () => false,
       markLiked: () => {},
       markSaved: () => {},
       markFollowing: () => {},
+      markItemSaved: () => {},
     };
   }
   return ctx;

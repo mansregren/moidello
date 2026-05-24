@@ -3,21 +3,24 @@
 import { useState, useTransition } from "react";
 import { Bookmark, Send } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useViewerEngagement } from "@/lib/viewer-engagement-context";
 import { toggleSavedItem } from "@/app/actions/saved-items";
 import { ShareToDmSheet } from "@/components/shared/ShareToDmSheet";
 import { cn } from "@/lib/utils";
 
 export function ProduktSaveAndShare({
   itemId,
-  initiallySaved,
   shareTitle,
 }: {
   itemId: string;
-  initiallySaved: boolean;
+  /** Deprecated — saved state now hydrates client-side via the engagement
+   *  context so the product page can be ISR cached. */
+  initiallySaved?: boolean;
   shareTitle: string;
 }) {
   const { isLoggedIn, requireAuth } = useAuth();
-  const [saved, setSaved] = useState(initiallySaved);
+  const engagement = useViewerEngagement();
+  const saved = engagement.isItemSaved(itemId);
   const [shareOpen, setShareOpen] = useState(false);
   const [, startTransition] = useTransition();
 
@@ -27,10 +30,10 @@ export function ProduktSaveAndShare({
       return;
     }
     const next = !saved;
-    setSaved(next);
+    engagement.markItemSaved(itemId, next);
     startTransition(async () => {
       const res = await toggleSavedItem(itemId);
-      if (!res.ok) setSaved(!next);
+      if (!res.ok) engagement.markItemSaved(itemId, !next);
     });
   };
 

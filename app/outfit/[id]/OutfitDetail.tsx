@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Heart, Bookmark, MessageCircle, X } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
@@ -13,9 +13,10 @@ import { UserAvatar } from "@/components/user/UserAvatar";
 import { FollowButton } from "@/components/user/FollowButton";
 import { IconButton } from "@/components/shared/IconButton";
 import { useAuth } from "@/lib/auth-context";
+import { useViewerEngagement } from "@/lib/viewer-engagement-context";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import type { Outfit, Region } from "@/lib/types";
+import type { Outfit } from "@/lib/types";
 import {
   toggleLike,
   toggleSave,
@@ -38,48 +39,31 @@ import { Send } from "lucide-react";
 export default function OutfitDetail({
   outfit,
   similar,
-  similarLikedIds = [],
-  similarSavedIds = [],
-  initiallyLiked,
-  initiallySaved,
-  initiallyFollowingCreator = false,
   isPersisted,
-  viewerRegion,
-  savedItemIds = [],
-  viewerIsAdmin = false,
 }: {
   outfit: Outfit;
   similar: Outfit[];
-  similarLikedIds?: string[];
-  similarSavedIds?: string[];
-  initiallyLiked: boolean;
-  initiallySaved: boolean;
-  initiallyFollowingCreator?: boolean;
   isPersisted: boolean;
-  viewerRegion?: Region;
-  savedItemIds?: string[];
-  viewerIsAdmin?: boolean;
 }) {
-  const { isLoggedIn, requireAuth, user } = useAuth();
+  const { isLoggedIn, requireAuth, user, profile } = useAuth();
+  const engagement = useViewerEngagement();
   const isHome = outfit.vertical === "hem";
+  // Admin status is read client-side so this page can be ISR cached.
+  const viewerIsAdmin = !!profile?.isAdmin;
   const [, startTransition] = useTransition();
-  const similarLiked = useMemo(() => new Set(similarLikedIds), [similarLikedIds]);
-  const similarSaved = useMemo(() => new Set(similarSavedIds), [similarSavedIds]);
 
-  // Plain useState — see OutfitCard for why useOptimistic was wrong here.
-  const [liked, setLiked] = useState(initiallyLiked);
+  // Liked/saved membership comes from the client-hydrated engagement context;
+  // counts are the cached totals adjusted optimistically on toggle.
+  const liked = engagement.isLiked(outfit.id);
+  const saved = engagement.isSaved(outfit.id);
   const [likeCount, setLikeCount] = useState(outfit.likes);
-  const [saved, setSaved] = useState(initiallySaved);
   const [saveCount, setSaveCount] = useState(outfit.saves);
   const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
-    setLiked(initiallyLiked);
-    setSaved(initiallySaved);
     setLikeCount(outfit.likes);
     setSaveCount(outfit.saves);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outfit.id]);
+  }, [outfit.id, outfit.likes, outfit.saves]);
 
   const handleLike = () => {
     if (!isLoggedIn) {
@@ -87,13 +71,13 @@ export default function OutfitDetail({
       return;
     }
     const next = !liked;
-    setLiked(next);
+    engagement.markLiked(outfit.id, next);
     setLikeCount((c) => c + (next ? 1 : -1));
     if (!isPersisted) return;
     startTransition(async () => {
       const res = await toggleLike(outfit.id);
       if (!res.ok) {
-        setLiked(!next);
+        engagement.markLiked(outfit.id, !next);
         setLikeCount((c) => c + (next ? -1 : 1));
       }
     });
@@ -105,13 +89,13 @@ export default function OutfitDetail({
       return;
     }
     const next = !saved;
-    setSaved(next);
+    engagement.markSaved(outfit.id, next);
     setSaveCount((c) => c + (next ? 1 : -1));
     if (!isPersisted) return;
     startTransition(async () => {
       const res = await toggleSave(outfit.id);
       if (!res.ok) {
-        setSaved(!next);
+        engagement.markSaved(outfit.id, !next);
         setSaveCount((c) => c + (next ? -1 : 1));
       }
     });
@@ -208,7 +192,6 @@ export default function OutfitDetail({
                   key={tag.id}
                   tag={tag}
                   outfitId={isPersisted ? outfit.id : undefined}
-                  region={viewerRegion}
                 />
               ))}
             </motion.div>
@@ -238,10 +221,7 @@ export default function OutfitDetail({
                     </p>
                   </div>
                 </Link>
-                <FollowButton
-                  userId={outfit.creator.id}
-                  initiallyFollowing={initiallyFollowingCreator}
-                />
+                <FollowButton userId={outfit.creator.id} />
               </div>
 
               <h1 className="font-heading text-[32px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-1.5">
@@ -350,8 +330,6 @@ export default function OutfitDetail({
                         key={tag.id}
                         item={tag}
                         outfitId={isPersisted ? outfit.id : undefined}
-                        region={viewerRegion}
-                        initiallySaved={savedItemIds.includes(tag.id)}
                       />
                     ))
                   )}
@@ -385,12 +363,7 @@ export default function OutfitDetail({
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {similar.map((o) => (
-                <OutfitCard
-                  key={o.id}
-                  outfit={o}
-                  initiallyLiked={similarLiked.has(o.id)}
-                  initiallySaved={similarSaved.has(o.id)}
-                />
+                <OutfitCard key={o.id} outfit={o} />
               ))}
             </div>
           </section>

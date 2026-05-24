@@ -17,14 +17,14 @@ import { ProduktSaveAndShare } from "./ProduktSaveAndShare";
 function isUsableBuyUrl(url: string | undefined): url is string {
   return !!url && url !== "#" && /^https?:\/\//i.test(url);
 }
-import {
-  fetchTaggedItemById,
-  fetchOutfitsByItem,
-  fetchEngagementForViewer,
-} from "@/lib/queries";
-import { createClient } from "@/lib/supabase/server";
+import { fetchTaggedItemById, fetchOutfitsByItem } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
 
-export const dynamic = "force-dynamic";
+// ISR: product detail is public. Saved-product state hydrates client-side
+// (ProduktSaveAndShare), buy link routes through /go for region. Public
+// client → no cookies → static render.
+export const dynamic = "force-static";
+export const revalidate = 300;
 
 export default async function ProduktPage({
   params,
@@ -33,31 +33,14 @@ export default async function ProduktPage({
 }) {
   const { id } = await params;
 
-  const item = await fetchTaggedItemById(id);
+  const client = createPublicClient();
+  const item = await fetchTaggedItemById(id, client);
   if (!item) notFound();
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const [otherOutfits, savedRow] = await Promise.all([
-    fetchOutfitsByItem(item.brand, item.name, item.outfitId),
-    user
-      ? supabase
-          .from("saved_items")
-          .select("user_id")
-          .eq("user_id", user.id)
-          .eq("tagged_item_id", item.id)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
-  ]);
-
-  const initiallySaved = !!savedRow.data;
-
-  // Engagement state for the related-outfits grid
-  const { liked, saved } = await fetchEngagementForViewer(
-    otherOutfits.map((o) => o.id),
+  const otherOutfits = await fetchOutfitsByItem(
+    item.brand,
+    item.name,
+    item.outfitId,
   );
 
   // Build the same item-detail shape ShareToDmSheet expects
@@ -157,7 +140,6 @@ export default async function ProduktPage({
                 )}
                 <ProduktSaveAndShare
                   itemId={item.id}
-                  initiallySaved={initiallySaved}
                   shareTitle={`${item.brand} — ${item.name}`}
                 />
                 <ShareButton
@@ -314,12 +296,7 @@ export default async function ProduktPage({
               </h2>
             </div>
             {otherOutfits.length > 0 ? (
-              <OutfitGrid
-                outfits={otherOutfits}
-                columns={3}
-                liked={liked}
-                saved={saved}
-              />
+              <OutfitGrid outfits={otherOutfits} columns={3} />
             ) : (
               <p className="text-sm text-foreground-muted">
                 Plagget syns hittills bara i{" "}
