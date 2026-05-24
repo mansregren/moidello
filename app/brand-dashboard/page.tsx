@@ -182,7 +182,7 @@ export default async function BrandDashboardPage() {
                         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-background-tertiary">
                           <Image
                             src={r.image_url}
-                            alt=""
+                            alt={r.title ?? ""}
                             fill
                             className="object-cover"
                             sizes="48px"
