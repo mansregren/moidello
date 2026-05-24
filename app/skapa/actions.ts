@@ -37,7 +37,12 @@ interface TagInput {
   isAffiliate?: boolean;
 }
 
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+];
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export async function createOutfit(

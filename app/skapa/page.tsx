@@ -793,7 +793,7 @@ export default function SkapaPage() {
                 id="add-more-input"
                 ref={addMoreInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept="image/jpeg,image/png,image/webp,image/avif"
                 multiple
                 className="hidden"
                 onChange={handleAddMore}
@@ -901,7 +901,7 @@ export default function SkapaPage() {
                 id="image-input"
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept="image/jpeg,image/png,image/webp,image/avif"
                 multiple
                 onChange={handleInitialPick}
                 className="sr-only"
@@ -916,7 +916,8 @@ export default function SkapaPage() {
                     // Replace just the active image
                     const replaceInput = document.createElement("input");
                     replaceInput.type = "file";
-                    replaceInput.accept = "image/jpeg,image/png,image/webp";
+                    replaceInput.accept =
+                      "image/jpeg,image/png,image/webp,image/avif";
                     replaceInput.onchange = (ev) => {
                       const f = (ev.target as HTMLInputElement).files?.[0];
                       if (f) replaceActiveImage(f);
