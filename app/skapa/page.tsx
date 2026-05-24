@@ -138,6 +138,21 @@ export default function SkapaPage() {
       : []),
   ];
 
+  // Reconcile the ?vertical=hem intent from the /home CTAs *after* mount.
+  // The useState initializer above is a best-effort read, but on a client
+  // navigation the query string isn't always committed by first render, and
+  // canCreateHome depends on the profile loading in. This effect runs once
+  // auth is ready and the URL is settled, so coming from /home reliably lands
+  // on Heminredning instead of falling back to the browse gender.
+  const appliedUrlIntent = useRef(false);
+  useEffect(() => {
+    if (appliedUrlIntent.current || loading) return;
+    const wantsHome =
+      new URLSearchParams(window.location.search).get("vertical") === "hem";
+    if (wantsHome && canCreateHome) setCreateMode("hem");
+    appliedUrlIntent.current = true;
+  }, [loading, canCreateHome]);
+
   // Switching the create mode: keep gender in sync across all unpublished
   // drafts, and clear the category when the vertical itself changes (the
   // fashion + hem taxonomies don't overlap).
