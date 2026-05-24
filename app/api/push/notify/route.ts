@@ -195,8 +195,7 @@ export async function POST(request: Request) {
 
   const pushBody = JSON.stringify({ title, body, url, tag });
 
-  let sent = 0;
-  await Promise.all(
+  const results = await Promise.all(
     list.map(async (sub) => {
       try {
         await webpush.sendNotification(
@@ -206,18 +205,24 @@ export async function POST(request: Request) {
           },
           pushBody,
         );
-        sent++;
+        return true;
       } catch (err: unknown) {
         const e = err as { statusCode?: number };
         if (e.statusCode === 404 || e.statusCode === 410) {
-          await admin
-            .from("push_subscriptions")
-            .delete()
-            .eq("id", sub.id);
+          // Prune dead subscriptions, but never let a failed delete reject
+          // this callback — that would reject Promise.all and 500 the webhook,
+          // triggering endless Supabase retries.
+          try {
+            await admin.from("push_subscriptions").delete().eq("id", sub.id);
+          } catch {
+            // ignore — best-effort cleanup
+          }
         }
+        return false;
       }
     }),
   );
 
+  const sent = results.filter(Boolean).length;
   return NextResponse.json({ ok: true, sent });
 }

@@ -78,6 +78,9 @@ export async function toggleSave(outfitId: string): Promise<EngagementResult> {
       .delete()
       .eq("user_id", user.id)
       .eq("outfit_id", outfitId);
+    // Mirror toggleLike: the save count is shown on the (ISR-cached) outfit
+    // page, so invalidate it or new visitors see a stale count.
+    revalidatePath(`/outfit/${outfitId}`);
     return { ok: true, active: false };
   }
 
@@ -85,6 +88,7 @@ export async function toggleSave(outfitId: string): Promise<EngagementResult> {
     .from("saves")
     .insert({ user_id: user.id, outfit_id: outfitId });
   if (error) return { ok: false, active: false, error: error.message };
+  revalidatePath(`/outfit/${outfitId}`);
   return { ok: true, active: true };
 }
 
