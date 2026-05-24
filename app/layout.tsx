@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GenderProvider } from "@/lib/gender-context";
 import { ToastProvider } from "@/lib/toast-context";
 import { AuthProvider, type AuthProfile } from "@/lib/auth-context";
+import { ViewerEngagementProvider } from "@/lib/viewer-engagement-context";
 import { AppShell } from "@/components/layout/AppShell";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { CookieBanner } from "@/components/layout/CookieBanner";
@@ -139,7 +140,9 @@ export default async function RootLayout({
         <AuthProvider initialUser={user} initialProfile={initialProfile}>
           <ToastProvider>
             <GenderProvider initial={initialGender}>
-              <AppShell footerBg={footerBg}>{children}</AppShell>
+              <ViewerEngagementProvider>
+                <AppShell footerBg={footerBg}>{children}</AppShell>
+              </ViewerEngagementProvider>
             </GenderProvider>
           </ToastProvider>
         </AuthProvider>

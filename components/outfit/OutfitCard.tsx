@@ -7,6 +7,7 @@ import { Outfit } from "@/lib/types";
 import { UserAvatar } from "../user/UserAvatar";
 import { useEffect, useState, useTransition, MouseEvent } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { useViewerEngagement } from "@/lib/viewer-engagement-context";
 import { cn } from "@/lib/utils";
 import { outfitPath } from "@/lib/outfit-url";
 import { toggleLike, toggleSave } from "@/app/actions/engagement";
@@ -52,33 +53,27 @@ function buildOutfitAlt(outfit: Outfit): string {
   return parts.join(" — ");
 }
 
-export function OutfitCard({
-  outfit,
-  initiallyLiked = false,
-  initiallySaved = false,
-}: OutfitCardProps) {
+export function OutfitCard({ outfit }: OutfitCardProps) {
   const { isLoggedIn, requireAuth } = useAuth();
+  // Liked/saved membership lives in the app-wide viewer-engagement context,
+  // hydrated client-side. That keeps this card free of per-viewer server data
+  // so the pages rendering it can be statically / ISR cached. Counts stay
+  // local (the cached total + optimistic adjustment on toggle).
+  const engagement = useViewerEngagement();
+  const liked = engagement.isLiked(outfit.id);
+  const saved = engagement.isSaved(outfit.id);
   const [hovering, setHovering] = useState(false);
   const [, startTransition] = useTransition();
 
   const isPersisted = UUID_RE.test(outfit.id);
 
-  // Persistent state (not useOptimistic — that reverts the count back to the
-  // SSR value as soon as the transition completes, which made the heart
-  // flicker 0 → 1 → 0 after every click). We mirror the props on initial
-  // mount + when the outfit id changes; user toggles persist locally.
-  const [liked, setLiked] = useState(initiallyLiked);
   const [likeCount, setLikeCount] = useState(outfit.likes);
-  const [saved, setSaved] = useState(initiallySaved);
   const [saveCount, setSaveCount] = useState(outfit.saves);
 
   useEffect(() => {
-    setLiked(initiallyLiked);
-    setSaved(initiallySaved);
     setLikeCount(outfit.likes);
     setSaveCount(outfit.saves);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outfit.id]);
+  }, [outfit.id, outfit.likes, outfit.saves]);
 
   const handleLike = (e: MouseEvent) => {
     e.preventDefault();
@@ -88,13 +83,13 @@ export function OutfitCard({
       return;
     }
     const next = !liked;
-    setLiked(next);
+    engagement.markLiked(outfit.id, next);
     setLikeCount((c) => c + (next ? 1 : -1));
     if (!isPersisted) return;
     startTransition(async () => {
       const res = await toggleLike(outfit.id);
       if (!res.ok) {
-        setLiked(!next);
+        engagement.markLiked(outfit.id, !next);
         setLikeCount((c) => c + (next ? -1 : 1));
       }
     });
@@ -108,13 +103,13 @@ export function OutfitCard({
       return;
     }
     const next = !saved;
-    setSaved(next);
+    engagement.markSaved(outfit.id, next);
     setSaveCount((c) => c + (next ? 1 : -1));
     if (!isPersisted) return;
     startTransition(async () => {
       const res = await toggleSave(outfit.id);
       if (!res.ok) {
-        setSaved(!next);
+        engagement.markSaved(outfit.id, !next);
         setSaveCount((c) => c + (next ? -1 : 1));
       }
     });

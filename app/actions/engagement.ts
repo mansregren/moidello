@@ -21,6 +21,28 @@ async function requireUser() {
   return { supabase, user };
 }
 
+/**
+ * All outfit IDs the current viewer has liked + saved. Returned as arrays of
+ * ids (cheap) so the client can hydrate engagement state without the page
+ * having to fetch it server-side — which is what lets public pages be
+ * statically/ISR cached instead of force-dynamic. Empty when logged out.
+ */
+export async function getViewerEngagement(): Promise<{
+  liked: string[];
+  saved: string[];
+}> {
+  const { supabase, user } = await requireUser();
+  if (!user) return { liked: [], saved: [] };
+  const [likesRes, savesRes] = await Promise.all([
+    supabase.from("likes").select("outfit_id").eq("user_id", user.id),
+    supabase.from("saves").select("outfit_id").eq("user_id", user.id),
+  ]);
+  return {
+    liked: (likesRes.data ?? []).map((r) => r.outfit_id as string),
+    saved: (savesRes.data ?? []).map((r) => r.outfit_id as string),
+  };
+}
+
 export async function toggleLike(outfitId: string): Promise<EngagementResult> {
   if (!UUID_RE.test(outfitId)) {
     return { ok: false, active: false, error: "Ogiltigt id." };
