@@ -171,6 +171,8 @@ const FAQ_GROUPS: FaqGroup[] = [
 
 const FAQ = FAQ_GROUPS.flatMap((g) => g.items);
 
+export const dynamic = "force-static";
+
 export default function FaqPage() {
   return (
     <>

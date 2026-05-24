@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/guider" },
 };
 
+export const dynamic = "force-static";
+
 export default function GuiderIndex() {
   return (
     <>

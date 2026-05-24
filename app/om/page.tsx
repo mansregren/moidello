@@ -5,6 +5,11 @@ import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { pickBgs, HERO_POOL } from "@/lib/session-background";
 
+// Static content — render once at build. cookies() returns empty under
+// force-static, so the session-seeded background just falls back to a fixed
+// pick; the header's auth state hydrates client-side.
+export const dynamic = "force-static";
+
 export default async function OmPage() {
   const [heroBg, parasolBg, harborBg] = await pickBgs(
     ["om-hero", "om-section", "om-stockholm"],

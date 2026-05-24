@@ -1,6 +1,8 @@
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 
+export const dynamic = "force-static";
+
 export default function KontaktPage() {
   return (
     <>

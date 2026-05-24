@@ -93,6 +93,8 @@ const TERMS: { term: string; description: string }[] = [
   },
 ];
 
+export const dynamic = "force-static";
+
 export default function OrdlistaPage() {
   return (
     <>
