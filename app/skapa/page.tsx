@@ -21,10 +21,15 @@ import {
   HOME_ITEM_TYPES,
   homeItemTypeOptions,
 } from "@/lib/home-data";
+import { homeVerticalVisible } from "@/lib/flags";
 import { createOutfit, type PublishedOutfit } from "./actions";
 
 type Gender = "dam" | "herr";
 type Vertical = "mode" | "hem";
+// What the user is creating. Dam/Herr stay in the fashion vertical (just a
+// gender), Hem is the heminredning vertical. One clear up-front choice that
+// drives both `vertical` and the draft gender.
+type CreateMode = "dam" | "herr" | "hem";
 
 interface DemoTag {
   id: number;
@@ -95,21 +100,62 @@ function makeDraft(file: File | null = null, gender: Gender = "dam"): Draft {
 
 export default function SkapaPage() {
   const router = useRouter();
-  const { isLoggedIn, loading } = useAuth();
+  const { isLoggedIn, loading, profile } = useAuth();
   const { gender } = useGender();
 
-  // Which vertical we're creating in. Driven by ?vertical=hem from the
-  // /home CTAs. Read from the URL directly (not useSearchParams) so we
-  // don't trigger the Next 16 SSR bailout — this page is client-only
-  // anyway (it redirects to /login when logged out).
-  const [vertical] = useState<Vertical>(() => {
-    if (typeof window === "undefined") return "mode";
-    return new URLSearchParams(window.location.search).get("vertical") === "hem"
-      ? "hem"
-      : "mode";
+  // Heminredning is admin-only until launch — only offer it as a choice to
+  // viewers who can see the vertical at all.
+  const canCreateHome = homeVerticalVisible(!!profile?.isAdmin);
+
+  // What we're creating: Dam, Herr or Heminredning. Seeded from ?vertical=hem
+  // (the /home CTAs) and the browse gender toggle so deep links land on the
+  // right choice, but the picker below makes it explicit and changeable.
+  // Read the URL directly (not useSearchParams) so we don't trigger the Next
+  // 16 SSR bailout — this page is client-only anyway (redirects when logged
+  // out).
+  const [createMode, setCreateMode] = useState<CreateMode>(() => {
+    if (typeof window === "undefined") return "dam";
+    const wantsHome =
+      new URLSearchParams(window.location.search).get("vertical") === "hem";
+    if (wantsHome) return "hem";
+    return gender === "herr" ? "herr" : "dam";
   });
+
+  // A non-admin can't actually create in hem even via ?vertical=hem — fall
+  // back to dam so the form stays valid.
+  const effectiveMode: CreateMode =
+    createMode === "hem" && !canCreateHome ? "dam" : createMode;
+  const vertical: Vertical = effectiveMode === "hem" ? "hem" : "mode";
   const isHome = vertical === "hem";
+  const draftGender: Gender = effectiveMode === "herr" ? "herr" : "dam";
   const categoryOptions = isHome ? HOME_CATEGORIES : CATEGORIES;
+
+  const MODE_OPTIONS: { id: CreateMode; label: string }[] = [
+    { id: "dam", label: "Dam" },
+    { id: "herr", label: "Herr" },
+    ...(canCreateHome
+      ? [{ id: "hem" as const, label: "Heminredning" }]
+      : []),
+  ];
+
+  // Switching the create mode: keep gender in sync across all unpublished
+  // drafts, and clear the category when the vertical itself changes (the
+  // fashion + hem taxonomies don't overlap).
+  const handleModeChange = (mode: CreateMode) => {
+    if (mode === createMode) return;
+    const nextVertical: Vertical = mode === "hem" ? "hem" : "mode";
+    const verticalChanged = nextVertical !== vertical;
+    setCreateMode(mode);
+    setDrafts((prev) =>
+      prev.map((d) => {
+        if (d.status === "published") return d;
+        const patch: Partial<Draft> = {};
+        if (mode !== "hem") patch.gender = mode;
+        if (verticalChanged) patch.category = "";
+        return { ...d, ...patch };
+      }),
+    );
+  };
 
   const [drafts, setDrafts] = useState<Draft[]>([makeDraft()]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -198,15 +244,14 @@ export default function SkapaPage() {
           ...next[0],
           file: resized[i],
           previewUrl: URL.createObjectURL(resized[i]),
-          // Seed from the browse filter so the picker starts on a sensible
-          // value — the user still confirms it explicitly below.
-          gender,
+          // Gender follows the explicit "Vad skapar du?" choice above.
+          gender: draftGender,
         };
         i++;
       }
 
       while (i < resized.length && next.length < MAX_DRAFTS) {
-        next.push(makeDraft(resized[i], gender));
+        next.push(makeDraft(resized[i], draftGender));
         i++;
       }
 
@@ -530,6 +575,40 @@ export default function SkapaPage() {
                 : "Ladda upp en eller flera bilder. Tagga plagg på varje, publicera allt samtidigt — varje outfit får sin egen URL."}
             </p>
           </motion.div>
+
+          {/* Up-front, explicit choice of what's being created. Drives both the
+              vertical (mode/hem) and the gender. Heminredning only appears for
+              viewers who can see the home vertical (admins until launch). */}
+          <div className="mb-8">
+            <label className="text-sm font-medium text-foreground-muted block mb-2">
+              Vad skapar du?
+            </label>
+            <div
+              className={`grid gap-2 ${
+                MODE_OPTIONS.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"
+              }`}
+            >
+              {MODE_OPTIONS.map((opt) => {
+                const selected = effectiveMode === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => handleModeChange(opt.id)}
+                    aria-pressed={selected}
+                    disabled={publishing}
+                    className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors disabled:opacity-60 ${
+                      selected
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border bg-background-secondary text-foreground-muted hover:border-foreground/30"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {topError && (
             <div className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/[0.05] p-4 flex items-start gap-3">
@@ -896,31 +975,6 @@ export default function SkapaPage() {
                   ))}
                 </select>
               </div>
-
-              {!isHome && (
-                <div>
-                  <label className="text-sm font-medium text-foreground-muted block mb-2">
-                    Kön
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {(["dam", "herr"] as const).map((g) => (
-                      <button
-                        key={g}
-                        type="button"
-                        onClick={() => updateActive({ gender: g })}
-                        disabled={active.status === "published" || publishing}
-                        className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors disabled:opacity-60 ${
-                          active.gender === g
-                            ? "border-foreground bg-foreground text-background"
-                            : "border-border bg-background-secondary text-foreground-muted hover:border-foreground/30"
-                        }`}
-                      >
-                        {g === "dam" ? "Dam" : "Herr"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               <div>
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
