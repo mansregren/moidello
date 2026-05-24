@@ -1277,6 +1277,10 @@ export type Database = {
           color: string | null
           created_at: string
           currency: string | null
+          alt_text: string | null
+          description: string | null
+          keywords: string[] | null
+          material: string | null
           garment: string
           id: string
           image_url: string | null
@@ -1300,6 +1304,10 @@ export type Database = {
           color?: string | null
           created_at?: string
           currency?: string | null
+          alt_text?: string | null
+          description?: string | null
+          keywords?: string[] | null
+          material?: string | null
           garment: string
           id?: string
           image_url?: string | null
@@ -1323,6 +1331,10 @@ export type Database = {
           color?: string | null
           created_at?: string
           currency?: string | null
+          alt_text?: string | null
+          description?: string | null
+          keywords?: string[] | null
+          material?: string | null
           garment?: string
           id?: string
           image_url?: string | null

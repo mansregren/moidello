@@ -42,6 +42,7 @@ interface DemoTag {
   price: string;
   currency: string;
   color: string;
+  material: string;
   imageUrl: string;
   isAffiliate: boolean;
   regionUrls: Record<string, string>;
@@ -79,6 +80,36 @@ const CATEGORIES = [
   "Sporty",
   "Preppy",
 ];
+
+// Common materials offered as autocomplete suggestions (free text — the user
+// can still type anything). Stored in tagged_items.material (migration 0036).
+const GARMENT_MATERIALS = [
+  "Bomull",
+  "Ekologisk bomull",
+  "Linne",
+  "Ull",
+  "Merinoull",
+  "Kashmir",
+  "Siden",
+  "Denim",
+  "Skinn",
+  "Mocka",
+  "Mockaimitation",
+  "Läderimitation",
+  "Viskos",
+  "Lyocell",
+  "Polyester",
+  "Nylon",
+  "Akryl",
+  "Fleece",
+  "Mohair",
+  "Tweed",
+  "Manchester",
+  "Satin",
+  "Spets",
+  "Jersey",
+  "Dun",
+] as const;
 
 const MAX_DRAFTS = 10;
 
@@ -356,6 +387,7 @@ export default function SkapaPage() {
       price: "",
       currency: "SEK",
       color: "",
+      material: "",
       imageUrl: "",
       isAffiliate: false,
       regionUrls: {},
@@ -402,6 +434,7 @@ export default function SkapaPage() {
         price: data.price != null ? String(data.price) : "",
         currency: (data.currency ?? "SEK").toUpperCase(),
         color: data.color ?? "",
+        material: "",
         imageUrl: data.image_url ?? "",
         isAffiliate: !!data.is_affiliate,
         regionUrls: {},
@@ -512,6 +545,7 @@ export default function SkapaPage() {
               : undefined,
           currency: t.currency.trim() || undefined,
           color: t.color.trim() || undefined,
+          material: t.material.trim() || undefined,
           imageUrl: t.imageUrl.trim() || undefined,
           x: t.x,
           y: t.y,
@@ -1069,6 +1103,13 @@ export default function SkapaPage() {
                   {active.tags.length})
                 </label>
 
+                {/* Shared autocomplete source for the per-tag material field. */}
+                <datalist id="garment-materials">
+                  {GARMENT_MATERIALS.map((m) => (
+                    <option key={m} value={m} />
+                  ))}
+                </datalist>
+
                 {/* Paste-URL → autofill. Tagg läggs i mitten av bilden,
                     användaren drar dit den ska. Ingen AI — bara OG-taggar +
                     retailer-parsers, så ~80–90% träffsäkert på stora butiker. */}
@@ -1229,6 +1270,25 @@ export default function SkapaPage() {
                             disabled={
                               active.status === "published" || publishing
                             }
+                          />
+                        </div>
+                        <div>
+                          <p className="text-[11px] uppercase tracking-wider text-foreground-subtle mb-1.5">
+                            Material{tag.material ? ` — ${tag.material}` : ""}
+                          </p>
+                          <input
+                            type="text"
+                            list="garment-materials"
+                            placeholder="t.ex. Bomull, Ull, Linne, Denim, Skinn"
+                            maxLength={60}
+                            value={tag.material}
+                            onChange={(e) =>
+                              updateTag(tag.id, { material: e.target.value })
+                            }
+                            disabled={
+                              active.status === "published" || publishing
+                            }
+                            className="w-full rounded-lg bg-background-tertiary border border-border px-3 py-2 text-sm text-foreground placeholder:text-foreground-subtle outline-none disabled:opacity-60"
                           />
                         </div>
                         <input

@@ -30,6 +30,7 @@ interface TagInput {
   price?: number | null;
   currency?: string | null;
   color?: string | null;
+  material?: string | null;
   imageUrl?: string | null;
   x: number;
   y: number;
@@ -216,6 +217,7 @@ export async function createOutfit(
             : null,
         currency: t.currency?.trim().toUpperCase().slice(0, 8) || "SEK",
         color: t.color?.trim().slice(0, 40) || null,
+        material: t.material?.trim().slice(0, 60) || null,
         image_url: t.imageUrl?.trim().slice(0, 1000) || null,
         position_x: t.x,
         position_y: t.y,
