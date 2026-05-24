@@ -168,7 +168,7 @@ export default function HomeClient({
                   initial={{ opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.35, delay: i * 0.04 }}
+                  transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.2) }}
                 >
                   <Link
                     href={`/stil/${cat.toLowerCase()}`}
@@ -260,7 +260,7 @@ export default function HomeClient({
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                    transition={{ duration: 0.3, delay: Math.min(i * 0.05, 0.2) }}
                     className="shrink-0"
                   >
                     <Link

@@ -63,6 +63,7 @@ function BoardSheet({
   const [boards, setBoards] = useState<BoardListItem[] | null>(null);
   const [creating, setCreating] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
   useEffect(() => {
@@ -100,6 +101,7 @@ function BoardSheet({
 
   const toggle = (boardId: string) => {
     setPendingId(boardId);
+    setError(null);
     startTransition(async () => {
       const res = await toggleOutfitOnBoard(boardId, outfitId);
       if (res.ok) {
@@ -109,6 +111,8 @@ function BoardSheet({
               b.id === boardId ? { ...b, contains: res.added } : b,
             ) ?? null,
         );
+      } else {
+        setError(res.error ?? "Kunde inte uppdatera samlingen. Försök igen.");
       }
       setPendingId(null);
     });
@@ -207,6 +211,9 @@ function BoardSheet({
               </li>
             ))}
           </ul>
+          {error && (
+            <p className="mt-3 px-1 text-xs text-red-500">{error}</p>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>

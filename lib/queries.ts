@@ -940,17 +940,18 @@ export async function fetchOutfitsByColor(
   const targetKey = color.toLowerCase().trim();
   if (!targetKey) return [];
 
+  // Push the colour match to Postgres (case-insensitive, no wildcards since
+  // colour names are plain words) instead of transferring every tagged row
+  // and filtering in JS.
   const { data: tagRows } = await supabase
     .from("tagged_items")
-    .select("outfit_id, color")
-    .not("color", "is", null);
+    .select("outfit_id")
+    .ilike("color", targetKey);
   if (!tagRows) return [];
 
   const outfitIds = Array.from(
     new Set(
-      (tagRows as Array<{ outfit_id: string; color: string | null }>)
-        .filter((r) => (r.color ?? "").toLowerCase() === targetKey)
-        .map((r) => r.outfit_id),
+      (tagRows as Array<{ outfit_id: string }>).map((r) => r.outfit_id),
     ),
   );
   if (outfitIds.length === 0) return [];
@@ -1008,16 +1009,17 @@ export async function fetchOutfitsByGarment(
   const garmentKey = garment.toLowerCase().trim();
   if (!garmentKey) return [];
 
+  // Filter in Postgres rather than transferring the whole table and
+  // matching in JS.
   const { data: tagRows } = await supabase
     .from("tagged_items")
-    .select("outfit_id, garment");
+    .select("outfit_id")
+    .ilike("garment", garmentKey);
   if (!tagRows) return [];
 
   const outfitIds = Array.from(
     new Set(
-      (tagRows as Array<{ outfit_id: string; garment: string }>)
-        .filter((r) => (r.garment ?? "").toLowerCase() === garmentKey)
-        .map((r) => r.outfit_id),
+      (tagRows as Array<{ outfit_id: string }>).map((r) => r.outfit_id),
     ),
   );
   if (outfitIds.length === 0) return [];
@@ -1067,19 +1069,16 @@ export async function fetchBrandOutfits(
 ): Promise<Outfit[]> {
   const supabase = await createClient();
 
-  // tagged_items has a lower(brand) index from migration 0007
+  // Match the brand in Postgres (case-insensitive) instead of pulling every
+  // tagged row and filtering in JS.
   const { data: tagRows } = await supabase
     .from("tagged_items")
-    .select("outfit_id, brand");
+    .select("outfit_id")
+    .ilike("brand", brandName);
 
   if (!tagRows) return [];
-  const targetKey = brandName.toLowerCase();
   const outfitIds = Array.from(
-    new Set(
-      tagRows
-        .filter((r) => (r.brand as string).toLowerCase() === targetKey)
-        .map((r) => r.outfit_id as string),
-    ),
+    new Set((tagRows as Array<{ outfit_id: string }>).map((r) => r.outfit_id)),
   );
   if (outfitIds.length === 0) return [];
 

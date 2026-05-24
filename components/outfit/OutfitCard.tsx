@@ -26,11 +26,15 @@ const UUID_RE =
  * types so Google Images can match the thumb against more queries.
  */
 function buildOutfitAlt(outfit: Outfit): string {
+  const isHome = outfit.vertical === "hem";
   const parts: string[] = [outfit.title];
-  const gender = outfit.gender === "herr" ? "herr" : "dam";
   const cat = outfit.category?.trim();
   if (cat) parts.push(cat.toLowerCase());
-  parts.push(`outfit ${gender}`);
+  // Home posts carry no gender — a room isn't dam/herr. Only fashion gets it.
+  if (!isHome) {
+    const gender = outfit.gender === "herr" ? "herr" : "dam";
+    parts.push(`outfit ${gender}`);
+  }
 
   const garments = Array.from(
     new Set(
@@ -120,7 +124,9 @@ export function OutfitCard({
     <div className="group">
       <Link
         href={outfitPath(outfit)}
-        aria-label={`${outfit.title} av ${outfit.creator.displayName}, ${outfit.tags.length} taggade plagg`}
+        aria-label={`${outfit.title} av ${outfit.creator.displayName}, ${outfit.tags.length} ${
+          outfit.vertical === "hem" ? "taggade saker" : "taggade plagg"
+        }`}
       >
         <div
           className="relative overflow-hidden rounded-2xl aspect-[3/4]"
@@ -197,7 +203,8 @@ export function OutfitCard({
             <div className="absolute bottom-4 left-4 right-4">
               <p className="text-sm font-medium text-white">{outfit.title}</p>
               <p className="text-xs text-white/70 mt-1">
-                {outfit.tags.length} taggade plagg
+                {outfit.tags.length}{" "}
+                {outfit.vertical === "hem" ? "taggade saker" : "taggade plagg"}
               </p>
             </div>
           </div>
