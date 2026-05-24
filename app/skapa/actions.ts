@@ -2,7 +2,8 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { slugify, storageFilename } from "@/lib/slug";
-import { getImpersonationTarget } from "@/lib/admin";
+import { getImpersonationTarget, isCurrentUserAdmin } from "@/lib/admin";
+import { homeVerticalVisible } from "@/lib/flags";
 
 export interface PublishedOutfit {
   id: string;
@@ -61,8 +62,14 @@ export async function createOutfit(
   const gender = (formData.get("gender") as string | null) ?? "dam";
   // Which vertical this post belongs to. Home posts ("hem") carry no
   // gender; everything else defaults to the fashion vertical ("mode").
+  // The hem vertical is gated (admin-only until launch) — the client check in
+  // /skapa is convenience only, so enforce it here too: a non-admin POSTing
+  // vertical=hem is silently downgraded to mode rather than trusted.
+  const wantsHome = (formData.get("vertical") as string | null) === "hem";
   const vertical =
-    (formData.get("vertical") as string | null) === "hem" ? "hem" : "mode";
+    wantsHome && homeVerticalVisible(await isCurrentUserAdmin())
+      ? "hem"
+      : "mode";
   const keywordsRaw = (formData.get("keywords") as string | null) ?? "[]";
   const tagsRaw = (formData.get("tags") as string | null) ?? "[]";
 

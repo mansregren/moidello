@@ -121,8 +121,11 @@ export function useGender(): GenderState {
 }
 
 export function matchesGenderFilter(
-  outfitGender: "herr" | "dam",
+  outfitGender: "herr" | "dam" | null,
   filter: GenderFilter,
 ): boolean {
+  // Hem posts carry gender=null and must never match a dam/herr filter —
+  // make that explicit rather than relying on `null === "dam"` being false.
+  if (outfitGender == null) return false;
   return outfitGender === filter;
 }

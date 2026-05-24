@@ -38,6 +38,13 @@ export default async function ProfilePage({
   ]);
   const showHome = homeVerticalVisible(viewerIsAdmin);
 
+  // Strip hem posts server-side when the viewer can't see the home vertical,
+  // so they never reach the client payload / SSR HTML / JSON-LD (the client
+  // also filters, but that leaves the data in the initial markup → SEO leak).
+  const visibleOutfits = showHome
+    ? userOutfits
+    : userOutfits.filter((o) => o.vertical !== "hem");
+
   let publicBoards: PublicBoardSummary[] = [];
   {
     const supabase = await createClient();
@@ -98,7 +105,7 @@ export default async function ProfilePage({
   return (
     <ProfileDetail
       user={profile}
-      outfits={userOutfits}
+      outfits={visibleOutfits}
       likedIds={Array.from(liked)}
       savedIds={Array.from(saved)}
       initiallyFollowing={alreadyFollowing}

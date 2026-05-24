@@ -147,11 +147,16 @@ export default function SkapaPage() {
   const appliedUrlIntent = useRef(false);
   useEffect(() => {
     if (appliedUrlIntent.current || loading) return;
+    // isAdmin lives on `profile`, which loads in a separate async pass *after*
+    // `loading` flips to false. Acting before it arrives means canCreateHome is
+    // still false, we skip hem, and — having set the applied flag — never retry
+    // once the profile lands. Wait until admin status is actually known.
+    if (isLoggedIn && profile === null) return;
     const wantsHome =
       new URLSearchParams(window.location.search).get("vertical") === "hem";
     if (wantsHome && canCreateHome) setCreateMode("hem");
     appliedUrlIntent.current = true;
-  }, [loading, canCreateHome]);
+  }, [loading, isLoggedIn, profile, canCreateHome]);
 
   // Switching the create mode: keep gender in sync across all unpublished
   // drafts, and clear the category when the vertical itself changes (the

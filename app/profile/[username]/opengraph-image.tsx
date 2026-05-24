@@ -35,7 +35,10 @@ export default async function Image({
     return brandFallback(antonFont, interFont);
   }
 
-  const outfits = (await fetchOutfitsByUser(user.id, sb)).slice(0, 4);
+  // OG images are public — never surface hem posts in the collage.
+  const outfits = (await fetchOutfitsByUser(user.id, sb))
+    .filter((o) => o.vertical !== "hem")
+    .slice(0, 4);
   const collageImages = outfits.map((o) => o.image);
 
   return new ImageResponse(

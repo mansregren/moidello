@@ -68,6 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
          profiles!outfits_user_id_fkey(username)`,
       )
       .eq("is_published", true)
+      .eq("vertical", "mode")
       .order("created_at", { ascending: false })
       .limit(10000),
     supabase

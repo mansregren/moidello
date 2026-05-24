@@ -411,6 +411,7 @@ export async function fetchSavedOutfitsByUser(userId: string): Promise<Outfit[]>
     .from("saves")
     .select(`outfit:outfits ( ${OUTFIT_COLUMNS} )`)
     .eq("user_id", userId)
+    .eq("outfits.vertical", "mode")
     .order("created_at", { ascending: false });
 
   if (error) return [];
