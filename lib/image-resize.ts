@@ -1,15 +1,14 @@
-// Outfit-bilden visas i en aspect-[3/4]-ruta på /skapa och i en 8:11
-// cover-ruta på outfit-detail-sidan. Padd till 3:4 med kräm-bg gör att
-// hela Pinterest-motivet får plats utan crop, och paddningen smälter in
-// i sajt-bakgrunden (#F7F6F3) så det inte syns på publika sidor.
+// Outfit-bilden visas i en aspect-[3/4]-ruta på /skapa och i en cover-ruta
+// på outfit-detail-sidan. Vi center-beskär (cover) uppladdade bilder till
+// exakt 3:4 så de FYLLER rutan helt — inga kräm-band/kanter. Pinterest-
+// nedladdningar (2:3, 9:16, landscape) beskärs centrerat så motivet behålls.
 const TARGET_ASPECT = 3 / 4; // bredd / höjd (portrait)
-const PAD_COLOR = "#F7F6F3";
+const PAD_COLOR = "#F7F6F3"; // 1px-säkerhet vid avrundning, syns ej
 
 /**
- * Downscale + pad a user-selected image to a 3:4 portrait canvas. Pinterest
- * downloads ofta i 2:3, 9:16 eller landscape — utan paddningen tappar
- * outfit-vyn topp/botten eller sidor. Runs entirely in the browser via
- * canvas — no upload happens here.
+ * Downscale + center-crop (cover) a user-selected image to a 3:4 portrait
+ * canvas so it fills the frame with no letterbox bars. Runs entirely in the
+ * browser via canvas — no upload happens here.
  */
 export async function resizeImageForUpload(
   file: File,
@@ -33,19 +32,20 @@ export async function resizeImageForUpload(
   const drawW = Math.round(bitmap.width * ratio);
   const drawH = Math.round(bitmap.height * ratio);
 
-  // Bestäm canvas-storlek så hela bilden ryms i 3:4 — utöka kortsidan.
+  // Bestäm 3:4-canvas genom att beskära den långa sidan (cover, ingen padd).
   const imgAspect = drawW / drawH;
   let canvasW = drawW;
   let canvasH = drawH;
   if (Math.abs(imgAspect - TARGET_ASPECT) > 0.005) {
     if (imgAspect > TARGET_ASPECT) {
-      // Bilden är bredare än 3:4 → bygg ut höjden med kräm-band
-      canvasH = Math.round(drawW / TARGET_ASPECT);
-    } else {
-      // Bilden är smalare än 3:4 → bygg ut bredden med kräm-band
+      // Bredare än 3:4 → behåll höjden, beskär bredden.
       canvasW = Math.round(drawH * TARGET_ASPECT);
+    } else {
+      // Smalare än 3:4 → behåll bredden, beskär höjden.
+      canvasH = Math.round(drawW / TARGET_ASPECT);
     }
   }
+  // Negativa offsets centrerar bilden och beskär överskjutande kanter.
   const dx = Math.round((canvasW - drawW) / 2);
   const dy = Math.round((canvasH - drawH) / 2);
 
