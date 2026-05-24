@@ -257,6 +257,47 @@ export async function recropOutfitImage(
   return { ok: true };
 }
 
+/**
+ * Pick which outfit is the cover shown on the category card (/home rooms,
+ * /stil + fashion categories). Clears the flag on every other outfit in the
+ * same vertical+category, then sets it on the chosen one. Pass null to clear
+ * (revert to the newest-post default). Admin-only.
+ */
+export async function setCategoryCover(
+  outfitId: string | null,
+  vertical: string,
+  category: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+  if (outfitId !== null && !UUID_RE.test(outfitId)) {
+    return { ok: false, error: "Ogiltigt id." };
+  }
+  const supabase = await createClient();
+
+  // Clear any existing cover for this vertical+category.
+  const { error: clearErr } = await supabase
+    .from("outfits")
+    .update({ is_category_cover: false })
+    .eq("vertical", vertical)
+    .eq("category", category)
+    .eq("is_category_cover", true);
+  if (clearErr) return { ok: false, error: clearErr.message };
+
+  if (outfitId) {
+    const { error: setErr } = await supabase
+      .from("outfits")
+      .update({ is_category_cover: true })
+      .eq("id", outfitId);
+    if (setErr) return { ok: false, error: setErr.message };
+  }
+
+  revalidatePath("/home");
+  revalidatePath("/");
+  return { ok: true };
+}
+
 export async function updateTaggedItem(
   tagId: string,
   patch: {

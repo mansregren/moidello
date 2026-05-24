@@ -262,6 +262,8 @@ export async function fetchCategoryCovers(
     .eq("is_published", true)
     .eq("vertical", "mode")
     .not("category", "is", null)
+    // Admin-picked cover (is_category_cover) wins; otherwise newest post.
+    .order("is_category_cover", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(500);
 
@@ -319,6 +321,8 @@ export async function fetchHomeCategoryCovers(
     .eq("is_published", true)
     .eq("vertical", "hem")
     .not("category", "is", null)
+    // Admin-picked cover (is_category_cover) wins; otherwise newest post.
+    .order("is_category_cover", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(500);
 

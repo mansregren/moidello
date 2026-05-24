@@ -802,6 +802,7 @@ export type Database = {
           id: string
           image_path: string
           image_url: string
+          is_category_cover: boolean
           is_hidden: boolean
           is_published: boolean
           keywords: string[] | null
@@ -826,6 +827,7 @@ export type Database = {
           id?: string
           image_path: string
           image_url: string
+          is_category_cover?: boolean
           is_hidden?: boolean
           is_published?: boolean
           keywords?: string[] | null
@@ -850,6 +852,7 @@ export type Database = {
           id?: string
           image_path?: string
           image_url?: string
+          is_category_cover?: boolean
           is_hidden?: boolean
           is_published?: boolean
           keywords?: string[] | null

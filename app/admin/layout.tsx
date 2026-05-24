@@ -31,6 +31,7 @@ export default async function AdminLayout({
             <AdminTab href="/admin/tiktok-bilder" label="TikTok-bilder" />
             <AdminTab href="/admin/seo" label="SEO" />
             <AdminTab href="/admin/bildfyll" label="Fyll bilder" />
+            <AdminTab href="/admin/omslag" label="Omslag" />
           </nav>
           {children}
         </Container>
