@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { fetchFollowingFeed } from "@/lib/queries";
+import type { Outfit } from "@/lib/types";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -27,6 +29,18 @@ async function requireUser() {
  * having to fetch it server-side — which is what lets public pages be
  * statically/ISR cached instead of force-dynamic. Empty when logged out.
  */
+/**
+ * The "from people you follow" feed for the current viewer. Fetched
+ * client-side so the homepage's public content can be statically/ISR cached
+ * while this personalised section still loads in for logged-in users. Empty
+ * when logged out.
+ */
+export async function getFollowingFeed(limit = 12): Promise<Outfit[]> {
+  const { user } = await requireUser();
+  if (!user) return [];
+  return fetchFollowingFeed(user.id, limit);
+}
+
 export async function getViewerEngagement(): Promise<{
   liked: string[];
   saved: string[];

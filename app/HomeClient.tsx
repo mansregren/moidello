@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -11,6 +11,8 @@ import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { categories } from "@/lib/data";
 import { useGender, matchesGenderFilter } from "@/lib/gender-context";
+import { useAuth } from "@/lib/auth-context";
+import { getFollowingFeed } from "@/app/actions/engagement";
 import type { Outfit, User } from "@/lib/types";
 
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
@@ -39,26 +41,38 @@ type CategoryCover = { category: string; gender: "herr" | "dam"; image: string }
 
 export default function HomeClient({
   outfits,
-  following = [],
   creators,
   categoryCovers = [],
-  likedIds = [],
-  savedIds = [],
   heroBg = "/images/bg/positano.webp",
   lifestyleBg = "/images/bg/parasols.webp",
 }: {
   outfits: Outfit[];
-  following?: Outfit[];
   creators: User[];
   categoryCovers?: CategoryCover[];
-  likedIds?: string[];
-  savedIds?: string[];
   heroBg?: string;
   lifestyleBg?: string;
 }) {
   const { gender } = useGender();
-  const liked = useMemo(() => new Set(likedIds), [likedIds]);
-  const saved = useMemo(() => new Set(savedIds), [savedIds]);
+  const { isLoggedIn } = useAuth();
+
+  // "Från dina följda" is per-viewer, so it's fetched client-side here — that
+  // keeps the page's public content statically/ISR cacheable.
+  const [following, setFollowing] = useState<Outfit[]>([]);
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setFollowing([]);
+      return;
+    }
+    let cancelled = false;
+    getFollowingFeed(12)
+      .then((f) => {
+        if (!cancelled) setFollowing(f);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn]);
 
   const visible = outfits.filter((o) => matchesGenderFilter(o.gender, gender));
   const recent = [...visible]
@@ -147,12 +161,7 @@ export default function HomeClient({
               href="/foljer"
               seeAllLabel="Hela flödet"
             >
-              <OutfitGrid
-                outfits={followingVisible}
-                columns={3}
-                liked={liked}
-                saved={saved}
-              />
+              <OutfitGrid outfits={followingVisible} columns={3} />
             </Section>
           )}
 
@@ -203,8 +212,6 @@ export default function HomeClient({
               <OutfitGrid
                 outfits={recent}
                 columns={3}
-                liked={liked}
-                saved={saved}
               />
             ) : (
               <div className="rounded-2xl border border-border bg-background-secondary p-10 text-center">
