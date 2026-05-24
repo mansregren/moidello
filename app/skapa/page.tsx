@@ -203,14 +203,18 @@ export default function SkapaPage() {
     }
   }, [loading, isLoggedIn, router]);
 
+  // Keep a live ref to the current drafts so the unmount cleanup revokes the
+  // object URLs that actually exist at teardown — not the (empty) first-render
+  // drafts the closure would otherwise capture. URLs from removed/replaced
+  // drafts are already revoked in removeDraft/replaceActiveImage.
+  const draftsRef = useRef(drafts);
+  draftsRef.current = drafts;
   useEffect(() => {
     return () => {
-      // Revoke all object URLs on unmount.
-      for (const d of drafts) {
+      for (const d of draftsRef.current) {
         if (d.previewUrl) URL.revokeObjectURL(d.previewUrl);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const active = drafts[activeIndex] ?? drafts[0];
@@ -222,6 +226,15 @@ export default function SkapaPage() {
     !publishing &&
     pendingDrafts.length > 0 &&
     pendingDrafts.every((d) => d.file && d.title.trim());
+
+  // Tags missing a brand or name are silently dropped at publish (see
+  // tagsForSubmit) — count them across pending drafts so we can warn instead
+  // of losing the user's work without a word.
+  const incompleteTagCount = pendingDrafts.reduce(
+    (sum, d) =>
+      sum + d.tags.filter((t) => !t.brand.trim() || !t.name.trim()).length,
+    0,
+  );
 
   const updateActive = (patch: Partial<Draft>) => {
     setDrafts((prev) =>
@@ -1320,6 +1333,14 @@ export default function SkapaPage() {
                     Varje bild behöver en titel innan du kan publicera.
                   </p>
                 )}
+
+              {incompleteTagCount > 0 && !publishing && (
+                <p className="text-xs text-amber-600">
+                  {incompleteTagCount === 1
+                    ? "1 tagg saknar märke eller namn och publiceras inte. Fyll i den eller ta bort den."
+                    : `${incompleteTagCount} taggar saknar märke eller namn och publiceras inte. Fyll i dem eller ta bort dem.`}
+                </p>
+              )}
             </motion.div>
           </div>
 
