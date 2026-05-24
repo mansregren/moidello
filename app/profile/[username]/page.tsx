@@ -1,16 +1,15 @@
 import { notFound, permanentRedirect } from "next/navigation";
-import {
-  fetchProfileByUsername,
-  fetchOutfitsByUser,
-  fetchEngagementForViewer,
-  isFollowing,
-} from "@/lib/queries";
-import { createClient } from "@/lib/supabase/server";
-import { isCurrentUserAdmin } from "@/lib/admin";
-import { homeVerticalVisible } from "@/lib/flags";
+import { fetchProfileByUsername, fetchOutfitsByUser } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
+import { HOME_VERTICAL_PUBLIC } from "@/lib/flags";
 import ProfileDetail, { type PublicBoardSummary } from "./ProfileDetail";
 
-export const dynamic = "force-dynamic";
+// ISR: a creator's profile is public content. Liked/saved + follow state and
+// the dam/herr toggle are all client-side now, so cache + background-refresh.
+// Public client → no cookies → static render. Hem posts are hidden while the
+// vertical is unlaunched (flag, not per-viewer admin) so the cache is correct.
+export const dynamic = "force-static";
+export const revalidate = 300;
 
 export default async function ProfilePage({
   params,
@@ -26,28 +25,23 @@ export default async function ProfilePage({
     permanentRedirect(`/profile/${username.toLowerCase()}`);
   }
 
-  const profile = await fetchProfileByUsername(username);
+  const client = createPublicClient();
+  const profile = await fetchProfileByUsername(username, client);
   if (!profile) notFound();
 
-  const userOutfits = await fetchOutfitsByUser(profile.id);
+  const userOutfits = await fetchOutfitsByUser(profile.id, client);
 
-  const [{ liked, saved }, alreadyFollowing, viewerIsAdmin] = await Promise.all([
-    fetchEngagementForViewer(userOutfits.map((o) => o.id)),
-    isFollowing(profile.id),
-    isCurrentUserAdmin(),
-  ]);
-  const showHome = homeVerticalVisible(viewerIsAdmin);
-
-  // Strip hem posts server-side when the viewer can't see the home vertical,
-  // so they never reach the client payload / SSR HTML / JSON-LD (the client
-  // also filters, but that leaves the data in the initial markup → SEO leak).
+  // Hem posts stay hidden while the vertical is unlaunched. Gated on the flag
+  // (not per-viewer admin) so the cached page is correct for everyone; admins
+  // manage hem content via /home and /admin.
+  const showHome = HOME_VERTICAL_PUBLIC;
   const visibleOutfits = showHome
     ? userOutfits
     : userOutfits.filter((o) => o.vertical !== "hem");
 
   let publicBoards: PublicBoardSummary[] = [];
   {
-    const supabase = await createClient();
+    const supabase = client;
     const { data: boardRows, error: boardError } = await supabase
       .from("board_summary")
       .select("id, name, description, is_public, cover_outfit_id, outfit_count")
@@ -106,9 +100,6 @@ export default async function ProfilePage({
     <ProfileDetail
       user={profile}
       outfits={visibleOutfits}
-      likedIds={Array.from(liked)}
-      savedIds={Array.from(saved)}
-      initiallyFollowing={alreadyFollowing}
       publicBoards={publicBoards}
       showHome={showHome}
     />

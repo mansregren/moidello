@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Globe } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
@@ -18,6 +18,7 @@ import { OutfitOwnerActions } from "@/components/outfit/OutfitOwnerActions";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { profilePageJsonLd } from "@/lib/json-ld";
 import { useAuth } from "@/lib/auth-context";
+import { useViewerEngagement } from "@/lib/viewer-engagement-context";
 // gender-context används inte längre här — profilen visar alla outfits
 // oavsett besökarens filter.
 import { motion } from "framer-motion";
@@ -40,31 +41,23 @@ function formatNumber(n: number): string {
 export default function ProfileDetail({
   user,
   outfits: allOutfits,
-  likedIds = [],
-  savedIds = [],
-  initiallyFollowing = false,
   publicBoards = [],
   showHome = false,
 }: {
   user: MoidelloUser;
   outfits: Outfit[];
-  likedIds?: string[];
-  savedIds?: string[];
-  initiallyFollowing?: boolean;
   publicBoards?: PublicBoardSummary[];
   showHome?: boolean;
 }) {
   const { user: viewer, isLoggedIn, requireAuth } = useAuth();
+  const engagement = useViewerEngagement();
   const [activeTab, setActiveTab] = useState<
     "outfits" | "hem" | "boards" | "followers" | "following" | "about"
   >("outfits");
-  const [following, setFollowing] = useState(initiallyFollowing);
-  useEffect(() => {
-    setFollowing(initiallyFollowing);
-  }, [user.id, initiallyFollowing]);
+  // Follow state is hydrated client-side via the engagement context so this
+  // page can be ISR cached.
+  const following = engagement.isFollowing(user.id);
   const [, startTransition] = useTransition();
-  const liked = useMemo(() => new Set(likedIds), [likedIds]);
-  const saved = useMemo(() => new Set(savedIds), [savedIds]);
 
   const isOwnProfile = viewer?.id === user.id;
   // En kreatörs profil visar ALLA deras publikationer oavsett besökarens
@@ -95,11 +88,7 @@ export default function ProfileDetail({
         <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-3">
           {list.map((outfit) => (
             <div key={outfit.id} className="space-y-2">
-              <OutfitCard
-                outfit={outfit}
-                initiallyLiked={liked.has(outfit.id)}
-                initiallySaved={saved.has(outfit.id)}
-              />
+              <OutfitCard outfit={outfit} />
               <OutfitOwnerActions
                 outfitId={outfit.id}
                 isHidden={!!outfit.isHidden}
@@ -111,7 +100,7 @@ export default function ProfileDetail({
         </div>
       );
     }
-    return <OutfitGrid outfits={list} columns={3} liked={liked} saved={saved} />;
+    return <OutfitGrid outfits={list} columns={3} />;
   };
 
   const handleFollow = () => {
@@ -121,10 +110,10 @@ export default function ProfileDetail({
     }
     if (isOwnProfile) return;
     const next = !following;
-    setFollowing(next);
+    engagement.markFollowing(user.id, next);
     startTransition(async () => {
       const res = await toggleFollow(user.id);
-      if (!res.ok) setFollowing(!next);
+      if (!res.ok) engagement.markFollowing(user.id, !next);
     });
   };
 

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useTransition } from "react";
 import { PremiumButton } from "../shared/PremiumButton";
 import { useAuth } from "@/lib/auth-context";
+import { useViewerEngagement } from "@/lib/viewer-engagement-context";
 import { toggleFollow } from "@/app/actions/engagement";
 
 const UUID_RE =
@@ -10,24 +11,20 @@ const UUID_RE =
 
 export function FollowButton({
   userId,
-  initiallyFollowing = false,
 }: {
   userId?: string;
+  /** Deprecated — follow state now hydrates client-side via the viewer
+   *  engagement context so profile pages can be ISR cached. Kept optional so
+   *  existing call sites don't break. */
   initiallyFollowing?: boolean;
 }) {
   const { user, isLoggedIn, requireAuth } = useAuth();
+  const engagement = useViewerEngagement();
   const [, startTransition] = useTransition();
-  // Plain useState (not useOptimistic) so the toggle persists visually
-  // after the server action's transition completes — useOptimistic would
-  // revert to `initiallyFollowing` and make the click look like a no-op.
-  const [following, setFollowing] = useState(initiallyFollowing);
 
   const isOwnProfile = userId && user?.id === userId;
   const isPersisted = userId && UUID_RE.test(userId);
-
-  useEffect(() => {
-    setFollowing(initiallyFollowing);
-  }, [userId, initiallyFollowing]);
+  const following = userId ? engagement.isFollowing(userId) : false;
 
   if (isOwnProfile) return null;
 
@@ -36,12 +33,13 @@ export function FollowButton({
       requireAuth("follow");
       return;
     }
+    if (!userId) return;
     const next = !following;
-    setFollowing(next);
+    engagement.markFollowing(userId, next);
     if (!isPersisted) return;
     startTransition(async () => {
-      const res = await toggleFollow(userId!);
-      if (!res.ok) setFollowing(!next);
+      const res = await toggleFollow(userId);
+      if (!res.ok) engagement.markFollowing(userId, !next);
     });
   };
 

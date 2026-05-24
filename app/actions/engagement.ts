@@ -44,16 +44,19 @@ export async function getFollowingFeed(limit = 12): Promise<Outfit[]> {
 export async function getViewerEngagement(): Promise<{
   liked: string[];
   saved: string[];
+  follows: string[];
 }> {
   const { supabase, user } = await requireUser();
-  if (!user) return { liked: [], saved: [] };
-  const [likesRes, savesRes] = await Promise.all([
+  if (!user) return { liked: [], saved: [], follows: [] };
+  const [likesRes, savesRes, followsRes] = await Promise.all([
     supabase.from("likes").select("outfit_id").eq("user_id", user.id),
     supabase.from("saves").select("outfit_id").eq("user_id", user.id),
+    supabase.from("follows").select("followee_id").eq("follower_id", user.id),
   ]);
   return {
     liked: (likesRes.data ?? []).map((r) => r.outfit_id as string),
     saved: (savesRes.data ?? []).map((r) => r.outfit_id as string),
+    follows: (followsRes.data ?? []).map((r) => r.followee_id as string),
   };
 }
 

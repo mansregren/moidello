@@ -25,8 +25,10 @@ import { getViewerEngagement } from "@/app/actions/engagement";
 interface ViewerEngagementState {
   isLiked: (outfitId: string) => boolean;
   isSaved: (outfitId: string) => boolean;
+  isFollowing: (userId: string) => boolean;
   markLiked: (outfitId: string, liked: boolean) => void;
   markSaved: (outfitId: string, saved: boolean) => void;
+  markFollowing: (userId: string, following: boolean) => void;
 }
 
 const ViewerEngagementContext = createContext<ViewerEngagementState | null>(
@@ -37,6 +39,7 @@ export function ViewerEngagementProvider({ children }: { children: ReactNode }) 
   const { isLoggedIn } = useAuth();
   const [liked, setLiked] = useState<Set<string>>(new Set());
   const [saved, setSaved] = useState<Set<string>>(new Set());
+  const [follows, setFollows] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Logged out → nothing to show, and clear any state left from a previous
@@ -44,15 +47,17 @@ export function ViewerEngagementProvider({ children }: { children: ReactNode }) 
     if (!isLoggedIn) {
       setLiked(new Set());
       setSaved(new Set());
+      setFollows(new Set());
       return;
     }
     let cancelled = false;
     (async () => {
       try {
-        const { liked: l, saved: s } = await getViewerEngagement();
+        const { liked: l, saved: s, follows: f } = await getViewerEngagement();
         if (cancelled) return;
         setLiked(new Set(l));
         setSaved(new Set(s));
+        setFollows(new Set(f));
       } catch {
         // Leave empty on failure — buttons just start un-toggled.
       }
@@ -80,14 +85,25 @@ export function ViewerEngagementProvider({ children }: { children: ReactNode }) 
     });
   }, []);
 
+  const markFollowing = useCallback((userId: string, value: boolean) => {
+    setFollows((prev) => {
+      const next = new Set(prev);
+      if (value) next.add(userId);
+      else next.delete(userId);
+      return next;
+    });
+  }, []);
+
   const value = useMemo<ViewerEngagementState>(
     () => ({
       isLiked: (id) => liked.has(id),
       isSaved: (id) => saved.has(id),
+      isFollowing: (id) => follows.has(id),
       markLiked,
       markSaved,
+      markFollowing,
     }),
-    [liked, saved, markLiked, markSaved],
+    [liked, saved, follows, markLiked, markSaved, markFollowing],
   );
 
   return (
@@ -104,8 +120,10 @@ export function useViewerEngagement(): ViewerEngagementState {
     return {
       isLiked: () => false,
       isSaved: () => false,
+      isFollowing: () => false,
       markLiked: () => {},
       markSaved: () => {},
+      markFollowing: () => {},
     };
   }
   return ctx;
