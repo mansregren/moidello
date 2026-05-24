@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isCurrentUserAdmin } from "@/lib/admin";
 import { invalidateAggregateCaches } from "@/lib/queries-cached";
+import { slugify, storageFilename } from "@/lib/slug";
 import type { Database, Json } from "@/lib/supabase/database.types";
 
 type OutfitUpdate = Database["public"]["Tables"]["outfits"]["Update"];
@@ -195,6 +196,65 @@ export async function addTaggedItem(
   revalidatePath(`/admin/inlagg/${outfitId}`);
   revalidatePath(`/outfit/${outfitId}`);
   return { ok: true, id: row.id as string };
+}
+
+/**
+ * Replace an outfit's main image with a re-cropped version (uploaded by the
+ * admin "fyll bilder"-tool, which crops away the legacy #F7F6F3 padding so
+ * the photo fills the frame). Uploads to a new path and keeps the old file so
+ * the change is recoverable. Admin-only.
+ */
+export async function recropOutfitImage(
+  outfitId: string,
+  formData: FormData,
+): Promise<{ ok: boolean; error?: string }> {
+  if (!UUID_RE.test(outfitId)) return { ok: false, error: "Ogiltigt id." };
+  if (!(await isCurrentUserAdmin())) {
+    return { ok: false, error: "Inte behörig." };
+  }
+  const image = formData.get("image");
+  if (!(image instanceof File) || image.size === 0) {
+    return { ok: false, error: "Ingen bild." };
+  }
+  if (image.size > 12 * 1024 * 1024) {
+    return { ok: false, error: "Bilden är för stor." };
+  }
+
+  const supabase = await createClient();
+  const { data: outfit } = await supabase
+    .from("outfits")
+    .select("user_id, slug, title")
+    .eq("id", outfitId)
+    .maybeSingle();
+  if (!outfit) return { ok: false, error: "Outfit saknas." };
+
+  const path = storageFilename({
+    userId: outfit.user_id as string,
+    slug: slugify((outfit.slug as string) || (outfit.title as string) || "outfit"),
+    ext: "jpg",
+    prefix: "fill",
+  });
+
+  const { error: upErr } = await supabase.storage
+    .from("outfits")
+    .upload(path, image, { contentType: "image/jpeg", upsert: false });
+  if (upErr) return { ok: false, error: upErr.message };
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("outfits").getPublicUrl(path);
+
+  const { error: updErr } = await supabase
+    .from("outfits")
+    .update({ image_url: publicUrl, image_path: path })
+    .eq("id", outfitId);
+  if (updErr) {
+    await supabase.storage.from("outfits").remove([path]);
+    return { ok: false, error: updErr.message };
+  }
+
+  revalidatePath(`/outfit/${outfitId}`);
+  return { ok: true };
 }
 
 export async function updateTaggedItem(
