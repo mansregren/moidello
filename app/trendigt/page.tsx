@@ -1,14 +1,14 @@
-import {
-  fetchTopOutfits,
-  fetchEngagementForViewer,
-} from "@/lib/queries";
+import { fetchTopOutfits } from "@/lib/queries";
 import {
   fetchTopCreatorsCached,
   fetchBrandsAggregatedCached,
 } from "@/lib/queries-cached";
 import TrendigtClient from "./TrendigtClient";
 
-export const dynamic = "force-dynamic";
+// ISR: rankings are the same for everyone; gender + liked/saved apply
+// client-side. Cache + background-refresh.
+export const dynamic = "force-static";
+export const revalidate = 600;
 
 export default async function TrendigtPage() {
   // Hämta brand-aggregeringar per kön så klienten kan växla utan reload
@@ -31,10 +31,6 @@ export default async function TrendigtPage() {
       newOutfits: b.outfitCount,
     }));
 
-  const { liked, saved } = await fetchEngagementForViewer(
-    topOutfits.map((o) => o.id),
-  );
-
   return (
     <TrendigtClient
       outfits={topOutfits}
@@ -42,8 +38,6 @@ export default async function TrendigtPage() {
       brandsAll={toUi(brandsAll)}
       brandsDam={toUi(brandsDam)}
       brandsHerr={toUi(brandsHerr)}
-      likedIds={Array.from(liked)}
-      savedIds={Array.from(saved)}
     />
   );
 }
