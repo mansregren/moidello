@@ -12,6 +12,7 @@ import {
   deleteTaggedItem,
 } from "@/app/actions/admin-content";
 import { garmentOptions, type Gender } from "@/lib/garments";
+import { HOME_CATEGORIES, homeItemTypeOptions } from "@/lib/home-data";
 import { ColorPicker } from "@/components/shared/ColorPicker";
 
 export interface OutfitForm {
@@ -21,6 +22,7 @@ export interface OutfitForm {
   keywords: string[];
   category: string;
   gender: "dam" | "herr";
+  vertical: "mode" | "hem";
   is_published: boolean;
   scheduled_for: string | null;
 }
@@ -66,6 +68,7 @@ const INPUT =
 export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
   const router = useRouter();
   const [form, setForm] = useState(outfit);
+  const isHome = form.vertical === "hem";
   const [pending, startTransition] = useTransition();
   const [deleting, startDeleting] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +84,8 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
         description: form.description || null,
         keywords: form.keywords,
         category: form.category || null,
-        gender: form.gender,
+        // Hem posts carry no gender — leave it untouched (null) by omitting it.
+        ...(isHome ? {} : { gender: form.gender }),
         is_published: form.is_published,
         scheduled_for: form.scheduled_for,
       });
@@ -194,32 +198,40 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Kategori">
+          <Field label={isHome ? "Rum" : "Kategori"}>
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
               className={INPUT}
             >
               <option value="">—</option>
-              {CATEGORIES.map((c) => (
+              {(isHome ? HOME_CATEGORIES : CATEGORIES).map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
               ))}
             </select>
           </Field>
-          <Field label="Kön">
-            <select
-              value={form.gender}
-              onChange={(e) =>
-                setForm({ ...form, gender: e.target.value as "dam" | "herr" })
-              }
-              className={INPUT}
-            >
-              <option value="dam">Dam</option>
-              <option value="herr">Herr</option>
-            </select>
-          </Field>
+          {isHome ? (
+            <Field label="Vertikal">
+              <div className={`${INPUT} flex items-center text-foreground-muted`}>
+                Heminredning
+              </div>
+            </Field>
+          ) : (
+            <Field label="Kön">
+              <select
+                value={form.gender}
+                onChange={(e) =>
+                  setForm({ ...form, gender: e.target.value as "dam" | "herr" })
+                }
+                className={INPUT}
+              >
+                <option value="dam">Dam</option>
+                <option value="herr">Herr</option>
+              </select>
+            </Field>
+          )}
         </div>
         <Field label="Status">
           <div className="flex flex-wrap gap-2">
@@ -312,13 +324,16 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
 export function TagsEditor({
   outfitId: _outfitId,
   gender,
+  vertical = "mode",
   tags: initialTags,
 }: {
   outfitId: string;
   gender: Gender;
+  vertical?: "mode" | "hem";
   tags: TagForm[];
 }) {
   const router = useRouter();
+  const isHome = vertical === "hem";
   const [tags, setTags] = useState(initialTags);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -479,7 +494,10 @@ export function TagsEditor({
                     onChange={(e) => patch(t.id, { garment: e.target.value })}
                     className={INPUT}
                   >
-                    {garmentOptions(gender, t.garment).map((g) => (
+                    {(isHome
+                      ? homeItemTypeOptions(t.garment)
+                      : garmentOptions(gender, t.garment)
+                    ).map((g) => (
                       <option key={g} value={g}>
                         {g}
                       </option>

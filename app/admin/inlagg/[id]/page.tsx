@@ -36,7 +36,7 @@ export default async function AdminOutfitDetailPage({
   const { data: outfit } = await supabase
     .from("outfits")
     .select(
-      "id, slug, user_id, title, description, keywords, category, gender, is_published, scheduled_for, image_url, image_path, created_at",
+      "id, slug, user_id, title, description, keywords, category, gender, vertical, is_published, scheduled_for, image_url, image_path, created_at",
     )
     .eq("id", id)
     .maybeSingle();
@@ -81,6 +81,10 @@ export default async function AdminOutfitDetailPage({
     keywords: (outfit.keywords as string[] | null) ?? [],
     category: (outfit.category as string | null) ?? "",
     gender: ((outfit.gender as string | null) ?? "dam") as "dam" | "herr",
+    vertical:
+      ((outfit.vertical as string | null) === "hem" ? "hem" : "mode") as
+        | "mode"
+        | "hem",
     is_published: !!outfit.is_published,
     scheduled_for: (outfit.scheduled_for as string | null) ?? null,
   };
@@ -225,10 +229,12 @@ export default async function AdminOutfitDetailPage({
           <PasteTagForm
             outfitId={outfit.id as string}
             gender={outfitForm.gender}
+            vertical={outfitForm.vertical}
           />
           <TagsEditor
             outfitId={outfit.id as string}
             gender={outfitForm.gender}
+            vertical={outfitForm.vertical}
             tags={tagsForm}
           />
         </div>

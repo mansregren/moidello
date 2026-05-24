@@ -16,6 +16,7 @@ import {
   garmentsForGender,
   type Gender,
 } from "@/lib/garments";
+import { HOME_ITEM_TYPES, homeItemTypeOptions } from "@/lib/home-data";
 
 interface PreviewResult {
   brand: string | null;
@@ -52,13 +53,18 @@ const INPUT =
 export function PasteTagForm({
   outfitId,
   gender,
+  vertical = "mode",
 }: {
   outfitId: string;
   gender: Gender;
+  vertical?: "mode" | "hem";
 }) {
   const router = useRouter();
+  const isHome = vertical === "hem";
   const [url, setUrl] = useState("");
-  const [garment, setGarment] = useState(garmentsForGender(gender)[0]);
+  const [garment, setGarment] = useState<string>(
+    isHome ? HOME_ITEM_TYPES[0] : garmentsForGender(gender)[0],
+  );
   const [draft, setDraft] = useState<Draft | null>(null);
   const [fetching, setFetching] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -255,7 +261,10 @@ export function PasteTagForm({
                   onChange={(e) => setGarment(e.target.value)}
                   className={INPUT}
                 >
-                  {garmentOptions(gender, garment).map((g) => (
+                  {(isHome
+                    ? homeItemTypeOptions(garment)
+                    : garmentOptions(gender, garment)
+                  ).map((g) => (
                     <option key={g} value={g}>
                       {g}
                     </option>
