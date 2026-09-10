@@ -61,6 +61,34 @@ const nextConfig: NextConfig = {
       // /welcome togs bort 2026-05-17 — hemsidan täcker samma syfte.
       // 308 (permanent) så Google flyttar ev. indexerad signal vidare.
       { source: "/welcome", destination: "/", permanent: true },
+
+      // Guide slugs went sv → en (site language switch). Keep the old
+      // indexed URLs alive with a permanent redirect to the new slug.
+      {
+        source: "/guider/skandinavisk-minimalism",
+        destination: "/guider/scandinavian-minimalism",
+        permanent: true,
+      },
+      {
+        source: "/guider/bygg-en-grundgarderob",
+        destination: "/guider/build-a-core-wardrobe",
+        permanent: true,
+      },
+      {
+        source: "/guider/smart-casual-jobb",
+        destination: "/guider/smart-casual-for-work",
+        permanent: true,
+      },
+      {
+        source: "/guider/hostgarderob-sverige",
+        destination: "/guider/nordic-autumn-wardrobe",
+        permanent: true,
+      },
+      {
+        source: "/guider/stylar-baggy-jeans",
+        destination: "/guider/how-to-style-baggy-jeans",
+        permanent: true,
+      },
     ];
   },
 };
