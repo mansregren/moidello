@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Search, Bookmark, ShoppingBag, Plus, ArrowRight } from "lucide-react";
+import { Search, Bookmark, ShoppingBag, Plus, Users, ArrowRight } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { pickBgs, HERO_POOL } from "@/lib/session-background";
@@ -34,44 +34,43 @@ export default async function OmPage() {
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/40 to-black/65" />
             <Container className="relative z-10 h-full flex flex-col justify-end pb-12 md:pb-20">
               <p className="text-xs uppercase tracking-[0.3em] text-white/70">
-                Om oss
+                About us
               </p>
               <h1 className="mt-4 font-heading text-[48px] md:text-[112px] leading-[0.9] uppercase tracking-[-0.02em] text-white">
-                Om Moidello
+                About Moidello
               </h1>
               <p className="mt-5 max-w-xl text-base md:text-lg text-white/80 leading-relaxed">
-                En plattform för att upptäcka, dela och inspireras av
-                outfits — där stil är enkelt att hitta och ännu enklare
-                att köpa.
+                A platform for discovering, sharing and being inspired by
+                outfits — where style is easy to find and even easier to buy.
               </p>
             </Container>
           </div>
         </section>
 
-        {/* Varför vi finns */}
+        {/* Why we exist */}
         <Container className="max-w-3xl py-20 md:py-28">
           <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-5">
-            Varför vi finns
+            Why we exist
           </p>
           <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-foreground mb-8">
-            Stil ska gå att hitta
+            Style should be findable
           </h2>
           <div className="space-y-6 text-base md:text-lg text-foreground-muted leading-relaxed">
             <p>
-              Du ser en outfit du älskar på Instagram. Cardiganen är perfekt.
-              Men vad är det för märke? Var köper du den? Du scrollar vidare.
-              Outfiten försvinner.
+              You see an outfit you love on Instagram. The cardigan is perfect.
+              But what brand is it? Where do you buy it? You keep scrolling.
+              The outfit is gone.
             </p>
-            <p>Det här ville vi ändra på.</p>
+            <p>That's what we wanted to change.</p>
             <p>
-              På Moidello taggar varje kreatör sina plagg och länkar dit du
-              kan köpa dem. Inga gissningar. Ingen scroll-frustration. Bara
-              stil — och vägen dit.
+              On Moidello every piece is tagged and linked to where you can buy
+              it. No guessing. No scroll frustration. Just style — and the way
+              to it.
             </p>
           </div>
         </Container>
 
-        {/* Hur det funkar */}
+        {/* How it works */}
         <section className="relative">
           <div className="absolute inset-0">
             <Image
@@ -85,50 +84,51 @@ export default async function OmPage() {
           </div>
           <Container className="relative z-10 py-20 md:py-28">
             <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-5">
-              Så funkar det
+              How it works
             </p>
             <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-foreground mb-12 max-w-2xl">
-              Fyra steg, ingen gissningslek
+              Four steps, no guesswork
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               <Step
                 icon={Search}
-                title="Upptäck"
-                body="Bläddra bland outfits från svenska kreatörer. Filtrera på stil, kategori eller säsong."
+                title="Discover"
+                body="Browse outfits and filter by style, category or season."
               />
               <Step
                 icon={Bookmark}
-                title="Spara"
-                body="Bokmärk hela outfits eller enskilda plagg. Bygg ditt eget bibliotek av inspiration."
+                title="Save"
+                body="Bookmark whole outfits or single pieces. Build your own library of inspiration."
               />
               <Step
                 icon={ShoppingBag}
-                title="Köp"
-                body="Klicka dig direkt vidare till butiken. Vi länkar — du handlar där du vill."
+                title="Buy"
+                body="Click straight through to the store. We link — you shop where you want."
               />
               <Step
-                icon={Plus}
-                title="Skapa"
-                body="Ladda upp dina egna outfits, tagga plaggen, och inspirera andra. Det är gratis."
+                icon={Users}
+                title="Follow"
+                body="Follow the profiles whose style matches yours and get their new outfits in your feed."
               />
             </div>
           </Container>
         </section>
 
-        {/* För kreatörer */}
+        {/* For creators */}
         {OUTFIT_CREATE_PUBLIC && (
           <Container className="max-w-3xl py-20 md:py-28">
             <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-5">
-              För kreatörer
+              For creators
             </p>
             <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-foreground mb-8">
-              En kanal utan algoritm
+              A channel without an algorithm
             </h2>
             <div className="space-y-6 text-base md:text-lg text-foreground-muted leading-relaxed">
               <p>
-                Är du contentskapare inom mode? Moidello är en ny kanal att nå
-                följare på — utan algoritmer som bestämmer vem som ser vad.
-                Tagga dina plagg, bygg din profil och få fler ögon på din stil.
+                Are you a fashion content creator? Moidello is a new channel to
+                reach followers — without an algorithm deciding who sees what.
+                Tag your pieces, build your profile and get more eyes on your
+                style.
               </p>
             </div>
             <div className="mt-10">
@@ -137,7 +137,7 @@ export default async function OmPage() {
                 className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-3 text-sm font-medium hover:bg-foreground/90 transition-transform active:scale-[0.98]"
               >
                 <Plus className="h-4 w-4" />
-                Skapa din första outfit
+                Create your first outfit
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -161,15 +161,15 @@ export default async function OmPage() {
               Made in Stockholm
             </p>
             <h2 className="font-heading text-[32px] md:text-[44px] leading-[0.95] uppercase tracking-tight text-foreground mb-6">
-              Litet team, korta beslutsvägar
+              Small team, short decisions
             </h2>
             <p className="text-base text-foreground-muted leading-relaxed">
-              Moidello byggs från Sverige med kärlek till mode, design och
-              enkla verktyg som faktiskt fungerar. Vi är ett litet team som
-              rör oss snabbt och lyssnar gärna på vad du tycker.
+              Moidello is built in Sweden with a love of fashion, design and
+              simple tools that actually work. We're a small team that moves
+              fast and is glad to hear what you think.
             </p>
             <p className="mt-6 text-sm text-foreground-muted">
-              Har du idéer, feedback eller vill samarbeta?
+              Have ideas, feedback or want to partner with us?
             </p>
             <a
               href="mailto:hello@moidello.com"

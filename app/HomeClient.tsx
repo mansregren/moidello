@@ -17,13 +17,13 @@ import { getFollowingFeed } from "@/app/actions/engagement";
 import type { Outfit, User } from "@/lib/types";
 
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
-  Streetwear: "Edge möter komfort",
-  Minimalism: "Mindre är mer",
-  Vintage: "Tidlöst & unikt",
-  Casual: "Avslappnat & lätt",
-  Formal: "Tailored & polerat",
-  Sporty: "Aktiv vardag",
-  Preppy: "Klassisk & ren",
+  Streetwear: "Edge meets comfort",
+  Minimalism: "Less is more",
+  Vintage: "Timeless & one-of-a-kind",
+  Casual: "Relaxed & easy",
+  Formal: "Tailored & polished",
+  Sporty: "Active everyday",
+  Preppy: "Classic & clean",
 };
 
 // Static cover per category — used when no real outfits exist for that
@@ -128,12 +128,12 @@ export default function HomeClient({
                 transition={{ duration: 0.5 }}
               >
                 <p className="text-xs uppercase tracking-[0.2em] text-white/80">
-                  Inspiration för din stil
+                  Inspiration for your style
                 </p>
                 <h1 className="mt-3 font-heading text-[44px] md:text-[88px] leading-[0.92] uppercase tracking-[-0.02em] text-white max-w-3xl">
-                  Hitta din nästa
+                  Find your next
                   <br />
-                  <span className="text-white/60">favorit</span>
+                  <span className="text-white/60">favourite</span>
                 </h1>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link
@@ -141,14 +141,14 @@ export default function HomeClient({
                     className="inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
                   >
                     <Search className="h-4 w-4" />
-                    Utforska
+                    Explore
                   </Link>
                   <Link
                     href="/trendigt"
                     className="inline-flex items-center gap-2 rounded-full border border-white/30 text-white px-5 py-2.5 text-sm font-medium transition-colors hover:bg-white/10"
                   >
                     <Sparkles className="h-4 w-4" />
-                    Trendigt nu
+                    Trending now
                   </Link>
                 </div>
               </motion.div>
@@ -159,18 +159,18 @@ export default function HomeClient({
         <Container className="space-y-14 pt-10 md:pt-14">
           {followingVisible.length > 0 && (
             <Section
-              title="Från dina följda"
+              title="From people you follow"
               href="/foljer"
-              seeAllLabel="Hela flödet"
+              seeAllLabel="Full feed"
             >
               <OutfitGrid outfits={followingVisible} columns={3} />
             </Section>
           )}
 
           <Section
-            title="Bläddra kategorier"
+            title="Browse categories"
             href="/upptack"
-            seeAllLabel="Alla kategorier"
+            seeAllLabel="All categories"
           >
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               {categories.map((cat, i) => (
@@ -209,7 +209,7 @@ export default function HomeClient({
             </div>
           </Section>
 
-          <Section title="Senast på Moidello" href="/upptack">
+          <Section title="Latest on Moidello" href="/upptack">
             {recent.length > 0 ? (
               <OutfitGrid
                 outfits={recent}
@@ -219,8 +219,8 @@ export default function HomeClient({
               <div className="rounded-2xl border border-border bg-background-secondary p-10 text-center">
                 <p className="text-foreground-muted">
                   {showCreate
-                    ? "Inga outfits ännu — bli först att lägga upp en."
-                    : "Inga outfits ännu — kika in snart igen."}
+                    ? "No outfits yet — be the first to post one."
+                    : "No outfits yet — check back soon."}
                 </p>
                 {showCreate && (
                   <Link
@@ -228,7 +228,7 @@ export default function HomeClient({
                     className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors"
                   >
                     <Plus className="h-4 w-4" />
-                    Skapa outfit
+                    Create outfit
                   </Link>
                 )}
               </div>
@@ -257,15 +257,14 @@ export default function HomeClient({
                   <span className="text-white/60">life you want</span>
                 </p>
                 <p className="mt-4 text-sm md:text-base text-white/70 max-w-md mx-auto">
-                  Tagga varje plagg, länka var du köper. Inspirera och
-                  inspireras.
+                  Tag every piece, link where you buy. Inspire and be inspired.
                 </p>
               </div>
             </div>
           </motion.section>
 
           {creators.length > 0 && (
-            <Section title="Nya kreatörer" href="/trendigt">
+            <Section title="Profiles to follow" href="/trendigt">
               <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
                 {creators.map((u, i) => (
                   <motion.div
@@ -306,12 +305,12 @@ export default function HomeClient({
           >
             <div className="max-w-lg">
               <h2 className="font-heading text-3xl md:text-5xl uppercase tracking-tight text-foreground leading-[0.95]">
-                Bygg ditt eget bibliotek
+                Build your own library
               </h2>
               <p className="mt-3 text-foreground-muted text-sm md:text-base">
                 {showCreate
-                  ? "Spara outfits, följ kreatörer och skapa dina egna. Det är gratis."
-                  : "Spara outfits och följ kreatörer. Det är gratis."}
+                  ? "Save outfits, follow others and publish your own. It's free."
+                  : "Save outfits and follow others. It's free."}
               </p>
             </div>
             <div className="flex gap-3 shrink-0">
@@ -321,14 +320,14 @@ export default function HomeClient({
                   className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
                 >
                   <Plus className="h-4 w-4" />
-                  Skapa outfit
+                  Create outfit
                 </Link>
               )}
               <Link
                 href="/om"
                 className="inline-flex items-center rounded-full border border-border text-foreground px-5 py-2.5 text-sm font-medium hover:border-foreground/30 transition-colors"
               >
-                Lär dig mer
+                Learn more
               </Link>
             </div>
           </motion.section>
@@ -343,7 +342,7 @@ export default function HomeClient({
 function Section({
   title,
   href,
-  seeAllLabel = "Se alla",
+  seeAllLabel = "See all",
   children,
 }: {
   title: string;
