@@ -9,6 +9,7 @@ import { collectionPageJsonLd } from "@/lib/json-ld";
 import { garmentsForGender } from "@/lib/garments";
 import { fetchOutfitsByGarment } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
+import { DAM_PUBLIC } from "@/lib/flags";
 
 // ISR: content is fully determined by the URL (gender + garment); liked/saved
 // hydrate client-side. Cache + background-refresh, public client → no cookies.
@@ -41,6 +42,9 @@ export default async function TypPage({
   const { gender: g, garment: gs } = await params;
   const gender = resolveGender(g);
   if (!gender) notFound();
+  // Dam is admin-only while DAM_PUBLIC is off — this route is static/public
+  // so it just 404s for everyone; admins browse Dam via the /upptack toggle.
+  if (gender === "dam" && !DAM_PUBLIC) notFound();
   const garment = slugToGarment(gs, gender);
   if (!garment) notFound();
 

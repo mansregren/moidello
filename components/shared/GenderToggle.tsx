@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useGender } from "@/lib/gender-context";
 import { useAuth } from "@/lib/auth-context";
 import { useToast, haptic } from "@/lib/toast-context";
-import { HOME_VERTICAL_PUBLIC } from "@/lib/flags";
+import { HOME_VERTICAL_PUBLIC, damVisible } from "@/lib/flags";
 import { GenderFilter } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +39,9 @@ export function GenderToggle({
   const isHome = pathname?.startsWith(HOME_PATH) ?? false;
   // While the vertical is unlaunched, only admins see the Hem entry.
   const showHome = HOME_VERTICAL_PUBLIC || !!profile?.isAdmin;
+  // While DAM_PUBLIC is off, non-admins don't get a Dam/Herr choice at all —
+  // the site is Herr-only for them.
+  const showGenderPills = damVisible(!!profile?.isAdmin);
 
   const handleGender = (opt: (typeof GENDER_OPTIONS)[number]) => {
     const alreadyActive = !isHome && opt.id === gender;
@@ -67,6 +70,9 @@ export function GenderToggle({
       : "px-2 py-1.5 text-center text-[11px]",
   );
 
+  // Nothing to show: no gender choice and no Hem entry.
+  if (!showGenderPills && !showHome) return null;
+
   return (
     <div
       role="radiogroup"
@@ -79,7 +85,8 @@ export function GenderToggle({
         className,
       )}
     >
-      {GENDER_OPTIONS.map((opt) => {
+      {showGenderPills &&
+        GENDER_OPTIONS.map((opt) => {
         const active = !isHome && gender === opt.id;
         return (
           <button

@@ -36,15 +36,27 @@ const GenderContext = createContext<GenderState | null>(null);
 export function GenderProvider({
   children,
   initial,
+  lockedToHerr = false,
 }: {
   children: ReactNode;
   initial?: GenderFilter;
+  /**
+   * While DAM_PUBLIC is off and the viewer isn't an admin, the gender
+   * filter is pinned to "herr": stored "dam" preferences are ignored and
+   * setGender is a no-op. Seeded server-side so SSR and first paint agree.
+   */
+  lockedToHerr?: boolean;
 }) {
   const [gender, setGenderState] = useState<GenderFilter>(
-    isValidFilter(initial) ? initial : DEFAULT_FILTER,
+    lockedToHerr
+      ? "herr"
+      : isValidFilter(initial)
+        ? initial
+        : DEFAULT_FILTER,
   );
 
   useEffect(() => {
+    if (lockedToHerr) return;
     let cancelled = false;
 
     // Reconcile with localStorage on mount. If a Herr user visited before
@@ -71,20 +83,26 @@ export function GenderProvider({
       cancelled = true;
       window.removeEventListener("storage", onStorage);
     };
-  }, []);
+  }, [lockedToHerr]);
 
-  const setGender = useCallback((g: GenderFilter) => {
-    setGenderState(g);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, g);
-    } catch {
-      // ignore
-    }
-    writeCookie(g);
-  }, []);
+  const setGender = useCallback(
+    (g: GenderFilter) => {
+      if (lockedToHerr) return;
+      setGenderState(g);
+      try {
+        window.localStorage.setItem(STORAGE_KEY, g);
+      } catch {
+        // ignore
+      }
+      writeCookie(g);
+    },
+    [lockedToHerr],
+  );
 
   return (
-    <GenderContext.Provider value={{ gender, setGender }}>
+    <GenderContext.Provider
+      value={{ gender: lockedToHerr ? "herr" : gender, setGender }}
+    >
       {children}
     </GenderContext.Provider>
   );

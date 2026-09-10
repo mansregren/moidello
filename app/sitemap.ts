@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createPublicClient } from "@/lib/supabase/public";
 import { GUIDES } from "@/lib/guides";
-import { HOME_VERTICAL_PUBLIC } from "@/lib/flags";
+import { HOME_VERTICAL_PUBLIC, DAM_PUBLIC } from "@/lib/flags";
 import { HOME_ROOMS } from "@/lib/home-data";
 
 const BASE_URL = "https://moidello.com";
@@ -196,6 +196,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const typeRoutes: MetadataRoute.Sitemap = Array.from(garmentCounts.entries())
     .filter(([, count]) => count >= 2)
+    // Dam type-landing pages 404 while DAM_PUBLIC is off — keep them out.
+    .filter(([key]) => DAM_PUBLIC || !key.startsWith("dam|"))
     .map(([key]) => {
       const [gender, garment] = key.split("|");
       return {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { fetchOutfitsByGarment } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { garmentsForGender } from "@/lib/garments";
+import { DAM_PUBLIC } from "@/lib/flags";
 
 const SITE = "Moidello";
 
@@ -32,6 +33,9 @@ export async function generateMetadata({
   const gender = resolveGender(g);
   if (!gender) {
     return { title: "Kategori", robots: { index: false, follow: true } };
+  }
+  if (gender === "dam" && !DAM_PUBLIC) {
+    return { title: "Kategori", robots: { index: false, follow: false } };
   }
   const garment = slugToGarment(gs, gender);
   if (!garment) {

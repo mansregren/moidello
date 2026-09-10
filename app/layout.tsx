@@ -12,6 +12,7 @@ import { CookieBanner } from "@/components/layout/CookieBanner";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { pickBg } from "@/lib/session-background";
 import { getViewerGender } from "@/lib/gender-server";
+import { damVisible } from "@/lib/flags";
 import { siteJsonLd } from "@/lib/json-ld";
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
@@ -122,7 +123,9 @@ export default async function RootLayout({
   }
 
   const footerBg = await pickBg("footer");
-  const initialGender = await getViewerGender();
+  const isAdmin = !!initialProfile?.isAdmin;
+  const initialGender = await getViewerGender(isAdmin);
+  const genderLockedToHerr = !damVisible(isAdmin);
 
   return (
     <html
@@ -139,7 +142,10 @@ export default async function RootLayout({
         <ImpersonationBanner />
         <AuthProvider initialUser={user} initialProfile={initialProfile}>
           <ToastProvider>
-            <GenderProvider initial={initialGender}>
+            <GenderProvider
+              initial={initialGender}
+              lockedToHerr={genderLockedToHerr}
+            >
               <ViewerEngagementProvider>
                 <AppShell footerBg={footerBg}>{children}</AppShell>
               </ViewerEngagementProvider>
