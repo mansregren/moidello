@@ -14,9 +14,9 @@ import HomeVerticalClient from "./HomeVerticalClient";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Heminredning – inred med stil | Moidello",
+  title: "Home interiors – decorate with style | Moidello",
   description:
-    "Inred hemmet med stil. Upptäck vardagsrum, sovrum och kök – tagga varje möbel och hitta var du köper den.",
+    "Decorate your home with style. Discover living rooms, bedrooms and kitchens – tag every piece of furniture and find where to buy it.",
   alternates: { canonical: "/home" },
   // Unlaunched → keep it out of the index even if someone links to it.
   robots: HOME_VERTICAL_PUBLIC ? undefined : { index: false, follow: false },
@@ -41,9 +41,9 @@ export default async function HomeVerticalPage() {
       <JsonLd
         data={collectionPageJsonLd({
           path: "/home",
-          name: "Moidello Home – heminredning",
+          name: "Moidello Home – interiors",
           description:
-            "Inred hemmet med stil. Upptäck rum, tagga varje möbel och hitta var du köper den.",
+            "Decorate your home with style. Discover rooms, tag every piece of furniture and find where to buy it.",
           outfits: posts,
         })}
       />

@@ -49,7 +49,7 @@ export default async function HomeRoomPage({
       <main id="main" tabIndex={-1} className="flex-1 pt-6 md:pt-10">
         <Container>
           <nav
-            aria-label="Brödsmulor"
+            aria-label="Breadcrumbs"
             className="text-xs text-foreground-subtle mb-6"
           >
             <ol className="flex items-center gap-2">
@@ -79,7 +79,7 @@ export default async function HomeRoomPage({
 
           <div className="mb-12 max-w-2xl">
             <p className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-3">
-              Rum
+              Room
             </p>
             <h1 className="font-heading text-[44px] md:text-[72px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
               {room.label}
@@ -89,7 +89,7 @@ export default async function HomeRoomPage({
             </p>
             {posts.length > 0 && (
               <p className="mt-3 text-sm text-foreground-subtle">
-                {posts.length} rum från svenska kreatörer.
+                {posts.length} rooms on Moidello.
               </p>
             )}
           </div>
@@ -104,21 +104,21 @@ export default async function HomeRoomPage({
           ) : (
             <div className="rounded-2xl border border-border bg-background-secondary p-10 text-center">
               <p className="text-foreground-muted">
-                Inga {room.label.toLowerCase()} ännu — bli först att inreda.
+                No {room.label.toLowerCase()} rooms yet — check back soon.
               </p>
               <Link
                 href="/skapa?vertical=hem"
                 className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors"
               >
                 <Plus className="h-4 w-4" />
-                Lägg upp ett rum
+                Post a room
               </Link>
             </div>
           )}
 
           <section className="mt-20 mb-16 border-t border-border pt-10">
             <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-5">
-              Fler rum
+              More rooms
             </h2>
             <ul className="flex flex-wrap gap-2">
               {HOME_ROOMS.filter((r) => r.slug !== room.slug).map((r) => (

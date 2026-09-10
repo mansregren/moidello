@@ -143,14 +143,14 @@ export async function POST(request: Request) {
 
   switch (payload.kind) {
     case "like":
-      title = `${actorName} gillade din outfit`;
-      body = outfitTitle ?? "Klicka för att se";
+      title = `${actorName} liked your outfit`;
+      body = outfitTitle ?? "Tap to view";
       url = outfitUrl ?? "/";
       tag = `like:${payload.outfit_id}`;
       break;
     case "follow":
-      title = `${actorName} följer dig nu`;
-      body = "Tryck för att se profilen";
+      title = `${actorName} is now following you`;
+      body = "Tap to view the profile";
       url = actorUsername ? `/profile/${actorUsername}` : "/";
       tag = `follow:${payload.actor_id}`;
       break;
@@ -164,15 +164,15 @@ export async function POST(request: Request) {
           .maybeSingle();
         snippet = (comment?.body as string | undefined) ?? "";
       }
-      title = `${actorName} kommenterade`;
-      body = snippet ? snippet.slice(0, 120) : (outfitTitle ?? "Ny kommentar");
+      title = `${actorName} commented`;
+      body = snippet ? snippet.slice(0, 120) : (outfitTitle ?? "New comment");
       url = outfitUrl ?? "/";
       tag = `comment:${payload.comment_id ?? payload.outfit_id}`;
       break;
     }
     case "message":
-      title = `${actorName} skickade ett meddelande`;
-      body = "Tryck för att läsa";
+      title = `${actorName} sent you a message`;
+      body = "Tap to read";
       url = "/meddelanden";
       tag = `message:${payload.actor_id}`;
       break;

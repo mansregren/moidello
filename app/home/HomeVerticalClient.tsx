@@ -55,16 +55,16 @@ export default function HomeVerticalClient({
                 transition={{ duration: 0.5 }}
               >
                 <p className="text-xs uppercase tracking-[0.2em] text-white/80">
-                  Heminredning
+                  Home interiors
                 </p>
                 <h1 className="mt-3 font-heading text-[40px] md:text-[80px] leading-[0.92] uppercase tracking-[-0.02em] text-white max-w-3xl">
-                  Inred för
+                  Decorate for
                   <br />
-                  <span className="text-white/60">livet hemma</span>
+                  <span className="text-white/60">life at home</span>
                 </h1>
                 <p className="mt-4 max-w-md text-sm md:text-base text-white/75">
-                  Rum att inspireras av. Tagga varje möbel och hitta var du
-                  köper den.
+                  Rooms to take inspiration from. Tag every piece of furniture
+                  and find where to buy it.
                 </p>
               </motion.div>
             </Container>
@@ -74,7 +74,7 @@ export default function HomeVerticalClient({
         <Container className="space-y-14 pt-10 md:pt-14">
           <section>
             <h2 className="font-heading text-[28px] md:text-[40px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-5">
-              Bläddra rum
+              Browse rooms
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
               {HOME_ROOMS.map((room, i) => {
@@ -148,14 +148,14 @@ export default function HomeVerticalClient({
             ) : (
               <div className="rounded-2xl border border-border bg-background-secondary p-10 text-center">
                 <p className="text-foreground-muted">
-                  Inga rum ännu — bli först att inreda.
+                  No rooms yet — check back soon.
                 </p>
                 <Link
                   href="/skapa?vertical=hem"
                   className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
-                  Lägg upp ett rum
+                  Post a room
                 </Link>
               </div>
             )}
@@ -170,11 +170,11 @@ export default function HomeVerticalClient({
           >
             <div className="max-w-lg">
               <h2 className="font-heading text-3xl md:text-5xl uppercase tracking-tight text-foreground leading-[0.95]">
-                Visa upp ditt hem
+                Show off your home
               </h2>
               <p className="mt-3 text-foreground-muted text-sm md:text-base">
-                Dela ett rum, tagga möblerna och länka var man köper dem. Det
-                är gratis.
+                Share a room, tag the furniture and link where to buy it. It’s
+                free.
               </p>
             </div>
             <div className="shrink-0">
@@ -183,7 +183,7 @@ export default function HomeVerticalClient({
                 className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
               >
                 <Plus className="h-4 w-4" />
-                Lägg upp ett rum
+                Post a room
               </Link>
             </div>
           </motion.section>
