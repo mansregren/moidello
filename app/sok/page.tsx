@@ -47,7 +47,7 @@ export async function generateMetadata({
   searchParams: Promise<{ q?: string }>;
 }): Promise<Metadata> {
   const { q } = await searchParams;
-  const title = q ? `Sök: ${q}` : "Sök";
+  const title = q ? `Search: ${q}` : "Search";
   return {
     title,
     robots: { index: false, follow: true },
@@ -68,16 +68,16 @@ export default async function SokPage({
       <main id="main" tabIndex={-1} className="flex-1 pt-20 md:pt-24 pb-16">
         <Container>
           <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-3">
-            Sökresultat
+            Search results
           </p>
           <h1 className="font-heading text-4xl md:text-6xl uppercase tracking-tight leading-none">
-            {q ? `"${q}"` : "Sök på Moidello"}
+            {q ? `"${q}"` : "Search Moidello"}
           </h1>
 
           {!q ? (
             <p className="mt-8 text-foreground-muted">
-              Sök efter kreatörer, märken eller outfits via förstoringsglaset
-              i toppmenyn.
+              Search for profiles, brands or outfits from the magnifying glass
+              in the top menu.
             </p>
           ) : (
             <SearchResults q={q} />
@@ -154,11 +154,11 @@ async function SearchResults({ q }: { q: string }) {
     return (
       <div className="mt-16 text-center text-foreground-muted">
         <Search className="h-8 w-8 mx-auto mb-4 text-foreground-subtle" />
-        <p>Inga träffar för &quot;{q}&quot;.</p>
+        <p>No results for &quot;{q}&quot;.</p>
         <p className="text-sm text-foreground-subtle mt-2">
-          Försök med ett annat ord, eller bläddra på{" "}
+          Try another word, or browse{" "}
           <Link href="/upptack" className="underline text-foreground">
-            Upptäck
+            Discover
           </Link>
           .
         </p>
@@ -171,7 +171,7 @@ async function SearchResults({ q }: { q: string }) {
       {profiles.length > 0 && (
         <section>
           <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground mb-5">
-            Kreatörer & märken
+            Profiles & brands
           </h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {profiles.map((p) => (
@@ -190,7 +190,7 @@ async function SearchResults({ q }: { q: string }) {
                       {p.display_name ?? p.brand_name ?? p.username}
                     </p>
                     <p className="text-xs text-foreground-subtle truncate">
-                      {p.account_type === "brand" ? "Märke" : "Kreatör"} ·
+                      {p.account_type === "brand" ? "Brand" : "Profile"} ·
                       @{p.username}
                     </p>
                   </div>
@@ -204,7 +204,7 @@ async function SearchResults({ q }: { q: string }) {
       {brands.length > 0 && (
         <section>
           <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground mb-5">
-            Märken i taggade plagg
+            Brands in tagged pieces
           </h2>
           <div className="flex flex-wrap gap-2">
             {brands.map((b) => (

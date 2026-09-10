@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Brands",
   description:
-    "Utforska brands från lyxhus till lokala designers — alla som inspirerar Moidello-communityn.",
+    "Explore brands from luxury houses to local designers — everyone who inspires the Moidello community.",
   alternates: { canonical: "/brands" },
 };
 

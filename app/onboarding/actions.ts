@@ -21,7 +21,7 @@ export async function completeOnboarding(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Du måste logga in först." };
+  if (!user) return { error: "You must log in first." };
 
   const username = ((formData.get("username") as string | null) ?? "")
     .trim()
@@ -41,7 +41,7 @@ export async function completeOnboarding(
     return {
       fieldErrors: {
         username:
-          "3–24 tecken: små bokstäver, siffror, understreck. Inga mellanslag.",
+          "3–24 characters: lowercase letters, digits, underscores. No spaces.",
       },
     };
   }
@@ -49,7 +49,7 @@ export async function completeOnboarding(
   if (isReservedUsername(username)) {
     return {
       fieldErrors: {
-        username: "Det användarnamnet är reserverat — välj ett annat.",
+        username: "That username is reserved — pick another one.",
       },
     };
   }
@@ -62,7 +62,7 @@ export async function completeOnboarding(
     .maybeSingle();
 
   if (existing) {
-    return { fieldErrors: { username: "Användarnamnet är upptaget." } };
+    return { fieldErrors: { username: "That username is taken." } };
   }
 
   // Read existing profile state so we can tell if this is the first

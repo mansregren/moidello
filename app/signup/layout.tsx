@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Skapa konto",
-  description: "Skapa ett gratis Moidello-konto och börja dela dina outfits.",
+  title: "Sign up",
+  description: "Create a free Moidello account and start sharing your outfits.",
   alternates: { canonical: "/signup" },
   robots: { index: false, follow: true },
 };

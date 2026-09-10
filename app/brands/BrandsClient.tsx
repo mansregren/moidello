@@ -56,10 +56,10 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
               transition={{ duration: 0.5 }}
             >
               <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
-                Märken
+                Brands
               </h1>
               <p className="mt-2 text-white/70">
-                Utforska alla märken på Moidello
+                Explore every brand on Moidello
               </p>
             </motion.div>
           </Container>
@@ -70,7 +70,7 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-subtle" />
             <input
               type="text"
-              placeholder="Sök märken..."
+              placeholder="Search brands..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full rounded-full bg-background-tertiary border border-border pl-11 pr-6 py-3 text-sm text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
@@ -153,8 +153,8 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
           {filtered.length === 0 && (
             <EmptyState
               icon={Search}
-              title="Inga märken hittades"
-              description="Prova en annan sökterm eller bläddra bland alla märken."
+              title="No brands found"
+              description="Try a different search or browse all brands."
             />
           )}
         </Container>

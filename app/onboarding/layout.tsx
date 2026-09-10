@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Kom igång",
-  description: "Tre steg till ditt Moidello-flöde.",
+  title: "Get started",
+  description: "Three steps to your Moidello feed.",
   robots: { index: false, follow: false },
 };
 

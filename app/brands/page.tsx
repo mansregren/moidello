@@ -13,7 +13,7 @@ export default async function BrandsPage() {
     slug: a.slug,
     name: a.name,
     description: a.isClaimed
-      ? "Verifierat märke"
+      ? "Verified brand"
       : `${a.outfitCount} ${a.outfitCount === 1 ? "outfit" : "outfits"} taggade`,
     tier: "contemporary",
     outfitCount: a.outfitCount,

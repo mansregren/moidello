@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Logga in",
-  description: "Logga in på ditt Moidello-konto.",
+  title: "Log in",
+  description: "Log in to your Moidello account.",
   alternates: { canonical: "/login" },
   robots: { index: false, follow: true },
 };

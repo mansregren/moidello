@@ -17,7 +17,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
   const [pending, setPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>(
     initialError
-      ? "Inloggningslänken kunde inte verifieras. Skriv 6-siffrig kod nedan istället."
+      ? "The login link could not be verified. Enter the 6-digit code below instead."
       : "",
   );
 
@@ -78,7 +78,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
 
     if (error || !data.session) {
       setPending(false);
-      setErrorMessage(error?.message ?? "Koden är ogiltig eller har gått ut.");
+      setErrorMessage(error?.message ?? "The code is invalid or has expired.");
       return;
     }
 
@@ -102,7 +102,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
       setPending(false);
       setErrorMessage(
         error.message.includes("Provider not enabled")
-          ? "Google-inlogg är inte aktiverat ännu."
+          ? "Google sign-in isn’t enabled yet."
           : error.message,
       );
     }
@@ -124,7 +124,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
 
     if (error || !data.session) {
       setPending(false);
-      setErrorMessage(error?.message ?? "Fel e-post eller lösenord.");
+      setErrorMessage(error?.message ?? "Wrong email or password.");
       return;
     }
 
@@ -141,14 +141,14 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
       <div className="glass-strong rounded-3xl p-8 md:p-10">
         <div className="text-center mb-8">
           <h1 className="font-heading text-[36px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
-            {phase === "code" ? "Kolla din inkorg" : "Logga in"}
+            {phase === "code" ? "Check your inbox" : "Log in"}
           </h1>
           <p className="text-foreground-muted mt-2 text-sm">
             {phase === "code"
-              ? `Vi har mailat dig en länk + 6-siffrig kod${email ? ` till ${email}` : ""}.`
+              ? `We’ve emailed you a link + 6-digit code${email ? ` to ${email}` : ""}.`
               : phase === "password"
-                ? "Skriv din e-post och lösenord."
-                : "Skriv din e-post — vi skickar en magisk länk."}
+                ? "Enter your email and password."
+                : "Enter your email — we’ll send a magic link."}
           </p>
         </div>
 
@@ -161,7 +161,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
               className="w-full inline-flex items-center justify-center gap-3 rounded-full bg-foreground text-background px-5 py-3 text-sm font-medium hover:bg-foreground/90 transition-colors active:scale-[0.98] disabled:opacity-60"
             >
               <GoogleIcon className="h-4 w-4" />
-              Fortsätt med Google
+              Continue with Google
             </button>
 
             <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-wider text-foreground-subtle">
@@ -179,7 +179,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 htmlFor="email"
                 className="text-sm font-medium text-foreground-muted block mb-2"
               >
-                E-post
+                Email
               </label>
               <input
                 id="email"
@@ -188,7 +188,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="din@email.se"
+                placeholder="you@email.com"
                 className="w-full rounded-xl bg-foreground/5 border border-foreground/10 px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
               />
             </div>
@@ -203,7 +203,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
               size="lg"
               disabled={pending || !email}
             >
-              {pending ? "Skickar…" : "Skicka inloggningslänk"}
+              {pending ? "Sending…" : "Send login link"}
             </PremiumButton>
 
             <p className="text-center text-xs text-foreground-subtle pt-2">
@@ -215,7 +215,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 }}
                 className="text-foreground-muted hover:text-foreground underline"
               >
-                Logga in med lösenord istället
+                Log in with a password instead
               </button>
             </p>
           </form>
@@ -229,7 +229,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                   htmlFor="email-verify"
                   className="text-sm font-medium text-foreground-muted block mb-2"
                 >
-                  E-post
+                  Email
                 </label>
                 <input
                   id="email-verify"
@@ -238,7 +238,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="din@email.se"
+                  placeholder="you@email.com"
                   className="w-full rounded-xl bg-foreground/5 border border-foreground/10 px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
                 />
               </div>
@@ -249,7 +249,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 htmlFor="otp-code"
                 className="text-sm font-medium text-foreground-muted block mb-2"
               >
-                6-siffrig kod
+                6-digit code
               </label>
               <input
                 id="otp-code"
@@ -278,11 +278,11 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
               size="lg"
               disabled={pending || code.length !== 6 || !email}
             >
-              {pending ? "Verifierar…" : "Logga in"}
+              {pending ? "Verifying…" : "Log in"}
             </PremiumButton>
 
             <p className="text-center text-xs text-foreground-subtle pt-2">
-              Får du inget mail? Kolla skräpkorgen.{" "}
+              Not getting the email? Check your spam folder.{" "}
               <button
                 type="button"
                 onClick={() => {
@@ -292,7 +292,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 }}
                 className="text-foreground-muted hover:text-foreground underline"
               >
-                Använd annan e-post
+                Use a different email
               </button>
             </p>
           </form>
@@ -305,7 +305,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 htmlFor="email-pw"
                 className="text-sm font-medium text-foreground-muted block mb-2"
               >
-                E-post
+                Email
               </label>
               <input
                 id="email-pw"
@@ -314,7 +314,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="din@email.se"
+                placeholder="you@email.com"
                 className="w-full rounded-xl bg-foreground/5 border border-foreground/10 px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
               />
             </div>
@@ -324,7 +324,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 htmlFor="password"
                 className="text-sm font-medium text-foreground-muted block mb-2"
               >
-                Lösenord
+                Password
               </label>
               <input
                 id="password"
@@ -348,7 +348,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
               size="lg"
               disabled={pending || !email || !password}
             >
-              {pending ? "Loggar in…" : "Logga in"}
+              {pending ? "Logging in…" : "Log in"}
             </PremiumButton>
 
             <p className="text-center text-xs text-foreground-subtle pt-2">
@@ -361,7 +361,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
                 }}
                 className="text-foreground-muted hover:text-foreground underline"
               >
-                Tillbaka till magisk länk
+                Back to magic link
               </button>
             </p>
           </form>
