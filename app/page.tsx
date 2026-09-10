@@ -19,13 +19,17 @@ export const metadata = {
 
 export default async function HomePage() {
   const client = createPublicClient();
-  const [outfits, creators, [heroBg, lifestyleBg], categoryCovers] =
+  const [outfits, creators, [lifestyleBg], categoryCovers] =
     await Promise.all([
       fetchOutfits(12, client),
       fetchTopCreatorsCached(6),
-      pickBgs(["home-hero", "home-lifestyle"], HERO_POOL),
+      pickBgs(["home-lifestyle"], HERO_POOL),
       fetchCategoryCovers(client),
     ]);
+
+  // The homepage hero is a fixed image (no rotation) — the lifestyle
+  // banner further down still rotates per session.
+  const heroBg = "/images/bg/capferrat.webp";
 
   return (
     <>
