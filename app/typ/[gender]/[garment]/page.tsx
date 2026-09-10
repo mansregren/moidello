@@ -6,7 +6,7 @@ import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { collectionPageJsonLd } from "@/lib/json-ld";
-import { garmentsForGender } from "@/lib/garments";
+import { garmentsForGender, garmentQueryValue, canonicalGarment } from "@/lib/garments";
 import { fetchOutfitsByGarment } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { DAM_PUBLIC } from "@/lib/flags";
@@ -22,18 +22,6 @@ function resolveGender(slug: string): "dam" | "herr" | null {
   return null;
 }
 
-function slugToGarment(
-  slug: string,
-  gender: "dam" | "herr",
-): string | null {
-  const lower = slug.toLowerCase();
-  const list = garmentsForGender(gender);
-  for (const g of list) {
-    if (g.toLowerCase() === lower) return g;
-  }
-  return null;
-}
-
 export default async function TypPage({
   params,
 }: {
@@ -45,12 +33,12 @@ export default async function TypPage({
   // Dam is admin-only while DAM_PUBLIC is off — this route is static/public
   // so it just 404s for everyone; admins browse Dam via the /upptack toggle.
   if (gender === "dam" && !DAM_PUBLIC) notFound();
-  const garment = slugToGarment(gs, gender);
+  const garment = canonicalGarment(gs);
   if (!garment) notFound();
 
   const outfits = await fetchOutfitsByGarment(
     gender,
-    garment,
+    garmentQueryValue(gs),
     createPublicClient(),
   );
   if (outfits.length === 0) notFound();

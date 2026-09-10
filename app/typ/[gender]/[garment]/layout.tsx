@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { fetchOutfitsByGarment } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
-import { garmentsForGender } from "@/lib/garments";
+import { garmentsForGender, garmentQueryValue, canonicalGarment } from "@/lib/garments";
 import { DAM_PUBLIC } from "@/lib/flags";
 
 const SITE = "Moidello";
@@ -9,18 +9,6 @@ const SITE = "Moidello";
 function resolveGender(slug: string): "dam" | "herr" | null {
   const lower = slug.toLowerCase();
   if (lower === "dam" || lower === "herr") return lower;
-  return null;
-}
-
-function slugToGarment(
-  slug: string,
-  gender: "dam" | "herr",
-): string | null {
-  const lower = slug.toLowerCase();
-  const list = garmentsForGender(gender);
-  for (const g of list) {
-    if (g.toLowerCase() === lower) return g;
-  }
   return null;
 }
 
@@ -32,19 +20,19 @@ export async function generateMetadata({
   const { gender: g, garment: gs } = await params;
   const gender = resolveGender(g);
   if (!gender) {
-    return { title: "Kategori", robots: { index: false, follow: true } };
+    return { title: "Category", robots: { index: false, follow: true } };
   }
   if (gender === "dam" && !DAM_PUBLIC) {
-    return { title: "Kategori", robots: { index: false, follow: false } };
+    return { title: "Category", robots: { index: false, follow: false } };
   }
-  const garment = slugToGarment(gs, gender);
+  const garment = canonicalGarment(gs);
   if (!garment) {
-    return { title: "Kategori", robots: { index: false, follow: true } };
+    return { title: "Category", robots: { index: false, follow: true } };
   }
 
   const outfits = await fetchOutfitsByGarment(
     gender,
-    garment,
+    garmentQueryValue(gs),
     createPublicClient(),
   );
 
