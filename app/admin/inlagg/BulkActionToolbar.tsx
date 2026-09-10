@@ -135,7 +135,7 @@ export function BulkActionBar({ users }: { users: SeedUser[] }) {
   const remove = () => {
     if (
       !confirm(
-        `Radera ${ids.length} inlägg permanent? Alla taggar, kommentarer och klick raderas också.`,
+        `Delete ${ids.length} posts permanently? All tags, comments and clicks are deleted too.`,
       )
     )
       return;
@@ -228,7 +228,7 @@ export function BulkActionBar({ users }: { users: SeedUser[] }) {
             disabled={pending}
             className="rounded-xl bg-background-tertiary border border-border text-sm text-foreground p-2 outline-none focus:border-foreground/30"
           >
-            <option value="">— välj —</option>
+            <option value="">— choose —</option>
             {users.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.display_name ?? u.username} (@{u.username})
@@ -241,7 +241,7 @@ export function BulkActionBar({ users }: { users: SeedUser[] }) {
             disabled={pending || !reassignTo}
             className="rounded-full bg-blue-500 hover:bg-blue-400 text-white px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
           >
-            Genomför
+            Apply
           </button>
         </div>
       )}

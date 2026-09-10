@@ -170,7 +170,7 @@ export function BulkSeedModal({
         errors: [
           {
             index: -1,
-            error: e instanceof Error ? e.message : "Okänt fel.",
+            error: e instanceof Error ? e.message : "Unknown error.",
           },
         ],
       });
@@ -188,7 +188,7 @@ export function BulkSeedModal({
           <div className="flex items-center gap-2.5">
             <Sparkles className="h-4 w-4 text-foreground" />
             <h2 className="font-heading text-xl uppercase tracking-tight text-foreground">
-              Skapa utkast från bilder
+              Create drafts from images
             </h2>
           </div>
           <button
@@ -209,9 +209,9 @@ export function BulkSeedModal({
               <p className="text-sm text-foreground-muted">
                 Dra in upp till {MAX_BATCH} bilder. Claude analyserar varje
                 outfit och fyller i titel, meta-description, keywords,
-                alt-text och kategori. Inläggen sparas som <strong>utkast</strong>{" "}
-                kopplade till respektive användare — du publicerar sedan
-                manuellt när du lagt på köplänkar.
+                alt text and category. The posts are saved as <strong>drafts</strong>{" "}
+                linked to each user — you then publish manually once you've
+                added buy links.
               </p>
 
               {slots.length === 0 ? (
@@ -316,7 +316,7 @@ export function BulkSeedModal({
                     className="inline-flex items-center gap-2 rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 px-4 py-2 text-sm disabled:opacity-50"
                   >
                     <Upload className="h-3.5 w-3.5" />
-                    Lägg till fler ({slots.length}/{MAX_BATCH})
+                    Add more ({slots.length}/{MAX_BATCH})
                   </button>
                 </>
               )}
@@ -430,8 +430,8 @@ function DistributePanel({
   return (
     <div className="rounded-xl border border-border bg-background-tertiary p-3 space-y-2">
       <p className="text-xs text-foreground-muted">
-        Markera användare nedan, tryck sedan <strong>Fördela jämnt</strong> så
-        sätts dropdownarna i grid:en automatiskt.
+        Select users below, then click <strong>Distribute evenly</strong> to
+        set the dropdowns in the grid automatically.
       </p>
       <div className="flex flex-wrap gap-1.5">
         {users.map((u) => (
@@ -455,7 +455,7 @@ function DistributePanel({
           disabled={disabled || selected.size === 0}
           className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-foreground/10 hover:bg-foreground/15 text-foreground px-3 py-1 text-xs font-semibold disabled:opacity-50"
         >
-          Fördela jämnt ({selected.size})
+          Distribute evenly ({selected.size})
         </button>
       </div>
     </div>
@@ -484,7 +484,7 @@ function SeedResultPanel({
           <p className="text-xs text-foreground-muted">
             {result.errors.length > 0
               ? `${result.errors.length} misslyckades — se nedan`
-              : "Klart. Filtrera på 'Utkast' i listan för att hitta dem."}
+              : "Done. Filter on 'Drafts' in the list to find them."}
           </p>
         </div>
       </div>
@@ -506,7 +506,7 @@ function SeedResultPanel({
           onClick={onClose}
           className="rounded-full bg-foreground text-background px-5 py-2 text-sm font-semibold hover:bg-foreground/90"
         >
-          Stäng
+          Close
         </button>
       </div>
     </div>

@@ -23,11 +23,11 @@ export default async function AdminLayout({
       <main id="main" tabIndex={-1} className="flex-1 pt-20 md:pt-24 pb-16">
         <Container className="max-w-6xl">
           <nav className="flex flex-wrap gap-1 mb-10 border-b border-border">
-            <AdminTab href="/admin" label="Översikt" />
+            <AdminTab href="/admin" label="Overview" />
             <AdminTab href="/admin/statistik" label="Statistik" />
-            <AdminTab href="/admin/inlagg" label="Inlägg" />
-            <AdminTab href="/admin/anvandare" label="Användare" />
-            <AdminTab href="/admin/anmalningar" label="Anmälningar" />
+            <AdminTab href="/admin/inlagg" label="Posts" />
+            <AdminTab href="/admin/anvandare" label="Users" />
+            <AdminTab href="/admin/anmalningar" label="Reports" />
             <AdminTab href="/admin/tiktok-bilder" label="TikTok-bilder" />
             <AdminTab href="/admin/seo" label="SEO" />
             <AdminTab href="/admin/bildfyll" label="Fyll bilder" />

@@ -139,7 +139,7 @@ export default async function AdminOutfitDetailPage({
         className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground mb-6"
       >
         <ArrowLeft className="h-4 w-4" />
-        Alla inlägg
+        All posts
       </Link>
 
       <div className="grid lg:grid-cols-2 gap-8">

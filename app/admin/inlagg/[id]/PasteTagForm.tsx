@@ -108,7 +108,7 @@ export function PasteTagForm({
         );
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Kunde inte hämta preview.");
+      setError(e instanceof Error ? e.message : "Could not fetch a preview.");
       // Open a blank draft so admin can still fill in manually.
       setDraft({
         url: trimmed,
@@ -139,7 +139,7 @@ export function PasteTagForm({
   const save = () => {
     if (!draft) return;
     if (!draft.brand.trim() || !draft.product_name.trim()) {
-      setError("Märke och plaggnamn måste fyllas i.");
+      setError("Brand and piece name are required.");
       return;
     }
     setError(null);
@@ -171,11 +171,11 @@ export function PasteTagForm({
   return (
     <section className="rounded-2xl border border-border bg-background-secondary p-6">
       <h2 className="font-heading text-xl uppercase tracking-tight text-foreground mb-1">
-        Lägg till plagg-tag
+        Add piece tag
       </h2>
       <p className="text-xs text-foreground-subtle mb-5">
         Klistra in en produkt-URL — vi fyller i brand, namn, pris och bild
-        automatiskt. Ändra fritt innan du sparar.
+        automatically. Edit freely before saving.
       </p>
 
       {!draft ? (
@@ -219,7 +219,7 @@ export function PasteTagForm({
               ) : (
                 <Sparkles className="h-4 w-4" />
               )}
-              Hämta info
+              Fetch info
             </button>
           </div>
           {error && <p className="text-xs text-red-400">{error}</p>}
@@ -249,7 +249,7 @@ export function PasteTagForm({
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="text"
-                  placeholder="Märke"
+                  placeholder="Brand"
                   value={draft.brand}
                   onChange={(e) =>
                     setDraft({ ...draft, brand: e.target.value })
@@ -307,7 +307,7 @@ export function PasteTagForm({
                 />
                 <input
                   type="text"
-                  placeholder="Färg"
+                  placeholder="Colour"
                   value={draft.color}
                   onChange={(e) =>
                     setDraft({ ...draft, color: e.target.value })
@@ -369,8 +369,8 @@ function StatusBadge({ draft }: { draft: Draft }) {
     return (
       <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-200 px-3 py-1.5 text-xs">
         <AlertCircle className="h-3.5 w-3.5" />
-        Affiliate-länk ({draft.affiliate_network ?? "okänt nätverk"}) —
-        skickas oförändrad
+        Affiliate link ({draft.affiliate_network ?? "unknown network"}) —
+        sent unchanged
       </div>
     );
   }
@@ -386,7 +386,7 @@ function StatusBadge({ draft }: { draft: Draft }) {
   return (
     <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-200 px-3 py-1.5 text-xs">
       <AlertCircle className="h-3.5 w-3.5" />
-      Okänd retailer — länken skickas som-den-är
+      Unknown retailer — the link is sent as-is
     </div>
   );
 }

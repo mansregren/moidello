@@ -90,7 +90,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
         scheduled_for: form.scheduled_for,
       });
       if (res.ok) {
-        setSuccess("Sparat.");
+        setSuccess("Saved.");
         router.refresh();
       } else {
         setError(res.error);
@@ -111,7 +111,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
   const handleDelete = () => {
     if (
       !confirm(
-        "Radera inlägget permanent? Alla taggar, kommentarer och klick raderas också.",
+        "Delete the post permanently? All tags, comments and clicks are deleted too.",
       )
     )
       return;
@@ -126,10 +126,10 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
   return (
     <section className="rounded-2xl border border-border bg-background-secondary p-6">
       <h2 className="font-heading text-xl uppercase tracking-tight text-foreground mb-5">
-        Redigera inlägg
+        Edit post
       </h2>
       <form onSubmit={save} className="space-y-4">
-        <Field label="Titel">
+        <Field label="Title">
           <input
             type="text"
             value={form.title}
@@ -138,7 +138,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
             className={INPUT}
           />
         </Field>
-        <Field label="Beskrivning">
+        <Field label="Description">
           <textarea
             value={form.description}
             onChange={(e) =>
@@ -175,7 +175,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
               placeholder={
                 form.keywords.length >= 10
                   ? "Max 10 keywords"
-                  : "Skriv + Enter"
+                  : "Type + Enter"
               }
               disabled={form.keywords.length >= 10}
               onKeyDown={(e) => {
@@ -198,7 +198,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label={isHome ? "Rum" : "Kategori"}>
+          <Field label={isHome ? "Room" : "Category"}>
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
@@ -213,13 +213,13 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
             </select>
           </Field>
           {isHome ? (
-            <Field label="Vertikal">
+            <Field label="Vertical">
               <div className={`${INPUT} flex items-center text-foreground-muted`}>
                 Heminredning
               </div>
             </Field>
           ) : (
-            <Field label="Kön">
+            <Field label="Gender">
               <select
                 value={form.gender}
                 onChange={(e) =>
@@ -227,8 +227,8 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
                 }
                 className={INPUT}
               >
-                <option value="dam">Dam</option>
-                <option value="herr">Herr</option>
+                <option value="dam">Women</option>
+                <option value="herr">Men</option>
               </select>
             </Field>
           )}
@@ -240,7 +240,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
               onClick={() =>
                 setForm({ ...form, is_published: false, scheduled_for: null })
               }
-              label="Utkast"
+              label="Draft"
               tone="amber"
             />
             <StatusButton
@@ -254,7 +254,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
                     new Date(Date.now() + 86400000).toISOString(),
                 })
               }
-              label="Schemalagd"
+              label="Scheduled"
               tone="blue"
             />
             <StatusButton
@@ -262,14 +262,14 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
               onClick={() =>
                 setForm({ ...form, is_published: true, scheduled_for: null })
               }
-              label="Publicerad"
+              label="Published"
               tone="emerald"
             />
           </div>
         </Field>
 
         {!form.is_published && !!form.scheduled_for && (
-          <Field label="Schemalagd publicering">
+          <Field label="Scheduled publishing">
             <input
               type="datetime-local"
               value={
@@ -287,9 +287,9 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
               className={INPUT}
             />
             <p className="mt-1 text-[11px] text-foreground-subtle">
-              OBS: Schemaläggnings-jobbet körs inte automatiskt än —
-              cron-tasken är inte aktiverad. Tills dess publiceras posten
-              först när admin trycker Publicerad manuellt.
+              NOTE: the scheduling job doesn't run automatically yet — the
+              cron task isn't enabled. Until then the post is only published
+              when an admin sets Published manually.
             </p>
           </Field>
         )}
@@ -304,7 +304,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
             className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
           >
             <Save className="h-4 w-4" />
-            {pending ? "Sparar…" : "Spara"}
+            {pending ? "Saving…" : "Save"}
           </button>
           <button
             type="button"
@@ -313,7 +313,7 @@ export function OutfitEditor({ outfit }: { outfit: OutfitForm }) {
             className="inline-flex items-center gap-2 rounded-full border border-red-500/30 text-red-400 px-4 py-2 text-sm font-semibold hover:bg-red-500/10 disabled:opacity-60 ml-auto"
           >
             <Trash2 className="h-4 w-4" />
-            {deleting ? "Raderar…" : "Radera inlägg"}
+            {deleting ? "Deleting…" : "Delete post"}
           </button>
         </div>
       </form>
@@ -370,7 +370,7 @@ export function TagsEditor({
     const tag = tags.find((t) => t.id === id);
     if (
       !confirm(
-        `Radera plagg-tag${tag ? ` "${tag.brand} ${tag.name}"` : ""} permanent? Detta kan inte ångras.`,
+        `Delete the piece tag${tag ? ` "${tag.brand} ${tag.name}"` : ""} permanently? This cannot be undone.`,
       )
     )
       return;
@@ -429,11 +429,11 @@ export function TagsEditor({
   return (
     <section className="rounded-2xl border border-border bg-background-secondary p-6">
       <h2 className="font-heading text-xl uppercase tracking-tight text-foreground mb-2">
-        Taggade plagg ({tags.length})
+        Tagged pieces ({tags.length})
       </h2>
       <p className="text-xs text-foreground-subtle mb-5">
-        Ändringar sparas per plagg. Dra punkterna på bilden ovan för att
-        flytta tag-positioner.
+        Changes are saved per piece. Drag the dots on the image above to
+        move tag positions.
       </p>
 
       {error && <p className="text-xs text-red-400 mb-4">{error}</p>}
@@ -484,7 +484,7 @@ export function TagsEditor({
                 <div className="grid grid-cols-2 gap-2">
                   <input
                     type="text"
-                    placeholder="Märke"
+                    placeholder="Brand"
                     value={t.brand}
                     onChange={(e) => patch(t.id, { brand: e.target.value })}
                     className={INPUT}
@@ -506,7 +506,7 @@ export function TagsEditor({
                 </div>
                 <input
                   type="text"
-                  placeholder="Plaggnamn"
+                  placeholder="Piece name"
                   value={t.name}
                   onChange={(e) => patch(t.id, { name: e.target.value })}
                   className={INPUT}
@@ -517,7 +517,7 @@ export function TagsEditor({
             <div className="relative">
               <input
                 type="url"
-                placeholder="Köp-URL — klistra in för att uppdatera meta"
+                placeholder="Buy URL — paste to update meta"
                 value={t.buy_url ?? ""}
                 onChange={(e) =>
                   patch(t.id, { buy_url: e.target.value || null })
@@ -534,14 +534,14 @@ export function TagsEditor({
               />
               {busyId === t.id && (
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[10px] text-foreground-muted">
-                  Hämtar…
+                  Fetching…
                 </span>
               )}
             </div>
             <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
-                placeholder="Pris"
+                placeholder="Price"
                 min="0"
                 step="1"
                 value={t.price ?? ""}
@@ -566,7 +566,7 @@ export function TagsEditor({
             </div>
             <div>
               <p className="text-[11px] uppercase tracking-wider text-foreground-subtle mb-1.5">
-                Färg{t.color ? ` — ${t.color}` : ""}
+                Colour{t.color ? ` — ${t.color}` : ""}
               </p>
               <ColorPicker
                 value={t.color ?? ""}
@@ -575,7 +575,7 @@ export function TagsEditor({
             </div>
             <input
               type="text"
-              placeholder="Material (t.ex. Bomull, Ull, Linne)"
+              placeholder="Material (e.g. Cotton, Wool, Linen)"
               maxLength={60}
               value={t.material ?? ""}
               onChange={(e) =>
@@ -585,7 +585,7 @@ export function TagsEditor({
             />
             <input
               type="url"
-              placeholder="Bild-URL"
+              placeholder="Image URL"
               value={t.image_url ?? ""}
               onChange={(e) =>
                 patch(t.id, { image_url: e.target.value || null })
@@ -602,7 +602,7 @@ export function TagsEditor({
                 className="h-4 w-4 rounded border-border bg-background-secondary accent-white"
               />
               <span className="text-xs text-foreground-muted">
-                Affiliatelänk (visas som &quot;Reklam&quot;)
+                Affiliate link (shown as &quot;Ad&quot;)
               </span>
             </label>
 
@@ -803,7 +803,7 @@ export function TagPositionEditor({
               <div
                 onPointerDown={(e) => startPointer(e, tag.id)}
                 className="cursor-pointer active:cursor-grabbing"
-                title={`${tag.brand || "(utan märke)"} — klick = redigera, drag = flytta`}
+                title={`${tag.brand || "(no brand)"} — click = edit, drag = move`}
               >
                 <span
                   className={`absolute inset-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full ${
@@ -820,7 +820,7 @@ export function TagPositionEditor({
                 <span>#{i + 1}</span>
                 <span className="text-foreground/60">·</span>
                 <span className="truncate max-w-[8rem]">
-                  {tag.brand || "(utan märke)"}
+                  {tag.brand || "(no brand)"}
                 </span>
                 {isDirty && (
                   <button
@@ -850,7 +850,7 @@ export function TagPositionEditor({
 
       <div className="flex items-center justify-between text-xs">
         <p className="text-foreground-subtle">
-          Dra punkterna för att flytta tag-positioner. Ändringar sparas per punkt.
+          Drag the dots to move tag positions. Changes are saved per dot.
         </p>
         {dirty.size > 0 && (
           <button
@@ -882,7 +882,7 @@ function TagStatusBadge({
   if (isAffiliate) {
     return (
       <span
-        title="Affiliate-länk — pass-through, ingen rewrite"
+        title="Affiliate link — pass-through, no rewrite"
         className="rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-300 px-2 py-0.5 text-[10px]"
       >
         Affiliate
@@ -901,10 +901,10 @@ function TagStatusBadge({
   }
   return (
     <span
-      title="Okänd retailer — länken skickas som-den-är"
+      title="Unknown retailer — the link is sent as-is"
       className="rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 text-[10px]"
     >
-      Okänd
+      Unknown
     </span>
   );
 }

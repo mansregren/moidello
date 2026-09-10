@@ -17,13 +17,13 @@ export interface ReportRow {
 }
 
 const REASON_LABEL: Record<string, string> = {
-  spam: "Spam / vilseledande",
-  harassment: "Trakasserier / hat",
-  inappropriate: "Olämpligt innehåll",
-  misinformation: "Felaktig information",
-  impersonation: "Identitetsstöld",
-  copyright: "Upphovsrätt",
-  other: "Annat",
+  spam: "Spam / misleading",
+  harassment: "Harassment / hate",
+  inappropriate: "Inappropriate content",
+  misinformation: "Misinformation",
+  impersonation: "Impersonation",
+  copyright: "Copyright",
+  other: "Other",
 };
 
 export function ReportsClient({
@@ -36,7 +36,7 @@ export function ReportsClient({
   if (reports.length === 0) {
     return (
       <p className="mt-10 text-sm text-foreground-subtle">
-        Inga anmälningar i kategorin {currentStatus}.
+        No reports in the {currentStatus} category.
       </p>
     );
   }
@@ -89,10 +89,10 @@ function ReportItem({ report }: { report: ReportRow }) {
               {REASON_LABEL[report.reason] ?? report.reason}
             </span>
             <span className="text-xs text-foreground-subtle">
-              {date} · av{" "}
+              {date} · by{" "}
               {report.reporter
                 ? `@${report.reporter.username}`
-                : "okänd"}
+                : "unknown"}
             </span>
           </div>
 
@@ -109,7 +109,7 @@ function ReportItem({ report }: { report: ReportRow }) {
                 target="_blank"
                 className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground px-3 py-1.5 text-xs hover:border-foreground/30"
               >
-                Öppna {labelForTarget(report.target_type)}
+                Open {labelForTarget(report.target_type)}
                 <ArrowRight className="h-3 w-3" />
               </Link>
             )}
@@ -121,7 +121,7 @@ function ReportItem({ report }: { report: ReportRow }) {
                 className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground px-3 py-1.5 text-xs hover:border-foreground/30 disabled:opacity-50"
               >
                 <AlertCircle className="h-3 w-3" />
-                Markera granskad
+                Mark reviewed
               </button>
             )}
             <button
@@ -131,7 +131,7 @@ function ReportItem({ report }: { report: ReportRow }) {
               className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground-muted px-3 py-1.5 text-xs hover:text-foreground hover:border-foreground/30 disabled:opacity-50"
             >
               <X className="h-3 w-3" />
-              Avvisa
+              Dismiss
             </button>
             <button
               type="button"
@@ -140,7 +140,7 @@ function ReportItem({ report }: { report: ReportRow }) {
               className="inline-flex items-center gap-1.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 px-3 py-1.5 text-xs hover:bg-red-500/30 disabled:opacity-50"
             >
               <Check className="h-3 w-3" />
-              Markera åtgärdad
+              Mark actioned
             </button>
           </div>
 
@@ -166,6 +166,6 @@ function buildTargetUrl(r: ReportRow): string | null {
 
 function labelForTarget(t: ReportRow["target_type"]): string {
   if (t === "outfit") return "outfit";
-  if (t === "profile") return "profil";
-  return "kommentar";
+  if (t === "profile") return "profile";
+  return "comment";
 }

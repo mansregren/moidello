@@ -31,7 +31,7 @@ interface ManualRow {
 }
 
 const CATEGORIES = [
-  { value: "", label: "— välj —" },
+  { value: "", label: "— choose —" },
   { value: "streetwear", label: "Streetwear" },
   { value: "minimalism", label: "Minimalism" },
   { value: "vintage", label: "Vintage" },
@@ -250,7 +250,7 @@ export function BulkManualModal({
         errors: [
           {
             index: -1,
-            error: e instanceof Error ? e.message : "Okänt fel.",
+            error: e instanceof Error ? e.message : "Unknown error.",
           },
         ],
       });
@@ -287,9 +287,9 @@ export function BulkManualModal({
           ) : (
             <>
               <p className="text-sm text-foreground-muted">
-                Dra in bilder, skriv titel + välj användare per bild, klicka{" "}
-                <strong>Skapa N utkast</strong>. Ingen AI — du har full
-                kontroll över texten.
+                Drag in images, type a title + choose a user per image, click{" "}
+                <strong>Create N drafts</strong>. No AI — you have full
+                control over the text.
               </p>
 
               {rows.length === 0 ? (
@@ -303,7 +303,7 @@ export function BulkManualModal({
                   <div className="rounded-xl border border-border bg-background-tertiary p-3 space-y-3">
                     <div>
                       <p className="text-xs text-foreground-muted mb-2">
-                        Markera användare → tryck Fördela jämnt.
+                        Select users → click Distribute evenly.
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {users.map((u) => (
@@ -333,14 +333,14 @@ export function BulkManualModal({
                           disabled={distributeUsers.size === 0}
                           className="ml-auto inline-flex rounded-full bg-foreground/10 hover:bg-foreground/15 text-foreground px-3 py-1 text-xs font-semibold disabled:opacity-50"
                         >
-                          Fördela jämnt ({distributeUsers.size})
+                          Distribute evenly ({distributeUsers.size})
                         </button>
                       </div>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs text-foreground-muted">
-                        Kategori för alla:
+                        Category for all:
                       </span>
                       <select
                         defaultValue=""
@@ -350,7 +350,7 @@ export function BulkManualModal({
                         }}
                         className="rounded-full bg-background-secondary border border-border text-foreground-muted text-xs px-2 py-1 outline-none cursor-pointer"
                       >
-                        <option value="">— välj —</option>
+                        <option value="">— choose —</option>
                         {CATEGORIES.filter((c) => c.value).map((c) => (
                           <option key={c.value} value={c.value}>
                             {c.label}
@@ -365,7 +365,7 @@ export function BulkManualModal({
                         type="text"
                         value={titlePrefix}
                         onChange={(e) => setTitlePrefix(e.target.value)}
-                        placeholder="ex: Sommar 2026"
+                        placeholder="e.g. Summer 2026"
                         className="rounded-full bg-background-secondary border border-border text-foreground text-xs px-3 py-1 outline-none focus:border-foreground/30"
                       />
                       <button
@@ -415,7 +415,7 @@ export function BulkManualModal({
 
                             <input
                               type="text"
-                              placeholder="Titel (krävs) — Linen Set & Espadrilles"
+                              placeholder="Title (required) — Linen Set & Espadrilles"
                               value={r.title}
                               onChange={(e) =>
                                 updateRow(r.id, { title: e.target.value })
@@ -433,7 +433,7 @@ export function BulkManualModal({
                                 disabled={busy}
                                 className={INPUT}
                               >
-                                <option value="">— användare —</option>
+                                <option value="">— user —</option>
                                 {users.map((u) => (
                                   <option key={u.id} value={u.id}>
                                     {u.display_name ?? u.username}
@@ -450,8 +450,8 @@ export function BulkManualModal({
                                 disabled={busy}
                                 className={INPUT}
                               >
-                                <option value="dam">Dam</option>
-                                <option value="herr">Herr</option>
+                                <option value="dam">Women</option>
+                                <option value="herr">Men</option>
                               </select>
                               <select
                                 value={r.category}
@@ -475,7 +475,7 @@ export function BulkManualModal({
                                 updateRow(r.id, { description: e.target.value })
                               }
                               disabled={busy}
-                              placeholder="Beskrivning (frivillig) — 1-2 meningar"
+                              placeholder="Description (optional) — 1-2 sentences"
                               rows={2}
                               maxLength={2000}
                               className={`${INPUT} resize-none`}
@@ -501,7 +501,7 @@ export function BulkManualModal({
                     className="inline-flex items-center gap-2 rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 px-4 py-2 text-sm disabled:opacity-50"
                   >
                     <Upload className="h-3.5 w-3.5" />
-                    Lägg till fler ({rows.length}/{MAX_BATCH})
+                    Add more ({rows.length}/{MAX_BATCH})
                   </button>
                 </>
               )}
@@ -546,7 +546,7 @@ export function BulkManualModal({
                     ) : (
                       <PenLine className="h-4 w-4" />
                     )}
-                    Skapa {readyCount > 0 ? readyCount : ""} utkast
+                    Create {readyCount > 0 ? readyCount : ""} drafts
                   </button>
                 </div>
               </div>
@@ -563,14 +563,14 @@ function StatusBadge({ ready }: { ready: boolean }) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 px-2 py-0.5 text-[10px]">
         <CheckCircle2 className="h-3 w-3" />
-        Klar
+        Done
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 text-[10px]">
       <Circle className="h-3 w-3" />
-      Behöver titel + user + gender
+      Needs title + user + gender
     </span>
   );
 }
@@ -610,7 +610,7 @@ function KeywordsInput({
       ))}
       <input
         type="text"
-        placeholder={value.length >= 8 ? "Max 8" : "Keywords + Enter (frivilligt)"}
+        placeholder={value.length >= 8 ? "Max 8" : "Keywords + Enter (optional)"}
         disabled={disabled || value.length >= 8}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === ",") {
@@ -693,12 +693,12 @@ function ResultPanel({
         )}
         <div>
           <p className="text-lg font-semibold text-foreground">
-            {result.drafts} utkast skapade
+            {result.drafts} drafts created
           </p>
           <p className="text-xs text-foreground-muted">
             {result.errors.length > 0
-              ? `${result.errors.length} misslyckades — se nedan`
-              : "Klart. Filtrera på 'Utkast' i listan."}
+              ? `${result.errors.length} failed — see below`
+              : "Done. Filter on 'Drafts' in the list."}
           </p>
         </div>
       </div>
@@ -706,7 +706,7 @@ function ResultPanel({
         <ul className="rounded-xl border border-red-500/20 bg-red-500/5 p-3 space-y-1 text-xs text-red-200">
           {result.errors.map((e, i) => (
             <li key={i}>
-              {e.index >= 0 ? `Bild #${e.index + 1}: ` : ""}
+              {e.index >= 0 ? `Image #${e.index + 1}: ` : ""}
               {e.error}
             </li>
           ))}
@@ -718,7 +718,7 @@ function ResultPanel({
           onClick={onClose}
           className="rounded-full bg-foreground text-background px-5 py-2 text-sm font-semibold hover:bg-foreground/90"
         >
-          Stäng
+          Close
         </button>
       </div>
     </div>

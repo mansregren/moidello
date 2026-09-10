@@ -163,11 +163,11 @@ export default async function AdminInlaggPage({
   return (
     <>
       <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-3">
-        Admin / Inlägg
+        Admin / Posts
       </p>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="font-heading text-4xl md:text-6xl uppercase tracking-tight leading-none">
-          Alla inlägg
+          All posts
         </h1>
         <div className="flex flex-wrap items-center gap-2">
           <BulkManualButton users={seedUserOptions} />
@@ -175,8 +175,8 @@ export default async function AdminInlaggPage({
         </div>
       </div>
       <p className="mt-4 text-foreground-muted">
-        {counts.all} matchande inlägg ({counts.published} publicerade,{" "}
-        {counts.drafts} utkast). Klicka på status-pillerna nedan för att
+        {counts.all} matching posts ({counts.published} published,{" "}
+        {counts.drafts} drafts). Click the status pills below to
         filtrera.
       </p>
 
@@ -208,7 +208,7 @@ export default async function AdminInlaggPage({
       </nav>
 
       <nav className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-foreground-subtle">Användare:</span>
+        <span className="text-xs text-foreground-subtle">User:</span>
         <UserFilterSelect
           users={seedUserOptions}
           current={filterUserId ?? null}
@@ -230,7 +230,7 @@ export default async function AdminInlaggPage({
         <ul className="mt-3 space-y-2">
           {outfits.length === 0 && (
             <p className="text-sm text-foreground-subtle">
-              Inga inlägg matchar.
+              No posts match.
             </p>
           )}
           {outfits.map((o) => {

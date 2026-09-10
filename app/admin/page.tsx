@@ -80,22 +80,22 @@ export default async function AdminDashboardPage() {
         Admin
       </p>
       <h1 className="font-heading text-4xl md:text-6xl uppercase tracking-tight leading-none">
-        Översikt
+        Overview
       </h1>
       <p className="mt-4 text-foreground-muted">
-        Nyckeltal för hela plattformen + senaste anmälningarna. Externa
-        verktyg (Vercel, Search Console, Supabase) länkas i botten.
+        Key metrics for the whole platform + the latest reports. External
+        tools (Vercel, Search Console, Supabase) are linked at the bottom.
       </p>
 
       <section className="mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         <StatCard
           icon={Users}
-          label="Användare"
+          label="Users"
           value={usersTotal.count ?? 0}
         />
         <StatCard
           icon={Layers}
-          label="Märken"
+          label="Brands"
           value={brandsTotal.count ?? 0}
         />
         <StatCard
@@ -105,17 +105,17 @@ export default async function AdminDashboardPage() {
         />
         <StatCard
           icon={MessageCircle}
-          label="Kommentarer"
+          label="Comments"
           value={commentsTotal.count ?? 0}
         />
         <StatCard
           icon={MousePointerClick}
-          label="Klick (7d)"
+          label="Clicks (7d)"
           value={clicks7d.count ?? 0}
         />
         <StatCard
           icon={Flag}
-          label="Öppna anmälningar"
+          label="Open reports"
           value={reportsOpen.count ?? 0}
           highlight={(reportsOpen.count ?? 0) > 0}
         />
@@ -124,18 +124,18 @@ export default async function AdminDashboardPage() {
       <section className="mt-14">
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground">
-            Senaste anmälningar
+            Latest reports
           </h2>
           <Link
             href="/admin/anmalningar"
             className="text-sm text-foreground-muted hover:text-foreground"
           >
-            Alla →
+            All →
           </Link>
         </div>
         {reports.length === 0 ? (
           <p className="text-sm text-foreground-subtle">
-            Inga öppna anmälningar just nu.
+            No open reports right now.
           </p>
         ) : (
           <ul className="space-y-2">
@@ -226,10 +226,10 @@ function ReportRow({ r }: { r: ReportPreview }) {
             </p>
           )}
           <p className="mt-1 text-[11px] text-foreground-subtle">
-            {date} · av{" "}
+            {date} · by{" "}
             {r.reporter
               ? `@${r.reporter.username}`
-              : "okänd"}{" "}
+              : "unknown"}{" "}
             · {r.target_id.slice(0, 8)}…
           </p>
         </div>
@@ -237,7 +237,7 @@ function ReportRow({ r }: { r: ReportPreview }) {
           href="/admin/anmalningar"
           className="text-xs text-foreground-muted hover:text-foreground shrink-0"
         >
-          Hantera →
+          Manage →
         </Link>
       </div>
     </li>
