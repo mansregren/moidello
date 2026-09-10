@@ -12,130 +12,126 @@ export default function VillkorPage() {
         <Container className="py-16 md:py-24 max-w-3xl">
           <div className="border-b border-border pb-10 mb-12">
             <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-4">
-              Juridik
+              Legal
             </p>
             <h1 className="font-heading text-5xl md:text-7xl uppercase tracking-tight leading-none">
-              Användarvillkor
+              Terms of Use
             </h1>
             <p className="mt-6 text-sm text-foreground-muted">
-              Senast uppdaterad 15 maj 2026
+              Last updated 15 May 2026
             </p>
           </div>
 
           <div className="space-y-12 text-foreground-muted leading-relaxed">
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                1. Inledning
+                1. Introduction
               </h2>
               <p>
-                Dessa villkor (&quot;Villkoren&quot;) reglerar din användning av Moidello,
-                en plattform för att upptäcka, dela och inspireras av outfits.
-                Genom att använda tjänsten godkänner du Villkoren i sin helhet.
-                Om du inte accepterar dem ska du inte använda tjänsten.
+                These terms (&quot;the Terms&quot;) govern your use of Moidello,
+                a platform for discovering, sharing and being inspired by
+                outfits. By using the service you accept the Terms in full. If
+                you do not accept them, do not use the service.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                2. Tjänsten
+                2. The service
               </h2>
               <p>
-                Moidello är en social plattform där användare publicerar bilder
-                på outfits, taggar plagg och länkar till var dessa kan köpas.
-                Tjänsten tillhandahålls i befintligt skick. Funktioner kan
-                ändras, läggas till eller tas bort utan föregående varsel.
+                Moidello is a platform where outfits are published as images,
+                pieces are tagged and linked to where they can be bought. The
+                service is provided as is. Features may change, be added or be
+                removed without prior notice.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                3. Användarkonton
+                3. User accounts
               </h2>
               <p>
-                Vissa funktioner kräver ett användarkonto. Du ansvarar för att
-                inloggningsuppgifter hålls säkra och att den information du
-                anger är korrekt. Du får inte överlåta ditt konto till någon
-                annan.
+                Some features require a user account. You are responsible for
+                keeping your login details secure and for the accuracy of the
+                information you provide. You may not transfer your account to
+                anyone else.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                4. Användargenererat innehåll
+                4. User-generated content
               </h2>
               <p>
-                Du behåller äganderätten till det innehåll du publicerar, men
-                ger Moidello en icke-exklusiv, royaltyfri, världsomspännande
-                licens att lagra, visa och distribuera innehållet inom tjänsten
-                och för marknadsföring av denna.
+                You retain ownership of the content you publish, but you grant
+                Moidello a non-exclusive, royalty-free, worldwide licence to
+                store, display and distribute the content within the service
+                and to market the service.
               </p>
               <p className="mt-4">
-                Du intygar att du har rätt till allt innehåll du publicerar,
-                inklusive bilder, varumärken och länkar, och att innehållet
-                inte gör intrång i tredje parts rättigheter.
+                You warrant that you hold the rights to all content you
+                publish, including images, trademarks and links, and that the
+                content does not infringe the rights of any third party.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                5. Licens till uppladdat innehåll
+                5. Licence to uploaded content
               </h2>
               <p>
-                Du behåller äganderätten till ditt innehåll. Genom att ladda
-                upp ger du Moidello rätt att använda, visa och dela det på
-                våra sociala medier och i marknadsföring, med kreditering
-                till din profil. Licensen upphör för framtida användning om
-                du raderar innehållet, men redan publicerat material på
-                sociala medier kan ligga kvar.
+                You retain ownership of your content. By uploading it you grant
+                Moidello the right to use, display and share it on our social
+                media and in marketing, with credit to your profile. The
+                licence ends for future use if you delete the content, but
+                material already published on social media may remain.
               </p>
               <p className="mt-4">
-                Du intygar att du har rätt till innehållet och samtycke från
-                personer som syns på bilderna.
+                You warrant that you hold the rights to the content and have
+                the consent of any people shown in the images.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                6. Affiliate-länkar och marknadsföring
+                6. Affiliate links and marketing
               </h2>
               <p>
-                Innehåll som innehåller affiliate-länkar eller annan
-                kommersiell ersättning ska tydligt märkas som reklam i enlighet
-                med Marknadsföringslagen och Konsumentverkets riktlinjer. Det
-                är ditt ansvar som användare att säkerställa korrekt
-                annonsmärkning.
+                Content that contains affiliate links or other commercial
+                compensation must be clearly marked as advertising, in line
+                with applicable marketing law and consumer-protection guidance.
+                It is your responsibility as a user to ensure correct ad
+                labelling.
               </p>
               <p className="mt-4">
-                Moidello är inte part i några avtal mellan användare,
-                affiliate-nätverk eller varumärken, och har inget ansvar för
-                ersättning som genereras genom användares länkar.
+                Moidello is not a party to any agreement between users,
+                affiliate networks or brands, and has no responsibility for
+                compensation generated through users' links.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                7. Otillåtet innehåll
+                7. Prohibited content
               </h2>
-              <p>
-                Det är inte tillåtet att publicera innehåll som:
-              </p>
+              <p>You may not publish content that:</p>
               <ul className="mt-4 space-y-2 list-disc list-outside pl-6">
-                <li>är olagligt, vilseledande eller kränkande</li>
-                <li>gör intrång i upphovsrätt eller varumärken</li>
-                <li>marknadsför kopior, förfalskningar eller plagiat</li>
-                <li>länkar till skadlig kod, bedrägerier eller olagliga produkter</li>
-                <li>strider mot god marknadsföringssed</li>
+                <li>is unlawful, misleading or offensive</li>
+                <li>infringes copyright or trademarks</li>
+                <li>promotes copies, counterfeits or knock-offs</li>
+                <li>links to malware, scams or illegal products</li>
+                <li>breaches good marketing practice</li>
               </ul>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                8. Anmälan av intrång
+                8. Reporting infringement
               </h2>
               <p>
-                Om du anser att innehåll på Moidello gör intrång i din
-                upphovsrätt, ditt varumärke eller annan rättighet, kan du
-                anmäla detta till{" "}
+                If you believe content on Moidello infringes your copyright,
+                trademark or other right, you can report it to{" "}
                 <a
                   href="mailto:hello@moidello.com"
                   className="text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"
@@ -144,21 +140,21 @@ export default function VillkorPage() {
                 </a>
                 .
               </p>
-              <p className="mt-4">En anmälan bör innehålla:</p>
+              <p className="mt-4">A report should include:</p>
               <ul className="mt-4 space-y-2 list-disc list-outside pl-6">
-                <li>länk till det innehåll som anses göra intrång</li>
-                <li>beskrivning av den rättighet som gjorts intrång i</li>
+                <li>a link to the content believed to infringe</li>
+                <li>a description of the right that has been infringed</li>
                 <li>
-                  dina kontaktuppgifter och en försäkran om att uppgifterna är
-                  korrekta
+                  your contact details and a statement that the information is
+                  accurate
                 </li>
               </ul>
               <p className="mt-4">
-                Vi granskar anmälningar utan onödigt dröjsmål, normalt inom
-                fem arbetsdagar, och tar bort innehåll som vid en första
-                bedömning verkar göra intrång. Användaren som publicerat
-                innehållet informeras om åtgärden och kan inkomma med
-                motanmälan om de anser att borttagningen är felaktig.
+                We review reports without undue delay, normally within five
+                business days, and remove content that, on a first assessment,
+                appears to infringe. The user who published the content is
+                informed of the action and may submit a counter-notice if they
+                believe the removal was in error.
               </p>
             </section>
 
@@ -167,69 +163,68 @@ export default function VillkorPage() {
                 9. Moderation
               </h2>
               <p>
-                Moidello förbehåller sig rätten att ta bort innehåll, begränsa
-                eller stänga av konton som bryter mot Villkoren, utan
-                ersättningsskyldighet. Innehåll som rapporteras granskas inom
-                rimlig tid.
+                Moidello reserves the right to remove content and to restrict
+                or suspend accounts that breach the Terms, with no obligation
+                to compensate. Reported content is reviewed within a reasonable
+                time.
               </p>
               <p className="mt-4">
-                Användare som upprepat publicerar innehåll som gör intrång i
-                tredje parts rättigheter kan stängas av permanent utan
-                föregående varning.
+                Users who repeatedly publish content that infringes third-party
+                rights may be permanently suspended without prior warning.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                10. Immateriella rättigheter
+                10. Intellectual property
               </h2>
               <p>
-                Moidello, logotyp, varumärken och plattformens design tillhör
-                Moidello. Inget i Villkoren överför några rättigheter till dig
-                utöver rätten att använda tjänsten enligt dessa villkor.
+                Moidello, the logo, trademarks and the platform's design belong
+                to Moidello. Nothing in the Terms transfers any rights to you
+                beyond the right to use the service under these terms.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                11. Ansvarsbegränsning
+                11. Limitation of liability
               </h2>
               <p>
-                Tjänsten tillhandahålls i befintligt skick utan garantier av
-                något slag. Moidello ansvarar inte för indirekta skador,
-                förlorad inkomst eller skador som uppstår till följd av
-                avbrott, fel eller förlust av data, i den utsträckning lagen
-                tillåter.
+                The service is provided as is, without warranties of any kind.
+                To the extent permitted by law, Moidello is not liable for
+                indirect damages, lost income or damages arising from
+                interruptions, errors or loss of data.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                12. Ändringar
+                12. Changes
               </h2>
               <p>
-                Villkoren kan uppdateras. Vid väsentliga ändringar informeras
-                aktiva användare. Fortsatt användning efter ändringar innebär
-                att du accepterar de nya villkoren.
+                The Terms may be updated. Active users are informed of material
+                changes. Continued use after changes means you accept the new
+                terms.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                13. Tillämplig lag
+                13. Governing law
               </h2>
               <p>
-                Svensk lag tillämpas på Villkoren. Tvister avgörs av svensk
-                domstol med Stockholms tingsrätt som första instans.
+                Swedish law applies to the Terms. Disputes are settled by the
+                Swedish courts, with Stockholm District Court as the court of
+                first instance.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                14. Kontakt
+                14. Contact
               </h2>
               <p>
-                Frågor om Villkoren skickas till{" "}
+                Questions about the Terms can be sent to{" "}
                 <a
                   href="mailto:hello@moidello.com"
                   className="text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"
@@ -246,7 +241,7 @@ export default function VillkorPage() {
               href="/integritet"
               className="text-sm text-foreground-muted hover:text-foreground transition-colors"
             >
-              Läs även Integritetspolicyn →
+              Read the Privacy Policy too →
             </Link>
           </div>
         </Container>

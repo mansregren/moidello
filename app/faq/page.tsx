@@ -5,17 +5,17 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { faqPageJsonLd } from "@/lib/json-ld";
 
 export const metadata: Metadata = {
-  title: "Vanliga frågor",
+  title: "Frequently asked questions",
   description:
-    "Vanliga frågor om Moidello — vad plattformen är, hur den fungerar, hur kreatörer tjänar pengar, hur märken kan vara med och hur intrång anmäls.",
+    "Frequently asked questions about Moidello — what the platform is, how it works, how brands can take part and how infringement is reported.",
   alternates: { canonical: "/faq" },
 };
 
-// Korta, faktiska svar — skrivna för att kunna citeras direkt av
-// AI-sökmotorer (ChatGPT, Perplexity, Claude). Varje svar ska stå
-// fristående utan beroende av föregående fråga. Sektionerna grupperar
-// frågor men FAQPage JSON-LD plattar dem i en lista — gruppsystemet är
-// bara för läsbarhet i HTML.
+// Short, factual answers — written so they can be quoted directly by AI
+// search engines (ChatGPT, Perplexity, Claude). Each answer must stand on
+// its own without depending on the previous question. The sections group
+// questions, but the FAQPage JSON-LD flattens them into one list — the
+// grouping is only for readability in the HTML.
 type FaqGroup = {
   heading: string;
   items: { question: string; answer: string }[];
@@ -23,147 +23,142 @@ type FaqGroup = {
 
 const FAQ_GROUPS: FaqGroup[] = [
   {
-    heading: "Om plattformen",
+    heading: "About the platform",
     items: [
       {
-        question: "Vad är Moidello?",
+        question: "What is Moidello?",
         answer:
-          "Moidello är en svensk plattform för outfit-inspiration. Användare publicerar bilder på outfits, taggar varje plagg med märke och köplänk, och andra kan klicka för att hitta och köpa plaggen från ursprungsbutiken.",
+          "Moidello is a platform for outfit inspiration. Outfits are published as images, every piece is tagged with its brand and a link, and anyone can click through to find and buy the pieces from the original store.",
       },
       {
-        question: "Hur fungerar Moidello?",
+        question: "How does Moidello work?",
         answer:
-          "Du bläddrar i outfits från olika kreatörer och kan klicka på taggade plagg för att se märke, namn, pris och köplänk. Köplänkarna går direkt till märkets egen butik. Med ett konto kan du publicera egna outfits, följa kreatörer och spara plagg.",
+          "You browse outfits and can click any tagged piece to see the brand, name, price and a link to buy it. The links go straight to the brand's own store. With an account you can save pieces and follow outfits you like.",
       },
       {
-        question: "Är Moidello gratis?",
+        question: "Is Moidello free?",
         answer:
-          "Ja. Det är kostnadsfritt att skapa konto, bläddra och publicera outfits. Det finns inga premium-abonnemang.",
+          "Yes. Creating an account and browsing are free. There are no premium subscriptions.",
       },
       {
-        question: "Hur tjänar kreatörer pengar på Moidello?",
+        question: "How does Moidello make money?",
         answer:
-          "Kreatörer använder sina egna affiliate-länkar när de taggar plagg. Eventuell kommission går direkt till kreatören — Moidello tar ingen del av intäkterna.",
+          "Moidello is at an early stage and is focused on building an audience and brand partnerships before a revenue model.",
       },
       {
-        question: "Hur tjänar Moidello pengar?",
+        question: "Is Moidello only for Swedish users?",
         answer:
-          "Moidello tar ingen del av kreatörers affiliate-intäkter. Plattformen är i ett tidigt skede och fokuserar på att bygga användarbas och partnerskap med märken före intäktsmodell.",
+          "The site is in English and most brands are European, but it is open to visitors from any country.",
       },
       {
-        question: "Är Moidello bara för svenska användare?",
+        question: "Which brands are on Moidello?",
         answer:
-          "Innehållet är på svenska och de flesta märken är europeiska, men sajten är öppen för besökare och kreatörer från alla länder.",
+          "The range spans Scandinavian designer labels to established international fashion houses across the full price spectrum.",
       },
       {
-        question: "Vilka märken finns på Moidello?",
+        question: "Can a brand create its own profile?",
         answer:
-          "Märken läggs till av kreatörer när de taggar plagg i sina outfits. Sortimentet spänner från svenska designermärken till etablerade internationella mode-företag inom hela prisspannet.",
+          "Yes. Brands can register a company account on Moidello, upload their own posts and link to their product catalogue. It is free. Contact hello@moidello.com to get started.",
       },
       {
-        question: "Kan ett märke skapa en egen profil?",
+        question: "Are affiliate links marked as advertising?",
         answer:
-          "Ja. Märken kan registrera ett företagskonto på Moidello, ladda upp egna inlägg och länka till sin produktkatalog. Det är kostnadsfritt. Kontakta hello@moidello.com för att komma igång.",
+          "Yes. A piece tagged with an affiliate link is shown with an AD marker, in line with marketing law and consumer-protection guidance.",
       },
       {
-        question: "Är affiliate-länkar märkta som reklam?",
+        question: "How do I report copyright infringement?",
         answer:
-          "Ja. Plagg som taggats med en affiliate-länk visas med en REKLAM-markering i enlighet med Marknadsföringslagen och Konsumentverkets riktlinjer.",
+          "Email hello@moidello.com with a link to the content you believe infringes and a description of the right. Reports are normally reviewed within five business days.",
       },
       {
-        question: "Hur rapporterar man upphovsrättsintrång?",
+        question: "What is a Moidello outfit code?",
         answer:
-          "Mejla hello@moidello.com med en länk till innehållet som anses göra intrång och en beskrivning av rättigheten. Anmälningar granskas normalt inom fem arbetsdagar.",
-      },
-      {
-        question: "Vad är en Moidello-outfit-kod?",
-        answer:
-          "Varje publicerad outfit får en unik kortkod i formatet A271 (en bokstav följt av tre siffror). Koden visas på outfit-sidan och kan sökas via plattformens sökfält. Den används främst när någon refererar till en outfit på sociala medier.",
+          "Every published outfit gets a unique short code in the format A271 (one letter followed by three digits). The code is shown on the outfit page and can be searched from the platform's search field. It is mainly used when someone refers to an outfit on social media.",
       },
     ],
   },
   {
-    heading: "Stil och inspiration",
+    heading: "Style and inspiration",
     items: [
       {
-        question: "Vad är skandinavisk minimalism inom mode?",
+        question: "What is Scandinavian minimalism in fashion?",
         answer:
-          "Skandinavisk minimalism kännetecknas av neutrala färgpaletter (beige, vit, svart, grå), rena silhuetter, naturmaterial som ull och linne, och plagg av hög kvalitet som är gjorda för att hålla flera säsonger. Stilen prioriterar passform och material framför mönster och accessoarer.",
+          "Scandinavian minimalism is defined by neutral colour palettes (beige, white, black, grey), clean silhouettes, natural materials such as wool and linen, and high-quality pieces built to last several seasons. The style prioritises fit and fabric over pattern and accessories.",
       },
       {
-        question: "Vad är smart casual?",
+        question: "What is smart casual?",
         answer:
-          "Smart casual är en stil som balanserar formellt och avslappnat. Typiska plagg är chinos eller mörka jeans, en stickad tröja eller skjorta, och rena läderskor eller minimalistiska sneakers. Mer uppklätt än vardagligt, mindre formellt än kostym.",
+          "Smart casual is a style that balances formal and relaxed. Typical pieces are chinos or dark jeans, a knit or a shirt, and clean leather shoes or minimalist sneakers. Dressier than everyday wear, less formal than a suit.",
       },
       {
-        question: "Vad är en capsule wardrobe?",
+        question: "What is a capsule wardrobe?",
         answer:
-          "En capsule wardrobe är en garderob bestående av ett litet antal noggrant utvalda plagg — ofta 30–40 stycken — som kan kombineras till många olika outfits. Idén bygger på kvalitet före kvantitet och fokus på tidlösa snitt i en sammanhållen färgpalett.",
+          "A capsule wardrobe is a wardrobe of a small number of carefully chosen pieces — often 30–40 — that combine into many different outfits. The idea rests on quality over quantity and a focus on timeless cuts in a cohesive colour palette.",
       },
       {
-        question: "Hur stylar man baggy jeans?",
+        question: "How do you style baggy jeans?",
         answer:
-          "Baggy jeans balanseras bäst med ett mer fitted ovandel — exempelvis en stickad tröja, en figursydd skjorta eller en t-shirt. Skor med lägre profil (sneakers, loafers eller boots utan klack) håller proportionerna. Bälte hjälper definiera midjan när jeansen sitter lågt.",
+          "Baggy jeans are balanced best with a more fitted top — a knit, a tailored shirt or a t-shirt. Lower-profile shoes (sneakers, loafers or flat boots) keep the proportions. A belt helps define the waist when the jeans sit low.",
       },
       {
-        question: "Vilka färger funkar i en grundgarderob?",
+        question: "Which colours work in a core wardrobe?",
         answer:
-          "En grundgarderob bygger oftast på neutrala basfärger som svart, vit, beige, grå och marinblå. Dessa låter plaggen kombineras fritt. Accent-färger som rött, kamel eller mörkgrönt läggs till för att skapa variation utan att splittra paletten.",
+          "A core wardrobe usually builds on neutral base colours such as black, white, beige, grey and navy. These let pieces combine freely. Accent colours such as red, camel or dark green are added for variety without breaking up the palette.",
       },
       {
-        question: "Vad är athleisure?",
+        question: "What is athleisure?",
         answer:
-          "Athleisure är en stilkategori där träningsinspirerade plagg används utanför gymmet. Joggers, oversized hoodies, tekniska jackor och sneakers kombineras med vardagliga plagg för en avslappnad men medveten look. Materialen är ofta funktionella — fukt-transporterande, stretch eller termo.",
+          "Athleisure is a style category where sport-inspired pieces are worn outside the gym. Joggers, oversized hoodies, technical jackets and sneakers are combined with everyday pieces for a relaxed but considered look. The materials are often functional — moisture-wicking, stretch or thermal.",
       },
     ],
   },
   {
-    heading: "Säsong och tillfälle",
+    heading: "Season and occasion",
     items: [
       {
-        question: "Vad bör man ha i en svensk höstgarderob?",
+        question: "What belongs in a Nordic autumn wardrobe?",
         answer:
-          "En typisk svensk höstgarderob innehåller en trenchcoat eller läderjacka för regn, stickade plagg i ull eller mohair, läder- eller mocka-boots, mörkare jeans eller chinos, och en halsduk i tunnt ylle. Lagerprincipen är central eftersom temperaturen varierar.",
+          "A typical Nordic autumn wardrobe holds a trench coat or leather jacket for rain, knits in wool or mohair, leather or suede boots, darker jeans or chinos, and a fine wool scarf. Layering is central because the temperature varies.",
       },
       {
-        question: "Hur klär man sig till en sommar-bröllop?",
+        question: "How do you dress for a summer wedding?",
         answer:
-          "Till ett sommar-bröllop bär man traditionellt en lätt klänning i naturmaterial (linne, bomull, viskos) för damer och en ljusare kostym eller chinos med skjorta för herrar. Stark färg går bra, men undvik vitt om paret bär det. Skorna ska vara bekväma — en stor del av tiden står man.",
+          "For a summer wedding you traditionally wear a light dress in a natural fabric (linen, cotton, viscose), or a lighter suit or chinos with a shirt. Strong colour is fine, but avoid white if the couple is wearing it. Shoes should be comfortable — you spend a lot of the time standing.",
       },
       {
-        question: "Vad är en bra kontorsoutfit för dam?",
+        question: "What is a good office outfit for women?",
         answer:
-          "En klassisk kontorsoutfit för dam bygger på en blazer eller stickad cardigan, en blus eller fin t-shirt, byxor eller en mid-rise kjol, och loafers eller låga boots. Färgpaletten är neutral med max en accent-färg. Smycken hålls minimala.",
+          "A classic office outfit for women builds on a blazer or a knit cardigan, a blouse or fine t-shirt, trousers or a mid-rise skirt, and loafers or low boots. The palette is neutral with at most one accent colour. Jewellery is kept minimal.",
       },
       {
-        question: "Vad är en bra kontorsoutfit för herr?",
+        question: "What is a good office outfit for men?",
         answer:
-          "En klassisk smart casual-kontorsoutfit för herr består av chinos eller mörka jeans, en skjorta eller poloskjorta, en stickad tröja vid behov, och läderskor — loafers, derbys eller minimalistiska sneakers. Färgerna är dämpade. Klocka som enda accessoar.",
+          "A classic smart-casual office outfit for men is chinos or dark jeans, a shirt or polo, a knit if needed, and leather shoes — loafers, derbies or minimalist sneakers. The colours are muted. A watch as the only accessory.",
       },
     ],
   },
   {
-    heading: "Köp och passform",
+    heading: "Buying and fit",
     items: [
       {
-        question: "Hur väljer man rätt storlek när man handlar online?",
+        question: "How do you pick the right size when shopping online?",
         answer:
-          "Mät dina egna mått (bröst, midja, höft, längd) och jämför med produktens storleksguide istället för att lita på den vanliga storleken. Olika märken har olika passform och storlekarna varierar. Återförsäljarens egna måttabeller är mer pålitliga än standardiserade storlekar.",
+          "Measure yourself (chest, waist, hip, length) and compare against the product's size guide instead of trusting your usual size. Different brands fit differently and sizing varies. A retailer's own measurement tables are more reliable than standardised sizes.",
       },
       {
-        question: "Vilka mode-material är mest hållbara?",
+        question: "Which fashion materials are most durable?",
         answer:
-          "Material med längst livslängd är ull, linne, denim av hög kvalitet, läder och kashmir. De håller form, åldras snyggt och tål många tvättar. Syntetiska blandningar som polyester och elastan håller färgen längre men förlorar form snabbare och bryts ned i miljön.",
+          "The longest-lasting materials are wool, linen, high-quality denim, leather and cashmere. They hold their shape, age well and survive many washes. Synthetic blends such as polyester and elastane keep colour longer but lose shape faster and break down in the environment.",
       },
       {
-        question: "Hur tvättar man stickade plagg?",
+        question: "How do you wash knitwear?",
         answer:
-          "Stickade plagg i ull eller kashmir tvättas i ulltvätt-program på max 30°C eller för hand i ljummet vatten med ulltvättmedel. Centrifugera lågt, pressa ut vatten i en handduk istället för att vrida, och torka platt på en plan yta. Häng inte upp — det drar ut formen.",
+          "Knitwear in wool or cashmere is washed on a wool programme at 30°C max, or by hand in lukewarm water with wool detergent. Spin low, press water out in a towel rather than wringing, and dry flat on a level surface. Don't hang it up — that stretches the shape.",
       },
       {
-        question: "Vad är skillnaden mellan affiliate-länk och vanlig länk?",
+        question: "What is the difference between an affiliate link and a normal link?",
         answer:
-          "En affiliate-länk innehåller en spårningskod som gör att kreatören som delar länken får en provision om någon klickar och handlar. För dig som köper är priset detsamma — provisionen tas från återförsäljarens marginal. Affiliate-länkar måste enligt svensk lag märkas tydligt som reklam.",
+          "An affiliate link contains a tracking code so that whoever shares it earns a commission if someone clicks and buys. For you as the buyer the price is the same — the commission comes out of the retailer's margin. Affiliate links must be clearly marked as advertising.",
       },
     ],
   },
@@ -182,7 +177,7 @@ export default function FaqPage() {
         <Container className="py-16 md:py-24 max-w-3xl">
           <div className="border-b border-border pb-10 mb-12">
             <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-4">
-              Vanliga frågor
+              Frequently asked questions
             </p>
             <h1 className="font-heading text-5xl md:text-7xl uppercase tracking-tight leading-none">
               FAQ
@@ -211,7 +206,7 @@ export default function FaqPage() {
 
           <div className="mt-20 pt-10 border-t border-border">
             <p className="text-sm text-foreground-muted">
-              Har du en fråga som inte besvaras här?{" "}
+              Have a question that isn't answered here?{" "}
               <a
                 href="mailto:hello@moidello.com"
                 className="text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"

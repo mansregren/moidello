@@ -34,7 +34,7 @@ export default async function HomePage() {
           path: "/",
           name: "Moidello",
           description:
-            "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
+            "Discover, share and get inspired by outfits. Tag every piece and find where to buy it.",
           outfits,
         })}
       />

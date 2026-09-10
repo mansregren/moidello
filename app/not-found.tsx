@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 
 export const metadata = {
-  title: "404 — Sidan finns inte | Moidello",
-  description: "Sidan du letar efter finns inte längre eller har flyttat.",
+  title: "404 — Page not found | Moidello",
+  description: "The page you're looking for no longer exists or has moved.",
 };
 
 export default function NotFound() {
@@ -14,24 +14,24 @@ export default function NotFound() {
           Error 404
         </p>
         <h1 className="font-heading text-6xl md:text-8xl leading-none mb-6">
-          Borttappad
+          Lost
         </h1>
         <p className="text-foreground-muted text-base md:text-lg mb-10 max-w-md mx-auto">
-          Sidan du letar efter finns inte längre — eller så har den flyttat.
-          Inga garmenter förlorade i processen.
+          The page you're looking for no longer exists — or it has moved.
+          No garments lost in the process.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href="/"
             className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground px-6 py-3 text-sm font-medium hover:opacity-90 transition"
           >
-            Till startsidan
+            Back to home
           </Link>
           <Link
             href="/upptack"
             className="inline-flex items-center justify-center rounded-full border border-border px-6 py-3 text-sm font-medium hover:bg-secondary transition"
           >
-            Upptäck outfits
+            Discover outfits
           </Link>
         </div>
       </Container>

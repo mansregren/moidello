@@ -12,37 +12,37 @@ export default function IntegritetPage() {
         <Container className="py-16 md:py-24 max-w-3xl">
           <div className="border-b border-border pb-10 mb-12">
             <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-4">
-              Juridik
+              Legal
             </p>
             <h1 className="font-heading text-5xl md:text-7xl uppercase tracking-tight leading-none">
-              Integritetspolicy
+              Privacy Policy
             </h1>
             <p className="mt-6 text-sm text-foreground-muted">
-              Senast uppdaterad 6 maj 2026
+              Last updated 6 May 2026
             </p>
           </div>
 
           <div className="space-y-12 text-foreground-muted leading-relaxed">
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                1. Inledning
+                1. Introduction
               </h2>
               <p>
-                Moidello värnar om din integritet. Denna policy beskriver hur vi
-                samlar in, använder och skyddar information i samband med din
-                användning av tjänsten, i enlighet med
-                Dataskyddsförordningen (GDPR).
+                Moidello cares about your privacy. This policy describes how we
+                collect, use and protect information in connection with your use
+                of the service, in accordance with the General Data Protection
+                Regulation (GDPR).
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                2. Personuppgiftsansvarig
+                2. Data controller
               </h2>
               <p>
-                Moidello är personuppgiftsansvarig för behandlingen av
-                personuppgifter inom tjänsten. Frågor om behandlingen kan
-                ställas till{" "}
+                Moidello is the data controller for the processing of personal
+                data within the service. Questions about the processing can be
+                sent to{" "}
                 <a
                   href="mailto:hello@moidello.com"
                   className="text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"
@@ -55,59 +55,54 @@ export default function IntegritetPage() {
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                3. Vilka uppgifter vi samlar in
+                3. What data we collect
               </h2>
-              <p>
-                Moidello är för närvarande i en publik förhandsversion utan
-                kontoskapande. Vi samlar in begränsad information:
-              </p>
+              <p>We collect limited information:</p>
               <ul className="mt-4 space-y-2 list-disc list-outside pl-6">
                 <li>
-                  <strong className="text-foreground font-medium">Anonym besöksstatistik</strong>
-                  {" "}via Vercel Web Analytics — utan cookies, utan IP-adress
-                  som identifierar enskild person.
+                  <strong className="text-foreground font-medium">Anonymous visitor statistics</strong>
+                  {" "}via Vercel Web Analytics — without cookies and without an
+                  IP address that identifies an individual.
                 </li>
                 <li>
-                  <strong className="text-foreground font-medium">Lokala inställningar</strong>
-                  {" "}(t.ex. valt kön-filter) sparas i din webbläsare via
-                  localStorage. Dessa data lämnar aldrig din enhet.
+                  <strong className="text-foreground font-medium">Local settings</strong>
+                  {" "}(such as the chosen category filter) are stored in your
+                  browser via localStorage. This data never leaves your device.
                 </li>
                 <li>
-                  <strong className="text-foreground font-medium">Klicklogg för köp-länkar</strong>
-                  {" "}lagrar besökarens land (ISO-kod, t.ex. SE), referrer och
-                  user-agent när någon klickar på en köp-länk i en taggad outfit.
-                  Detta används enbart för fraud-detection och kreatörsstatistik,
-                  och raderas automatiskt efter 90 dagar.
+                  <strong className="text-foreground font-medium">Click log for buy links</strong>
+                  {" "}stores the visitor's country (ISO code, e.g. SE), referrer
+                  and user agent when someone clicks a buy link in a tagged
+                  outfit. This is used only for fraud detection and platform
+                  statistics, and is deleted automatically after 90 days.
                 </li>
               </ul>
               <p className="mt-4">
-                När kontoskapande och inloggning aktiveras kommer vi att samla
-                in e-postadress, användarnamn och innehåll du publicerar. Denna
-                policy uppdateras i samband med det.
+                When you create an account we also collect your email address,
+                username and the content you publish.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                4. Hur vi använder uppgifterna
+                4. How we use the data
               </h2>
               <p>
-                Anonym statistik används för att förstå hur tjänsten används
-                och för att förbättra upplevelsen. Lokala inställningar används
-                för att personalisera ditt flöde. Vi säljer aldrig data till
-                tredje part.
+                Anonymous statistics are used to understand how the service is
+                used and to improve the experience. Local settings are used to
+                personalise your feed. We never sell data to third parties.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                5. Tredjepartstjänster
+                5. Third-party services
               </h2>
               <p>
-                Tjänsten driftas på Vercel. Anonym besöksstatistik tillhandahålls
-                av Vercel Web Analytics. När du klickar på affiliate-länkar
-                publicerade av andra användare lämnar du Moidello och omfattas
-                av den länkade webbplatsens villkor och integritetspolicy.
+                The service is hosted on Vercel. Anonymous visitor statistics
+                are provided by Vercel Web Analytics. When you click an
+                affiliate link published by another user you leave Moidello and
+                are covered by the terms and privacy policy of the linked site.
               </p>
             </section>
 
@@ -116,54 +111,54 @@ export default function IntegritetPage() {
                 6. Cookies
               </h2>
               <p>
-                Moidello använder inga marknadsförings- eller spårningscookies.
-                Vi använder endast tekniskt nödvändig lagring (localStorage)
-                för att komma ihåg dina inställningar mellan besök. Eftersom
-                ingen tredjepartsspårning används krävs ingen cookie-banner.
+                Moidello uses no marketing or tracking cookies. We use only
+                technically necessary storage (localStorage) to remember your
+                settings between visits, plus a cookie that keeps you signed in.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                7. Dina rättigheter
+                7. Your rights
               </h2>
               <p>
-                Enligt GDPR har du rätt att begära information om vilka
-                personuppgifter vi behandlar om dig, samt att begära rättelse,
-                radering, begränsning eller dataportabilitet. Du har även rätt
-                att invända mot behandling och lämna klagomål till
-                Integritetsskyddsmyndigheten (IMY).
+                Under the GDPR you have the right to request information about
+                which personal data we process about you, and to request
+                rectification, erasure, restriction or data portability. You
+                also have the right to object to processing and to lodge a
+                complaint with the Swedish Authority for Privacy Protection
+                (IMY).
               </p>
               <p className="mt-4">
-                Förfrågningar skickas till{" "}
+                Requests can be sent to{" "}
                 <a
                   href="mailto:hello@moidello.com"
                   className="text-foreground border-b border-foreground/30 hover:border-foreground transition-colors"
                 >
                   hello@moidello.com
                 </a>
-                . Vi besvarar inom 30 dagar.
+                . We respond within 30 days.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                8. Säkerhet
+                8. Security
               </h2>
               <p>
-                Vi vidtar tekniska och organisatoriska åtgärder för att skydda
-                de uppgifter vi behandlar mot obehörig åtkomst, förlust och
-                förvanskning.
+                We take technical and organisational measures to protect the
+                data we process against unauthorised access, loss and
+                corruption.
               </p>
             </section>
 
             <section>
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-4">
-                9. Ändringar
+                9. Changes
               </h2>
               <p>
-                Denna policy kan uppdateras. Datum för senaste uppdatering visas
-                ovan.
+                This policy may be updated. The date of the most recent update
+                is shown above.
               </p>
             </section>
           </div>
@@ -173,7 +168,7 @@ export default function IntegritetPage() {
               href="/villkor"
               className="text-sm text-foreground-muted hover:text-foreground transition-colors"
             >
-              Läs även Användarvillkoren →
+              Read the Terms of Use too →
             </Link>
           </div>
         </Container>
