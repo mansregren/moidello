@@ -18,7 +18,7 @@ export async function startImpersonation(
   targetUserId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
 
   const supabase = await createClient();
@@ -27,7 +27,7 @@ export async function startImpersonation(
     .select("id")
     .eq("id", targetUserId)
     .maybeSingle();
-  if (!target) return { ok: false, error: "Användaren finns inte." };
+  if (!target) return { ok: false, error: "The user doesn’t exist." };
 
   const jar = await cookies();
   jar.set(IMPERSONATION_COOKIE, targetUserId, {
@@ -52,7 +52,7 @@ export async function toggleAdmin(
   userId: string,
 ): Promise<{ ok: true; isAdmin: boolean } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
 
   const supabase = await createClient();
@@ -61,7 +61,7 @@ export async function toggleAdmin(
     .select("is_admin")
     .eq("id", userId)
     .maybeSingle();
-  if (!row) return { ok: false, error: "Användaren finns inte." };
+  if (!row) return { ok: false, error: "The user doesn’t exist." };
 
   const next = !row.is_admin;
   const { error } = await supabase
@@ -78,7 +78,7 @@ export async function deleteUserAccount(
   userId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
 
   // Service-role required to drop the auth.users row. Without it we'd
@@ -92,7 +92,7 @@ export async function deleteUserAccount(
       error:
         e instanceof Error
           ? e.message
-          : "SUPABASE_SERVICE_ROLE_KEY behövs för att radera konton.",
+          : "SUPABASE_SERVICE_ROLE_KEY is needed to delete accounts.",
     };
   }
 
@@ -114,7 +114,7 @@ const DUMMY_CREATORS: DummySpec[] = [
   {
     username: "elinwong",
     displayName: "Elin Wong",
-    bio: "Stockholmsbaserad stylist. Bygger garderoben kring tre färger.",
+    bio: "Stockholm-based stylist. Builds the wardrobe around three colours.",
     avatarUrl: "https://i.pravatar.cc/300?img=10",
   },
   {
@@ -132,7 +132,7 @@ const DUMMY_CREATORS: DummySpec[] = [
   {
     username: "ninapettersson",
     displayName: "Nina Pettersson",
-    bio: "Minimalism för verkliga liv. Linne, ull, läder.",
+    bio: "Minimalism for real life. Linen, wool, leather.",
     avatarUrl: "https://i.pravatar.cc/300?img=13",
   },
   {
@@ -144,19 +144,19 @@ const DUMMY_CREATORS: DummySpec[] = [
   {
     username: "majagrahn",
     displayName: "Maja Grahn",
-    bio: "Klänningar, lager, en kopp kaffe.",
+    bio: "Dresses, layers, a cup of coffee.",
     avatarUrl: "https://i.pravatar.cc/300?img=15",
   },
   {
     username: "leonardlowe",
     displayName: "Leonard Löwe",
-    bio: "Workwear möter Stockholms vinter.",
+    bio: "Workwear meets a Stockholm winter.",
     avatarUrl: "https://i.pravatar.cc/300?img=16",
   },
   {
     username: "amanda_h",
     displayName: "Amanda Hellström",
-    bio: "Färg som signatur. Mjuk skärning, hårda accessoarer.",
+    bio: "Colour as a signature. Soft cuts, hard accessories.",
     avatarUrl: "https://i.pravatar.cc/300?img=17",
   },
   {
@@ -168,7 +168,7 @@ const DUMMY_CREATORS: DummySpec[] = [
   {
     username: "hugolindqvist",
     displayName: "Hugo Lindqvist",
-    bio: "Tailoring för verkliga liv. Ull och linne.",
+    bio: "Tailoring for real life. Wool and linen.",
     avatarUrl: "https://i.pravatar.cc/300?img=33",
   },
 ];
@@ -193,7 +193,7 @@ export async function updateUserProfile(
   },
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
 
   const updates: ProfileUpdate = {};
@@ -204,12 +204,12 @@ export async function updateUserProfile(
       return {
         ok: false,
         error:
-          "Användarnamn måste vara 2–30 tecken, bara a–z, 0–9 och _.",
+          "Username must be 2–30 characters, only a–z, 0–9 and _.",
       };
     }
     const { isReservedUsername } = await import("@/lib/reserved-usernames");
     if (isReservedUsername(u)) {
-      return { ok: false, error: "Användarnamnet är reserverat." };
+      return { ok: false, error: "That username is reserved." };
     }
     updates.username = u;
   }
@@ -224,7 +224,7 @@ export async function updateUserProfile(
   if (patch.avatar_url !== undefined) {
     const a = patch.avatar_url?.trim() ?? null;
     if (a && !/^https?:\/\//i.test(a)) {
-      return { ok: false, error: "Avatar-URL måste börja med http(s)://" };
+      return { ok: false, error: "The avatar URL must start with http(s)://" };
     }
     updates.avatar_url = a && a.length > 0 ? a : null;
   }
@@ -264,7 +264,7 @@ export async function updateUserProfile(
     .eq("id", userId);
   if (error) {
     if (error.code === "23505") {
-      return { ok: false, error: "Användarnamnet är upptaget." };
+      return { ok: false, error: "That username is taken." };
     }
     return { ok: false, error: error.message };
   }
@@ -283,18 +283,18 @@ export async function uploadUserAvatar(
   formData: FormData,
 ): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
 
   const file = formData.get("avatar");
   if (!(file instanceof File) || file.size === 0) {
-    return { ok: false, error: "Välj en bild." };
+    return { ok: false, error: "Choose an image." };
   }
   if (!ACCEPTED_AVATAR_TYPES.includes(file.type)) {
-    return { ok: false, error: "Bilden måste vara JPG, PNG eller WebP." };
+    return { ok: false, error: "The image must be JPG, PNG or WebP." };
   }
   if (file.size > MAX_AVATAR_BYTES) {
-    return { ok: false, error: "Bilden är för stor (max 5 MB)." };
+    return { ok: false, error: "The image is too large (max 5 MB)." };
   }
 
   const supabase = await createClient();
@@ -343,19 +343,19 @@ export async function createDummyCreator(input: {
   avatarUrl: string;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
 
   const username = input.username.trim().toLowerCase();
   if (!USERNAME_RE.test(username)) {
     return {
       ok: false,
-      error: "Användarnamn måste vara 2–30 tecken, bara a–z, 0–9 och _.",
+      error: "Username must be 2–30 characters, only a–z, 0–9 and _.",
     };
   }
   const { isReservedUsername } = await import("@/lib/reserved-usernames");
   if (isReservedUsername(username)) {
-    return { ok: false, error: "Användarnamnet är reserverat." };
+    return { ok: false, error: "That username is reserved." };
   }
 
   const displayName = input.displayName.trim();
@@ -363,7 +363,7 @@ export async function createDummyCreator(input: {
 
   const avatarUrl = input.avatarUrl.trim();
   if (avatarUrl && !/^https?:\/\//i.test(avatarUrl)) {
-    return { ok: false, error: "Avatar-URL måste börja med http(s)://" };
+    return { ok: false, error: "The avatar URL must start with http(s)://" };
   }
 
   let admin;
@@ -385,7 +385,7 @@ export async function createDummyCreator(input: {
     .select("id")
     .eq("username", username)
     .maybeSingle();
-  if (existing) return { ok: false, error: "Användarnamnet är upptaget." };
+  if (existing) return { ok: false, error: "That username is taken." };
 
   const email = `${username}@demo.moidello.com`;
   const { data: createdUser, error: authError } =
@@ -440,7 +440,7 @@ export async function seedDummyCreators(): Promise<{
       ok: true,
       created: 0,
       skipped: 0,
-      errors: ["Inte behörig."],
+      errors: ["Not authorised."],
     };
   }
 
@@ -455,7 +455,7 @@ export async function seedDummyCreators(): Promise<{
       errors: [
         e instanceof Error
           ? e.message
-          : "Service role-nyckel saknas — sätt SUPABASE_SERVICE_ROLE_KEY i Vercel.",
+          : "Service role key missing — set SUPABASE_SERVICE_ROLE_KEY in Vercel.",
       ],
     };
   }
@@ -489,7 +489,7 @@ export async function seedDummyCreators(): Promise<{
       });
 
     if (authError || !created_user.user) {
-      errors.push(`${spec.username}: ${authError?.message ?? "okänt fel"}`);
+      errors.push(`${spec.username}: ${authError?.message ?? "unknown error"}`);
       continue;
     }
 

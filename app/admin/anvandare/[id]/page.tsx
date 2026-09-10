@@ -107,7 +107,7 @@ export default async function AdminUserDetailPage({
         className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground mb-6"
       >
         <ArrowLeft className="h-4 w-4" />
-        Alla användare
+        All users
       </Link>
 
       <div className="flex items-start gap-6 mb-10">
@@ -141,7 +141,7 @@ export default async function AdminUserDetailPage({
             )}
             {user.account_type === "brand" && (
               <span className="inline-flex rounded-full bg-foreground/10 text-foreground px-2 py-0.5 text-[10px] uppercase tracking-wider">
-                Märke
+                Brand
               </span>
             )}
           </div>
@@ -171,8 +171,8 @@ export default async function AdminUserDetailPage({
 
       {/* Stats grid */}
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
-        <Stat icon={Users} label="Följare" value={followers} />
-        <Stat icon={Users} label="Följer" value={following} />
+        <Stat icon={Users} label="Followers" value={followers} />
+        <Stat icon={Users} label="Following" value={following} />
         <Stat icon={Eye} label="Visningar" value={totals.views} />
         <Stat
           icon={Eye}
@@ -188,7 +188,7 @@ export default async function AdminUserDetailPage({
         />
         <Stat
           icon={MousePointerClick}
-          label="Köp-klick"
+          label="Buy clicks"
           value={totals.clicks}
         />
       </section>
@@ -200,7 +200,7 @@ export default async function AdminUserDetailPage({
       <section className="mt-14">
         <div className="flex items-end justify-between mb-5 gap-3">
           <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground">
-            Inlägg ({outfits.length})
+            Posts ({outfits.length})
           </h2>
           <p className="text-xs text-foreground-subtle">
             {outfits.filter((o) => !o.is_published).length} utkast,{" "}
@@ -209,7 +209,7 @@ export default async function AdminUserDetailPage({
         </div>
         {outfits.length === 0 ? (
           <p className="text-sm text-foreground-subtle">
-            Inga inlägg ännu.
+            No posts yet.
           </p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">

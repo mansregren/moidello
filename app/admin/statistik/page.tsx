@@ -207,38 +207,38 @@ export default async function AdminStatsPage() {
   return (
     <Container className="max-w-6xl">
       <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-3">
-        Admin / Statistik
+        Admin / Stats
       </p>
       <h1 className="font-heading text-4xl md:text-6xl uppercase tracking-tight leading-none">
-        Statistik
+        Stats
       </h1>
       <p className="mt-4 text-foreground-muted">
-        Toppinlägg, kreatörer och märken. Aktivitet senaste {DAYS} dagar.
+        Top posts, profiles and brands. Activity over the last {DAYS} days.
       </p>
 
       {/* Daily activity */}
       <section className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <Sparkline
           icon={Users}
-          label="Nya konton"
+          label="New accounts"
           daily={dailySignups}
           color="emerald"
         />
         <Sparkline
           icon={TrendingUp}
-          label="Nya outfits"
+          label="New outfits"
           daily={dailyOutfits}
           color="sky"
         />
         <Sparkline
           icon={Eye}
-          label="Visningar"
+          label="Views"
           daily={dailyViews}
           color="violet"
         />
         <Sparkline
           icon={MousePointerClick}
-          label="Köp-klick"
+          label="Buy clicks"
           daily={dailyClicks}
           color="amber"
         />
@@ -246,28 +246,28 @@ export default async function AdminStatsPage() {
 
       <div className="grid lg:grid-cols-2 gap-8 mt-14">
         <OutfitTopList
-          title="Mest visade"
+          title="Most viewed"
           icon={Eye}
           rows={topByViews}
           metric={(o) => o.views}
           profileMap={profileMap}
         />
         <OutfitTopList
-          title="Mest klick"
+          title="Most clicks"
           icon={MousePointerClick}
           rows={topByClicks}
           metric={(o) => o.clicks}
           profileMap={profileMap}
         />
         <OutfitTopList
-          title="Mest gillade"
+          title="Most liked"
           icon={Heart}
           rows={topByLikes}
           metric={(o) => o.likes}
           profileMap={profileMap}
         />
         <OutfitTopList
-          title="Mest sparade"
+          title="Most saved"
           icon={Bookmark}
           rows={topBySaves}
           metric={(o) => o.saves}
@@ -278,12 +278,12 @@ export default async function AdminStatsPage() {
       <div className="grid lg:grid-cols-2 gap-8 mt-14">
         <section>
           <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-5">
-            Topp kreatörer
+            Top profiles
           </h2>
           <ul className="space-y-2">
             {topCreators.length === 0 && (
               <p className="text-sm text-foreground-subtle">
-                Inga kreatörer med följare än.
+                No profiles with followers yet.
               </p>
             )}
             {topCreators.map((c, i) => (
@@ -334,12 +334,12 @@ export default async function AdminStatsPage() {
 
         <section>
           <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-5">
-            Topp märken (klick, 90d)
+            Top brands (clicks, 90d)
           </h2>
           <ul className="space-y-2">
             {topBrands.length === 0 && (
               <p className="text-sm text-foreground-subtle">
-                Inga klick på taggade plagg ännu.
+                No clicks on tagged pieces yet.
               </p>
             )}
             {topBrands.map((b, i) => (
@@ -391,7 +391,7 @@ function OutfitTopList({
       </h2>
       <ul className="space-y-2">
         {rows.length === 0 && (
-          <p className="text-sm text-foreground-subtle">Inga data ännu.</p>
+          <p className="text-sm text-foreground-subtle">No data yet.</p>
         )}
         {rows.map((o, i) => {
           const c = profileMap.get(o.user_id);

@@ -58,7 +58,7 @@ interface DraftError {
 export async function POST(request: Request) {
   if (!(await isCurrentUserAdmin())) {
     return NextResponse.json(
-      { error: "Inte behörig." },
+      { error: "Not authorised." },
       { status: 403 },
     );
   }
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
   }
   if (assignments.length !== images.length) {
     return NextResponse.json(
-      { error: "assignments-arrayen måste matcha antal bilder." },
+      { error: "The assignments array must match the number of images." },
       { status: 400 },
     );
   }
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
       errors.push({
         index: i,
         user_id: a.user_id,
-        error: "Bilden måste vara JPG, PNG eller WebP.",
+        error: "The image must be JPG, PNG or WebP.",
       });
       continue;
     }
@@ -148,7 +148,7 @@ export async function POST(request: Request) {
       errors.push({
         index: i,
         user_id: a.user_id,
-        error: "Bilden är för stor (max 10 MB).",
+        error: "The image is too large (max 10 MB).",
       });
       continue;
     }
@@ -227,7 +227,7 @@ export async function POST(request: Request) {
       errors.push({
         index: i,
         user_id: a.user_id,
-        error: "Titel saknas (krävs i manuellt läge).",
+        error: "Title missing (required in manual mode).",
       });
       continue;
     }
@@ -284,7 +284,7 @@ export async function POST(request: Request) {
       errors.push({
         index: i,
         user_id: a.user_id,
-        error: `DB-fel: ${insertError?.message ?? "okänt"}`,
+        error: `DB error: ${insertError?.message ?? "unknown"}`,
       });
       continue;
     }

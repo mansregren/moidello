@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Skapa outfit",
-  description: "Bygg och dela din egen outfit. Tagga plagg och länka var de finns att köpa.",
+  title: "Create outfit",
+  description: "Build and share your own outfit. Tag the pieces and link where to buy them.",
   alternates: { canonical: "/skapa" },
   robots: { index: false, follow: true },
 };

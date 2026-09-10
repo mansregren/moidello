@@ -15,7 +15,7 @@ export async function ImpersonationBanner() {
   const target = await getImpersonationTarget();
   if (!target) return null;
 
-  const label = target.targetDisplayName ?? target.targetUsername ?? "okänd";
+  const label = target.targetDisplayName ?? target.targetUsername ?? "unknown";
 
   return (
     <div className="sticky top-0 z-50 bg-amber-500 text-black">
@@ -31,7 +31,7 @@ export async function ImpersonationBanner() {
             type="submit"
             className="rounded-full bg-background text-foreground px-3 py-1 text-xs font-semibold hover:bg-background/80"
           >
-            Återgå
+            Back
           </button>
         </form>
       </div>

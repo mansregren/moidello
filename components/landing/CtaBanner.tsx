@@ -29,18 +29,18 @@ export function CtaBanner() {
           className="max-w-xl"
         >
           <h2 className="font-heading text-[36px] md:text-[56px] lg:text-[72px] leading-[0.95] uppercase tracking-[-0.02em] text-white">
-            Dela din
+            Share your
             <br />
-            <span className="text-white/60">stil med världen</span>
+            <span className="text-white/60">style with the world</span>
           </h2>
           <p className="mt-4 text-white/70 text-lg max-w-md">
-            Skapa ditt konto och börja posta outfits idag.
-            Tagga plaggen, inspirera andra.
+            Create your account and start posting outfits today.
+            Tag the pieces, inspire others.
           </p>
           <div className="mt-8">
             <Link href="/signup">
               <PremiumButton variant="primary" size="lg">
-                Kom igång gratis
+                Get started free
                 <ArrowRight className="h-5 w-5" />
               </PremiumButton>
             </Link>

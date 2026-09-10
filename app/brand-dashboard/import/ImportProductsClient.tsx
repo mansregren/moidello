@@ -29,7 +29,7 @@ export function ImportProductsClient() {
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-5">
       <label className="block text-xs uppercase tracking-[0.2em] text-foreground-subtle">
-        Klistra in CSV eller välj fil
+        Paste CSV or choose a file
       </label>
 
       <div className="flex items-center gap-3">
@@ -39,7 +39,7 @@ export function ImportProductsClient() {
           className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2 text-sm hover:border-foreground/30"
         >
           <Upload className="h-4 w-4" />
-          Välj CSV-fil
+          Choose CSV file
         </button>
         <input
           ref={fileInputRef}
@@ -84,7 +84,7 @@ export function ImportProductsClient() {
                 </p>
                 {result.skipped.length > 0 && (
                   <p className="text-xs text-foreground-muted mt-1">
-                    {result.skipped.length} rader hoppades över.
+                    {result.skipped.length} rows were skipped.
                   </p>
                 )}
               </div>
@@ -104,7 +104,7 @@ export function ImportProductsClient() {
           {result.skipped.length > 0 && (
             <details className="rounded-2xl border border-border bg-background-secondary p-5">
               <summary className="text-sm text-foreground cursor-pointer">
-                Hoppade över rader ({result.skipped.length})
+                Skipped rows ({result.skipped.length})
               </summary>
               <ul className="mt-3 space-y-1 text-xs text-foreground-muted">
                 {result.skipped.map((s, i) => (

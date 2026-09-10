@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Brand-dashboard",
-  description: "Aggregerat engagemang på outfits som taggar ditt märke.",
+  description: "Aggregated engagement on outfits tagging your brand.",
   alternates: { canonical: "/brand-dashboard" },
   robots: { index: false, follow: true },
 };

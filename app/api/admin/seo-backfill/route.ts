@@ -54,7 +54,7 @@ function hasComplete(o: OutfitRow): boolean {
 
 export async function POST(request: Request) {
   if (!(await isCurrentUserAdmin())) {
-    return NextResponse.json({ error: "Inte behörig." }, { status: 403 });
+    return NextResponse.json({ error: "Not authorised." }, { status: 403 });
   }
 
   let body: {

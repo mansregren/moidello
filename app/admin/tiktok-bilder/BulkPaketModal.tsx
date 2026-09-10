@@ -50,7 +50,7 @@ export function BulkPaketModal({ open, outfits, onClose }: Props) {
         const res = await fetch(`/api/admin/share-image/${o.id}`, {
           cache: "no-store",
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status} på ${o.id}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status} on ${o.id}`);
         const blob = await res.blob();
         return new File([blob], heroFileName(o), { type: "image/png" });
       }),
@@ -186,7 +186,7 @@ export function BulkPaketModal({ open, outfits, onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Stäng"
+            aria-label="Close"
             className="rounded-full p-1.5 text-foreground-muted hover:bg-background-secondary hover:text-foreground"
           >
             <X className="h-5 w-5" />
@@ -293,16 +293,16 @@ export function BulkPaketModal({ open, outfits, onClose }: Props) {
               >
                 <Download className="h-3.5 w-3.5" />
                 {bulkBusy
-                  ? "Hämtar…"
+                  ? "Fetching…"
                   : filesLoading || !files
-                    ? "Förbereder…"
+                    ? "Preparing…"
                     : `Spara alla ${outfits.length}`}
               </button>
             </div>
             <p className="mb-3 text-[11px] text-foreground-subtle">
-              På iPhone: tryck Spara → välj <strong>Spara bild</strong> i
-              delningsmenyn (inte “Spara i Filer”). Om inget händer, håll
-              fingret på en thumbnail nedan → <strong>Lägg till i Bilder</strong>.
+              On iPhone: tap Save → choose <strong>Save Image</strong> in the
+              share sheet (not “Save to Files”). If nothing happens, press and
+              hold a thumbnail below → <strong>Add to Photos</strong>.
             </p>
             {bulkError && (
               <p className="mb-3 text-sm text-red-400">{bulkError}</p>

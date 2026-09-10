@@ -96,7 +96,7 @@ export function OmslagClient({ rows }: { rows: CoverCandidate[] }) {
                   disabled={pending && busyKey === group.key}
                   className="text-[11px] text-foreground-subtle hover:text-foreground transition-colors disabled:opacity-60"
                 >
-                  Återställ (nyaste)
+                  Reset (newest)
                 </button>
               )}
             </div>
@@ -138,7 +138,7 @@ export function OmslagClient({ rows }: { rows: CoverCandidate[] }) {
       })}
       {groups.length === 0 && (
         <p className="text-foreground-muted">
-          Inga publicerade inlägg med kategori ännu.
+          No published posts with a category yet.
         </p>
       )}
     </div>

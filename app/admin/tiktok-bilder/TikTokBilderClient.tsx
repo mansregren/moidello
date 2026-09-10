@@ -74,7 +74,7 @@ export function TikTokBilderClient({ outfits }: Props) {
       const file = await fetchPng(o);
       await shareOrSavePhotos([file]);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Kunde inte hämta bilden");
+      setError(e instanceof Error ? e.message : "Could not fetch the image");
     } finally {
       setBusyId(null);
     }
@@ -90,7 +90,7 @@ export function TikTokBilderClient({ outfits }: Props) {
       const files = await Promise.all(targets.map(fetchPng));
       await shareOrSavePhotos(files);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Kunde inte hämta bilderna");
+      setError(e instanceof Error ? e.message : "Could not fetch the images");
     } finally {
       setBulkBusy(false);
     }
@@ -148,7 +148,7 @@ export function TikTokBilderClient({ outfits }: Props) {
           >
             <Download className="h-3.5 w-3.5" />
             {bulkBusy
-              ? "Hämtar…"
+              ? "Fetching…"
               : selected.size > 1
                 ? `Hero × ${selected.size}`
                 : "Hero"}
@@ -230,13 +230,13 @@ export function TikTokBilderClient({ outfits }: Props) {
                       className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:border-foreground/30 disabled:opacity-50"
                     >
                       <Download className="h-3.5 w-3.5" />
-                      {isBusy ? "Hämtar…" : "Hero"}
+                      {isBusy ? "Fetching…" : "Hero"}
                     </button>
                     <Link
                       href={`/admin/inlagg/${o.id}`}
                       className="text-[11px] text-foreground-muted hover:text-foreground"
                     >
-                      Öppna →
+                      Open →
                     </Link>
                   </div>
                 </div>

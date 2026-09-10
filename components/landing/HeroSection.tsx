@@ -62,19 +62,19 @@ export function HeroSection() {
               Outfit
             </h1>
             <p className="mt-6 text-lg text-white/70 lg:text-foreground/70 max-w-md">
-              Upptäck, dela och shoppa outfits från kreatörer du älskar.
-              Tagga varje plagg, länka var du köper.
+              Discover, share and shop outfits. Tag every piece, link where
+              you buy.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/">
                 <PremiumButton variant="primary" size="lg">
-                  Utforska outfits
+                  Explore outfits
                   <ArrowRight className="h-5 w-5" />
                 </PremiumButton>
               </Link>
               <Link href="/signup">
                 <PremiumButton variant="glass" size="lg">
-                  Skapa konto
+                  Create account
                 </PremiumButton>
               </Link>
             </div>

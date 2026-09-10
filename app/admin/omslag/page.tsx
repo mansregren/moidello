@@ -41,9 +41,9 @@ export default async function OmslagPage() {
         Kategori-omslag
       </h1>
       <p className="text-sm text-foreground-muted mb-8">
-        Välj vilken bild som är omslag på varje kategori-kort (/home-rummen och
-        mode-kategorierna). Klicka på en bild för att göra den till omslag. Utan
-        val visas det nyaste inlägget automatiskt.
+        Choose which image is the cover on each category card (the /home
+        rooms and the fashion categories). Click an image to make it the
+        cover. Without a choice the newest post is shown automatically.
       </p>
       <OmslagClient rows={rows} />
     </div>

@@ -28,7 +28,7 @@ export async function updateOutfit(
   },
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
   if (!UUID_RE.test(outfitId)) {
     return { ok: false, error: "Ogiltigt id." };
@@ -37,7 +37,7 @@ export async function updateOutfit(
   const updates: OutfitUpdate = {};
   if (patch.title !== undefined) {
     const t = patch.title.trim();
-    if (!t) return { ok: false, error: "Titel får inte vara tom." };
+    if (!t) return { ok: false, error: "The title can’t be empty." };
     updates.title = t.slice(0, 200);
   }
   if (patch.description !== undefined) {
@@ -61,7 +61,7 @@ export async function updateOutfit(
   }
   if (patch.gender !== undefined) {
     if (patch.gender !== "dam" && patch.gender !== "herr") {
-      return { ok: false, error: "Ogiltigt kön." };
+      return { ok: false, error: "Invalid gender." };
     }
     updates.gender = patch.gender;
   }
@@ -74,7 +74,7 @@ export async function updateOutfit(
     } else {
       const d = new Date(patch.scheduled_for);
       if (Number.isNaN(d.getTime())) {
-        return { ok: false, error: "Ogiltigt schemaläggnings-datum." };
+        return { ok: false, error: "Invalid scheduling date." };
       }
       updates.scheduled_for = d.toISOString();
     }
@@ -100,7 +100,7 @@ export async function deleteOutfit(
   outfitId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
   if (!UUID_RE.test(outfitId)) {
     return { ok: false, error: "Ogiltigt id." };
@@ -150,7 +150,7 @@ export async function addTaggedItem(
   },
 ): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
   if (!UUID_RE.test(outfitId)) {
     return { ok: false, error: "Ogiltigt outfit-id." };
@@ -159,10 +159,10 @@ export async function addTaggedItem(
   const name = data.name.trim();
   const buyUrl = data.buy_url.trim();
   if (!brand || !name) {
-    return { ok: false, error: "Märke och plaggnamn måste fyllas i." };
+    return { ok: false, error: "Brand and piece name are required." };
   }
   if (!/^https?:\/\//i.test(buyUrl)) {
-    return { ok: false, error: "Köp-URL måste börja med http(s)://" };
+    return { ok: false, error: "The buy URL must start with http(s)://" };
   }
 
   const supabase = await createClient();
@@ -210,14 +210,14 @@ export async function recropOutfitImage(
 ): Promise<{ ok: boolean; error?: string }> {
   if (!UUID_RE.test(outfitId)) return { ok: false, error: "Ogiltigt id." };
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
   const image = formData.get("image");
   if (!(image instanceof File) || image.size === 0) {
     return { ok: false, error: "Ingen bild." };
   }
   if (image.size > 12 * 1024 * 1024) {
-    return { ok: false, error: "Bilden är för stor." };
+    return { ok: false, error: "The image is too large." };
   }
 
   const supabase = await createClient();
@@ -269,7 +269,7 @@ export async function setCategoryCover(
   category: string,
 ): Promise<{ ok: boolean; error?: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
   if (outfitId !== null && !UUID_RE.test(outfitId)) {
     return { ok: false, error: "Ogiltigt id." };
@@ -316,25 +316,25 @@ export async function updateTaggedItem(
   },
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
   if (!UUID_RE.test(tagId)) return { ok: false, error: "Ogiltigt id." };
 
   const updates: TaggedItemUpdate = {};
   if (patch.brand !== undefined) {
     const b = patch.brand.trim();
-    if (!b) return { ok: false, error: "Märke får inte vara tomt." };
+    if (!b) return { ok: false, error: "Brand can’t be empty." };
     updates.brand = b.slice(0, 80);
   }
   if (patch.name !== undefined) {
     const n = patch.name.trim();
-    if (!n) return { ok: false, error: "Namn får inte vara tomt." };
+    if (!n) return { ok: false, error: "Name can’t be empty." };
     updates.name = n.slice(0, 200);
   }
   if (patch.buy_url !== undefined) {
     const u = patch.buy_url?.trim() ?? null;
     if (u && !/^https?:\/\//i.test(u)) {
-      return { ok: false, error: "URL måste börja med http(s)://" };
+      return { ok: false, error: "The URL must start with http(s)://" };
     }
     updates.buy_url = u && u.length > 0 ? u : null;
   }
@@ -402,7 +402,7 @@ export async function bulkPublishOutfits(
   publish: boolean,
 ): Promise<{ ok: true; count: number } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
   const valid = outfitIds.filter((id) => UUID_RE.test(id)).slice(0, MAX_BULK);
   if (valid.length === 0) return { ok: false, error: "Inga giltiga ID." };
@@ -423,7 +423,7 @@ export async function bulkDeleteOutfits(
   outfitIds: string[],
 ): Promise<{ ok: true; count: number } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
   const valid = outfitIds.filter((id) => UUID_RE.test(id)).slice(0, MAX_BULK);
   if (valid.length === 0) return { ok: false, error: "Inga giltiga ID." };
@@ -455,10 +455,10 @@ export async function bulkReassignOutfits(
   newUserId: string,
 ): Promise<{ ok: true; count: number } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
   if (!UUID_RE.test(newUserId)) {
-    return { ok: false, error: "Ogiltig mål-användare." };
+    return { ok: false, error: "Invalid target user." };
   }
   const valid = outfitIds.filter((id) => UUID_RE.test(id)).slice(0, MAX_BULK);
   if (valid.length === 0) return { ok: false, error: "Inga giltiga ID." };
@@ -480,7 +480,7 @@ export async function updateTaggedItemPosition(
   y: number,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
   if (!UUID_RE.test(tagId)) return { ok: false, error: "Ogiltigt id." };
 
@@ -512,7 +512,7 @@ export async function deleteTaggedItem(
   tagId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Inte behörig." };
+    return { ok: false, error: "Not authorised." };
   }
   if (!UUID_RE.test(tagId)) return { ok: false, error: "Ogiltigt id." };
 

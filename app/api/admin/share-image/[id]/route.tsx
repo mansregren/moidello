@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 
 const SITE_BASE = "https://moidello.com";
 
-// 9:16 (TikTok / Stories). 1080×1920 är standardupplösning som klipps
+// 9:16 (TikTok / Stories). 1080×1920 is the standard resolution, cropped
 // rent i alla appar utan extra crop.
 const CANVAS_W = 1080;
 const CANVAS_H = 1920;
@@ -250,7 +250,7 @@ function renderPlagg(outfit: Outfit, focus: TaggedItem) {
           }}
         />
 
-        {/* Övriga prickar — diskreta */}
+        {/* Other dots — subtle */}
         {others.map((t) => {
           const ox = (t.x / 100) * PLAGG_FRAME_W;
           const oy = (t.y / 100) * PLAGG_FRAME_H;
@@ -371,7 +371,7 @@ function renderPlagg(outfit: Outfit, focus: TaggedItem) {
         )}
       </div>
 
-      {/* Footer — söka koden på moidello.com */}
+      {/* Footer — search the code on moidello.com */}
       <div
         style={{
           position: "absolute",
@@ -393,7 +393,7 @@ function renderPlagg(outfit: Outfit, focus: TaggedItem) {
             display: "flex",
           }}
         >
-          Sök koden
+          Search the code
         </div>
         <div
           style={{

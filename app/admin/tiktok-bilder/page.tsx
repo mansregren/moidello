@@ -43,7 +43,7 @@ export default async function AdminTikTokBilderPage() {
     title: o.title,
     image_url: o.image_url,
     code: o.code,
-    username: o.profiles?.username ?? "okänd",
+    username: o.profiles?.username ?? "unknown",
     tags: (o.tagged_items ?? []).map((t) => ({
       id: t.id,
       brand: t.brand,
@@ -58,13 +58,13 @@ export default async function AdminTikTokBilderPage() {
         Admin
       </p>
       <h1 className="font-heading text-4xl md:text-6xl uppercase tracking-tight leading-none">
-        TikTok-bilder
+        TikTok images
       </h1>
       <p className="mt-4 text-foreground-muted max-w-2xl">
-        Per outfit får du ett TikTok-paket: hero-bild + en bild per plagg
-        (max 5), AI-genererad rubrik + beskrivning + 5 hashtags. Tryck
-        Paket på ett kort. På iPhone öppnas delningsmenyn så bilderna
-        landar i kamerarullen.
+        For each outfit you get a TikTok pack: a hero image + one image per
+        piece (max 5), an AI-generated headline + description + 5 hashtags.
+        Tap Pack on a card. On iPhone the share sheet opens so the images
+        land in the camera roll.
       </p>
 
       <div className="mt-8">

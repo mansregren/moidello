@@ -60,9 +60,9 @@ export default async function BrandImportPage() {
               CSV-format
             </h2>
             <p className="text-sm text-foreground-muted mb-4">
-              Första raden måste innehålla kolumnnamnen nedan. Endast{" "}
-              <code className="text-foreground">name</code> krävs — resten är
-              valfria. Värden med komma måste omslutas med citationstecken.
+              The first row must contain the column names below. Only{" "}
+              <code className="text-foreground">name</code> is required — the
+              rest are optional. Values with commas must be wrapped in quotes.
             </p>
             <pre className="text-xs text-foreground-muted bg-background-tertiary rounded-xl p-4 overflow-x-auto">
               {`name,description,price,currency,buy_url,image_url

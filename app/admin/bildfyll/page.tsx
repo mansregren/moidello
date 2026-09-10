@@ -37,9 +37,10 @@ export default async function BildFyllPage() {
         Fyll bilder
       </h1>
       <p className="text-sm text-foreground-muted mb-8">
-        Går igenom alla {rows.length} uppladdade bilder, beskär bort den beige
-        paddingen (#F7F6F3) så fotot fyller rutan, och sparar en ny version.
-        Originalfilen behålls (backbart). Bilder utan padding rörs inte.
+        Goes through all {rows.length} uploaded images, crops away the beige
+        padding (#F7F6F3) so the photo fills the frame, and saves a new
+        version. The original file is kept (reversible). Images without
+        padding are left untouched.
       </p>
       <BildFyllClient rows={rows} />
     </div>

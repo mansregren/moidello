@@ -62,12 +62,12 @@ export function ItemSeoBackfillClient({ missing }: Props) {
     <>
       <div className="rounded-2xl border border-border bg-background-secondary p-5 mb-6">
         <p className="text-sm text-foreground-muted mb-4">
-          AI-genererar description, keywords, alt-text och material för plagg
-          (tagged_items) som saknar fält. Text-only Claude — ~$0.002 per
-          plagg, batchas så Vercel-timeouten håller.
+          AI-generates description, keywords, alt text and material for
+          pieces (tagged_items) missing fields. Text-only Claude — ~$0.002
+          per piece, batched so the Vercel timeout holds.
         </p>
         <label className="flex items-center gap-2 text-sm text-foreground mb-4">
-          Batch-storlek
+          Batch size
           <input
             type="number"
             min={1}
@@ -90,10 +90,10 @@ export function ItemSeoBackfillClient({ missing }: Props) {
         >
           <Sparkles className="h-4 w-4" />
           {running
-            ? "Bearbetar…"
+            ? "Processing…"
             : missing.length === 0
-              ? "Allt är OK"
-              : `Backfilla ${Math.min(batchSize, missing.length)} av ${missing.length} plagg`}
+              ? "All OK"
+              : `Backfill ${Math.min(batchSize, missing.length)} of ${missing.length} pieces`}
         </button>
       </div>
 
@@ -161,7 +161,7 @@ export function ItemSeoBackfillClient({ missing }: Props) {
           </ul>
           {missing.length > 100 && (
             <p className="mt-3 text-xs text-foreground-subtle">
-              … visar 100 första av {missing.length}.
+              … showing the first 100 of {missing.length}.
             </p>
           )}
         </section>

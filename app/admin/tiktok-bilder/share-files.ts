@@ -36,14 +36,14 @@ export async function shareOrSavePhotos(files: File[]): Promise<void> {
       if (err instanceof Error && err.name === "AbortError") return;
       if (ios) {
         throw new Error(
-          "Spara via delningsmenyn misslyckades. Håll fingret på en bild nedan och välj Lägg till i Bilder.",
+          "Saving via the share sheet failed. Press and hold an image below and choose Add to Photos.",
         );
       }
       // Desktop: fall vidare till download-fallback
     }
   } else if (ios) {
     throw new Error(
-      "Den här webbläsaren tillåter inte direkt-spara till Bilder. Håll fingret på en bild nedan och välj Lägg till i Bilder.",
+      "This browser doesn't allow saving directly to Photos. Press and hold an image below and choose Add to Photos.",
     );
   }
 

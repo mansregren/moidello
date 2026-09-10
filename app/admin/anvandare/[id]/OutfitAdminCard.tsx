@@ -54,7 +54,7 @@ export function OutfitAdminCard({
     e.stopPropagation();
     if (
       !confirm(
-        `Radera "${outfit.title}" permanent? Alla taggar, kommentarer, gilla- och köp-klick raderas också.`,
+        `Delete "${outfit.title}" permanently? All tags, comments, likes and buy clicks are deleted too.`,
       )
     )
       return;
@@ -115,7 +115,7 @@ export function OutfitAdminCard({
               type="button"
               onClick={handleDelete}
               disabled={pending || deleting}
-              title="Radera inlägg permanent"
+              title="Delete post permanently"
               className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-red-500/85 hover:bg-red-500 text-white backdrop-blur-sm transition-colors disabled:opacity-60"
             >
               {deleting ? (

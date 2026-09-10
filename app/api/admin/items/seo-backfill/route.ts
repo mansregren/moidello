@@ -57,7 +57,7 @@ function hasComplete(o: ItemRow): boolean {
 
 export async function POST(request: Request) {
   if (!(await isCurrentUserAdmin())) {
-    return NextResponse.json({ error: "Inte behörig." }, { status: 403 });
+    return NextResponse.json({ error: "Not authorised." }, { status: 403 });
   }
 
   let body: { onlyMissing?: unknown; ids?: unknown; limit?: unknown };

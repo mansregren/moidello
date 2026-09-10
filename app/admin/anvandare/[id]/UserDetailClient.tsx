@@ -156,7 +156,7 @@ export function UserDetailClient({ user }: { user: FullUserRow }) {
       </div>
 
       <form onSubmit={handleSave} className="grid sm:grid-cols-2 gap-4">
-        <Field label="Användarnamn" wide={false}>
+        <Field label="Username" wide={false}>
           <input
             type="text"
             value={form.username}
@@ -203,14 +203,14 @@ export function UserDetailClient({ user }: { user: FullUserRow }) {
             }
             className={INPUT}
           >
-            <option value="creator">Kreatör</option>
-            <option value="brand">Märke</option>
+            <option value="creator">Creator</option>
+            <option value="brand">Brand</option>
           </select>
         </Field>
 
         {form.account_type === "brand" && (
           <>
-            <Field label="Märkesnamn">
+            <Field label="Brand name">
               <input
                 type="text"
                 value={form.brand_name}
@@ -218,7 +218,7 @@ export function UserDetailClient({ user }: { user: FullUserRow }) {
                 className={INPUT}
               />
             </Field>
-            <Field label="Märkets hemsida">
+            <Field label="Brand website">
               <input
                 type="url"
                 value={form.brand_website}
@@ -235,7 +235,7 @@ export function UserDetailClient({ user }: { user: FullUserRow }) {
             type="text"
             value={form.instagram}
             onChange={(e) => set("instagram", e.target.value)}
-            placeholder="användarnamn"
+            placeholder="username"
             className={INPUT}
           />
         </Field>
@@ -244,7 +244,7 @@ export function UserDetailClient({ user }: { user: FullUserRow }) {
             type="text"
             value={form.tiktok}
             onChange={(e) => set("tiktok", e.target.value)}
-            placeholder="användarnamn"
+            placeholder="username"
             className={INPUT}
           />
         </Field>
@@ -281,7 +281,7 @@ export function UserDetailClient({ user }: { user: FullUserRow }) {
             className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
           >
             <Save className="h-4 w-4" />
-            {pending ? "Sparar…" : "Spara ändringar"}
+            {pending ? "Saving…" : "Save changes"}
           </button>
         </div>
       </form>

@@ -60,14 +60,14 @@ export default async function AdminUsersPage({
   return (
     <>
       <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-3">
-        Admin / Användare
+        Admin / Users
       </p>
       <h1 className="font-heading text-4xl md:text-6xl uppercase tracking-tight leading-none">
-        Användare
+        Users
       </h1>
       <p className="mt-4 text-foreground-muted">
-        Hantera profiler, byt bild, posta som någon eller skapa nya
-        demo-konton.
+        Manage profiles, change avatars, post as someone or create new
+        demo accounts.
       </p>
 
       <nav className="mt-6 flex flex-wrap gap-2">
@@ -102,10 +102,10 @@ function FilterPill({
   const href = `/admin/anvandare${qs.toString() ? "?" + qs.toString() : ""}`;
 
   const labels: Record<Filter, string> = {
-    all: "Alla",
-    real: "Riktiga",
+    all: "All",
+    real: "Real",
     demo: "Demo",
-    brand: "Märken",
+    brand: "Brands",
     admin: "Admins",
   };
 

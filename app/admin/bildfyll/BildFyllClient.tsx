@@ -153,22 +153,22 @@ export function BildFyllClient({ rows }: { rows: FillRow[] }) {
         className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
       >
         {status === "running"
-          ? `Kör… ${done}/${rows.length}`
+          ? `Running… ${done}/${rows.length}`
           : status === "done"
-            ? "Kör igen"
+            ? "Run again"
             : `Fyll ${rows.length} bilder`}
       </button>
 
       {(status === "running" || status === "done") && (
         <div className="rounded-2xl border border-border bg-background-secondary p-4 text-sm">
           <p className="text-foreground">
-            Klar: {done}/{rows.length} · Beskurna: {changed} · Orörda (ingen
+            Done: {done}/{rows.length} · Cropped: {changed} · Untouched (no
             padding): {skipped} · Fel: {errors.length}
           </p>
           {status === "done" && (
             <p className="mt-2 text-xs text-foreground-muted">
-              Färdigt. Ladda om sidorna för att se de fyllda bilderna (cachen
-              uppdateras inom några minuter på publika sidor).
+              Finished. Reload the pages to see the filled images (the cache
+              updates within a few minutes on public pages).
             </p>
           )}
           {errors.length > 0 && (

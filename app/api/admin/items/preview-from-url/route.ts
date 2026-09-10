@@ -121,7 +121,7 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json(
-      { error: "Du måste vara inloggad." },
+      { error: "You must be logged in." },
       { status: 401 },
     );
   }
@@ -131,7 +131,7 @@ export async function POST(request: Request) {
   const rl = await checkRateLimit("preview", rateKey);
   if (!rl.ok) {
     return NextResponse.json(
-      { error: "För många anrop. Vänta lite." },
+      { error: "Too many requests. Wait a moment." },
       {
         status: 429,
         headers: rl.retryAfter
@@ -159,14 +159,14 @@ export async function POST(request: Request) {
     if (!/^https?:$/i.test(url.protocol)) throw new Error();
   } catch {
     return NextResponse.json(
-      { error: "Ogiltig URL — måste börja med http(s)." },
+      { error: "Invalid URL — must start with http(s)." },
       { status: 400 },
     );
   }
 
   if (!(await isHostnameSafe(url.hostname))) {
     return NextResponse.json(
-      { error: "URL pekar mot intern eller ej tillåten adress." },
+      { error: "The URL points to an internal or disallowed address." },
       { status: 400 },
     );
   }

@@ -47,7 +47,7 @@ export default async function BrandDashboardPage() {
     return (
       <Shell>
         <p className="text-sm text-amber-400">
-          account_type-kolumnen finns inte ännu. Kör migration
+          The account_type column doesn't exist yet. Run migration
           0007_account_types.sql i Supabase.
         </p>
       </Shell>
@@ -59,12 +59,11 @@ export default async function BrandDashboardPage() {
     return (
       <Shell>
         <p className="text-foreground-muted">
-          Du har inte aktiverat ett brand-konto. Gå till{" "}
+          You haven't enabled a brand account. Go to{" "}
           <Link href="/profil" className="text-foreground underline hover:text-foreground/80">
-            din profil
+            your profile
           </Link>{" "}
-          och kryssa i &quot;Jag representerar ett märke&quot; för att komma
-          igång.
+          and tick &quot;I represent a brand&quot; to get started.
         </p>
       </Shell>
     );
@@ -113,7 +112,7 @@ export default async function BrandDashboardPage() {
         {profile.brand_name}
       </h1>
       <p className="mt-3 text-foreground-muted">
-        Engagemang på outfits där kreatörer har taggat ditt märke.
+        Engagement on outfits that tag your brand.
       </p>
 
       <div className="mt-5 flex flex-wrap gap-2">
@@ -121,26 +120,26 @@ export default async function BrandDashboardPage() {
           href="/brand-dashboard/import"
           className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-xs font-semibold hover:bg-foreground/90"
         >
-          Importera produkter (CSV)
+          Import products (CSV)
         </Link>
       </div>
 
       <section className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <SummaryCard icon={Heart} label="Gillningar" value={totals.likes} />
-        <SummaryCard icon={Bookmark} label="Sparade" value={totals.saves} />
-        <SummaryCard icon={MessageCircle} label="Kommentarer" value={totals.comments} />
-        <SummaryCard icon={MousePointerClick} label="Klick på köplänk" value={totals.clicks} />
+        <SummaryCard icon={Heart} label="Likes" value={totals.likes} />
+        <SummaryCard icon={Bookmark} label="Saves" value={totals.saves} />
+        <SummaryCard icon={MessageCircle} label="Comments" value={totals.comments} />
+        <SummaryCard icon={MousePointerClick} label="Buy-link clicks" value={totals.clicks} />
       </section>
 
       <section className="mt-12">
         <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground mb-5">
-          Outfits som taggar {profile.brand_name}
+          Outfits tagging {profile.brand_name}
         </h2>
 
         {rows.length === 0 && (
           <p className="text-sm text-foreground-muted">
-            Inga outfits taggar ditt märke ännu. Statistik dyker upp här när
-            kreatörer börjar tagga.
+            No outfits tag your brand yet. Stats show up here once people
+            start tagging.
           </p>
         )}
 

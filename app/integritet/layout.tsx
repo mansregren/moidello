@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Integritetspolicy",
+  title: "Privacy Policy",
   description:
-    "Hur Moidello samlar in, använder och skyddar personuppgifter i enlighet med GDPR.",
+    "How Moidello collects, uses and protects personal data in accordance with the GDPR.",
   alternates: { canonical: "/integritet" },
 };
 

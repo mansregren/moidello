@@ -96,9 +96,9 @@ export default async function AdminSeoPage() {
         SEO
       </h1>
       <p className="mt-4 text-foreground-muted max-w-2xl">
-        AI-backfill av meta-data för outfits och taggade plagg. Två
-        separata pipelines — outfits använder Claude vision (bild + ev.
-        kategori-hint), plagg använder Claude text (brand/namn/färg-fakta).
+        AI backfill of metadata for outfits and tagged pieces. Two separate
+        pipelines — outfits use Claude vision (image + optional category
+        hint), pieces use Claude text (brand/name/colour facts).
       </p>
 
       <section className="mt-12">
@@ -106,7 +106,7 @@ export default async function AdminSeoPage() {
           Outfits
         </h2>
         <p className="text-xs uppercase tracking-wider text-foreground-subtle mb-5">
-          Title · beskrivning · meta-description · keywords · alt-text
+          Title · description · meta description · keywords · alt text
         </p>
         <SeoBackfillClient missing={missingOutfits} />
       </section>

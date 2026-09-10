@@ -36,7 +36,7 @@ function service() {
 
 export async function POST(request: Request) {
   if (!(await isCurrentUserAdmin())) {
-    return NextResponse.json({ error: "Inte behörig." }, { status: 403 });
+    return NextResponse.json({ error: "Not authorised." }, { status: 403 });
   }
 
   let body: { outfitIds?: unknown };
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
 
   if (!Array.isArray(body.outfitIds) || body.outfitIds.length === 0) {
     return NextResponse.json(
-      { error: "outfitIds måste vara en array med minst en id." },
+      { error: "outfitIds must be an array with at least one id." },
       { status: 400 },
     );
   }

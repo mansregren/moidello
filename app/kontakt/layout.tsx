@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Kontakt",
+  title: "Contact",
   description:
-    "Kontakta Moidello — frågor, samarbete och feedback. Vi återkommer inom två arbetsdagar.",
+    "Contact Moidello — questions, partnerships and feedback. We get back to you within two business days.",
   alternates: { canonical: "/kontakt" },
 };
 

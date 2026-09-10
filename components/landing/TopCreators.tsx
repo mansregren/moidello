@@ -16,7 +16,7 @@ export function TopCreators() {
           transition={{ duration: 0.6 }}
           className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground text-center mb-16"
         >
-          Top <span className="text-foreground-subtle">Kreatörer</span>
+          Top <span className="text-foreground-subtle">Profiles</span>
         </motion.h2>
 
         <div className="flex flex-wrap justify-center gap-12 md:gap-16">

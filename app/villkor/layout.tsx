@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Användarvillkor",
-  description: "Villkor för användning av Moidello.",
+  title: "Terms of Use",
+  description: "Terms for using Moidello.",
   alternates: { canonical: "/villkor" },
 };
 

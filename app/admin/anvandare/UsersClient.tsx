@@ -102,7 +102,7 @@ export function UsersClient({
   const handleDelete = (uid: string, label: string) => {
     if (
       !confirm(
-        `Radera ${label} permanent? All deras outfits, kommentarer och meddelanden raderas också.`,
+        `Delete ${label} permanently? All their outfits, comments and messages are deleted too.`,
       )
     )
       return;
@@ -126,7 +126,7 @@ export function UsersClient({
       if (res.skipped > 0) parts.push(`${res.skipped} fanns redan`);
       if (res.errors.length > 0)
         parts.push(`${res.errors.length} fel: ${res.errors.join("; ")}`);
-      setSeedReport(parts.join(" · ") || "Inget hände.");
+      setSeedReport(parts.join(" · ") || "Nothing happened.");
       router.refresh();
     });
   };
@@ -141,7 +141,7 @@ export function UsersClient({
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Sök användarnamn, namn eller märke…"
+              placeholder="Search username, name or brand…"
               className="w-full rounded-full bg-background-secondary border border-border pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
             />
           </div>
@@ -152,7 +152,7 @@ export function UsersClient({
           className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2.5 text-sm font-semibold hover:bg-foreground/90"
         >
           <Plus className="h-4 w-4" />
-          Ny användare
+          New user
         </button>
         <button
           type="button"
@@ -174,7 +174,7 @@ export function UsersClient({
       <ul className="mt-8 space-y-2">
         {users.length === 0 && (
           <p className="text-sm text-foreground-subtle">
-            Inga användare matchar.
+            No users match.
           </p>
         )}
         {users.map((u) => {
@@ -215,7 +215,7 @@ export function UsersClient({
                   </Link>
                   {u.account_type === "brand" && (
                     <span className="inline-flex rounded-full bg-foreground/10 text-foreground px-2 py-0.5 text-[10px] uppercase tracking-wider">
-                      Märke
+                      Brand
                     </span>
                   )}
                   {u.is_admin && (
@@ -230,7 +230,7 @@ export function UsersClient({
                   )}
                   {isViewer && (
                     <span className="inline-flex rounded-full bg-foreground/10 text-foreground px-2 py-0.5 text-[10px] uppercase tracking-wider">
-                      Du
+                      You
                     </span>
                   )}
                 </div>
@@ -248,14 +248,14 @@ export function UsersClient({
                     className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1.5 text-xs font-semibold hover:bg-foreground/90 disabled:opacity-50"
                   >
                     <UserCheck className="h-3 w-3" />
-                    Posta som
+                    Post as
                   </button>
                 )}
                 <button
                   type="button"
                   disabled={isBusy}
                   onClick={() => setEditing(u)}
-                  aria-label="Redigera"
+                  aria-label="Edit"
                   className="inline-flex items-center justify-center rounded-full border border-border text-foreground h-7 w-7 hover:border-foreground/30 disabled:opacity-50"
                 >
                   <Pencil className="h-3 w-3" />
@@ -265,8 +265,8 @@ export function UsersClient({
                     type="button"
                     disabled={isBusy}
                     onClick={() => handleToggleAdmin(u.id)}
-                    aria-label={u.is_admin ? "Ta bort admin" : "Gör till admin"}
-                    title={u.is_admin ? "Ta bort admin" : "Gör till admin"}
+                    aria-label={u.is_admin ? "Remove admin" : "Make admin"}
+                    title={u.is_admin ? "Remove admin" : "Make admin"}
                     className="inline-flex items-center justify-center rounded-full border border-border text-foreground h-7 w-7 hover:border-foreground/30 disabled:opacity-50"
                   >
                     {u.is_admin ? (
@@ -370,9 +370,9 @@ function EditUserModal({
   };
 
   return (
-    <Modal title={`Redigera @${user.username}`} onClose={onClose}>
+    <Modal title={`Edit @${user.username}`} onClose={onClose}>
       <form onSubmit={submit} className="space-y-4">
-        <Field label="Användarnamn">
+        <Field label="Username">
           <input
             type="text"
             value={username}
@@ -381,7 +381,7 @@ function EditUserModal({
             className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30 font-mono"
           />
         </Field>
-        <Field label="Visningsnamn">
+        <Field label="Display name">
           <input
             type="text"
             value={displayName}
@@ -398,7 +398,7 @@ function EditUserModal({
             className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30 resize-none"
           />
         </Field>
-        <Field label="Profilbild">
+        <Field label="Profile picture">
           <div className="flex items-center gap-3">
             <div className="relative h-14 w-14 shrink-0 rounded-full overflow-hidden border border-border bg-background-tertiary">
               {avatarUrl ? (
@@ -424,7 +424,7 @@ function EditUserModal({
                 className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-3 py-2 text-xs font-semibold hover:bg-foreground/90 disabled:opacity-60"
               >
                 <Upload className="h-3 w-3" />
-                {uploading ? "Laddar upp…" : "Välj bild"}
+                {uploading ? "Uploading…" : "Choose image"}
               </button>
               <p className="text-[11px] text-foreground-subtle mt-1.5">
                 JPG/PNG/WebP, max 5 MB
@@ -459,14 +459,14 @@ function EditUserModal({
             onClick={onClose}
             className="flex-1 rounded-full border border-border text-foreground py-2.5 text-sm font-medium hover:border-foreground/30"
           >
-            Avbryt
+            Cancel
           </button>
           <button
             type="submit"
             disabled={pending}
             className="flex-1 rounded-full bg-foreground text-background py-2.5 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
           >
-            {pending ? "Sparar…" : "Spara"}
+            {pending ? "Saving…" : "Save"}
           </button>
         </div>
       </form>
@@ -504,13 +504,13 @@ function CreateUserModal({
   };
 
   return (
-    <Modal title="Skapa ny användare" onClose={onClose}>
+    <Modal title="Create a new user" onClose={onClose}>
       <p className="text-xs text-foreground-subtle mb-4">
-        Skapar ett demo-konto utan inloggning. Krä­ver
-        SUPABASE_SERVICE_ROLE_KEY i Vercel.
+        Creates a demo account without login. Requires
+        SUPABASE_SERVICE_ROLE_KEY in Vercel.
       </p>
       <form onSubmit={submit} className="space-y-4">
-        <Field label="Användarnamn (a–z, 0–9, _)">
+        <Field label="Username (a–z, 0–9, _)">
           <input
             type="text"
             value={username}
@@ -521,7 +521,7 @@ function CreateUserModal({
             className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30 font-mono"
           />
         </Field>
-        <Field label="Visningsnamn">
+        <Field label="Display name">
           <input
             type="text"
             value={displayName}
@@ -531,17 +531,17 @@ function CreateUserModal({
             className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30"
           />
         </Field>
-        <Field label="Bio (valfri)">
+        <Field label="Bio (optional)">
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={2}
             maxLength={500}
-            placeholder="Berätta i en mening."
+            placeholder="Describe them in one sentence."
             className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30 resize-none"
           />
         </Field>
-        <Field label="Avatar-URL (valfri)">
+        <Field label="Avatar URL (optional)">
           <input
             type="url"
             value={avatarUrl}
@@ -557,14 +557,14 @@ function CreateUserModal({
             onClick={onClose}
             className="flex-1 rounded-full border border-border text-foreground py-2.5 text-sm font-medium hover:border-foreground/30"
           >
-            Avbryt
+            Cancel
           </button>
           <button
             type="submit"
             disabled={pending}
             className="flex-1 rounded-full bg-foreground text-background py-2.5 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
           >
-            {pending ? "Skapar…" : "Skapa"}
+            {pending ? "Creating…" : "Create"}
           </button>
         </div>
       </form>
@@ -596,7 +596,7 @@ function Modal({
           </h3>
           <button
             onClick={onClose}
-            aria-label="Stäng"
+            aria-label="Close"
             className="text-foreground-muted hover:text-foreground"
           >
             <X className="h-5 w-5" />

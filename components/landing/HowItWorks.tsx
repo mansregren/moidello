@@ -8,18 +8,18 @@ import { Container } from "../layout/Container";
 const steps = [
   {
     icon: Camera,
-    title: "Ladda upp",
-    description: "Ta en bild på din outfit och ladda upp den till Moidello.",
+    title: "Upload",
+    description: "Take a photo of your outfit and upload it to Moidello.",
   },
   {
     icon: Tag,
-    title: "Tagga plaggen",
-    description: "Markera varje plagg i bilden med märke, namn och köplänk.",
+    title: "Tag the pieces",
+    description: "Mark every piece in the image with its brand, name and a buy link.",
   },
   {
     icon: ShoppingBag,
-    title: "Dela & shoppa",
-    description: "Andra kan upptäcka din stil och köpa plaggen direkt.",
+    title: "Share & shop",
+    description: "Others can discover your style and buy the pieces directly.",
   },
 ];
 

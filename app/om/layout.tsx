@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Om Moidello",
+  title: "About Moidello",
   description:
-    "Moidello är en plattform för att upptäcka, dela och inspireras av outfits — där varje plagg är taggat och köpbart.",
+    "Moidello is a platform for discovering, sharing and being inspired by outfits — where every piece is tagged and buyable.",
   alternates: { canonical: "/om" },
   openGraph: {
-    title: "Om Moidello",
+    title: "About Moidello",
     description:
-      "Moidello är en plattform för att upptäcka, dela och inspireras av outfits — där varje plagg är taggat och köpbart.",
+      "Moidello is a platform for discovering, sharing and being inspired by outfits — where every piece is tagged and buyable.",
     url: "/om",
     type: "website",
   },

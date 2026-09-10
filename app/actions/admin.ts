@@ -16,7 +16,7 @@ export async function setReportStatus(
     return { ok: false, error: "Ogiltig status." };
   }
   const admin = await isCurrentUserAdmin();
-  if (!admin) return { ok: false, error: "Inte behörig." };
+  if (!admin) return { ok: false, error: "Not authorised." };
 
   const supabase = await createClient();
   const { error } = await supabase

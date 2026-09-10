@@ -89,7 +89,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   if (!(await isCurrentUserAdmin())) {
-    return NextResponse.json({ error: "Inte behörig." }, { status: 403 });
+    return NextResponse.json({ error: "Not authorised." }, { status: 403 });
   }
   const { id } = await params;
   const result = await loadOutfit(id);
@@ -118,7 +118,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   if (!(await isCurrentUserAdmin())) {
-    return NextResponse.json({ error: "Inte behörig." }, { status: 403 });
+    return NextResponse.json({ error: "Not authorised." }, { status: 403 });
   }
   const { id } = await params;
   const result = await loadOutfit(id);

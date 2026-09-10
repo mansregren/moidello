@@ -64,9 +64,9 @@ export function SeoBackfillClient({ missing }: Props) {
     <>
       <div className="rounded-2xl border border-border bg-background-secondary p-5 mb-6">
         <p className="text-sm text-foreground-muted mb-4">
-          AI-genererar title, beskrivning, meta-description, keywords och
-          alt-text för outfits som saknar något av fälten. Använder Claude
-          Sonnet 4.6 med vision — kostar ~$0.01 per outfit.
+          AI-generates title, description, meta description, keywords and
+          alt text for outfits missing any of the fields. Uses Claude Sonnet
+          4.6 with vision — costs ~$0.01 per outfit.
         </p>
         <label className="flex items-center gap-2 text-sm text-foreground mb-4 cursor-pointer">
           <input
@@ -75,8 +75,8 @@ export function SeoBackfillClient({ missing }: Props) {
             onChange={(e) => setOverwriteTitle(e.target.checked)}
             className="h-4 w-4 rounded border-border accent-foreground"
           />
-          Skriv över existerande title (rekommenderat — många är "Casual",
-          "Sporty", produktnamn-stuff)
+          Overwrite the existing title (recommended — many are "Casual",
+          "Sporty", product-name stuff)
         </label>
         <button
           type="button"
@@ -86,18 +86,18 @@ export function SeoBackfillClient({ missing }: Props) {
         >
           <Sparkles className="h-4 w-4" />
           {running
-            ? "Bearbetar…"
+            ? "Processing…"
             : missing.length === 0
-              ? "Allt är OK"
-              : `Backfilla ${missing.length} outfits`}
+              ? "All OK"
+              : `Backfill ${missing.length} outfits`}
         </button>
       </div>
 
       {result && (
         <div className="rounded-2xl border border-border bg-background-secondary p-5 mb-6">
           <h3 className="text-sm font-semibold text-foreground mb-3">
-            Resultat: {result.processed.length} uppdaterade,{" "}
-            {result.errors.length} fel
+            Result: {result.processed.length} updated,{" "}
+            {result.errors.length} errors
           </h3>
           {result.processed.length > 0 && (
             <ul className="space-y-1.5 mb-4 text-sm">

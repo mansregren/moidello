@@ -200,7 +200,7 @@ export function PaketModal({ open, outfit, tags, onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Stäng"
+            aria-label="Close"
             className="rounded-full p-1.5 text-foreground-muted hover:bg-background-secondary hover:text-foreground"
           >
             <X className="h-5 w-5" />
@@ -286,16 +286,16 @@ export function PaketModal({ open, outfit, tags, onClose }: Props) {
               >
                 <Download className="h-3.5 w-3.5" />
                 {bulkBusy
-                  ? "Hämtar…"
+                  ? "Fetching…"
                   : filesLoading || !files
-                    ? "Förbereder…"
+                    ? "Preparing…"
                     : `Spara alla ${limitedTags.length + 1}`}
               </button>
             </div>
             <p className="mb-3 text-[11px] text-foreground-subtle">
-              På iPhone: tryck Spara → välj <strong>Spara bild</strong> i
-              delningsmenyn (inte “Spara i Filer”). Om inget händer, håll
-              fingret på en thumbnail nedan → <strong>Lägg till i Bilder</strong>.
+              On iPhone: tap Save → choose <strong>Save Image</strong> in the
+              share sheet (not “Save to Files”). If nothing happens, press and
+              hold a thumbnail below → <strong>Add to Photos</strong>.
             </p>
             {bulkError && (
               <p className="mb-3 text-sm text-red-400">{bulkError}</p>
@@ -303,7 +303,7 @@ export function PaketModal({ open, outfit, tags, onClose }: Props) {
             <ul className="grid grid-cols-3 gap-2">
               <li className="rounded-xl overflow-hidden bg-background-tertiary aspect-[9/16] relative">
                 {/* Hero — använd den server-genererade bilden direkt så
-                    thumbnail = exakt vad användaren laddar ner. */}
+                    thumbnail = exactly what the user downloads. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`/api/admin/share-image/${outfit.id}`}
