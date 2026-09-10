@@ -6,7 +6,7 @@ import { useEffect, useState, MouseEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, LogOut, Bookmark, MessageCircle } from "lucide-react";
 import { IconButton } from "../shared/IconButton";
-import { primaryNav } from "@/lib/nav";
+import { visiblePrimaryNav } from "@/lib/nav";
 import { useAuth, AuthAction } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
@@ -19,8 +19,9 @@ function isActive(pathname: string | null, href: string): boolean {
 export function MobileMenu() {
   const pathname = usePathname();
   const router = useRouter();
-  const { isLoggedIn, requireAuth, signOut } = useAuth();
+  const { isLoggedIn, requireAuth, signOut, profile } = useAuth();
   const [open, setOpen] = useState(false);
+  const navItems = visiblePrimaryNav(!!profile?.isAdmin);
 
   const isHomeArea = pathname?.startsWith("/home") ?? false;
 
@@ -111,7 +112,7 @@ export function MobileMenu() {
               </div>
 
               <ul className="flex-1 overflow-y-auto py-2">
-                {primaryNav.map((item) => {
+                {navItems.map((item) => {
                   const active = isActive(pathname, item.href);
                   const Icon = item.icon;
                   const href =

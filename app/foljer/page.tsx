@@ -9,6 +9,7 @@ import {
   fetchEngagementForViewer,
 } from "@/lib/queries";
 import { fetchTopCreatorsCached as fetchTopCreators } from "@/lib/queries-cached";
+import { OUTFIT_CREATE_PUBLIC } from "@/lib/flags";
 import { FoljerClient } from "./FoljerClient";
 
 export const metadata = {
@@ -110,14 +111,20 @@ function Shell({
               </h2>
               {creators.length === 0 ? (
                 <p className="text-foreground-muted">
-                  Inga kreatörer än. Bli först ut —{" "}
-                  <Link
-                    href="/skapa"
-                    className="text-foreground underline hover:text-foreground/80"
-                  >
-                    skapa en outfit
-                  </Link>
-                  .
+                  {OUTFIT_CREATE_PUBLIC ? (
+                    <>
+                      Inga kreatörer än. Bli först ut —{" "}
+                      <Link
+                        href="/skapa"
+                        className="text-foreground underline hover:text-foreground/80"
+                      >
+                        skapa en outfit
+                      </Link>
+                      .
+                    </>
+                  ) : (
+                    "Inga kreatörer att visa just nu."
+                  )}
                 </p>
               ) : (
                 <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

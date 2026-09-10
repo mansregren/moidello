@@ -11,7 +11,7 @@ import { GenderToggle } from "../shared/GenderToggle";
 import { UserMenu } from "./UserMenu";
 import { NotificationBell } from "./NotificationBell";
 import { MobileMenu } from "./MobileMenu";
-import { primaryNav, shouldShowAppHeader } from "@/lib/nav";
+import { visiblePrimaryNav, shouldShowAppHeader } from "@/lib/nav";
 import { useAuth, AuthAction } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
@@ -24,8 +24,9 @@ function isActive(pathname: string | null, href: string): boolean {
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { isLoggedIn, requireAuth } = useAuth();
+  const { isLoggedIn, requireAuth, profile } = useAuth();
   const showHeader = shouldShowAppHeader(pathname);
+  const navItems = visiblePrimaryNav(!!profile?.isAdmin);
 
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -100,7 +101,7 @@ export function Header() {
           aria-label="Huvudnavigation"
           className="hidden md:flex items-center gap-1 ml-4"
         >
-          {primaryNav.map((item) => {
+          {navItems.map((item) => {
             const active = isActive(pathname, item.href);
             const href =
               item.authAction === "create" && pathname?.startsWith("/home")

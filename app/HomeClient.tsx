@@ -12,6 +12,7 @@ import { UserAvatar } from "@/components/user/UserAvatar";
 import { categories } from "@/lib/data";
 import { useGender, matchesGenderFilter } from "@/lib/gender-context";
 import { useAuth } from "@/lib/auth-context";
+import { canCreateOutfits } from "@/lib/flags";
 import { getFollowingFeed } from "@/app/actions/engagement";
 import type { Outfit, User } from "@/lib/types";
 
@@ -53,7 +54,8 @@ export default function HomeClient({
   lifestyleBg?: string;
 }) {
   const { gender } = useGender();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, profile } = useAuth();
+  const showCreate = canCreateOutfits(!!profile?.isAdmin);
 
   // "Från dina följda" is per-viewer, so it's fetched client-side here — that
   // keeps the page's public content statically/ISR cacheable.
@@ -216,15 +218,19 @@ export default function HomeClient({
             ) : (
               <div className="rounded-2xl border border-border bg-background-secondary p-10 text-center">
                 <p className="text-foreground-muted">
-                  Inga outfits ännu — bli först att lägga upp en.
+                  {showCreate
+                    ? "Inga outfits ännu — bli först att lägga upp en."
+                    : "Inga outfits ännu — kika in snart igen."}
                 </p>
-                <Link
-                  href="/skapa"
-                  className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors"
-                >
-                  <Plus className="h-4 w-4" />
-                  Skapa outfit
-                </Link>
+                {showCreate && (
+                  <Link
+                    href="/skapa"
+                    className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Skapa outfit
+                  </Link>
+                )}
               </div>
             )}
           </Section>
@@ -303,18 +309,21 @@ export default function HomeClient({
                 Bygg ditt eget bibliotek
               </h2>
               <p className="mt-3 text-foreground-muted text-sm md:text-base">
-                Spara outfits, följ kreatörer och skapa dina egna. Det är
-                gratis.
+                {showCreate
+                  ? "Spara outfits, följ kreatörer och skapa dina egna. Det är gratis."
+                  : "Spara outfits och följ kreatörer. Det är gratis."}
               </p>
             </div>
             <div className="flex gap-3 shrink-0">
-              <Link
-                href="/skapa"
-                className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
-              >
-                <Plus className="h-4 w-4" />
-                Skapa outfit
-              </Link>
+              {showCreate && (
+                <Link
+                  href="/skapa"
+                  className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium transition-transform active:scale-95"
+                >
+                  <Plus className="h-4 w-4" />
+                  Skapa outfit
+                </Link>
+              )}
               <Link
                 href="/om"
                 className="inline-flex items-center rounded-full border border-border text-foreground px-5 py-2.5 text-sm font-medium hover:border-foreground/30 transition-colors"

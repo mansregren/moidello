@@ -21,7 +21,7 @@ import {
   HOME_ITEM_TYPES,
   homeItemTypeOptions,
 } from "@/lib/home-data";
-import { homeVerticalVisible } from "@/lib/flags";
+import { homeVerticalVisible, canCreateOutfits } from "@/lib/flags";
 import { createOutfit, type PublishedOutfit } from "./actions";
 
 type Gender = "dam" | "herr";
@@ -143,6 +143,10 @@ export default function SkapaPage() {
   // viewers who can see the vertical at all.
   const canCreateHome = homeVerticalVisible(!!profile?.isAdmin);
 
+  // While OUTFIT_CREATE_PUBLIC is off, publishing is admin-only. Non-admins
+  // (and logged-out visitors, handled below) get bounced to the home page.
+  const mayCreate = canCreateOutfits(!!profile?.isAdmin);
+
   // What we're creating: Dam, Herr or Heminredning. Seeded from ?vertical=hem
   // (the /home CTAs) and the browse gender toggle so deep links land on the
   // right choice, but the picker below makes it explicit and changeable.
@@ -234,10 +238,17 @@ export default function SkapaPage() {
   }, [activeIndex]);
 
   useEffect(() => {
-    if (!loading && !isLoggedIn) {
+    if (loading) return;
+    if (!isLoggedIn) {
       router.push("/login");
+      return;
     }
-  }, [loading, isLoggedIn, router]);
+    // Wait for the profile (and its isAdmin flag) to load before deciding.
+    if (isLoggedIn && profile === null) return;
+    if (!mayCreate) {
+      router.replace("/");
+    }
+  }, [loading, isLoggedIn, profile, mayCreate, router]);
 
   // Keep a live ref to the current drafts so the unmount cleanup revokes the
   // object URLs that actually exist at teardown — not the (empty) first-render
@@ -624,7 +635,7 @@ export default function SkapaPage() {
     }
   };
 
-  if (loading || !isLoggedIn) {
+  if (loading || !isLoggedIn || !mayCreate) {
     return (
       <>
         <Header />

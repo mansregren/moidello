@@ -4,6 +4,7 @@ import { Search, Bookmark, ShoppingBag, Plus, ArrowRight } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { pickBgs, HERO_POOL } from "@/lib/session-background";
+import { OUTFIT_CREATE_PUBLIC } from "@/lib/flags";
 
 // Static content — render once at build. cookies() returns empty under
 // force-static, so the session-seeded background just falls back to a fixed
@@ -115,31 +116,33 @@ export default async function OmPage() {
         </section>
 
         {/* För kreatörer */}
-        <Container className="max-w-3xl py-20 md:py-28">
-          <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-5">
-            För kreatörer
-          </p>
-          <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-foreground mb-8">
-            En kanal utan algoritm
-          </h2>
-          <div className="space-y-6 text-base md:text-lg text-foreground-muted leading-relaxed">
-            <p>
-              Är du contentskapare inom mode? Moidello är en ny kanal att nå
-              följare på — utan algoritmer som bestämmer vem som ser vad.
-              Tagga dina plagg, bygg din profil och få fler ögon på din stil.
+        {OUTFIT_CREATE_PUBLIC && (
+          <Container className="max-w-3xl py-20 md:py-28">
+            <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-5">
+              För kreatörer
             </p>
-          </div>
-          <div className="mt-10">
-            <Link
-              href="/skapa"
-              className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-3 text-sm font-medium hover:bg-foreground/90 transition-transform active:scale-[0.98]"
-            >
-              <Plus className="h-4 w-4" />
-              Skapa din första outfit
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </Container>
+            <h2 className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-tight text-foreground mb-8">
+              En kanal utan algoritm
+            </h2>
+            <div className="space-y-6 text-base md:text-lg text-foreground-muted leading-relaxed">
+              <p>
+                Är du contentskapare inom mode? Moidello är en ny kanal att nå
+                följare på — utan algoritmer som bestämmer vem som ser vad.
+                Tagga dina plagg, bygg din profil och få fler ögon på din stil.
+              </p>
+            </div>
+            <div className="mt-10">
+              <Link
+                href="/skapa"
+                className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-3 text-sm font-medium hover:bg-foreground/90 transition-transform active:scale-[0.98]"
+              >
+                <Plus className="h-4 w-4" />
+                Skapa din första outfit
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </Container>
+        )}
 
         {/* Made in Stockholm */}
         <section className="relative border-t border-border">

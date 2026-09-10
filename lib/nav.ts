@@ -1,4 +1,5 @@
 import { Home, Search, Plus, Users, User, type LucideIcon } from "lucide-react";
+import { canCreateOutfits } from "./flags";
 
 export interface NavItem {
   href: string;
@@ -16,6 +17,16 @@ export const primaryNav: NavItem[] = [
   { href: "/foljer", label: "Följer", icon: Users },
   { href: "/profil", label: "Profil", icon: User, authAction: "profile" },
 ];
+
+/**
+ * primaryNav filtered for a given viewer. Drops the "Skapa" entry while
+ * OUTFIT_CREATE_PUBLIC is off and the viewer isn't an admin.
+ */
+export function visiblePrimaryNav(isAdmin: boolean): NavItem[] {
+  return primaryNav.filter(
+    (item) => item.authAction !== "create" || canCreateOutfits(isAdmin),
+  );
+}
 
 export function isLandingRoute(_pathname: string | null): boolean {
   // /welcome togs bort 2026-05-17 — funktionen behålls som no-op tills

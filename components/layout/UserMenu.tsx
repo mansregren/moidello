@@ -7,6 +7,7 @@ import { LogOut, User as UserIcon, Plus, Bookmark, MessageCircle } from "lucide-
 import { motion, AnimatePresence } from "framer-motion";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { useAuth } from "@/lib/auth-context";
+import { canCreateOutfits } from "@/lib/flags";
 
 export function UserMenu() {
   const { user, profile, signOut } = useAuth();
@@ -91,13 +92,15 @@ export function UserMenu() {
               >
                 Meddelanden
               </MenuItem>
-              <MenuItem
-                href="/skapa"
-                icon={Plus}
-                onClick={() => setOpen(false)}
-              >
-                Skapa outfit
-              </MenuItem>
+              {canCreateOutfits(!!profile?.isAdmin) && (
+                <MenuItem
+                  href="/skapa"
+                  icon={Plus}
+                  onClick={() => setOpen(false)}
+                >
+                  Skapa outfit
+                </MenuItem>
+              )}
               <MenuItem
                 href="/profil"
                 icon={Bookmark}

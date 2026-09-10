@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { slugify, storageFilename } from "@/lib/slug";
 import { getImpersonationTarget, isCurrentUserAdmin } from "@/lib/admin";
-import { homeVerticalVisible } from "@/lib/flags";
+import { homeVerticalVisible, canCreateOutfits } from "@/lib/flags";
 
 export interface PublishedOutfit {
   id: string;
@@ -56,6 +56,14 @@ export async function createOutfit(
 
   if (!user) return { error: "Du måste logga in först." };
 
+  // Publishing is admin-only while OUTFIT_CREATE_PUBLIC is off. The /skapa
+  // page redirects non-admins away — enforce it here too so a hand-rolled
+  // POST can't slip through.
+  const isAdmin = await isCurrentUserAdmin();
+  if (!canCreateOutfits(isAdmin)) {
+    return { error: "Det går inte att publicera outfits just nu." };
+  }
+
   // If an admin is impersonating someone, write the new outfit under that
   // user's id. RLS lets admins do this via the policies added in 0026.
   const impersonation = await getImpersonationTarget();
@@ -73,9 +81,7 @@ export async function createOutfit(
   // vertical=hem is silently downgraded to mode rather than trusted.
   const wantsHome = (formData.get("vertical") as string | null) === "hem";
   const vertical =
-    wantsHome && homeVerticalVisible(await isCurrentUserAdmin())
-      ? "hem"
-      : "mode";
+    wantsHome && homeVerticalVisible(isAdmin) ? "hem" : "mode";
   const keywordsRaw = (formData.get("keywords") as string | null) ?? "[]";
   const tagsRaw = (formData.get("tags") as string | null) ?? "[]";
 

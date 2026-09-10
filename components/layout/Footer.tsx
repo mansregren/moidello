@@ -1,13 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "./Container";
+import { OUTFIT_CREATE_PUBLIC } from "@/lib/flags";
 
 const footerLinks = {
   Plattform: [
     { href: "/", label: "Hem" },
     { href: "/upptack", label: "Upptäck" },
     { href: "/trendigt", label: "Trendigt" },
-    { href: "/skapa", label: "Skapa" },
+    ...(OUTFIT_CREATE_PUBLIC ? [{ href: "/skapa", label: "Skapa" }] : []),
   ],
   Företag: [
     { href: "/om", label: "Om Moidello" },
