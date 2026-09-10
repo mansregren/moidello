@@ -32,7 +32,7 @@ export async function createBoard(
     return { ok: false, fieldErrors: { name: "Skriv ett namn." } };
   }
   if (name.length > 80) {
-    return { ok: false, fieldErrors: { name: "För långt namn (max 80)." } };
+    return { ok: false, fieldErrors: { name: "Name is too long (max 80)." } };
   }
 
   const { data, error } = await supabase
@@ -47,7 +47,7 @@ export async function createBoard(
     .single();
 
   if (error || !data) {
-    return { ok: false, error: error?.message ?? "Kunde inte skapa board." };
+    return { ok: false, error: error?.message ?? "Could not create the collection." };
   }
 
   revalidatePath("/profil/boards");
@@ -79,7 +79,7 @@ export async function updateBoard(
 
   if (error) return { ok: false, error: error.message };
   if (!data || data.length === 0) {
-    return { ok: false, error: "Du kan inte ändra den här samlingen." };
+    return { ok: false, error: "You can’t edit this collection." };
   }
 
   revalidatePath("/profil/boards");
@@ -103,7 +103,7 @@ export async function deleteBoard(
     .select("id");
   if (error) return { ok: false, error: error.message };
   if (!data || data.length === 0) {
-    return { ok: false, error: "Du kan inte ta bort den här samlingen." };
+    return { ok: false, error: "You can’t delete this collection." };
   }
   revalidatePath("/profil/boards");
   return { ok: true };

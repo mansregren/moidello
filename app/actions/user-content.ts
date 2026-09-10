@@ -26,7 +26,7 @@ async function gateOwnerOrAdmin(outfitId: string): Promise<
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Du måste logga in." };
+  if (!user) return { ok: false, error: "You must log in." };
 
   const { data: outfit } = await supabase
     .from("outfits")
@@ -34,7 +34,7 @@ async function gateOwnerOrAdmin(outfitId: string): Promise<
     .eq("id", outfitId)
     .maybeSingle();
 
-  if (!outfit) return { ok: false, error: "Inlägget finns inte." };
+  if (!outfit) return { ok: false, error: "The post doesn’t exist." };
 
   const isOwner = (outfit.user_id as string) === user.id;
   if (isOwner) return { ok: true, userId: user.id, outfitId };
@@ -42,7 +42,7 @@ async function gateOwnerOrAdmin(outfitId: string): Promise<
   if (await isCurrentUserAdmin()) {
     return { ok: true, userId: user.id, outfitId };
   }
-  return { ok: false, error: "Du har inte rätt att hantera det här inlägget." };
+  return { ok: false, error: "You don’t have permission to manage this post." };
 }
 
 export async function setOutfitHidden(
@@ -103,7 +103,7 @@ export async function updateOwnOutfit(
   const updates: OutfitUpdate = {};
   if (patch.title !== undefined) {
     const t = patch.title.trim();
-    if (!t) return { ok: false, error: "Titel får inte vara tom." };
+    if (!t) return { ok: false, error: "The title can’t be empty." };
     updates.title = t.slice(0, 200);
   }
   if (patch.description !== undefined) {
@@ -137,7 +137,7 @@ export async function restoreOutfit(
   // they can't see the row in the first place (deleted_at filters them out
   // via the SELECT policy). Admin keeps the safety net.
   if (!(await isCurrentUserAdmin())) {
-    return { ok: false, error: "Bara admin kan återställa." };
+    return { ok: false, error: "Only an admin can restore." };
   }
   if (!UUID_RE.test(outfitId)) return { ok: false, error: "Ogiltigt id." };
 

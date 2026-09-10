@@ -103,7 +103,7 @@ export async function deleteMyAccount(
   // Deliberate guard: client passes the user's exact username so a stray
   // click cannot wipe the account.
   if (!confirmation || confirmation.length < 1) {
-    return { ok: false, error: "Bekräftelse saknas." };
+    return { ok: false, error: "Confirmation missing." };
   }
 
   const supabase = await createClient();
@@ -119,7 +119,7 @@ export async function deleteMyAccount(
     .maybeSingle();
 
   if (!profile || profile.username !== confirmation) {
-    return { ok: false, error: "Användarnamnet matchar inte." };
+    return { ok: false, error: "The username doesn’t match." };
   }
 
   // Cascading FKs on profiles remove outfits, comments, follows, saves,
@@ -135,7 +135,7 @@ export async function deleteMyAccount(
     .eq("id", user.id);
 
   if (error) {
-    return { ok: false, error: "Kunde inte radera kontot." };
+    return { ok: false, error: "Could not delete the account." };
   }
 
   await supabase.auth.signOut();

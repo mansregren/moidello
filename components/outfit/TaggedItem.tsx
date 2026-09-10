@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Treats `#` and empty strings as missing — those came from seed data
- * placeholders. Used to *hide* the Köp button when no real URL exists;
+ * placeholders. Used to *hide* the Buy button when no real URL exists;
  * the actual outgoing href routes through /go for click logging.
  */
 function isUsableBuyUrl(url: string | undefined): url is string {
@@ -111,7 +111,7 @@ export function TaggedItemCard({
           <button
             type="button"
             onClick={handleShare}
-            aria-label="Skicka plagg till vän"
+            aria-label="Send piece to a friend"
             className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors"
           >
             <Send className="h-4 w-4" />
@@ -119,10 +119,10 @@ export function TaggedItemCard({
           {isUsableBuyUrl(buyUrl) && (
             <UserLink
               href={outfitId ? `/go/${item.id}` : buyUrl}
-              aria-label={`Köp ${item.brand} ${item.name}`}
+              aria-label={`Buy ${item.brand} ${item.name}`}
               className="inline-flex items-center gap-1 rounded-full bg-foreground text-background px-3 py-2 text-xs font-semibold hover:bg-foreground/90 transition-colors"
             >
-              Köp
+              Buy
               <ExternalLink className="h-3 w-3" />
             </UserLink>
           )}

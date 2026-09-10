@@ -63,7 +63,7 @@ export function OutfitTag({ tag, outfitId, region }: OutfitTagProps) {
               rel="noopener noreferrer"
               className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1.5 text-xs font-medium hover:bg-foreground/90"
             >
-              Köp
+              Buy
               <ExternalLink className="h-3 w-3" />
             </a>
           )}

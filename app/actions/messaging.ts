@@ -31,7 +31,7 @@ export async function getOrCreateConversation(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Inte inloggad" };
   if (user.id === otherUserId)
-    return { ok: false, error: "Du kan inte meddela dig själv" };
+    return { ok: false, error: "You can’t message yourself" };
 
   const [a, b] =
     user.id < otherUserId ? [user.id, otherUserId] : [otherUserId, user.id];
@@ -62,7 +62,7 @@ export async function getOrCreateConversation(
     console.error("[messaging] conversation insert failed:", error);
     return {
       ok: false,
-      error: error?.message ?? "Kunde inte starta samtal",
+      error: error?.message ?? "Could not start the conversation",
     };
   }
   return { ok: true, conversationId: created.id as string };
@@ -80,13 +80,13 @@ export async function sendMessage(
 
   const rl = await checkRateLimit("message", user.id);
   if (!rl.ok) {
-    return { ok: false, error: "För många meddelanden. Vänta lite." };
+    return { ok: false, error: "Too many messages. Wait a moment." };
   }
 
   const trimmed = body.trim();
-  if (trimmed.length === 0) return { ok: false, error: "Skriv något." };
+  if (trimmed.length === 0) return { ok: false, error: "Write something." };
   if (trimmed.length > 4000)
-    return { ok: false, error: "För långt meddelande (max 4000 tecken)." };
+    return { ok: false, error: "Message is too long (max 4000 characters)." };
 
   const { error } = await supabase.from("messages").insert({
     conversation_id: conversationId,
@@ -123,14 +123,14 @@ export async function sendShare(args: {
     (id) => id !== user.id,
   );
   if (uniqRecipients.length === 0)
-    return { ok: false, error: "Välj minst en mottagare" };
+    return { ok: false, error: "Choose at least one recipient" };
   // Cap fan-out — a share is a person-to-person action, not a broadcast.
   // Keeps the batched .or() query and inserts bounded.
   if (uniqRecipients.length > 30)
-    return { ok: false, error: "Du kan dela till max 30 personer åt gången" };
+    return { ok: false, error: "You can share to at most 30 people at a time" };
 
   const text = (args.message ?? "").trim();
-  if (text.length > 4000) return { ok: false, error: "För lång text" };
+  if (text.length > 4000) return { ok: false, error: "Text is too long" };
 
   const dataPayload =
     args.type === "outfit_share"
@@ -202,7 +202,7 @@ export async function sendShare(args: {
     }));
 
   if (messages.length === 0) {
-    return { ok: false, error: "Kunde inte hitta samtal." };
+    return { ok: false, error: "Could not find the conversation." };
   }
 
   const { error: msgError } = await supabase.from("messages").insert(messages);

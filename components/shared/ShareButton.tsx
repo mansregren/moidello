@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Native share on devices that support it; otherwise copies the link to
- * the clipboard and shows a brief "Länk kopierad" confirmation.
+ * the clipboard and shows a brief "Link copied" confirmation.
  */
 export function ShareButton({
   url,
@@ -64,13 +64,13 @@ export function ShareButton({
     <button
       type="button"
       onClick={handleClick}
-      aria-label="Dela länk"
+      aria-label="Share link"
       className={cn(base, styles, className)}
     >
       {copied ? (
         <>
           <Check className="h-4 w-4" />
-          Länk kopierad
+          Link copied
         </>
       ) : (
         <>

@@ -38,7 +38,7 @@ export function AddToBoardButton({ outfitId }: { outfitId: string }) {
         className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2 text-sm hover:border-foreground/30 transition-colors"
       >
         <FolderPlus className="h-4 w-4" />
-        Lägg i samling
+        Add to collection
       </button>
       {open && user && (
         <BoardSheet
@@ -112,7 +112,7 @@ function BoardSheet({
             ) ?? null,
         );
       } else {
-        setError(res.error ?? "Kunde inte uppdatera samlingen. Försök igen.");
+        setError(res.error ?? "Could not update the collection. Try again.");
       }
       setPendingId(null);
     });
@@ -138,11 +138,11 @@ function BoardSheet({
         >
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground">
-              Spara i samling
+              Save to collection
             </h2>
             <button
               onClick={onClose}
-              aria-label="Stäng"
+              aria-label="Close"
               className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-foreground/5 hover:text-foreground"
             >
               <X className="h-5 w-5" />
@@ -155,7 +155,7 @@ function BoardSheet({
             className="w-full mb-4 inline-flex items-center gap-2 rounded-xl border border-dashed border-border bg-background-tertiary px-4 py-3 text-sm text-foreground hover:border-foreground/30"
           >
             <Plus className="h-4 w-4" />
-            Skapa ny samling
+            Create a new collection
           </button>
 
           {creating && (
@@ -172,12 +172,12 @@ function BoardSheet({
           )}
 
           {!boards && (
-            <p className="text-sm text-foreground-subtle py-6">Laddar samlingar…</p>
+            <p className="text-sm text-foreground-subtle py-6">Loading collections…</p>
           )}
 
           {boards && boards.length === 0 && (
             <p className="text-sm text-foreground-muted py-2">
-              Du har inga samlingar än. Skapa en för att börja kuratera.
+              You don’t have any collections yet. Create one to start curating.
             </p>
           )}
 
@@ -195,7 +195,7 @@ function BoardSheet({
                       {b.name}
                     </span>
                     <span className="block text-xs text-foreground-subtle">
-                      {b.isPublic ? "Publik" : "Privat"}
+                      {b.isPublic ? "Public" : "Private"}
                     </span>
                   </span>
                   <span
@@ -237,7 +237,7 @@ function CreateInline({
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setError("Skriv ett namn.");
+      setError("Enter a name.");
       return;
     }
     startTransition(async () => {
@@ -248,7 +248,7 @@ function CreateInline({
       if (res.ok && res.boardId) {
         onCreated({ id: res.boardId, name: name.trim(), isPublic });
       } else {
-        setError(res.error ?? res.fieldErrors?.name ?? "Kunde inte skapa.");
+        setError(res.error ?? res.fieldErrors?.name ?? "Could not create.");
       }
     });
   };
@@ -260,7 +260,7 @@ function CreateInline({
     >
       <input
         type="text"
-        placeholder="Namn på samling"
+        placeholder="Collection name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         maxLength={80}
@@ -274,7 +274,7 @@ function CreateInline({
           onChange={(e) => setIsPublic(e.target.checked)}
           className="h-4 w-4 rounded border-border bg-background-secondary accent-white"
         />
-        Publik
+        Public
       </label>
       {error && <p className="text-xs text-red-400">{error}</p>}
       <div className="flex gap-2">
@@ -283,14 +283,14 @@ function CreateInline({
           onClick={onCancel}
           className="flex-1 rounded-full border border-border text-foreground py-2 text-xs font-medium hover:border-foreground/30"
         >
-          Avbryt
+          Cancel
         </button>
         <button
           type="submit"
           disabled={pending}
           className="flex-1 rounded-full bg-foreground text-background py-2 text-xs font-semibold disabled:opacity-60"
         >
-          {pending ? "Skapar…" : "Skapa"}
+          {pending ? "Creating…" : "Create"}
         </button>
       </div>
     </form>

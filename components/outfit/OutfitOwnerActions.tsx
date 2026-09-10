@@ -40,7 +40,7 @@ export function OutfitOwnerActions({
   const remove = () => {
     if (
       !confirm(
-        "Är du säker? Detta kan inte ångras.\n\nInlägget döljs direkt; admin kan återställa inom kort tid.",
+        "Are you sure? This cannot be undone.\n\nThe post is hidden immediately; an admin can restore it for a short while.",
       )
     )
       return;
@@ -85,7 +85,7 @@ export function OutfitOwnerActions({
         ) : (
           <EyeOff className="h-3 w-3" />
         )}
-        {hidden ? "Visa igen" : "Dölj"}
+        {hidden ? "Show again" : "Hide"}
       </button>
 
       <button

@@ -67,7 +67,7 @@ export function ShareToDmSheet({
 
   const submit = () => {
     if (selected.size === 0) {
-      setError("Välj minst en mottagare");
+      setError("Choose at least one recipient");
       return;
     }
     startTransition(async () => {
@@ -83,7 +83,7 @@ export function ShareToDmSheet({
           router.push(`/meddelanden/${res.conversationId}`);
         }
       } else {
-        setError(res.error ?? "Kunde inte skicka");
+        setError(res.error ?? "Could not send");
       }
     });
   };
@@ -110,7 +110,7 @@ export function ShareToDmSheet({
             <div className="flex items-start justify-between gap-3 mb-5">
               <div>
                 <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground leading-tight">
-                  Skicka till
+                  Send to
                 </h2>
                 <p className="text-xs text-foreground-subtle mt-1 truncate">
                   {title}
@@ -118,7 +118,7 @@ export function ShareToDmSheet({
               </div>
               <button
                 onClick={onClose}
-                aria-label="Stäng"
+                aria-label="Close"
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-foreground-muted hover:bg-foreground/5 hover:text-foreground"
               >
                 <X className="h-5 w-5" />
@@ -131,19 +131,19 @@ export function ShareToDmSheet({
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Sök bland följda och följare…"
+                placeholder="Search people you follow and followers…"
                 className="w-full rounded-xl bg-background-tertiary border border-border pl-10 pr-3 py-2.5 text-sm text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
               />
             </div>
 
             {recipients === null && (
-              <p className="text-sm text-foreground-subtle py-6">Laddar…</p>
+              <p className="text-sm text-foreground-subtle py-6">Loading…</p>
             )}
 
             {recipients && recipients.length === 0 && (
               <p className="text-sm text-foreground-muted py-4">
-                Du har inga följda eller följare än. Följ någon först för att
-                kunna dela.
+                You don’t follow anyone and have no followers yet. Follow
+                someone first to be able to share.
               </p>
             )}
 
@@ -190,7 +190,7 @@ export function ShareToDmSheet({
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Lägg till en text (valfritt)…"
+              placeholder="Add a message (optional)…"
               rows={2}
               maxLength={500}
               className="mt-4 w-full resize-none rounded-xl bg-background-tertiary border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
@@ -208,10 +208,10 @@ export function ShareToDmSheet({
             >
               <Send className="h-4 w-4" />
               {pending
-                ? "Skickar…"
+                ? "Sending…"
                 : selected.size > 0
-                  ? `Skicka till ${selected.size}`
-                  : "Skicka"}
+                  ? `Send to ${selected.size}`
+                  : "Send"}
             </button>
           </motion.div>
         </motion.div>

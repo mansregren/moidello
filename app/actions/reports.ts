@@ -29,7 +29,7 @@ export async function submitReport(input: {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Du måste vara inloggad." };
+  if (!user) return { ok: false, error: "You must be logged in." };
 
   const body = input.body?.trim() ?? "";
   const { error } = await supabase.from("reports").insert({
@@ -41,7 +41,7 @@ export async function submitReport(input: {
   });
 
   if (error) {
-    return { ok: false, error: "Kunde inte skicka rapport." };
+    return { ok: false, error: "Could not submit the report." };
   }
   return { ok: true };
 }

@@ -77,7 +77,7 @@ export async function toggleLike(outfitId: string): Promise<EngagementResult> {
 
   const rl = await checkRateLimit("like", user.id);
   if (!rl.ok) {
-    return { ok: false, active: false, error: "För många klick. Vänta lite." };
+    return { ok: false, active: false, error: "Too many clicks. Wait a moment." };
   }
 
   const { data: existing } = await supabase
@@ -148,7 +148,7 @@ export async function toggleFollow(
   const { supabase, user } = await requireUser();
   if (!user) return { ok: false, active: false, error: "Inte inloggad" };
   if (user.id === followeeId)
-    return { ok: false, active: false, error: "Kan inte följa dig själv" };
+    return { ok: false, active: false, error: "You can’t follow yourself" };
 
   const { data: existing } = await supabase
     .from("follows")
@@ -185,14 +185,14 @@ export async function postComment(
 
   const rl = await checkRateLimit("comment", user.id);
   if (!rl.ok) {
-    return { ok: false, error: "För många kommentarer. Vänta lite." };
+    return { ok: false, error: "Too many comments. Wait a moment." };
   }
 
   const trimmed = body.trim();
   if (trimmed.length === 0)
-    return { ok: false, error: "Skriv något." };
+    return { ok: false, error: "Write something." };
   if (trimmed.length > 1000)
-    return { ok: false, error: "För lång kommentar (max 1000 tecken)." };
+    return { ok: false, error: "Comment is too long (max 1000 characters)." };
 
   const { error } = await supabase
     .from("comments")

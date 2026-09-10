@@ -27,8 +27,8 @@ export function GenderFilteredGrid({
   if (visible.length === 0) {
     return (
       <p className="text-foreground-muted">
-        Inga outfits för {gender === "herr" ? "herr" : "dam"} här ännu. Byt
-        kön-filtret högst upp för att se fler.
+        No outfits for {gender === "herr" ? "men" : "women"} here yet. Switch
+        the category filter at the top to see more.
       </p>
     );
   }

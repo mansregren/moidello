@@ -16,13 +16,13 @@ type Reason =
   | "other";
 
 const REASON_LABELS: Record<Reason, string> = {
-  spam: "Spam eller vilseledande marknadsföring",
-  harassment: "Trakasserier eller hat",
-  inappropriate: "Olämpligt eller stötande innehåll",
-  misinformation: "Felaktig information",
-  impersonation: "Utger sig för någon annan",
-  copyright: "Upphovsrättsintrång",
-  other: "Annat",
+  spam: "Spam or misleading advertising",
+  harassment: "Harassment or hate",
+  inappropriate: "Inappropriate or offensive content",
+  misinformation: "Misinformation",
+  impersonation: "Impersonating someone else",
+  copyright: "Copyright infringement",
+  other: "Other",
 };
 
 export function ReportButton({
@@ -79,8 +79,8 @@ export function ReportButton({
         <button
           type="button"
           onClick={handleOpen}
-          aria-label="Rapportera"
-          title="Rapportera"
+          aria-label="Report"
+          title="Report"
           className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors"
         >
           <Flag className="h-4 w-4" />
@@ -92,7 +92,7 @@ export function ReportButton({
           className="inline-flex items-center gap-1.5 text-xs text-foreground-subtle hover:text-foreground-muted transition-colors"
         >
           <Flag className="h-3 w-3" />
-          {label ?? "Rapportera"}
+          {label ?? "Report"}
         </button>
       )}
 
@@ -107,12 +107,12 @@ export function ReportButton({
           >
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-heading text-2xl uppercase tracking-tight text-foreground">
-                Rapportera
+                Report
               </h3>
               <button
                 type="button"
                 onClick={() => !pending && setOpen(false)}
-                aria-label="Stäng"
+                aria-label="Close"
                 className="text-foreground-muted hover:text-foreground"
               >
                 <X className="h-5 w-5" />
@@ -122,26 +122,26 @@ export function ReportButton({
             {done ? (
               <>
                 <p className="text-sm text-foreground-muted mt-2">
-                  Tack — vi har tagit emot din rapport och granskar den så
-                  snart vi kan.
+                  Thanks — we’ve received your report and will review it as
+                  soon as we can.
                 </p>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
                   className="mt-6 w-full rounded-full bg-foreground text-background py-3 text-sm font-semibold hover:bg-foreground/90"
                 >
-                  Stäng
+                  Close
                 </button>
               </>
             ) : (
               <form onSubmit={handleSubmit}>
                 <p className="text-sm text-foreground-muted mt-2 mb-5">
-                  Berätta vad som är fel. Rapporten är anonym för den
-                  rapporterade.
+                  Tell us what’s wrong. The report is anonymous to the person
+                  reported.
                 </p>
 
                 <label className="block text-xs uppercase tracking-[0.2em] text-foreground-subtle mb-2">
-                  Anledning
+                  Reason
                 </label>
                 <div className="space-y-2 mb-5">
                   {(Object.keys(REASON_LABELS) as Reason[]).map((r) => (
@@ -165,14 +165,14 @@ export function ReportButton({
                 </div>
 
                 <label className="block text-xs uppercase tracking-[0.2em] text-foreground-subtle mb-2">
-                  Mer information (valfritt)
+                  More information (optional)
                 </label>
                 <textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   maxLength={2000}
                   rows={3}
-                  placeholder="Vad såg du? Vad bör vi titta på?"
+                  placeholder="What did you see? What should we look at?"
                   className="w-full rounded-xl bg-background-tertiary border border-border text-sm text-foreground placeholder:text-foreground-subtle p-3 outline-none focus:border-foreground/30"
                 />
 
@@ -187,14 +187,14 @@ export function ReportButton({
                     disabled={pending}
                     className="flex-1 rounded-full border border-border text-foreground py-3 text-sm font-medium hover:border-foreground/30"
                   >
-                    Avbryt
+                    Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={pending}
                     className="flex-1 rounded-full bg-foreground text-background py-3 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
                   >
-                    {pending ? "Skickar…" : "Skicka rapport"}
+                    {pending ? "Sending…" : "Submit report"}
                   </button>
                 </div>
               </form>

@@ -138,7 +138,7 @@ export async function importProductsCsv(
       return;
     }
     if (name.length > 200) {
-      skipped.push({ row: idx + 2, reason: "name för lång (>200)." });
+      skipped.push({ row: idx + 2, reason: "name too long (>200)." });
       return;
     }
 
@@ -158,7 +158,7 @@ export async function importProductsCsv(
 
     const buyUrl = row.buy_url?.trim() || null;
     if (buyUrl && !/^https?:\/\//i.test(buyUrl)) {
-      skipped.push({ row: idx + 2, reason: "buy_url måste börja med http(s)://" });
+      skipped.push({ row: idx + 2, reason: "buy_url must start with http(s)://" });
       return;
     }
 
@@ -166,7 +166,7 @@ export async function importProductsCsv(
     if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
       skipped.push({
         row: idx + 2,
-        reason: "image_url måste börja med http(s)://",
+        reason: "image_url must start with http(s)://",
       });
       return;
     }
