@@ -10,6 +10,7 @@ import { IconButton } from "../shared/IconButton";
 import { GenderToggle } from "../shared/GenderToggle";
 import { UserMenu } from "./UserMenu";
 import { NotificationBell } from "./NotificationBell";
+import { MobileMenu } from "./MobileMenu";
 import { primaryNav, shouldShowAppHeader } from "@/lib/nav";
 import { useAuth, AuthAction } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -138,16 +139,19 @@ export function Header() {
           {isLoggedIn ? (
             <>
               <NotificationBell />
-              <UserMenu />
+              <div className="hidden md:block">
+                <UserMenu />
+              </div>
             </>
           ) : (
             <Link
               href="/login"
-              className="inline-flex items-center rounded-full bg-foreground text-background px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-transform active:scale-95 hover:bg-foreground/90"
+              className="hidden md:inline-flex items-center rounded-full bg-foreground text-background px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-transform active:scale-95 hover:bg-foreground/90"
             >
               Logga in
             </Link>
           )}
+          <MobileMenu />
         </div>
 
         {/* Search expansion */}

@@ -3,10 +3,8 @@
 import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { MotionConfig } from "framer-motion";
-import { FloatingBottomNav } from "./FloatingBottomNav";
 import { Footer } from "./Footer";
-import { shouldShowAppNav, shouldShowFooter } from "@/lib/nav";
-import { cn } from "@/lib/utils";
+import { shouldShowFooter } from "@/lib/nav";
 
 export function AppShell({
   children,
@@ -16,7 +14,6 @@ export function AppShell({
   footerBg?: string;
 }) {
   const pathname = usePathname();
-  const showNav = shouldShowAppNav(pathname);
   const showFooter = shouldShowFooter(pathname);
 
   return (
@@ -25,16 +22,10 @@ export function AppShell({
     // globals.css already shorted CSS transitions; this catches the
     // JS-driven motion.* components too.
     <MotionConfig reducedMotion="user">
-      <div
-        className={cn(
-          "flex min-h-screen flex-1 flex-col",
-          showNav && "pb-28 md:pb-0"
-        )}
-      >
+      <div className="flex min-h-screen flex-1 flex-col">
         {children}
         {showFooter && <Footer bg={footerBg} />}
       </div>
-      {showNav && <FloatingBottomNav />}
     </MotionConfig>
   );
 }
