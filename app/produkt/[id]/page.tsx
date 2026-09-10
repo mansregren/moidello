@@ -18,6 +18,7 @@ function isUsableBuyUrl(url: string | undefined): url is string {
   return !!url && url !== "#" && /^https?:\/\//i.test(url);
 }
 import { fetchTaggedItemById, fetchOutfitsByItem } from "@/lib/queries";
+import { HIDE_CREATORS } from "@/lib/flags";
 import { createPublicClient } from "@/lib/supabase/public";
 
 // ISR: product detail is public. Saved-product state hydrates client-side
@@ -175,7 +176,7 @@ export default async function ProduktPage({
                     <p className="text-sm font-medium text-foreground truncate">
                       {item.outfitTitle}
                     </p>
-                    {item.creator.username && (
+                    {!HIDE_CREATORS && item.creator.username && (
                       <Link
                         href={`/profile/${item.creator.username}`}
                         className="flex items-center gap-2 mt-1 text-xs text-foreground-muted hover:text-foreground"

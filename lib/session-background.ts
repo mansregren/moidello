@@ -8,7 +8,7 @@ import { cookies } from "next/headers";
  * still referenced as the Casual category cover in HomeClient.
  */
 export const HERO_POOL = [
-  "/images/bg/positano.webp",
+  "/images/bg/capferrat.webp",
   "/images/bg/parasols.webp",
   "/images/bg/harbor.webp",
   "/images/bg/ocean.webp",

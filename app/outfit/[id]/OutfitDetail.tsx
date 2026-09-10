@@ -28,6 +28,7 @@ import { AddToBoardButton } from "@/components/outfit/AddToBoardButton";
 import { ShareButton } from "@/components/shared/ShareButton";
 import { ShareToDmSheet } from "@/components/shared/ShareToDmSheet";
 import { ReportButton } from "@/components/shared/ReportButton";
+import { HIDE_CREATORS } from "@/lib/flags";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { outfitPageJsonLd } from "@/lib/json-ld";
 import { outfitPath } from "@/lib/outfit-url";
@@ -174,12 +175,12 @@ export default function OutfitDetail({
                   const cat = outfit.category?.trim();
                   const noun = isHome ? "" : "-outfit";
                   if (top && cat) {
-                    return `${cat}${noun} med ${top} av ${outfit.creator.displayName}`;
+                    return `${cat}${noun} with ${top}`;
                   }
                   if (top) {
-                    return `${isHome ? "Rum" : "Outfit"} med ${top} av ${outfit.creator.displayName}`;
+                    return `${isHome ? "Room" : "Outfit"} with ${top}`;
                   }
-                  return `${outfit.title} av ${outfit.creator.displayName}`;
+                  return outfit.title;
                 })()}
                 width={800}
                 height={1100}
@@ -201,28 +202,30 @@ export default function OutfitDetail({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <div className="flex items-center justify-between mb-6">
-                <Link
-                  href={`/profile/${outfit.creator.username}`}
-                  aria-label={outfit.creator.displayName}
-                  className="flex items-center gap-3 group min-w-0"
-                >
-                  <UserAvatar
-                    src={outfit.creator.avatar}
-                    alt=""
-                    size="lg"
-                  />
-                  <div className="min-w-0">
-                    <p className="font-medium text-foreground group-hover:underline truncate">
-                      {outfit.creator.displayName}
-                    </p>
-                    <p className="text-sm text-foreground-subtle truncate">
-                      @{outfit.creator.username}
-                    </p>
-                  </div>
-                </Link>
-                <FollowButton userId={outfit.creator.id} />
-              </div>
+              {!HIDE_CREATORS && (
+                <div className="flex items-center justify-between mb-6">
+                  <Link
+                    href={`/profile/${outfit.creator.username}`}
+                    aria-label={outfit.creator.displayName}
+                    className="flex items-center gap-3 group min-w-0"
+                  >
+                    <UserAvatar
+                      src={outfit.creator.avatar}
+                      alt=""
+                      size="lg"
+                    />
+                    <div className="min-w-0">
+                      <p className="font-medium text-foreground group-hover:underline truncate">
+                        {outfit.creator.displayName}
+                      </p>
+                      <p className="text-sm text-foreground-subtle truncate">
+                        @{outfit.creator.username}
+                      </p>
+                    </div>
+                  </Link>
+                  <FollowButton userId={outfit.creator.id} />
+                </div>
+              )}
 
               <h1 className="font-heading text-[32px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-1.5">
                 {outfit.title}
@@ -300,7 +303,7 @@ export default function OutfitDetail({
                 <ShareButton
                   url={outfitPath(outfit)}
                   title={outfit.title}
-                  text={outfit.description || `Outfit by ${outfit.creator.displayName}`}
+                  text={outfit.description || outfit.title}
                   label="Share link"
                   variant="outline"
                 />

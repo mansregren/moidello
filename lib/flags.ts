@@ -42,3 +42,14 @@ export const OUTFIT_CREATE_PUBLIC = false;
 export function canCreateOutfits(isAdmin: boolean): boolean {
   return OUTFIT_CREATE_PUBLIC || isAdmin;
 }
+
+/**
+ * HIDE_CREATORS — while `true` the site shows no authorship: outfit and
+ * product pages carry no "by <name>" byline or creator strip, the
+ * creator/profile carousels and suggestions are removed from the home,
+ * trending, following and search pages, and profile links aren't
+ * surfaced. Profiles still resolve by direct URL (for a signed-in user's
+ * own profile) but nothing points at them. Flip to `false` to bring
+ * creator discovery and bylines back.
+ */
+export const HIDE_CREATORS = true;

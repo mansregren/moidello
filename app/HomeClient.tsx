@@ -12,7 +12,7 @@ import { UserAvatar } from "@/components/user/UserAvatar";
 import { categories } from "@/lib/data";
 import { useGender, matchesGenderFilter } from "@/lib/gender-context";
 import { useAuth } from "@/lib/auth-context";
-import { canCreateOutfits } from "@/lib/flags";
+import { canCreateOutfits, HIDE_CREATORS } from "@/lib/flags";
 import { getFollowingFeed } from "@/app/actions/engagement";
 import type { Outfit, User } from "@/lib/types";
 
@@ -263,7 +263,7 @@ export default function HomeClient({
             </div>
           </motion.section>
 
-          {creators.length > 0 && (
+          {!HIDE_CREATORS && creators.length > 0 && (
             <Section title="Profiles to follow" href="/trendigt">
               <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
                 {creators.map((u, i) => (

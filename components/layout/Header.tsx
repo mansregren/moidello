@@ -75,9 +75,11 @@ export function Header() {
           the logo stays exactly centered without absolute positioning (no
           overlap with the 3-pill toggle). Desktop switches to flex. */}
       <Container className="relative grid grid-cols-[1fr_auto_1fr] items-center h-14 gap-2 md:flex md:h-20 md:gap-4">
-        {/* Mobile: gender toggle (left column) */}
+        {/* Mobile: search (left column) */}
         <div className="md:hidden flex items-center justify-self-start">
-          <GenderToggle orientation="horizontal" />
+          <IconButton aria-label="Search" onClick={() => setSearchOpen(true)}>
+            <Search className="h-5 w-5" />
+          </IconButton>
         </div>
 
         {/* Desktop: logo (left) */}
@@ -91,7 +93,7 @@ export function Header() {
         {/* Mobile: logo (center column, truly viewport-centered) */}
         <Link
           href="/"
-          className="md:hidden justify-self-center font-heading text-lg uppercase tracking-tight text-foreground whitespace-nowrap"
+          className="md:hidden justify-self-center font-heading text-2xl uppercase tracking-tight text-foreground whitespace-nowrap"
         >
           Moidello
         </Link>
@@ -134,7 +136,11 @@ export function Header() {
           <div className="hidden md:block">
             <GenderToggle orientation="horizontal" />
           </div>
-          <IconButton aria-label="Search" onClick={() => setSearchOpen(true)}>
+          <IconButton
+            aria-label="Search"
+            onClick={() => setSearchOpen(true)}
+            className="hidden md:inline-flex"
+          >
             <Search className="h-5 w-5" />
           </IconButton>
           {isLoggedIn ? (

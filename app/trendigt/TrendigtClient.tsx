@@ -10,6 +10,7 @@ import { Container } from "@/components/layout/Container";
 import { OutfitCard } from "@/components/outfit/OutfitCard";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { useGender, matchesGenderFilter } from "@/lib/gender-context";
+import { HIDE_CREATORS } from "@/lib/flags";
 import type { Outfit, User } from "@/lib/types";
 
 interface TrendingBrand {
@@ -96,7 +97,7 @@ export default function TrendigtClient({
             </Section>
           )}
 
-          {creators.length > 0 && (
+          {!HIDE_CREATORS && creators.length > 0 && (
             <Section title="Top profiles this week" href="/upptack">
               <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
                 {creators.map((user, i) => (

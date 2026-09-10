@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useViewerEngagement } from "@/lib/viewer-engagement-context";
 import { cn } from "@/lib/utils";
 import { outfitPath } from "@/lib/outfit-url";
+import { HIDE_CREATORS } from "@/lib/flags";
 import { toggleLike, toggleSave } from "@/app/actions/engagement";
 
 interface OutfitCardProps {
@@ -44,10 +45,10 @@ function buildOutfitAlt(outfit: Outfit): string {
         .filter((g): g is string => !!g),
     ),
   ).slice(0, 2);
-  if (garments.length > 0) parts.push(`med ${garments.join(" och ")}`);
+  if (garments.length > 0) parts.push(`with ${garments.join(" and ")}`);
 
-  if (outfit.creator?.displayName) {
-    parts.push(`av ${outfit.creator.displayName}`);
+  if (!HIDE_CREATORS && outfit.creator?.displayName) {
+    parts.push(`by ${outfit.creator.displayName}`);
   }
 
   return parts.join(" — ");
@@ -119,16 +120,16 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
     <div className="group">
       <Link
         href={outfitPath(outfit)}
-        aria-label={`${outfit.title} av ${outfit.creator.displayName}, ${outfit.tags.length} ${
-          outfit.vertical === "hem" ? "taggade saker" : "taggade plagg"
+        aria-label={`${outfit.title}, ${outfit.tags.length} ${
+          outfit.vertical === "hem" ? "tagged items" : "tagged pieces"
         }`}
       >
         <div
           className="relative overflow-hidden rounded-2xl aspect-[3/4]"
-          // Padding-färgen som upload-flowet skriver runt icke-3:4-bilder
-          // (#F7F6F3, se lib/image-resize.ts). Kortets background måste
-          // matcha för att paddingen ska smälta in — annars ser portrait-
-          // bilder med top/botten-padd ut som om de har vit kant.
+          // The padding colour the upload flow writes around non-3:4 images
+          // (#F7F6F3, see lib/image-resize.ts). The card background must
+          // match so the padding blends in — otherwise portrait images with
+          // top/bottom padding look like they have a white border.
           style={{
             backgroundColor: outfit.type === "flatlay" ? "#ffffff" : "#F7F6F3",
           }}
@@ -199,7 +200,7 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
               <p className="text-sm font-medium text-white">{outfit.title}</p>
               <p className="text-xs text-white/70 mt-1">
                 {outfit.tags.length}{" "}
-                {outfit.vertical === "hem" ? "taggade saker" : "taggade plagg"}
+                {outfit.vertical === "hem" ? "tagged items" : "tagged pieces"}
               </p>
             </div>
           </div>
@@ -207,22 +208,26 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
       </Link>
 
       <div className="mt-3 flex items-center justify-between">
-        <Link
-          href={`/profile/${outfit.creator.username}`}
-          aria-label={outfit.creator.displayName}
-          className="flex items-center gap-2 group/user"
-        >
-          <UserAvatar src={outfit.creator.avatar} alt="" size="sm" />
-          <span className="text-sm text-foreground-muted group-hover/user:text-foreground transition-colors">
-            {outfit.creator.displayName}
-          </span>
-        </Link>
+        {HIDE_CREATORS ? (
+          <span />
+        ) : (
+          <Link
+            href={`/profile/${outfit.creator.username}`}
+            aria-label={outfit.creator.displayName}
+            className="flex items-center gap-2 group/user"
+          >
+            <UserAvatar src={outfit.creator.avatar} alt="" size="sm" />
+            <span className="text-sm text-foreground-muted group-hover/user:text-foreground transition-colors">
+              {outfit.creator.displayName}
+            </span>
+          </Link>
+        )}
 
         <div className="flex items-center gap-3">
           <button
             onClick={handleLike}
             className="flex items-center gap-1 text-foreground-subtle hover:text-foreground transition-colors active:scale-95"
-            aria-label={liked ? "Ta bort gilla" : "Gilla"}
+            aria-label={liked ? "Remove like" : "Like"}
             aria-pressed={liked}
           >
             <Heart
@@ -233,7 +238,7 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
           <button
             onClick={handleSave}
             className="flex items-center gap-1 text-foreground-subtle hover:text-foreground transition-colors active:scale-95"
-            aria-label={saved ? "Ta bort sparad" : "Spara"}
+            aria-label={saved ? "Remove from saved" : "Save"}
             aria-pressed={saved}
           >
             <Bookmark

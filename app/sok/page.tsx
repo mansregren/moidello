@@ -7,6 +7,7 @@ import { UserAvatar } from "@/components/user/UserAvatar";
 import { createPublicClient } from "@/lib/supabase/public";
 import { outfitPathFromParts } from "@/lib/outfit-url";
 import { getViewerGender } from "@/lib/gender-server";
+import { HIDE_CREATORS } from "@/lib/flags";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -148,7 +149,9 @@ async function SearchResults({ q }: { q: string }) {
     .slice(0, 12);
 
   const empty =
-    profiles.length === 0 && outfits.length === 0 && brands.length === 0;
+    (HIDE_CREATORS || profiles.length === 0) &&
+    outfits.length === 0 &&
+    brands.length === 0;
 
   if (empty) {
     return (
@@ -168,7 +171,7 @@ async function SearchResults({ q }: { q: string }) {
 
   return (
     <div className="mt-10 space-y-14">
-      {profiles.length > 0 && (
+      {!HIDE_CREATORS && profiles.length > 0 && (
         <section>
           <h2 className="font-heading text-2xl md:text-3xl uppercase tracking-tight text-foreground mb-5">
             Profiles & brands

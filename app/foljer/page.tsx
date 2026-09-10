@@ -9,7 +9,7 @@ import {
   fetchEngagementForViewer,
 } from "@/lib/queries";
 import { fetchTopCreatorsCached as fetchTopCreators } from "@/lib/queries-cached";
-import { OUTFIT_CREATE_PUBLIC } from "@/lib/flags";
+import { OUTFIT_CREATE_PUBLIC, HIDE_CREATORS } from "@/lib/flags";
 import { FoljerClient } from "./FoljerClient";
 
 export const metadata = {
@@ -89,9 +89,11 @@ function Shell({
           <p className="mt-6 text-foreground-muted max-w-2xl">
             {mode === "feed"
               ? "New outfits from the profiles you follow."
-              : mode === "empty"
-                ? "You’re not following anyone yet. Start with the profiles below and your feed will fill up here."
-                : "Log in to build your personal feed. Here are profiles worth following."}
+              : HIDE_CREATORS
+                ? "Save outfits you like and they'll be easy to find again. Browse the full catalogue on Discover."
+                : mode === "empty"
+                  ? "You’re not following anyone yet. Start with the profiles below and your feed will fill up here."
+                  : "Log in to build your personal feed. Here are profiles worth following."}
           </p>
 
           {mode === "feed" && (
@@ -104,7 +106,7 @@ function Shell({
             </section>
           )}
 
-          {(mode === "empty" || mode === "logged-out") && (
+          {!HIDE_CREATORS && (mode === "empty" || mode === "logged-out") && (
             <section className="mt-12">
               <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-6">
                 Suggested profiles
