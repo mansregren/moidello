@@ -33,14 +33,14 @@ const TYPE_ICON: Record<NotificationType, typeof Heart> = {
 };
 
 function describe(n: NotificationRow): string {
-  const who = n.actor?.display_name ?? n.actor?.username ?? "Någon";
+  const who = n.actor?.display_name ?? n.actor?.username ?? "Someone";
   switch (n.type) {
     case "like":
-      return `${who} gillade din outfit`;
+      return `${who} liked your outfit`;
     case "follow":
-      return `${who} följer dig`;
+      return `${who} started following you`;
     case "comment":
-      return `${who} kommenterade din outfit`;
+      return `${who} commented on your outfit`;
   }
 }
 
@@ -61,7 +61,7 @@ function timeAgo(iso: string): string {
   if (h < 24) return `${h}h`;
   const d = Math.round(h / 24);
   if (d < 30) return `${d}d`;
-  return new Date(iso).toLocaleDateString("sv-SE");
+  return new Date(iso).toLocaleDateString("en-GB");
 }
 
 export function NotificationBell() {
@@ -156,14 +156,14 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={handleOpen}
-        aria-label="Notifikationer"
+        aria-label="Notifications"
         aria-expanded={open}
         className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground hover:bg-foreground/5 transition-colors"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
           <span
-            aria-label={`${unreadCount} olästa`}
+            aria-label={`${unreadCount} unread`}
             className="absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
           >
             {unreadCount > 9 ? "9+" : unreadCount}
@@ -181,16 +181,16 @@ export function NotificationBell() {
             className="absolute top-full right-0 mt-2 w-80 sm:w-96 max-h-[70vh] overflow-y-auto rounded-2xl bg-background-secondary border border-foreground/10 shadow-2xl shadow-black/50 z-50"
           >
             <div className="p-4 border-b border-foreground/5">
-              <p className="text-sm font-semibold text-foreground">Notifikationer</p>
+              <p className="text-sm font-semibold text-foreground">Notifications</p>
             </div>
 
             {loading && notifs.length === 0 && (
-              <p className="p-4 text-sm text-foreground-subtle">Laddar…</p>
+              <p className="p-4 text-sm text-foreground-subtle">Loading…</p>
             )}
 
             {!loading && notifs.length === 0 && (
               <p className="p-4 text-sm text-foreground-muted">
-                Inga notifikationer än. Aktivitet på dina outfits dyker upp här.
+                No notifications yet. Activity on your outfits will show up here.
               </p>
             )}
 

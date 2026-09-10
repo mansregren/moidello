@@ -11,11 +11,11 @@ export interface NavItem {
 }
 
 export const primaryNav: NavItem[] = [
-  { href: "/", label: "Hem", icon: Home },
-  { href: "/upptack", label: "Upptäck", icon: Search },
-  { href: "/skapa", label: "Skapa", icon: Plus, primary: true, authAction: "create" },
-  { href: "/foljer", label: "Följer", icon: Users },
-  { href: "/profil", label: "Profil", icon: User, authAction: "profile" },
+  { href: "/", label: "Home", icon: Home },
+  { href: "/upptack", label: "Discover", icon: Search },
+  { href: "/skapa", label: "Create", icon: Plus, primary: true, authAction: "create" },
+  { href: "/foljer", label: "Following", icon: Users },
+  { href: "/profil", label: "Profile", icon: User, authAction: "profile" },
 ];
 
 /**

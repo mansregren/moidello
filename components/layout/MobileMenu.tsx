@@ -71,7 +71,7 @@ export function MobileMenu() {
   return (
     <div className="md:hidden">
       <IconButton
-        aria-label="Meny"
+        aria-label="Menu"
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen(true)}
@@ -91,7 +91,7 @@ export function MobileMenu() {
               onClick={() => setOpen(false)}
             />
             <motion.nav
-              aria-label="Huvudnavigation"
+              aria-label="Main navigation"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
@@ -106,7 +106,7 @@ export function MobileMenu() {
                 <span className="font-heading text-lg uppercase tracking-tight text-foreground">
                   Moidello
                 </span>
-                <IconButton aria-label="Stäng meny" onClick={() => setOpen(false)}>
+                <IconButton aria-label="Close menu" onClick={() => setOpen(false)}>
                   <X className="h-5 w-5" />
                 </IconButton>
               </div>
@@ -152,7 +152,7 @@ export function MobileMenu() {
                         className="flex items-center gap-3 px-5 py-3.5 text-base text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
                       >
                         <MessageCircle className="h-5 w-5 shrink-0" strokeWidth={1.8} />
-                        Meddelanden
+                        Messages
                       </Link>
                     </li>
                     <li>
@@ -162,7 +162,7 @@ export function MobileMenu() {
                         className="flex items-center gap-3 px-5 py-3.5 text-base text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
                       >
                         <Bookmark className="h-5 w-5 shrink-0" strokeWidth={1.8} />
-                        Sparade
+                        Saved
                       </Link>
                     </li>
                     <li>
@@ -172,7 +172,7 @@ export function MobileMenu() {
                         className="w-full flex items-center gap-3 px-5 py-3.5 text-base text-red-400 hover:bg-foreground/5 transition-colors"
                       >
                         <LogOut className="h-5 w-5 shrink-0" strokeWidth={1.8} />
-                        Logga ut
+                        Log out
                       </button>
                     </li>
                   </>
@@ -186,7 +186,7 @@ export function MobileMenu() {
                     onClick={() => setOpen(false)}
                     className="flex items-center justify-center rounded-full bg-foreground text-background px-4 py-2.5 text-sm font-semibold uppercase tracking-wider transition-transform active:scale-95"
                   >
-                    Logga in
+                    Log in
                   </Link>
                 </div>
               )}

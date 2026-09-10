@@ -55,10 +55,10 @@ export function UserMenu() {
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label="Användarmeny"
+        aria-label="User menu"
         className="rounded-full transition-transform active:scale-95 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
-        <UserAvatar src={avatarUrl} alt={email || "Konto"} size="sm" />
+        <UserAvatar src={avatarUrl} alt={email || "Account"} size="sm" />
       </button>
 
       <AnimatePresence>
@@ -73,7 +73,7 @@ export function UserMenu() {
           >
             <div className="px-4 py-3 border-b border-border">
               <p className="text-xs text-foreground-subtle uppercase tracking-wider">
-                Inloggad som
+                Signed in as
               </p>
               <p className="text-sm text-foreground truncate mt-0.5">{email}</p>
             </div>
@@ -83,14 +83,14 @@ export function UserMenu() {
                 icon={UserIcon}
                 onClick={() => setOpen(false)}
               >
-                Min profil
+                My profile
               </MenuItem>
               <MenuItem
                 href="/meddelanden"
                 icon={MessageCircle}
                 onClick={() => setOpen(false)}
               >
-                Meddelanden
+                Messages
               </MenuItem>
               {canCreateOutfits(!!profile?.isAdmin) && (
                 <MenuItem
@@ -98,7 +98,7 @@ export function UserMenu() {
                   icon={Plus}
                   onClick={() => setOpen(false)}
                 >
-                  Skapa outfit
+                  Create outfit
                 </MenuItem>
               )}
               <MenuItem
@@ -106,7 +106,7 @@ export function UserMenu() {
                 icon={Bookmark}
                 onClick={() => setOpen(false)}
               >
-                Sparade
+                Saved
               </MenuItem>
               <li>
                 <button
@@ -116,7 +116,7 @@ export function UserMenu() {
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-foreground/5 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
-                  Logga ut
+                  Log out
                 </button>
               </li>
             </ul>

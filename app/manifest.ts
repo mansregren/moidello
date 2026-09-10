@@ -5,14 +5,14 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Moidello",
     short_name: "Moidello",
     description:
-      "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
+      "Discover, share and get inspired by outfits. Tag every piece and find where to buy it.",
     start_url: "/",
     scope: "/",
     display: "standalone",
     orientation: "portrait",
     background_color: "#000000",
     theme_color: "#000000",
-    lang: "sv",
+    lang: "en",
     categories: ["lifestyle", "shopping", "social"],
     icons: [
       {

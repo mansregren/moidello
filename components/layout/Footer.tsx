@@ -4,20 +4,20 @@ import { Container } from "./Container";
 import { OUTFIT_CREATE_PUBLIC } from "@/lib/flags";
 
 const footerLinks = {
-  Plattform: [
-    { href: "/", label: "Hem" },
-    { href: "/upptack", label: "Upptäck" },
-    { href: "/trendigt", label: "Trendigt" },
-    ...(OUTFIT_CREATE_PUBLIC ? [{ href: "/skapa", label: "Skapa" }] : []),
+  Platform: [
+    { href: "/", label: "Home" },
+    { href: "/upptack", label: "Discover" },
+    { href: "/trendigt", label: "Trending" },
+    ...(OUTFIT_CREATE_PUBLIC ? [{ href: "/skapa", label: "Create" }] : []),
   ],
-  Företag: [
-    { href: "/om", label: "Om Moidello" },
-    { href: "/faq", label: "Vanliga frågor" },
-    { href: "/kontakt", label: "Kontakt" },
+  Company: [
+    { href: "/om", label: "About Moidello" },
+    { href: "/faq", label: "FAQ" },
+    { href: "/kontakt", label: "Contact" },
   ],
-  Juridik: [
-    { href: "/villkor", label: "Användarvillkor" },
-    { href: "/integritet", label: "Integritetspolicy" },
+  Legal: [
+    { href: "/villkor", label: "Terms of Use" },
+    { href: "/integritet", label: "Privacy Policy" },
   ],
 };
 
@@ -42,7 +42,7 @@ export function Footer({
               Moidello
             </Link>
             <p className="mt-4 text-sm text-foreground-muted max-w-xs leading-relaxed">
-              En plattform för outfits och inspiration. Tagga varje plagg, dela var du fann det.
+              A platform for outfits and inspiration. Tag every piece, share where you found it.
             </p>
             <a
               href="mailto:hello@moidello.com"
@@ -75,7 +75,7 @@ export function Footer({
 
         <div className="mt-16 border-t border-foreground/10 pt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
           <p className="text-xs text-foreground-subtle">
-            © {year} Moidello. Alla rättigheter förbehållna.
+            © {year} Moidello. All rights reserved.
           </p>
           <p className="text-xs text-foreground-subtle tracking-wide">
             Made in Stockholm

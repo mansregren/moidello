@@ -35,33 +35,33 @@ export const metadata: Metadata = {
     template: "%s | Moidello",
   },
   description:
-    "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
+    "Discover, share and get inspired by outfits. Tag every piece and find where to buy it.",
   applicationName: "Moidello",
   keywords: [
     "outfits",
-    "mode",
-    "stil",
+    "fashion",
+    "style",
     "inspiration",
     "shopping",
-    "kläder",
-    "fashion",
+    "clothing",
+    "outfit ideas",
     "moidello",
   ],
   authors: [{ name: "Moidello" }],
   openGraph: {
     type: "website",
-    locale: "sv_SE",
+    locale: "en_US",
     url: "https://moidello.com",
     siteName: "Moidello",
     title: "Moidello",
     description:
-      "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
+      "Discover, share and get inspired by outfits. Tag every piece and find where to buy it.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Moidello",
     description:
-      "Upptäck, dela och inspireras av outfits. Tagga varje plagg och hitta var du kan köpa det.",
+      "Discover, share and get inspired by outfits. Tag every piece and find where to buy it.",
   },
   robots: {
     index: true,
@@ -129,7 +129,7 @@ export default async function RootLayout({
 
   return (
     <html
-      lang="sv"
+      lang="en"
       className={`${inter.variable} ${anton.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
@@ -137,7 +137,7 @@ export default async function RootLayout({
             search box). Page-level JSON-LD goes inside the route components. */}
         <JsonLd data={siteJsonLd()} />
         <a href="#main" className="skip-link">
-          Hoppa till innehåll
+          Skip to content
         </a>
         <ImpersonationBanner />
         <AuthProvider initialUser={user} initialProfile={initialProfile}>

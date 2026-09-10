@@ -9,8 +9,8 @@ import { GenderFilter } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const GENDER_OPTIONS: { id: GenderFilter; label: string; toast: string }[] = [
-  { id: "dam", label: "Dam", toast: "Visar Dam-outfits" },
-  { id: "herr", label: "Herr", toast: "Visar Herr-outfits" },
+  { id: "dam", label: "Women", toast: "Showing women's outfits" },
+  { id: "herr", label: "Men", toast: "Showing men's outfits" },
 ];
 
 // Where Dam/Herr send you when you tap them while inside the home vertical.
@@ -76,7 +76,7 @@ export function GenderToggle({
   return (
     <div
       role="radiogroup"
-      aria-label="Visa kategori"
+      aria-label="Choose category"
       className={cn(
         "rounded-full border border-border bg-background-secondary p-0.5",
         orientation === "horizontal"
@@ -117,7 +117,7 @@ export function GenderToggle({
               : "text-foreground-muted hover:text-foreground",
           )}
         >
-          Hem
+          Home
         </button>
       )}
     </div>

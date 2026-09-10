@@ -98,7 +98,7 @@ export function Header() {
 
         {/* Desktop: nav links */}
         <nav
-          aria-label="Huvudnavigation"
+          aria-label="Main navigation"
           className="hidden md:flex items-center gap-1 ml-4"
         >
           {navItems.map((item) => {
@@ -134,7 +134,7 @@ export function Header() {
           <div className="hidden md:block">
             <GenderToggle orientation="horizontal" />
           </div>
-          <IconButton aria-label="Sök" onClick={() => setSearchOpen(true)}>
+          <IconButton aria-label="Search" onClick={() => setSearchOpen(true)}>
             <Search className="h-5 w-5" />
           </IconButton>
           {isLoggedIn ? (
@@ -149,7 +149,7 @@ export function Header() {
               href="/login"
               className="hidden md:inline-flex items-center rounded-full bg-foreground text-background px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-transform active:scale-95 hover:bg-foreground/90"
             >
-              Logga in
+              Log in
             </Link>
           )}
           <MobileMenu />
@@ -178,10 +178,10 @@ export function Header() {
                 ref={searchInputRef}
                 type="search"
                 name="q"
-                placeholder="Sök outfits, märken, kreatörer…"
+                placeholder="Search outfits, brands, creators…"
                 className="flex-1 bg-transparent border-0 outline-none px-3 text-base text-foreground placeholder:text-foreground-subtle"
               />
-              <IconButton aria-label="Stäng sök" onClick={() => setSearchOpen(false)}>
+              <IconButton aria-label="Close search" onClick={() => setSearchOpen(false)}>
                 <X className="h-5 w-5" />
               </IconButton>
             </motion.form>

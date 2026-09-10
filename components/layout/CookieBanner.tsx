@@ -57,23 +57,23 @@ export function CookieBanner() {
   return (
     <div
       role="dialog"
-      aria-label="Cookie-information"
+      aria-label="Cookie information"
       className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md z-[55] rounded-2xl border border-foreground/10 bg-background-secondary/95 backdrop-blur-xl shadow-2xl p-5"
     >
       <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
           <p className="font-heading text-sm uppercase tracking-wider text-foreground mb-2">
-            Cookies på Moidello
+            Cookies on Moidello
           </p>
           <p className="text-xs text-foreground-muted leading-relaxed">
-            Vi använder cookies för att hålla dig inloggad, komma ihåg din
-            region och förbättra prestanda. Inga tredjeparts-spårningsko­okies.
-            Läs mer i vår{" "}
+            We use cookies to keep you signed in, remember your region and
+            improve performance. No third-party tracking cookies. Read more in
+            our{" "}
             <Link
               href="/integritet"
               className="text-foreground underline hover:text-foreground/80"
             >
-              integritetspolicy
+              privacy policy
             </Link>
             .
           </p>
@@ -83,7 +83,7 @@ export function CookieBanner() {
               onClick={() => dismiss("essential")}
               className="rounded-full border border-border text-foreground px-3 py-1.5 text-xs hover:border-foreground/30"
             >
-              Endast nödvändiga
+              Essential only
             </button>
             <button
               type="button"
@@ -97,7 +97,7 @@ export function CookieBanner() {
         <button
           type="button"
           onClick={() => dismiss("essential")}
-          aria-label="Stäng"
+          aria-label="Close"
           className="shrink-0 text-foreground-muted hover:text-foreground"
         >
           <X className="h-4 w-4" />
