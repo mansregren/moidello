@@ -154,18 +154,18 @@ export default async function BoardPage({
             className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
-            {isOwner ? "Mina samlingar" : owner ? `Profilen för @${owner.username}` : "Tillbaka"}
+            {isOwner ? "My collections" : owner ? `@${owner.username}’s profile` : "Back"}
           </Link>
 
           <div className="flex items-center gap-2 mb-3">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background-secondary px-3 py-1 text-[11px] uppercase tracking-wider text-foreground-muted">
               {board.is_public ? (
                 <>
-                  <Globe className="h-3 w-3" /> Publik samling
+                  <Globe className="h-3 w-3" /> Public collection
                 </>
               ) : (
                 <>
-                  <Lock className="h-3 w-3" /> Privat samling
+                  <Lock className="h-3 w-3" /> Private collection
                 </>
               )}
             </span>
@@ -177,7 +177,7 @@ export default async function BoardPage({
 
           {owner && !isOwner && (
             <p className="mt-3 text-foreground-muted text-sm">
-              Av{" "}
+              By{" "}
               <Link
                 href={`/profile/${owner.username}`}
                 className="text-foreground hover:underline"
@@ -214,7 +214,7 @@ export default async function BoardPage({
             ) : (
               <div className="rounded-2xl border border-border bg-background-secondary p-10 text-center">
                 <p className="text-foreground-muted">
-                  Den här samlingen är tom. Lägg till outfits från en outfit-sida.
+                  This collection is empty. Add outfits from an outfit page.
                 </p>
               </div>
             )}

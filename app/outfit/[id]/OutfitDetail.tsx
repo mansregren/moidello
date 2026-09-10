@@ -118,7 +118,7 @@ export default function OutfitDetail({
       <main id="main" tabIndex={-1} className="flex-1 pt-20 md:pt-24">
         <Container>
           <nav
-            aria-label="Brödsmulor"
+            aria-label="Breadcrumbs"
             className="mb-6 text-[11px] uppercase tracking-[0.18em] text-foreground-subtle"
           >
             <ol className="flex items-center gap-2 flex-wrap">
@@ -157,8 +157,8 @@ export default function OutfitDetail({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               className="relative overflow-hidden rounded-2xl"
-              // Matchar upload-padding-färgen (#F7F6F3 i lib/image-resize.ts)
-              // så ev. kräm-band runt portrait-bilder smälter in i bakgrunden.
+              // Matches the upload-padding colour (#F7F6F3 in lib/image-resize.ts)
+              // so any cream band around portrait images blends into the background.
               style={{ backgroundColor: "#F7F6F3" }}
             >
               <Image
@@ -254,7 +254,7 @@ export default function OutfitDetail({
                 <button
                   type="button"
                   onClick={handleLike}
-                  aria-label={liked ? "Ta bort gillning" : "Gilla"}
+                  aria-label={liked ? "Remove like" : "Like"}
                   aria-pressed={liked}
                   className={cn(
                     "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
@@ -272,7 +272,7 @@ export default function OutfitDetail({
                 <button
                   type="button"
                   onClick={handleSave}
-                  aria-label={saved ? "Ta bort sparad" : "Spara"}
+                  aria-label={saved ? "Remove from saved" : "Save"}
                   aria-pressed={saved}
                   className={cn(
                     "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
@@ -294,14 +294,14 @@ export default function OutfitDetail({
                     className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2 text-sm font-medium hover:border-foreground/30 transition-colors"
                   >
                     <Send className="h-4 w-4" />
-                    Skicka till vän
+                    Send to a friend
                   </button>
                 )}
                 <ShareButton
                   url={outfitPath(outfit)}
                   title={outfit.title}
-                  text={outfit.description || `Outfit av ${outfit.creator.displayName}`}
-                  label="Dela länk"
+                  text={outfit.description || `Outfit by ${outfit.creator.displayName}`}
+                  label="Share link"
                   variant="outline"
                 />
                 {isPersisted && user?.id !== outfit.creator.id && (
@@ -317,7 +317,7 @@ export default function OutfitDetail({
 
               <div className="mb-8">
                 <h3 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-4">
-                  {isHome ? "Taggade saker" : "Taggade plagg"}
+                  {isHome ? "Tagged items" : "Tagged pieces"}
                 </h3>
                 <div className="rounded-2xl border border-border bg-background-secondary p-4">
                   {outfit.tags.length === 0 ? (
@@ -417,7 +417,7 @@ function CommentsSection({
         setBody("");
         setError(null);
       } else {
-        setError(res.error ?? "Något gick fel");
+        setError(res.error ?? "Something went wrong");
       }
     });
   };
@@ -426,12 +426,12 @@ function CommentsSection({
     <div>
       <h3 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-4 flex items-center gap-2">
         <MessageCircle className="h-4 w-4" />
-        Kommentarer ({comments.length})
+        Comments ({comments.length})
       </h3>
       <div className="space-y-4">
         {comments.length === 0 && (
           <p className="text-sm text-foreground-subtle">
-            Inga kommentarer än. Var först med att kommentera!
+            No comments yet. Be the first to comment!
           </p>
         )}
         {comments.map((comment) => {
@@ -456,7 +456,7 @@ function CommentsSection({
                 </p>
                 <div className="flex items-center gap-3 mt-1">
                   <p className="text-xs text-foreground-subtle">
-                    {new Date(comment.createdAt).toLocaleString("sv-SE", {
+                    {new Date(comment.createdAt).toLocaleString("en-GB", {
                       dateStyle: "medium",
                       timeStyle: "short",
                     })}
@@ -474,7 +474,7 @@ function CommentsSection({
                 <button
                   type="button"
                   onClick={() => setConfirmDelete(comment.id)}
-                  aria-label="Radera kommentar"
+                  aria-label="Delete comment"
                   className="shrink-0 self-start text-foreground-subtle hover:text-red-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
                 >
                   <X className="h-4 w-4" />
@@ -495,17 +495,17 @@ function CommentsSection({
             <AlertDialog.Popup className="fixed inset-0 z-[60] flex items-center justify-center p-6 outline-none">
               <div className="w-full max-w-sm rounded-3xl bg-background-secondary border border-foreground/10 p-6">
                 <AlertDialog.Title className="font-heading text-2xl uppercase tracking-tight text-foreground">
-                  Radera kommentar?
+                  Delete comment?
                 </AlertDialog.Title>
                 <AlertDialog.Description className="mt-3 text-sm text-foreground-muted">
-                  Detta går inte att ångra.
+                  This cannot be undone.
                 </AlertDialog.Description>
                 <div className="mt-6 flex gap-3">
                   <AlertDialog.Close
                     type="button"
                     className="flex-1 rounded-full border border-border text-foreground py-3 text-sm font-medium hover:border-foreground/30"
                   >
-                    Avbryt
+                    Cancel
                   </AlertDialog.Close>
                   <button
                     type="button"
@@ -537,7 +537,7 @@ function CommentsSection({
                     }}
                     className="flex-1 rounded-full bg-red-500 text-white py-3 text-sm font-semibold hover:bg-red-600 disabled:opacity-60"
                   >
-                    Radera
+                    Delete
                   </button>
                 </div>
               </div>
@@ -549,15 +549,15 @@ function CommentsSection({
           onSubmit={submit}
           className="flex gap-3 mt-6 pt-4 border-t border-border"
         >
-          <UserAvatar src={viewerAvatar} alt="Du" size="sm" />
+          <UserAvatar src={viewerAvatar} alt="You" size="sm" />
           <input
             type="text"
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder={
               isPersisted
-                ? "Skriv en kommentar..."
-                : "Kommentarer aktiveras när outfiten är publicerad"
+                ? "Write a comment..."
+                : "Comments open once the outfit is published"
             }
             disabled={!isPersisted || pending}
             maxLength={1000}
@@ -569,7 +569,7 @@ function CommentsSection({
               disabled={pending}
               className="text-sm text-foreground font-semibold disabled:opacity-50"
             >
-              Posta
+              Post
             </button>
           )}
         </form>
@@ -580,10 +580,10 @@ function CommentsSection({
 }
 
 /**
- * Discreet internal-link strip — distinct färger och kategorier som
- * finns i outfit-taggarna, länkade till /farg/<slug> resp.
- * /typ/<gender>/<garment>. Renderar bara när det finns minst en chip
- * att visa så outfits utan backfill inte får en tom rubrik.
+ * Discreet internal-link strip — distinct colours and categories found
+ * in the outfit tags, linked to /farg/<slug> and
+ * /typ/<gender>/<garment>. Only renders when there is at least one chip
+ * to show, so outfits without backfill don't get an empty heading.
  */
 function ExploreLinks({ outfit }: { outfit: Outfit }) {
   const colors = Array.from(
@@ -607,7 +607,7 @@ function ExploreLinks({ outfit }: { outfit: Outfit }) {
   return (
     <section className="mt-16 md:mt-20 pb-2 border-t border-border pt-10">
       <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-4">
-        Utforska liknande
+        Explore similar
       </h2>
       <div className="space-y-3">
         {garments.length > 0 && (
@@ -618,7 +618,7 @@ function ExploreLinks({ outfit }: { outfit: Outfit }) {
                 href={`/typ/${outfit.gender}/${slugify(g)}`}
                 className="inline-block rounded-full border border-border bg-background-secondary px-3.5 py-1.5 text-xs text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors capitalize"
               >
-                {g} {outfit.gender === "herr" ? "herr" : "dam"}
+                {g} {outfit.gender === "herr" ? "men" : "women"}
               </Link>
             ))}
           </div>

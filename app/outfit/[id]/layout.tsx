@@ -29,7 +29,7 @@ function buildDescription(outfit: {
   if (top) {
     return `Outfit med ${top} av ${outfit.creator.displayName}.`;
   }
-  return `Outfit av ${outfit.creator.displayName} på ${SITE}.`;
+  return `Outfit by ${outfit.creator.displayName} on ${SITE}.`;
 }
 
 export async function generateMetadata({

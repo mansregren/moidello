@@ -40,7 +40,7 @@ export function BoardOwnerActions({
           className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2 text-sm hover:border-foreground/30 transition-colors"
         >
           <Pencil className="h-3.5 w-3.5" />
-          Redigera
+          Edit
         </button>
         <button
           type="button"
@@ -48,7 +48,7 @@ export function BoardOwnerActions({
           className="inline-flex items-center gap-2 rounded-full border border-border text-red-400 px-4 py-2 text-sm hover:border-red-400/30 transition-colors"
         >
           <Trash2 className="h-3.5 w-3.5" />
-          Radera
+          Delete
         </button>
       </div>
 
@@ -80,11 +80,11 @@ export function BoardOwnerActions({
               className="w-full max-w-sm rounded-3xl bg-background-secondary border border-foreground/10 p-6"
             >
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground">
-                Radera samling?
+                Delete collection?
               </h2>
               <p className="mt-3 text-sm text-foreground-muted">
-                Detta tar bort samlingen permanent. Outfitsen tas inte bort —
-                bara samlingen.
+                This permanently removes the collection. The outfits aren’t
+                deleted — only the collection.
               </p>
               <div className="mt-6 flex gap-3">
                 <button
@@ -92,7 +92,7 @@ export function BoardOwnerActions({
                   onClick={() => setConfirmDelete(false)}
                   className="flex-1 rounded-full border border-border text-foreground py-3 text-sm font-medium hover:border-foreground/30"
                 >
-                  Avbryt
+                  Cancel
                 </button>
                 <button
                   type="button"
@@ -100,7 +100,7 @@ export function BoardOwnerActions({
                   disabled={pending}
                   className="flex-1 rounded-full bg-red-500 text-white py-3 text-sm font-semibold hover:bg-red-600 disabled:opacity-60"
                 >
-                  {pending ? "Raderar…" : "Radera"}
+                  {pending ? "Deleting…" : "Delete"}
                 </button>
               </div>
             </motion.div>
@@ -136,7 +136,7 @@ function EditBoardModal({
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setError("Skriv ett namn.");
+      setError("Enter a name.");
       return;
     }
     startTransition(async () => {
@@ -149,7 +149,7 @@ function EditBoardModal({
         onClose();
         router.refresh();
       } else {
-        setError(res.error ?? "Kunde inte spara.");
+        setError(res.error ?? "Could not save.");
       }
     });
   };
@@ -175,11 +175,11 @@ function EditBoardModal({
           >
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground">
-                Redigera samling
+                Edit collection
               </h2>
               <button
                 onClick={onClose}
-                aria-label="Stäng"
+                aria-label="Close"
                 className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-foreground/5 hover:text-foreground"
               >
                 <X className="h-5 w-5" />
@@ -189,7 +189,7 @@ function EditBoardModal({
             <form onSubmit={submit} className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
-                  Namn
+                  Name
                 </label>
                 <input
                   type="text"
@@ -202,7 +202,7 @@ function EditBoardModal({
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
-                  Beskrivning
+                  Description
                 </label>
                 <textarea
                   rows={3}
@@ -215,7 +215,7 @@ function EditBoardModal({
               <div className="flex items-center justify-between rounded-xl bg-background-tertiary border border-border px-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    Publik samling
+                    Public collection
                   </p>
                 </div>
                 <label className="relative inline-flex cursor-pointer">
@@ -237,7 +237,7 @@ function EditBoardModal({
                 disabled={pending}
                 className="w-full rounded-full bg-foreground text-background py-3 text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-60"
               >
-                {pending ? "Sparar…" : "Spara"}
+                {pending ? "Saving…" : "Save"}
               </button>
             </form>
           </motion.div>

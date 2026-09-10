@@ -10,8 +10,8 @@ const SITE = "Moidello";
  *   2. Auto-fallback from brand/name/garment/color/material/price.
  *
  * Capped at ~155 chars so the full snippet shows in Google. The fallback
- * is intentionally richer than the old "Brand name. Pris. Se hur det
- * stylas på Moidello." line because Google scores keyword density in
+ * is intentionally richer than the old thin "Brand name. Price." line
+ * because Google scores keyword density in
  * meta-description and the old version was too thin to compete.
  */
 function buildDescription(item: {
@@ -29,13 +29,13 @@ function buildDescription(item: {
 
   const garmentLower = item.garment?.toLowerCase().trim() ?? "";
   const colorPart = item.color ? `${item.color.toLowerCase()} ` : "";
-  const materialPart = item.material ? `i ${item.material.toLowerCase()} ` : "";
+  const materialPart = item.material ? `in ${item.material.toLowerCase()} ` : "";
   const pricePart =
     item.price > 0
-      ? `${item.price.toLocaleString("sv-SE")} ${item.currency}. `
+      ? `${item.price.toLocaleString("en-GB")} ${item.currency}. `
       : "";
-  const noun = garmentLower || "plagg";
-  return `${item.brand} ${item.name} — ${colorPart}${noun} ${materialPart}stylad i outfits på ${SITE}. ${pricePart}Se färg, passform och fler outfit-idéer.`.slice(
+  const noun = garmentLower || "piece";
+  return `${item.brand} ${item.name} — ${colorPart}${noun} ${materialPart}styled in outfits on ${SITE}. ${pricePart}See colour, fit and more outfit ideas.`.slice(
     0,
     200,
   );
@@ -90,7 +90,7 @@ export async function generateMetadata({
       ? { index: false, follow: true }
       : { index: true, follow: true },
     openGraph: {
-      title: `${item.brand} ${item.name} på ${SITE}`,
+      title: `${item.brand} ${item.name} on ${SITE}`,
       description,
       url: canonical,
       type: "website",

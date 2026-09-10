@@ -61,7 +61,7 @@ export default async function BrandPage({
     .limit(60);
 
   const description = dbMatch.isClaimed
-    ? "Verifierat märke på Moidello"
+    ? "Verified brand on Moidello"
     : `Outfits som taggar ${dbMatch.name}.`;
 
   return (
@@ -122,7 +122,7 @@ function BrandShell({
             className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-8"
           >
             <ArrowLeft className="h-4 w-4" />
-            Alla märken
+            All brands
           </Link>
 
           <div className="mb-12">
@@ -149,7 +149,7 @@ function BrandShell({
                 <a href={website} target="_blank" rel="noopener noreferrer">
                   <PremiumButton variant="secondary" size="sm">
                     <Globe className="h-4 w-4" />
-                    Besök hemsida
+                    Visit website
                   </PremiumButton>
                 </a>
               )}
@@ -169,10 +169,10 @@ function BrandShell({
           ) : (
             <div className="py-24 text-center mb-16">
               <p className="text-foreground-muted text-lg">
-                Inga outfits med {name} ännu
+                No outfits with {name} yet
               </p>
               <p className="text-sm text-foreground-subtle mt-2">
-                Bli först med att tagga ett plagg från {name}!
+                Be the first to tag a piece from {name}!
               </p>
             </div>
           )}
@@ -219,7 +219,7 @@ function BrandShell({
                           href={p.buy_url}
                           className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1.5 text-xs font-semibold hover:bg-foreground/90"
                         >
-                          Köp
+                          Buy
                           <ExternalLink className="h-3 w-3" />
                         </UserLink>
                       )}

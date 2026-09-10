@@ -27,14 +27,14 @@ export async function generateMetadata({
   const handle = `@${user.username}`;
   const countLabel = user.outfitCount > 0
     ? `${user.outfitCount} outfit${user.outfitCount === 1 ? "" : "s"}`
-    : "Ny kreatör";
+    : "New profile";
 
   // Root layout's metadata.title.template adds " | Moidello"; don't double it.
   const title = `${user.displayName} (${handle}) — ${countLabel}`;
   const ownBio = user.bio?.trim();
   const description = ownBio
     ? ownBio
-    : `Stilkreatör på ${SITE} med ${user.outfitCount} ${user.outfitCount === 1 ? "outfit" : "outfits"}.`;
+    : `Style profile on ${SITE} with ${user.outfitCount} ${user.outfitCount === 1 ? "outfit" : "outfits"}.`;
 
   // Hide trigger-default usernames + outfit-less profiles from the index.
   // A profile with zero outfits is too thin to surface in search even
@@ -53,7 +53,7 @@ export async function generateMetadata({
     // OG + Twitter images come from opengraph-image.tsx — Next.js auto-
     // populates them from the file route at this directory.
     openGraph: {
-      title: `${user.displayName} (${handle}) på ${SITE}`,
+      title: `${user.displayName} (${handle}) on ${SITE}`,
       description,
       url: canonical,
       type: "profile",

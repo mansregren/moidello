@@ -19,8 +19,8 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { profilePageJsonLd } from "@/lib/json-ld";
 import { useAuth } from "@/lib/auth-context";
 import { useViewerEngagement } from "@/lib/viewer-engagement-context";
-// gender-context används inte längre här — profilen visar alla outfits
-// oavsett besökarens filter.
+// gender-context is no longer used here — the profile shows all outfits
+// regardless of the viewer's filter.
 import { motion } from "framer-motion";
 import type { Outfit, User as MoidelloUser } from "@/lib/types";
 import { toggleFollow } from "@/app/actions/engagement";
@@ -60,14 +60,15 @@ export default function ProfileDetail({
   const [, startTransition] = useTransition();
 
   const isOwnProfile = viewer?.id === user.id;
-  // En kreatörs profil visar ALLA deras publikationer oavsett besökarens
-  // gender-toggle. Filtret hör hemma i feeds (/upptack, /, /foljer) där
-  // användaren bläddrar — på en specifik profil vill man se vad just den
-  // personen publicerat. Tidigare logik filtrerade bort herr-kreatörers
-  // outfits för besökare med dam-filter, vilket gjorde profiler tomma.
+  // A profile shows ALL of its posts regardless of the viewer's gender
+  // toggle. The filter belongs in feeds (/upptack, /, /foljer) where the
+  // user is browsing — on a specific profile you want to see what that
+  // person published. Earlier logic filtered out men's outfits for
+  // viewers on the women's filter, which made profiles look empty.
   //
-  // Mode och hem separeras i flikar. Medan hem-vertikalen är dold
-  // (showHome=false) exkluderas hem-poster helt så de inte läcker.
+  // Fashion and home are split into tabs. While the home vertical is
+  // hidden (showHome=false), home posts are excluded entirely so they
+  // don't leak.
   const outfits = useMemo(
     () => allOutfits.filter((o) => o.vertical !== "hem"),
     [allOutfits],
@@ -124,14 +125,14 @@ export default function ProfileDetail({
   }> = [
     { key: "outfits", label: "Outfits", count: outfits.length },
     ...(homeOutfits.length > 0
-      ? [{ key: "hem" as const, label: "Hem", count: homeOutfits.length }]
+      ? [{ key: "hem" as const, label: "Home", count: homeOutfits.length }]
       : []),
     ...(publicBoards.length > 0
-      ? [{ key: "boards" as const, label: "Samlingar", count: publicBoards.length }]
+      ? [{ key: "boards" as const, label: "Collections", count: publicBoards.length }]
       : []),
-    { key: "followers", label: "Följare", count: user.followers },
-    { key: "following", label: "Följer", count: user.following },
-    { key: "about", label: "Om" },
+    { key: "followers", label: "Followers", count: user.followers },
+    { key: "following", label: "Following", count: user.following },
+    { key: "about", label: "About" },
   ];
 
   return (
@@ -186,7 +187,7 @@ export default function ProfileDetail({
                 <p className="text-lg font-semibold text-foreground">
                   {formatNumber(user.followers)}
                 </p>
-                <p className="text-xs text-foreground-subtle">Följare</p>
+                <p className="text-xs text-foreground-subtle">Followers</p>
               </button>
               <button
                 type="button"
@@ -196,7 +197,7 @@ export default function ProfileDetail({
                 <p className="text-lg font-semibold text-foreground">
                   {formatNumber(user.following)}
                 </p>
-                <p className="text-xs text-foreground-subtle">Följer</p>
+                <p className="text-xs text-foreground-subtle">Following</p>
               </button>
               <button
                 type="button"
@@ -224,18 +225,18 @@ export default function ProfileDetail({
                         : "bg-foreground text-background hover:bg-foreground/90"
                     }`}
                   >
-                    {following ? "Följer" : "Följ"}
+                    {following ? "Following" : "Follow"}
                   </button>
                   <MessageButton userId={user.id} />
                 </>
               )}
               <ShareButton
                 url={`/profile/${user.username}`}
-                title={`${user.displayName} på Moidello`}
+                title={`${user.displayName} on Moidello`}
                 text={
                   user.bio
                     ? `${user.displayName} — ${user.bio}`
-                    : `Kolla in ${user.displayName} på Moidello`
+                    : `Check out ${user.displayName} on Moidello`
                 }
               />
               {!isOwnProfile && (
@@ -279,8 +280,8 @@ export default function ProfileDetail({
             className="pb-16"
           >
             {activeTab === "outfits" &&
-              renderGrid(outfits, "Inga outfits ännu.")}
-            {activeTab === "hem" && renderGrid(homeOutfits, "Inga rum ännu.")}
+              renderGrid(outfits, "No outfits yet.")}
+            {activeTab === "hem" && renderGrid(homeOutfits, "No rooms yet.")}
             {activeTab === "boards" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {publicBoards.map((b) => (
@@ -335,7 +336,7 @@ export default function ProfileDetail({
                   <p className="text-foreground-muted">{user.bio}</p>
                 ) : (
                   <p className="text-foreground-subtle text-sm">
-                    Den här användaren har ingen biografi än.
+                    This user has no bio yet.
                   </p>
                 )}
               </div>

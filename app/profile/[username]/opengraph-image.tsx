@@ -9,7 +9,7 @@ import { loadAnton, loadInter } from "@/lib/og-fonts";
 export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Profil på Moidello";
+export const alt = "Profile on Moidello";
 
 const SITE_BASE = "https://moidello.com";
 
@@ -141,8 +141,8 @@ export default async function Image({
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div style={{ display: "flex", gap: 36 }}>
               <Stat label="Outfits" value={user.outfitCount} />
-              <Stat label="Följare" value={user.followers} />
-              <Stat label="Följer" value={user.following} />
+              <Stat label="Followers" value={user.followers} />
+              <Stat label="Following" value={user.following} />
             </div>
             <span
               style={{

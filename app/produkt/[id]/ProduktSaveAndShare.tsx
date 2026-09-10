@@ -67,7 +67,7 @@ export function ProduktSaveAndShare({
         className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2.5 text-sm font-medium hover:border-foreground/30 transition-colors"
       >
         <Send className="h-4 w-4" />
-        Skicka till vän
+        Send to a friend
       </button>
       <ShareToDmSheet
         open={shareOpen}

@@ -33,7 +33,7 @@ function buildDescription(outfit: {
   if (top) {
     return `${isHome ? "Rum" : "Outfit"} med ${top} av ${outfit.creator.displayName}.`;
   }
-  return `${isHome ? "Inredning" : "Outfit"} av ${outfit.creator.displayName} på ${SITE}.`;
+  return `${isHome ? "Interior" : "Outfit"} by ${outfit.creator.displayName} on ${SITE}.`;
 }
 
 export async function generateMetadata({

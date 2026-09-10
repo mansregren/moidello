@@ -15,7 +15,7 @@ export async function generateMetadata({
 
   if (!brand) {
     return {
-      title: "Märke hittades inte",
+      title: "Brand not found",
       robots: { index: false, follow: false },
     };
   }
@@ -23,8 +23,8 @@ export async function generateMetadata({
   // Root template appends " | Moidello".
   const title = brand.name;
   const description = brand.isClaimed
-    ? `Verifierat märke på ${SITE}. ${brand.outfitCount} ${brand.outfitCount === 1 ? "outfit" : "outfits"} taggade.`
-    : `Outfits som taggar ${brand.name} på ${SITE}. ${brand.outfitCount} ${brand.outfitCount === 1 ? "outfit" : "outfits"}.`;
+    ? `Verified brand on ${SITE}. ${brand.outfitCount} ${brand.outfitCount === 1 ? "outfit" : "outfits"} tagged.`
+    : `Outfits tagging ${brand.name} on ${SITE}. ${brand.outfitCount} ${brand.outfitCount === 1 ? "outfit" : "outfits"}.`;
   const canonical = `/brand/${brand.slug}`;
 
   return {
@@ -37,7 +37,7 @@ export async function generateMetadata({
         ? { index: false, follow: true }
         : { index: true, follow: true },
     openGraph: {
-      title: `${brand.name} på ${SITE}`,
+      title: `${brand.name} on ${SITE}`,
       description,
       url: canonical,
       type: "website",

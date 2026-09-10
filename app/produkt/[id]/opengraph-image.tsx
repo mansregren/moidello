@@ -6,7 +6,7 @@ import { loadAnton, loadInter } from "@/lib/og-fonts";
 export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Plagg på Moidello";
+export const alt = "Piece on Moidello";
 
 const SITE_BASE = "https://moidello.com";
 

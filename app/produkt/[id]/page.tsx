@@ -93,7 +93,7 @@ export default async function ProduktPage({
                 src={item.outfitImage}
                 alt={
                   item.altText?.trim() ||
-                  `${item.color ? `${item.color.toLowerCase()} ` : ""}${item.garment?.toLowerCase() ?? "plagg"} från ${item.brand} — ${item.name}`
+                  `${item.color ? `${item.color.toLowerCase()} ` : ""}${item.garment?.toLowerCase() ?? "piece"} from ${item.brand} — ${item.name}`
                 }
                 fill
                 priority
@@ -134,7 +134,7 @@ export default async function ProduktPage({
                     href={`/go/${item.id}`}
                     className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-3 text-sm font-semibold hover:bg-foreground/90 transition-colors"
                   >
-                    Köp hos {item.brand}
+                    Buy at {item.brand}
                     <ExternalLink className="h-4 w-4" />
                   </UserLink>
                 )}
@@ -145,8 +145,8 @@ export default async function ProduktPage({
                 <ShareButton
                   url={`/produkt/${item.id}`}
                   title={`${item.brand} ${item.name}`}
-                  text={`${item.brand} ${item.name} på Moidello`}
-                  label="Dela länk"
+                  text={`${item.brand} ${item.name} on Moidello`}
+                  label="Share link"
                   variant="outline"
                 />
               </div>
@@ -154,7 +154,7 @@ export default async function ProduktPage({
               {/* Source outfit / creator strip */}
               <div className="mt-10 pt-6 border-t border-border">
                 <p className="text-xs uppercase tracking-wider text-foreground-subtle mb-3">
-                  Sett i outfit
+                  Seen in outfit
                 </p>
                 <Link
                   href={outfitPathFromParts(item.creator.username, item.outfitSlug, item.outfitId)}
@@ -207,7 +207,7 @@ export default async function ProduktPage({
               {item.description && (
                 <>
                   <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-3">
-                    Om plagget
+                    About the piece
                   </h2>
                   <p className="text-foreground/90 leading-relaxed text-[15px] md:text-base whitespace-pre-line">
                     {item.description}
@@ -218,7 +218,7 @@ export default async function ProduktPage({
               <dl className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-5 text-sm">
                 <div>
                   <dt className="text-[11px] uppercase tracking-wider text-foreground-subtle">
-                    Märke
+                    Brand
                   </dt>
                   <dd className="mt-1 text-foreground font-medium">
                     <Link
@@ -231,7 +231,7 @@ export default async function ProduktPage({
                 </div>
                 <div>
                   <dt className="text-[11px] uppercase tracking-wider text-foreground-subtle">
-                    Kategori
+                    Category
                   </dt>
                   <dd className="mt-1 text-foreground font-medium capitalize">
                     {item.garment?.toLowerCase() ?? "—"}
@@ -240,7 +240,7 @@ export default async function ProduktPage({
                 {item.color && (
                   <div>
                     <dt className="text-[11px] uppercase tracking-wider text-foreground-subtle">
-                      Färg
+                      Colour
                     </dt>
                     <dd className="mt-1 text-foreground font-medium capitalize">
                       <Link
