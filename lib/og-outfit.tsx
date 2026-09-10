@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import type { Outfit } from "@/lib/types";
+import { HIDE_CREATORS } from "@/lib/flags";
 
 const SITE_BASE = "https://moidello.com";
 const SIZE = { width: 1200, height: 630 } as const;
@@ -75,7 +76,7 @@ export function renderOutfitOg(
             textTransform: "uppercase",
           }}
         >
-          {outfit.tags.length} plagg
+          {outfit.tags.length} {outfit.tags.length === 1 ? "piece" : "pieces"}
         </div>
         <div
           style={{
@@ -119,7 +120,7 @@ export function renderOutfitOg(
             position: "absolute",
             bottom: 56,
             left: 56,
-            display: "flex",
+            display: HIDE_CREATORS ? "none" : "flex",
             alignItems: "center",
             gap: 16,
           }}
@@ -166,7 +167,7 @@ export function renderOutfitOg(
                 color: "rgba(255,255,255,0.6)",
               }}
             >
-              Av kreatör
+              On Moidello
             </span>
             <span style={{ fontSize: 32, fontWeight: 600, marginTop: 2 }}>
               {outfit.creator.displayName}
@@ -257,6 +258,6 @@ export function buildOutfitOgAlt(outfit: Outfit): string {
     .map((t) => `${t.brand} ${t.name}`)
     .join(", ");
   return top
-    ? `${outfit.title} av ${outfit.creator.displayName} — ${top}`
-    : `${outfit.title} av ${outfit.creator.displayName}`;
+    ? `${outfit.title} — ${top}`
+    : outfit.title;
 }

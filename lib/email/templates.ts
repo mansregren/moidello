@@ -12,7 +12,7 @@ const BASE_STYLES = `
 
 function wrap(body: string, footerNote?: string): string {
   return `<!doctype html>
-<html lang="sv">
+<html lang="en">
   <body style="margin:0;padding:0;background:#f4f4f0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f0;padding:32px 16px;">
       <tr>
@@ -44,16 +44,16 @@ export function welcomeEmail(opts: {
 }): { html: string; text: string; subject: string } {
   const url = `https://moidello.com/profile/${opts.username}`;
   return {
-    subject: `Välkommen till Moidello, ${opts.displayName}`,
+    subject: `Welcome to Moidello, ${opts.displayName}`,
     html: wrap(`
-      <h1 style="margin:0 0 12px;font-size:28px;font-weight:600;letter-spacing:-0.01em;">Välkommen.</h1>
-      <p style="margin:0 0 18px;">Hej ${escapeHtml(opts.displayName)} — kul att du är här. Din profil är klar och redo att fyllas.</p>
-      <p style="margin:0 0 24px;">Börja med att ladda upp din första outfit, eller bläddra runt och se vad andra delar.</p>
+      <h1 style="margin:0 0 12px;font-size:28px;font-weight:600;letter-spacing:-0.01em;">Welcome.</h1>
+      <p style="margin:0 0 18px;">Hi ${escapeHtml(opts.displayName)} — glad to have you here. Your profile is set up and ready.</p>
+      <p style="margin:0 0 24px;">Start by browsing around and saving the outfits you like.</p>
       <p style="margin:0;">
-        <a href="${url}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;letter-spacing:0.02em;">Öppna din profil</a>
+        <a href="${url}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;letter-spacing:0.02em;">Open your profile</a>
       </p>
     `),
-    text: `Välkommen till Moidello, ${opts.displayName}.\n\nDin profil ligger på ${url}.\n\n— Moidello`,
+    text: `Welcome to Moidello, ${opts.displayName}.\n\nYour profile is at ${url}.\n\n— Moidello`,
   };
 }
 
@@ -64,15 +64,15 @@ export function newFollowerEmail(opts: {
 }): { html: string; text: string; subject: string } {
   const url = `https://moidello.com/profile/${opts.followerUsername}`;
   return {
-    subject: `${opts.followerName} följer dig nu på Moidello`,
+    subject: `${opts.followerName} is now following you on Moidello`,
     html: wrap(`
-      <h1 style="margin:0 0 12px;font-size:24px;font-weight:600;">Ny följare</h1>
-      <p style="margin:0 0 18px;">Hej ${escapeHtml(opts.recipientName)} — <strong>${escapeHtml(opts.followerName)}</strong> följer dig nu.</p>
+      <h1 style="margin:0 0 12px;font-size:24px;font-weight:600;">New follower</h1>
+      <p style="margin:0 0 18px;">Hi ${escapeHtml(opts.recipientName)} — <strong>${escapeHtml(opts.followerName)}</strong> is now following you.</p>
       <p style="margin:0;">
-        <a href="${url}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;">Visa profil</a>
+        <a href="${url}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;">View profile</a>
       </p>
     `),
-    text: `${opts.followerName} följer dig nu på Moidello.\n\n${url}`,
+    text: `${opts.followerName} is now following you on Moidello.\n\n${url}`,
   };
 }
 
@@ -84,19 +84,19 @@ export function newCommentEmail(opts: {
   outfitUrl: string;
 }): { html: string; text: string; subject: string } {
   return {
-    subject: `${opts.commenterName} kommenterade din outfit`,
+    subject: `${opts.commenterName} commented on your outfit`,
     html: wrap(`
-      <h1 style="margin:0 0 12px;font-size:24px;font-weight:600;">Ny kommentar</h1>
-      <p style="margin:0 0 8px;color:#555;">På <strong>${escapeHtml(opts.outfitTitle)}</strong></p>
+      <h1 style="margin:0 0 12px;font-size:24px;font-weight:600;">New comment</h1>
+      <p style="margin:0 0 8px;color:#555;">On <strong>${escapeHtml(opts.outfitTitle)}</strong></p>
       <blockquote style="margin:0 0 18px;padding:14px 18px;border-left:3px solid #0b0b0b;background:#fafaf8;font-size:15px;">
         ${escapeHtml(opts.commentBody)}
       </blockquote>
       <p style="margin:0 0 18px;color:#555;">– ${escapeHtml(opts.commenterName)}</p>
       <p style="margin:0;">
-        <a href="${opts.outfitUrl}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;">Öppna outfit</a>
+        <a href="${opts.outfitUrl}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;">Open outfit</a>
       </p>
     `),
-    text: `${opts.commenterName} kommenterade din outfit "${opts.outfitTitle}":\n\n${opts.commentBody}\n\n${opts.outfitUrl}`,
+    text: `${opts.commenterName} commented on your outfit "${opts.outfitTitle}":\n\n${opts.commentBody}\n\n${opts.outfitUrl}`,
   };
 }
 
@@ -107,15 +107,15 @@ export function newMessageEmail(opts: {
 }): { html: string; text: string; subject: string } {
   const url = `https://moidello.com/meddelanden`;
   return {
-    subject: `${opts.senderName} skickade ett meddelande`,
+    subject: `${opts.senderName} sent you a message`,
     html: wrap(`
-      <h1 style="margin:0 0 12px;font-size:24px;font-weight:600;">Nytt meddelande</h1>
-      <p style="margin:0 0 18px;">Hej ${escapeHtml(opts.recipientName)} — <strong>${escapeHtml(opts.senderName)}</strong> (@${escapeHtml(opts.senderUsername)}) har skickat dig ett meddelande på Moidello.</p>
+      <h1 style="margin:0 0 12px;font-size:24px;font-weight:600;">New message</h1>
+      <p style="margin:0 0 18px;">Hi ${escapeHtml(opts.recipientName)} — <strong>${escapeHtml(opts.senderName)}</strong> (@${escapeHtml(opts.senderUsername)}) has sent you a message on Moidello.</p>
       <p style="margin:0;">
-        <a href="${url}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;">Öppna inkorgen</a>
+        <a href="${url}" style="display:inline-block;background:#0b0b0b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;">Open your inbox</a>
       </p>
     `),
-    text: `${opts.senderName} (@${opts.senderUsername}) skickade ett meddelande.\n\n${url}`,
+    text: `${opts.senderName} (@${opts.senderUsername}) sent you a message.\n\n${url}`,
   };
 }
 

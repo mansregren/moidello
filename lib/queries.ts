@@ -129,8 +129,8 @@ function rowToOutfit(row: OutfitRow): Outfit {
     ? profileToUser(row.profiles)
     : {
         id: row.user_id,
-        username: "okänd",
-        displayName: "Okänd",
+        username: "unknown",
+        displayName: "Unknown",
         avatar: "",
         bio: "",
         followers: 0,

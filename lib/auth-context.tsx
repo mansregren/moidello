@@ -32,13 +32,13 @@ export interface AuthProfile {
 }
 
 const PROMPTS: Record<AuthAction, { title: string; icon: typeof Heart }> = {
-  like: { title: "Skapa konto för att gilla", icon: Heart },
-  save: { title: "Skapa konto för att spara", icon: Bookmark },
-  follow: { title: "Skapa konto för att följa", icon: UserPlus },
-  create: { title: "Skapa konto för att lägga upp outfits", icon: Plus },
-  profile: { title: "Logga in för att se din profil", icon: User },
-  comment: { title: "Skapa konto för att kommentera", icon: Heart },
-  report: { title: "Logga in för att rapportera", icon: Flag },
+  like: { title: "Create an account to like", icon: Heart },
+  save: { title: "Create an account to save", icon: Bookmark },
+  follow: { title: "Create an account to follow", icon: UserPlus },
+  create: { title: "Create an account to post outfits", icon: Plus },
+  profile: { title: "Log in to see your profile", icon: User },
+  comment: { title: "Create an account to comment", icon: Heart },
+  report: { title: "Log in to report", icon: Flag },
 };
 
 interface AuthContextValue {
@@ -191,7 +191,7 @@ function AuthPrompt({
       >
         <button
           onClick={onClose}
-          aria-label="Stäng"
+          aria-label="Close"
           className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-white/5 hover:text-white transition-colors"
         >
           <X className="h-5 w-5" />
@@ -205,7 +205,7 @@ function AuthPrompt({
           {config.title}
         </h2>
         <p className="mt-3 text-sm text-foreground-muted">
-          Det är gratis och tar 30 sekunder. Spara, gilla och följ kreatörer du älskar.
+          It’s free and takes 30 seconds. Save and like the outfits you love.
         </p>
 
         <div className="mt-7 flex flex-col gap-3">
@@ -214,7 +214,7 @@ function AuthPrompt({
             onClick={onClose}
             className="inline-flex items-center justify-center rounded-full bg-white text-black px-6 py-3 text-sm font-medium transition-transform active:scale-[0.98]"
           >
-            Skapa konto / logga in
+            Create account / log in
           </Link>
         </div>
       </motion.div>

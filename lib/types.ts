@@ -27,13 +27,13 @@ export interface User {
 }
 
 export type GarmentType =
-  | "Toppar"
-  | "Byxor"
-  | "Skor"
-  | "Accessoarer"
-  | "Ytterkläder"
-  | "Klänningar"
-  | "Väskor";
+  | "Tops"
+  | "Trousers"
+  | "Shoes"
+  | "Accessories"
+  | "Outerwear"
+  | "Dresses"
+  | "Bags";
 
 export interface TaggedItem {
   id: string;
@@ -46,8 +46,8 @@ export interface TaggedItem {
   /** Per-region buy URLs. ISO country codes as keys (e.g. { SE: "...", NO: "..." }). */
   buyUrls?: Record<Region, string>;
   /**
-   * Whether the link is an affiliate link. When true, the UI must display a
-   * "Reklam" disclosure per Marknadsföringslagen / Konsumentverkets riktlinjer.
+   * Whether the link is an affiliate link. When true, the UI must display an
+   * "Ad" disclosure per applicable marketing / consumer-protection rules.
    */
   isAffiliate?: boolean;
   garment: GarmentType;

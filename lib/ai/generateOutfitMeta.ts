@@ -1,6 +1,6 @@
 /**
  * Claude-backed outfit-meta generator. Takes an image URL + optional
- * category hint and returns structured SEO metadata for the bild-först
+ * category hint and returns structured SEO metadata for the image-first
  * admin seedning-flow.
  *
  * Designed to be testable in isolation: pure function with a single
@@ -32,19 +32,19 @@ export interface OutfitMeta {
   suggested_items: string[];
 }
 
-const SYSTEM_PROMPT = `Du är en mode-curator för Moidello, en svensk plattform för outfit-inspiration. Tonen är minimalistisk, redaktionell, skandinavisk. Undvik klichér som "outfit goals", "obsessed", "slay". Skriv som ett genomtänkt magasin, inte som en TikTok-kommentar.`;
+const SYSTEM_PROMPT = `You are a fashion curator for Moidello, a platform for outfit inspiration. The tone is minimalist, editorial, Scandinavian. Avoid clichés like "outfit goals", "obsessed", "slay". Write like a considered magazine, not a TikTok comment. Write in English.`;
 
 function userPrompt(categoryHint?: string | null): string {
-  return `Analysera outfiten på bilden och returnera STRIKT JSON med fälten:
+  return `Analyse the outfit in the image and return STRICT JSON with the fields:
 
 - title: 2–4 ord, engelska, evokativt (t.ex. "Linen Set & Espadrilles", "Camel & Cream"). Matcha stilen i befintliga Moidello-titlar.
-- meta_description: svenska, 140–155 tecken inklusive mellanslag. Börja med stil/plagg, väv in ett känslo- eller säsongsord, avsluta naturligt. Inga utropstecken.
+- meta_description: English, 140–155 characters including spaces. Start with the style/garment, weave in an emotion or season word, end naturally. No exclamation marks.
 - keywords: array med 5–8 svenska keywords. Blanda bred (outfit-inspiration, minimalism) med smal (linnedress, beige-look, sommar-outfit).
-- alt_text: svenska, beskrivande, en mening. Inkludera plaggtyper och färger så Google Images förstår vad bilden visar.
-- category: välj EN av: streetwear, minimalism, vintage, casual, formal, sporty, preppy.
-- suggested_items: array med 3–6 strängar som beskriver plaggen som syns (t.ex. "vit linnedress", "beigea espadriller"). Detta är hint till admin för att tagga senare — inga brands, bara plaggtyp + färg.
+- alt_text: English, descriptive, one sentence. Include garment types and colours so Google Images understands what the image shows.
+- category: pick ONE of: streetwear, minimalism, vintage, casual, formal, sporty, preppy.
+- suggested_items: array of 3–6 strings describing the visible pieces (e.g. "white linen dress", "beige espadrilles"). This is a hint for an admin to tag later — no brands, just garment type + colour.
 
-Om en kategori-hint ges, prioritera den om bilden tillåter.
+If a category hint is given, prioritise it if the image allows.
 Kategori-hint: ${categoryHint ?? "ingen"}
 
 Returnera ENDAST JSON, ingen extra text.`;
@@ -54,7 +54,7 @@ function getClient(): Anthropic {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     throw new Error(
-      "ANTHROPIC_API_KEY saknas — sätt i Vercel env för att aktivera bild-först-seedning.",
+      "ANTHROPIC_API_KEY is missing — set it in the Vercel env to enable image-first seeding.",
     );
   }
   return new Anthropic({ apiKey });
@@ -116,7 +116,7 @@ async function fetchImageAsBase64(
 ): Promise<{ base64: string; mediaType: SupportedMedia }> {
   const res = await fetch(imageUrl);
   if (!res.ok) {
-    throw new Error(`Kunde inte hämta bilden (${res.status})`);
+    throw new Error(`Could not fetch the image (${res.status})`);
   }
 
   const arrayBuffer = await res.arrayBuffer();
@@ -125,7 +125,7 @@ async function fetchImageAsBase64(
   const sniffed = sniffMediaType(bytes);
   if (!sniffed) {
     throw new Error(
-      "Bilden är inte i ett format Claude kan läsa (JPEG/PNG/WebP/GIF).",
+      "The image is not in a format Claude can read (JPEG/PNG/WebP/GIF).",
     );
   }
 
@@ -157,7 +157,7 @@ function validateMeta(raw: unknown): OutfitMeta {
     .filter((k): k is string => typeof k === "string" && k.trim().length > 0)
     .map((k) => k.trim().toLowerCase())
     .slice(0, 10);
-  if (keywords.length < 3) throw new Error("För få giltiga keywords.");
+  if (keywords.length < 3) throw new Error("Too few valid keywords.");
 
   const alt_text = typeof o.alt_text === "string" ? o.alt_text.trim() : "";
   if (!alt_text || alt_text.length > 400) {

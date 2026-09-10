@@ -20,7 +20,7 @@ export interface ItemMeta {
   material: string | null;
 }
 
-const SYSTEM_PROMPT = `Du är en mode-curator för Moidello, en svensk plattform för outfit-inspiration. Skriv redaktionellt, lugnt och konkret. Ingen klickretorik, inga utropstecken, inga emojis. Tonen är skandinaviskt minimalistisk — som ett magasin, inte som en webshop.`;
+const SYSTEM_PROMPT = `You are a fashion curator for Moidello, a platform for outfit inspiration. Write editorially, calmly and concretely. No clickbait, no exclamation marks, no emojis. The tone is Scandinavian minimalist — like a magazine, not a webshop. Write in English.`;
 
 interface PromptInput {
   brand: string;
@@ -36,36 +36,36 @@ interface PromptInput {
 
 function userPrompt(input: PromptInput): string {
   const lines = [
-    `Märke: ${input.brand}`,
-    `Produktnamn: ${input.name}`,
-    `Kategori: ${input.garment}`,
+    `Brand: ${input.brand}`,
+    `Product name: ${input.name}`,
+    `Category: ${input.garment}`,
   ];
-  if (input.color) lines.push(`Färg: ${input.color}`);
-  if (input.retailer) lines.push(`Återförsäljare: ${input.retailer}`);
+  if (input.color) lines.push(`Colour: ${input.color}`);
+  if (input.retailer) lines.push(`Retailer: ${input.retailer}`);
   if (input.price && input.price > 0) {
-    lines.push(`Pris: ${input.price} ${input.currency ?? "SEK"}`);
+    lines.push(`Price: ${input.price} ${input.currency ?? "SEK"}`);
   }
-  if (input.outfitTitle) lines.push(`Sett i outfit: ${input.outfitTitle}`);
-  if (input.outfitCategory) lines.push(`Outfit-stil: ${input.outfitCategory}`);
+  if (input.outfitTitle) lines.push(`Seen in outfit: ${input.outfitTitle}`);
+  if (input.outfitCategory) lines.push(`Outfit style: ${input.outfitCategory}`);
 
-  return `Plagg-fakta:
+  return `Piece facts:
 ${lines.join("\n")}
 
-Skriv SEO-meta för plaggets sida. Returnera STRIKT JSON med fälten:
+Write SEO meta for the piece's page. Return STRICT JSON with the fields:
 
-- description: svenska, 280–500 tecken. En sammanhängande paragraf (inga punktlistor). Beskriv plagget konkret: silhuett, material om uppenbart från namnet, typisk styling, säsong. Avsluta med en mening om hur det kan kombineras. Inga superlativ ("fantastisk", "perfekt"). Inga säljfraser ("missa inte"). Naturligt språk.
-- keywords: array med 5–8 svenska keywords. Blanda generella ("beige trenchcoat", "minimalism") med specifika ("oversized fit", "höst-outfit dam"). Allt gemener. Inga märkesnamn i listan (de finns redan strukturerat).
-- alt_text: en mening, 80–200 tecken. Beskriv vad bilden visar så Google Images förstår. Inkludera färg + plaggtyp + märke.
-- material: om materialet kan härledas säkert från produktnamnet (t.ex. "linne-skjorta" → "Linne", "denim-jacka" → "Denim"), returnera ordet med stor bokstav. Annars null.
+- description: English, 280–500 characters. One cohesive paragraph (no bullet lists). Describe the piece concretely: silhouette, material if obvious from the name, typical styling, season. End with a sentence on how it can be combined. No superlatives ("amazing", "perfect"). No sales phrases ("don't miss out"). Natural language.
+- keywords: array of 5–8 English keywords. Mix general ("beige trench coat", "minimalism") with specific ("oversized fit", "women's autumn outfit"). All lowercase. No brand names in the list (they are already structured).
+- alt_text: one sentence, 80–200 characters. Describe what the image shows so Google Images understands. Include colour + garment type + brand.
+- material: if the material can be safely derived from the product name (e.g. "linen shirt" → "Linen", "denim jacket" → "Denim"), return the word capitalised. Otherwise null.
 
-Returnera ENDAST JSON, ingen extra text.`;
+Return ONLY JSON, no extra text.`;
 }
 
 function getClient(): Anthropic {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     throw new Error(
-      "ANTHROPIC_API_KEY saknas — sätt i Vercel env för att aktivera plagg-SEO-backfill.",
+      "ANTHROPIC_API_KEY is missing — set it in the Vercel env to enable piece SEO backfill.",
     );
   }
   return new Anthropic({ apiKey });
@@ -73,7 +73,7 @@ function getClient(): Anthropic {
 
 function validateMeta(raw: unknown): ItemMeta {
   if (typeof raw !== "object" || raw === null) {
-    throw new Error("Claude returnerade icke-objekt.");
+    throw new Error("Claude returned a non-object.");
   }
   const o = raw as Record<string, unknown>;
 
@@ -81,7 +81,7 @@ function validateMeta(raw: unknown): ItemMeta {
     typeof o.description === "string" ? o.description.trim() : "";
   if (!description || description.length < 80 || description.length > 600) {
     throw new Error(
-      `Ogiltig description (längd ${description.length}, kräver 80–600).`,
+      `Invalid description (length ${description.length}, requires 80–600).`,
     );
   }
 
@@ -90,17 +90,17 @@ function validateMeta(raw: unknown): ItemMeta {
     o.keywords.length < 3 ||
     o.keywords.length > 10
   ) {
-    throw new Error("Ogiltig keywords-array.");
+    throw new Error("Invalid keywords array.");
   }
   const keywords = (o.keywords as unknown[])
     .filter((k): k is string => typeof k === "string" && k.trim().length > 0)
     .map((k) => k.trim().toLowerCase())
     .slice(0, 10);
-  if (keywords.length < 3) throw new Error("För få giltiga keywords.");
+  if (keywords.length < 3) throw new Error("Too few valid keywords.");
 
   const alt_text = typeof o.alt_text === "string" ? o.alt_text.trim() : "";
   if (!alt_text || alt_text.length > 400) {
-    throw new Error("Ogiltig alt_text.");
+    throw new Error("Invalid alt_text.");
   }
 
   let material: string | null = null;

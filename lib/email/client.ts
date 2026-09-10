@@ -47,7 +47,7 @@ export async function sendEmail(options: {
   } catch (e) {
     return {
       ok: false,
-      error: e instanceof Error ? e.message : "Okänt fel.",
+      error: e instanceof Error ? e.message : "Unknown error.",
     };
   }
 }
