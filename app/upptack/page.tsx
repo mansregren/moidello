@@ -18,9 +18,9 @@ export default async function UpptackPage() {
       <JsonLd
         data={collectionPageJsonLd({
           path: "/upptack",
-          name: "Upptäck outfits — Moidello",
+          name: "Discover outfits — Moidello",
           description:
-            "Bläddra bland outfits från svenska kreatörer. Filtrera på kön, kategori och plagg. Klicka för att se exakta plagg och var du kan köpa dem.",
+            "Browse outfits and filter by category and garment. Click to see the exact pieces and where to buy them.",
           outfits,
         })}
       />

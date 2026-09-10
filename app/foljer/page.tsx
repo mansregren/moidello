@@ -13,8 +13,8 @@ import { OUTFIT_CREATE_PUBLIC } from "@/lib/flags";
 import { FoljerClient } from "./FoljerClient";
 
 export const metadata = {
-  title: "Följer",
-  description: "Outfits från kreatörer du följer.",
+  title: "Following",
+  description: "Outfits from profiles you follow.",
   alternates: { canonical: "/foljer" },
   robots: { index: false, follow: true },
 };
@@ -79,19 +79,19 @@ function Shell({
       <main id="main" tabIndex={-1} className="flex-1 pt-20 md:pt-24 pb-16">
         <Container>
           <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-3">
-            Följer
+            Following
           </p>
           <h1 className="font-heading text-4xl md:text-6xl uppercase tracking-tight leading-none">
             {mode === "feed"
-              ? "Senast från dina följda"
-              : "Bygg ditt flöde"}
+              ? "Latest from people you follow"
+              : "Build your feed"}
           </h1>
           <p className="mt-6 text-foreground-muted max-w-2xl">
             {mode === "feed"
-              ? "Nya outfits från kreatörerna du följer."
+              ? "New outfits from the profiles you follow."
               : mode === "empty"
-                ? "Du följer inte någon än. Börja med kreatörerna nedan så fylls ditt flöde här."
-                : "Logga in för att bygga ditt personliga flöde. Här är kreatörer som är värda att följa."}
+                ? "You’re not following anyone yet. Start with the profiles below and your feed will fill up here."
+                : "Log in to build your personal feed. Here are profiles worth following."}
           </p>
 
           {mode === "feed" && (
@@ -107,23 +107,23 @@ function Shell({
           {(mode === "empty" || mode === "logged-out") && (
             <section className="mt-12">
               <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-6">
-                Förslag på kreatörer
+                Suggested profiles
               </h2>
               {creators.length === 0 ? (
                 <p className="text-foreground-muted">
                   {OUTFIT_CREATE_PUBLIC ? (
                     <>
-                      Inga kreatörer än. Bli först ut —{" "}
+                      No profiles yet. Be the first —{" "}
                       <Link
                         href="/skapa"
                         className="text-foreground underline hover:text-foreground/80"
                       >
-                        skapa en outfit
+                        create an outfit
                       </Link>
                       .
                     </>
                   ) : (
-                    "Inga kreatörer att visa just nu."
+                    "No profiles to show right now."
                   )}
                 </p>
               ) : (
@@ -158,12 +158,12 @@ function Shell({
                 </ul>
               )}
               <p className="mt-8 text-sm text-foreground-subtle">
-                Eller bläddra hela katalogen på{" "}
+                Or browse the whole catalogue on{" "}
                 <Link
                   href="/upptack"
                   className="text-foreground underline hover:text-foreground/80"
                 >
-                  Upptäck
+                  Discover
                 </Link>
                 .
               </p>

@@ -45,18 +45,18 @@ const EMPTY_FILTERS: FilterState = {
   price: new Set(),
 };
 
-const COLORS = ["Svart", "Vit", "Beige", "Pastell", "Färgglatt"];
-const SEASONS = ["Sommar", "Höst", "Vinter", "Vår"];
-const PRICES = ["Budget", "Mid", "Premium", "Lyx"];
-const STYLES = ["Streetwear", "Minimalism", "Vintage", "Lyx", "Casual", "Sport"];
+const COLORS = ["Black", "White", "Beige", "Pastel", "Colourful"];
+const SEASONS = ["Summer", "Autumn", "Winter", "Spring"];
+const PRICES = ["Budget", "Mid", "Premium", "Luxury"];
+const STYLES = ["Streetwear", "Minimalism", "Vintage", "Luxury", "Casual", "Sporty"];
 
 const CATEGORY_LABELS: Record<FilterCategory, string> = {
-  garment: "Plagg",
-  style: "Stil",
-  brand: "Märke",
-  color: "Färg",
-  season: "Säsong",
-  price: "Pris",
+  garment: "Garment",
+  style: "Style",
+  brand: "Brand",
+  color: "Colour",
+  season: "Season",
+  price: "Price",
 };
 
 export default function UpptackClient({
@@ -70,7 +70,7 @@ export default function UpptackClient({
 }) {
   const { gender } = useGender();
   // Garment filter follows the gender filter — herr shouldn't be offered
-  // Klänningar/Kjol, dam shouldn't be missing them.
+  // dresses/skirts, and men shouldn't be missing them.
   const genderGarments = garmentsForGender(gender);
   const liked = useMemo(() => new Set(likedIds), [likedIds]);
   const saved = useMemo(() => new Set(savedIds), [savedIds]);
@@ -141,7 +141,7 @@ export default function UpptackClient({
           {/* Title + search */}
           <div className="mb-5">
             <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
-              Upptäck
+              Discover
             </h1>
             <div className="relative mt-5 max-w-xl">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground-subtle" />
@@ -149,13 +149,13 @@ export default function UpptackClient({
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Sök outfits, kreatörer, märken…"
+                placeholder="Search outfits, profiles, brands…"
                 className="w-full rounded-full bg-background-tertiary border border-border pl-12 pr-12 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  aria-label="Rensa sök"
+                  aria-label="Clear search"
                   className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full text-foreground-muted hover:text-foreground"
                 >
                   <X className="h-4 w-4" />
@@ -200,7 +200,7 @@ export default function UpptackClient({
                 )}
               >
                 <SlidersHorizontal className="h-4 w-4" />
-                Filter
+                Filters
                 {totalActive > 0 && (
                   <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-background text-foreground px-1.5 text-[11px] font-bold">
                     {totalActive}
@@ -210,47 +210,47 @@ export default function UpptackClient({
 
               <p className="text-xs text-foreground-muted">
                 <span className="text-foreground font-semibold">{visible.length}</span>{" "}
-                resultat
+                results
               </p>
             </div>
 
             {/* Desktop: row of filter dropdowns + count + clear */}
             <div className="hidden lg:flex items-center gap-2 flex-wrap">
-              <FilterDropdown label="Plagg" badge={filters.garment.size}>
+              <FilterDropdown label="Garment" badge={filters.garment.size}>
                 <CheckList
                   values={genderGarments}
                   selected={filters.garment}
                   onToggle={(v) => toggleFilter("garment", v)}
                 />
               </FilterDropdown>
-              <FilterDropdown label="Stil" badge={filters.style.size}>
+              <FilterDropdown label="Style" badge={filters.style.size}>
                 <CheckList
                   values={Array.from(new Set([...STYLES, ...categories]))}
                   selected={filters.style}
                   onToggle={(v) => toggleFilter("style", v)}
                 />
               </FilterDropdown>
-              <FilterDropdown label="Märken" badge={filters.brand.size} width="w-80">
+              <FilterDropdown label="Brands" badge={filters.brand.size} width="w-80">
                 <BrandList
                   selected={filters.brand}
                   onToggle={(v) => toggleFilter("brand", v)}
                 />
               </FilterDropdown>
-              <FilterDropdown label="Färg" badge={filters.color.size}>
+              <FilterDropdown label="Colour" badge={filters.color.size}>
                 <CheckList
                   values={COLORS}
                   selected={filters.color}
                   onToggle={(v) => toggleFilter("color", v)}
                 />
               </FilterDropdown>
-              <FilterDropdown label="Säsong" badge={filters.season.size}>
+              <FilterDropdown label="Season" badge={filters.season.size}>
                 <CheckList
                   values={SEASONS}
                   selected={filters.season}
                   onToggle={(v) => toggleFilter("season", v)}
                 />
               </FilterDropdown>
-              <FilterDropdown label="Pris" badge={filters.price.size}>
+              <FilterDropdown label="Price" badge={filters.price.size}>
                 <CheckList
                   values={PRICES}
                   selected={filters.price}
@@ -268,7 +268,7 @@ export default function UpptackClient({
                     onClick={clearAll}
                     className="text-sm text-foreground-muted hover:text-foreground whitespace-nowrap"
                   >
-                    Rensa alla
+                    Clear all
                   </button>
                 )}
               </div>
@@ -305,7 +305,7 @@ export default function UpptackClient({
                     onClick={clearAll}
                     className="text-xs text-foreground-muted hover:text-foreground px-2 py-1 lg:hidden"
                   >
-                    Rensa alla
+                    Clear all
                   </button>
                 </div>
               </motion.div>
@@ -318,8 +318,8 @@ export default function UpptackClient({
             ) : (
               <EmptyState
                 icon={Search}
-                title="Inga outfits hittades"
-                description="Prova att rensa filtren eller söka på något annat. Det finns alltid något att upptäcka."
+                title="No outfits found"
+                description="Try clearing the filters or searching for something else. There’s always something to discover."
                 action={
                   <button
                     onClick={() => {
@@ -328,7 +328,7 @@ export default function UpptackClient({
                     }}
                     className="rounded-full bg-foreground text-background px-6 py-2.5 text-sm font-medium transition-transform active:scale-95 hover:bg-foreground/90"
                   >
-                    Rensa alla filter
+                    Clear all filters
                   </button>
                 }
               />
@@ -359,7 +359,7 @@ export default function UpptackClient({
               >
                 <div className="flex items-center justify-between px-5 py-4 border-b border-foreground/5 shrink-0">
                   <h2 className="text-base font-semibold text-foreground">
-                    Filter
+                    Filters
                     {totalActive > 0 && (
                       <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground text-background px-1.5 text-[11px] font-bold align-middle">
                         {totalActive}
@@ -368,7 +368,7 @@ export default function UpptackClient({
                   </h2>
                   <button
                     onClick={() => setMobileFiltersOpen(false)}
-                    aria-label="Stäng filter"
+                    aria-label="Close filters"
                     className="flex h-9 w-9 items-center justify-center rounded-full text-foreground hover:bg-foreground/5"
                   >
                     <X className="h-5 w-5" />
@@ -391,14 +391,14 @@ export default function UpptackClient({
                       onClick={clearAll}
                       className="rounded-full border border-border text-foreground px-4 py-3 text-sm font-medium hover:border-foreground/30"
                     >
-                      Rensa
+                      Clear
                     </button>
                   )}
                   <button
                     onClick={() => setMobileFiltersOpen(false)}
                     className="flex-1 rounded-full bg-foreground text-background py-3 text-sm font-semibold transition-transform active:scale-95"
                   >
-                    Visa {visible.length} resultat
+                    Show {visible.length} results
                   </button>
                 </div>
               </motion.div>
@@ -430,11 +430,11 @@ function FilterPanel({
           onClick={onClear}
           className="mb-4 text-xs uppercase tracking-wider text-foreground-muted hover:text-foreground"
         >
-          Rensa filter ({totalActive})
+          Clear filters ({totalActive})
         </button>
       )}
 
-      <Accordion title="Plagg" badge={filters.garment.size} defaultOpen>
+      <Accordion title="Garment" badge={filters.garment.size} defaultOpen>
         <CheckList
           values={genderGarments}
           selected={filters.garment}
@@ -442,7 +442,7 @@ function FilterPanel({
         />
       </Accordion>
 
-      <Accordion title="Stil" badge={filters.style.size} defaultOpen>
+      <Accordion title="Style" badge={filters.style.size} defaultOpen>
         <CheckList
           values={Array.from(new Set([...STYLES, ...categories]))}
           selected={filters.style}
@@ -450,14 +450,14 @@ function FilterPanel({
         />
       </Accordion>
 
-      <Accordion title="Märken" badge={filters.brand.size}>
+      <Accordion title="Brands" badge={filters.brand.size}>
         <BrandList
           selected={filters.brand}
           onToggle={(v) => onToggle("brand", v)}
         />
       </Accordion>
 
-      <Accordion title="Färg" badge={filters.color.size}>
+      <Accordion title="Colour" badge={filters.color.size}>
         <CheckList
           values={COLORS}
           selected={filters.color}
@@ -465,7 +465,7 @@ function FilterPanel({
         />
       </Accordion>
 
-      <Accordion title="Säsong" badge={filters.season.size}>
+      <Accordion title="Season" badge={filters.season.size}>
         <CheckList
           values={SEASONS}
           selected={filters.season}
@@ -473,7 +473,7 @@ function FilterPanel({
         />
       </Accordion>
 
-      <Accordion title="Pris" badge={filters.price.size}>
+      <Accordion title="Price" badge={filters.price.size}>
         <CheckList
           values={PRICES}
           selected={filters.price}
@@ -700,7 +700,7 @@ function BrandList({
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Sök märke…"
+          placeholder="Search brand…"
           className="w-full rounded-lg bg-background-tertiary border border-border pl-9 pr-3 py-2 text-xs text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
         />
       </div>

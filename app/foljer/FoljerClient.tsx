@@ -31,7 +31,7 @@ export function FoljerClient({
     return (
       <div className="rounded-2xl border border-border bg-background-secondary p-10 text-center">
         <p className="text-foreground-muted">
-          Inga outfits för det här filtret — testa Herr/Dam-toggle i menyn.
+          No outfits for this filter — try the Men/Women toggle in the menu.
         </p>
       </div>
     );

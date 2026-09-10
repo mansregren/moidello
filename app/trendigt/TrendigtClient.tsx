@@ -45,8 +45,8 @@ export default function TrendigtClient({
     matchesGenderFilter(o.gender, gender),
   );
 
-  // Brand-listan följer kön-filtret. Server skickar tre cache-vänliga
-  // varianter; vi byter mellan dem utan att rendera om något extra.
+  // The brand list follows the gender filter. The server sends three
+  // cache-friendly variants; we switch between them without re-rendering.
   const brands =
     gender === "dam" ? brandsDam : gender === "herr" ? brandsHerr : brandsAll;
 
@@ -67,16 +67,16 @@ export default function TrendigtClient({
             transition={{ duration: 0.5 }}
           >
             <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground flex items-center gap-3">
-              Trendigt
+              Trending
               <Flame className="h-8 w-8 md:h-12 md:w-12 text-foreground" />
             </h1>
             <p className="mt-3 text-foreground-muted">
-              Vad alla pratar om just nu
+              What everyone is talking about right now
             </p>
           </motion.div>
 
           {trendingNow.length > 0 && (
-            <Section title="Trending just nu" href="/upptack">
+            <Section title="Trending right now" href="/upptack">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                 {trendingNow.map((outfit, i) => (
                   <motion.div
@@ -97,7 +97,7 @@ export default function TrendigtClient({
           )}
 
           {creators.length > 0 && (
-            <Section title="Top creators denna vecka" href="/upptack">
+            <Section title="Top profiles this week" href="/upptack">
               <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
                 {creators.map((user, i) => (
                   <motion.div
@@ -109,7 +109,7 @@ export default function TrendigtClient({
                   >
                     <Link
                       href={`/profile/${user.username}`}
-                      aria-label={`${user.displayName} — ${user.followers.toLocaleString("sv-SE")} följare`}
+                      aria-label={`${user.displayName} — ${user.followers.toLocaleString("en-GB")} followers`}
                       className="flex flex-col items-center gap-3 w-32 group"
                     >
                       <UserAvatar src={user.avatar} alt="" size="lg" />
@@ -118,7 +118,7 @@ export default function TrendigtClient({
                           {user.displayName}
                         </p>
                         <p className="text-xs text-foreground-subtle">
-                          {user.followers.toLocaleString("sv-SE")} följare
+                          {user.followers.toLocaleString("en-GB")} followers
                         </p>
                       </div>
                     </Link>
@@ -129,7 +129,7 @@ export default function TrendigtClient({
           )}
 
           {brands.length > 0 && (
-            <Section title="Heta märken" href="/brands">
+            <Section title="Hot brands" href="/brands">
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 {brands.map((b, i) => (
                   <motion.div
@@ -158,7 +158,7 @@ export default function TrendigtClient({
 
           {localOutfits.length > 0 && (
             <Section
-              title="Populärt i Stockholm"
+              title="Popular in Stockholm"
               href="/upptack"
               icon={<MapPin className="h-6 w-6 text-foreground" />}
             >
@@ -210,7 +210,7 @@ function Section({
           href={href}
           className="inline-flex items-center gap-1 text-sm text-foreground-muted hover:text-foreground transition-colors shrink-0"
         >
-          Se alla
+          See all
           <ChevronRight className="h-4 w-4" />
         </Link>
       </div>

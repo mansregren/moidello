@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Trendigt nu",
+  title: "Trending now",
   description:
-    "Se vad som trendar just nu — populära outfits, brands, stilar och kreatörer.",
+    "See what's trending right now — popular outfits, brands and styles.",
   alternates: { canonical: "/trendigt" },
 };
 

@@ -11,9 +11,9 @@ export const dynamic = "force-static";
 export const revalidate = 600;
 
 export default async function TrendigtPage() {
-  // Hämta brand-aggregeringar per kön så klienten kan växla utan reload
-  // när gender-context ändras. Tre listor håller en cache-vänlig
-  // size — varje kall är cacheade i lib/queries-cached.
+  // Fetch brand aggregations per gender so the client can switch without
+  // a reload when gender-context changes. Three lists keep a cache-friendly
+  // size — each call is cached in lib/queries-cached.
   const [topOutfits, topCreators, brandsAll, brandsDam, brandsHerr] =
     await Promise.all([
       fetchTopOutfits(12),
