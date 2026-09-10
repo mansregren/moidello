@@ -91,7 +91,7 @@ export function OutfitShareCard({
     return (
       <ShareCardShell fromMe={fromMe}>
         <p className="p-4 text-sm text-foreground-subtle">
-          Outfiten är inte längre tillgänglig.
+          This outfit is no longer available.
         </p>
       </ShareCardShell>
     );
@@ -199,7 +199,7 @@ export function ItemShareCard({
     return (
       <ShareCardShell fromMe={fromMe}>
         <p className="p-4 text-sm text-foreground-subtle">
-          Plagget är inte längre tillgängligt.
+          This piece is no longer available.
         </p>
       </ShareCardShell>
     );
@@ -255,7 +255,7 @@ export function ItemShareCard({
             rel="ugc nofollow noopener noreferrer"
             className="flex items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-medium text-foreground hover:bg-foreground/5"
           >
-            Köp
+            Buy
             <ExternalLink className="h-3 w-3" />
           </a>
         )}

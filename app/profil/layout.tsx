@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Min profil",
-  description: "Hantera dina outfits, sparade looks och följda kreatörer.",
+  description: "Manage your outfits and saved looks.",
   alternates: { canonical: "/profil" },
   robots: { index: false, follow: true },
 };

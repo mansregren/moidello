@@ -16,14 +16,14 @@ import type { User as MoidelloUser } from "@/lib/types";
 const initialState: ProfileUpdateState = {};
 
 const REGIONS = [
-  { code: "SE", label: "Sverige" },
-  { code: "NO", label: "Norge" },
-  { code: "DK", label: "Danmark" },
+  { code: "SE", label: "Sweden" },
+  { code: "NO", label: "Norway" },
+  { code: "DK", label: "Denmark" },
   { code: "FI", label: "Finland" },
-  { code: "IS", label: "Island" },
-  { code: "EU", label: "EU (övriga)" },
+  { code: "IS", label: "Iceland" },
+  { code: "EU", label: "EU (other)" },
   { code: "US", label: "USA" },
-  { code: "GB", label: "Storbritannien" },
+  { code: "GB", label: "United Kingdom" },
 ];
 
 export function ProfileEditSheet({
@@ -119,11 +119,11 @@ export function ProfileEditSheet({
           >
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground">
-                Redigera profil
+                Edit profile
               </h2>
               <button
                 onClick={onClose}
-                aria-label="Stäng"
+                aria-label="Close"
                 className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-foreground/5 hover:text-foreground"
               >
                 <X className="h-5 w-5" />
@@ -138,7 +138,7 @@ export function ProfileEditSheet({
                     <div className="h-20 w-20 overflow-hidden rounded-full bg-background-tertiary">
                       <Image
                         src={avatarPreview}
-                        alt="Förhandsvisning"
+                        alt="Preview"
                         width={80}
                         height={80}
                         className="h-20 w-20 object-cover"
@@ -155,7 +155,7 @@ export function ProfileEditSheet({
                   <label
                     htmlFor="avatar-input"
                     className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background cursor-pointer hover:bg-foreground/90"
-                    aria-label="Byt avatar"
+                    aria-label="Change avatar"
                   >
                     <Camera className="h-4 w-4" />
                   </label>
@@ -170,14 +170,14 @@ export function ProfileEditSheet({
                   />
                 </div>
                 <div className="text-sm text-foreground-muted">
-                  Klicka på kameran för att byta avatar.
+                  Click the camera to change your avatar.
                   <p className="text-xs text-foreground-subtle mt-1">
                     JPG, PNG, WebP — max 5 MB
                   </p>
                 </div>
               </div>
 
-              <Field label="Användarnamn" error={state.fieldErrors?.username}>
+              <Field label="Username" error={state.fieldErrors?.username}>
                 <div className="flex items-center rounded-xl bg-background-tertiary border border-border focus-within:border-foreground/30 transition-colors overflow-hidden">
                   <span className="px-4 text-foreground-subtle">@</span>
                   <input
@@ -199,14 +199,14 @@ export function ProfileEditSheet({
                 </div>
               </Field>
 
-              <Field label="Visningsnamn">
+              <Field label="Display name">
                 <input
                   name="display_name"
                   type="text"
                   maxLength={50}
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="T.ex. Anna Svensson"
+                  placeholder="e.g. Anna Svensson"
                   className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors"
                 />
               </Field>
@@ -218,7 +218,7 @@ export function ProfileEditSheet({
                   rows={3}
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  placeholder="Berätta lite om dig själv…"
+                  placeholder="Tell people a bit about yourself…"
                   className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors resize-none"
                 />
                 <p className="mt-1 text-xs text-foreground-subtle">
@@ -226,7 +226,7 @@ export function ProfileEditSheet({
                 </p>
               </Field>
 
-              <Field label="Region (var du shoppar)">
+              <Field label="Region (where you shop)">
                 <select
                   name="region"
                   value={region}
@@ -243,7 +243,7 @@ export function ProfileEditSheet({
 
               <div className="space-y-3">
                 <p className="text-sm font-medium text-foreground-muted">
-                  Sociala länkar (lämna tomt för att dölja)
+                  Social links (leave blank to hide)
                 </p>
                 <Field label="Instagram">
                   <input
@@ -251,7 +251,7 @@ export function ProfileEditSheet({
                     type="text"
                     value={instagram}
                     onChange={(e) => setInstagram(e.target.value)}
-                    placeholder="@dittnamn eller https://instagram.com/..."
+                    placeholder="@yourname or https://instagram.com/..."
                     className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
                   />
                 </Field>
@@ -261,7 +261,7 @@ export function ProfileEditSheet({
                     type="text"
                     value={tiktok}
                     onChange={(e) => setTiktok(e.target.value)}
-                    placeholder="@dittnamn"
+                    placeholder="@yourname"
                     className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
                   />
                 </Field>
@@ -271,27 +271,27 @@ export function ProfileEditSheet({
                     type="text"
                     value={youtube}
                     onChange={(e) => setYoutube(e.target.value)}
-                    placeholder="@kanalnamn eller URL"
+                    placeholder="@channelname or URL"
                     className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
                   />
                 </Field>
-                <Field label="Webbsida">
+                <Field label="Website">
                   <input
                     name="website"
                     type="text"
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
-                    placeholder="dinsida.se"
+                    placeholder="yoursite.com"
                     className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
                   />
                 </Field>
-                <Field label="Kontakt-e-post (valfri, syns publikt)">
+                <Field label="Contact email (optional, shown publicly)">
                   <input
                     name="contact_email"
                     type="email"
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
-                    placeholder="kontakt@dinsida.se"
+                    placeholder="contact@yoursite.com"
                     className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
                   />
                 </Field>
@@ -309,11 +309,11 @@ export function ProfileEditSheet({
                   />
                   <span className="flex-1">
                     <span className="block text-sm font-medium text-foreground">
-                      Jag representerar ett märke
+                      I represent a brand
                     </span>
                     <span className="block text-xs text-foreground-subtle mt-0.5">
-                      Få en brand-dashboard som aggregerar engagemang på outfits
-                      som taggar ditt märke.
+                      Get a brand dashboard that aggregates engagement on
+                      outfits tagging your brand.
                     </span>
                   </span>
                 </label>
@@ -325,7 +325,7 @@ export function ProfileEditSheet({
                         htmlFor="brand-name"
                         className="text-xs font-medium text-foreground-muted block mb-1.5"
                       >
-                        Märkets namn
+                        Brand name
                       </label>
                       <input
                         id="brand-name"
@@ -334,11 +334,11 @@ export function ProfileEditSheet({
                         value={brandName}
                         onChange={(e) => setBrandName(e.target.value)}
                         maxLength={80}
-                        placeholder="T.ex. Acne Studios"
+                        placeholder="e.g. Acne Studios"
                         className="w-full rounded-lg bg-background-secondary border border-border px-3 py-2 text-sm text-foreground outline-none focus:border-foreground/30"
                       />
                       <p className="mt-1 text-[11px] text-foreground-subtle">
-                        Måste matcha exakt hur taggar skrivs. Skiftläge ignoreras.
+                        Must match exactly how tags are written. Case is ignored.
                       </p>
                     </div>
                     <div>
@@ -346,7 +346,7 @@ export function ProfileEditSheet({
                         htmlFor="brand-website"
                         className="text-xs font-medium text-foreground-muted block mb-1.5"
                       >
-                        Webbsida
+                        Website
                       </label>
                       <input
                         id="brand-website"
@@ -372,14 +372,14 @@ export function ProfileEditSheet({
                   onClick={onClose}
                   className="flex-1 rounded-full border border-border text-foreground py-3 text-sm font-medium hover:border-foreground/30 transition-colors"
                 >
-                  Avbryt
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={pending}
                   className="flex-1 rounded-full bg-foreground text-background py-3 text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-60"
                 >
-                  {pending ? "Sparar…" : "Spara ändringar"}
+                  {pending ? "Saving…" : "Save changes"}
                 </button>
               </div>
             </form>

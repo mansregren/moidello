@@ -98,7 +98,7 @@ export function FollowersList({
   if (rows.length === 0) {
     return (
       <p className="py-12 text-center text-foreground-muted text-sm">
-        {mode === "followers" ? "Inga följare än." : "Följer ingen än."}
+        {mode === "followers" ? "No followers yet." : "Not following anyone yet."}
       </p>
     );
   }

@@ -53,7 +53,7 @@ export function PushToggle() {
     setError(null);
     if (!vapidPublicKey) {
       setError(
-        "Push-notiser är inte konfigurerade än. Säg till Mans att sätta NEXT_PUBLIC_VAPID_PUBLIC_KEY i Vercel.",
+        "Push notifications aren’t configured yet.",
       );
       return;
     }
@@ -62,7 +62,7 @@ export function PushToggle() {
       try {
         const permission = await Notification.requestPermission();
         if (permission !== "granted") {
-          setError("Tillstånd nekat. Slå på i webbläsarens inställningar.");
+          setError("Permission denied. Enable it in your browser settings.");
           return;
         }
 
@@ -96,7 +96,7 @@ export function PushToggle() {
         }
         setEnabled(true);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Något gick fel.");
+        setError(e instanceof Error ? e.message : "Something went wrong.");
       }
     });
   };
@@ -113,7 +113,7 @@ export function PushToggle() {
         }
         setEnabled(false);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Något gick fel.");
+        setError(e instanceof Error ? e.message : "Something went wrong.");
       }
     });
   };
@@ -136,10 +136,10 @@ export function PushToggle() {
           </h2>
           <p className="mt-2 text-sm text-foreground-muted">
             {supported === false
-              ? "Din webbläsare stödjer inte push-notiser. På iPhone måste appen vara installerad (lägg till på hemskärmen)."
+              ? "Your browser doesn’t support push notifications. On iPhone the app must be installed (add to home screen)."
               : enabled
-                ? "Aktiv på den här enheten. Du får notiser även när Moidello är stängt."
-                : "Få notiser om följare, kommentarer och meddelanden direkt på enheten."}
+                ? "Active on this device. You’ll get notifications even when Moidello is closed."
+                : "Get notified about followers, comments and messages straight to your device."}
           </p>
 
           {supported && (
@@ -154,10 +154,10 @@ export function PushToggle() {
               }
             >
               {pending
-                ? "Vänta…"
+                ? "Wait…"
                 : enabled
-                  ? "Stäng av push-notiser"
-                  : "Slå på push-notiser"}
+                  ? "Turn off push notifications"
+                  : "Turn on push notifications"}
             </button>
           )}
 

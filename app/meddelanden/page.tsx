@@ -111,7 +111,7 @@ export default async function MeddelandenPage() {
 
           {migrationMissing && (
             <p className="mt-6 text-sm text-amber-400">
-              Tabellen finns inte ännu. Kör migration 0013_messaging.sql i Supabase.
+              The table doesn’t exist yet. Run migration 0013_messaging.sql in Supabase.
             </p>
           )}
 
@@ -119,8 +119,8 @@ export default async function MeddelandenPage() {
             <div className="mt-12 rounded-2xl border border-border bg-background-secondary p-10 text-center">
               <MessageCircle className="mx-auto h-10 w-10 text-foreground-subtle mb-3" />
               <p className="text-foreground-muted">
-                Inga samtal än. Besök en profil och tryck &quot;Skicka meddelande&quot;
-                för att börja.
+                No conversations yet. Visit a profile and tap &quot;Send message&quot;
+                to start one.
               </p>
             </div>
           )}
@@ -167,7 +167,7 @@ export default async function MeddelandenPage() {
                         >
                           {preview
                             ? `${preview.sender_id === user.id ? "Du: " : ""}${preview.body}`
-                            : "Inga meddelanden ännu"}
+                            : "No messages yet"}
                         </p>
                       </div>
                       {unread > 0 && (

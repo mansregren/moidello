@@ -28,7 +28,7 @@ export default function MeddelandenError({
             Det blev fel
           </h1>
           <p className="mt-4 text-foreground-muted">
-            Vi kunde inte ladda meddelanden just nu. Försök igen om en stund.
+            We couldn’t load messages right now. Try again in a moment.
           </p>
           {error.digest && (
             <p className="mt-3 text-xs text-foreground-subtle font-mono">
@@ -41,7 +41,7 @@ export default function MeddelandenError({
               onClick={reset}
               className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors"
             >
-              Försök igen
+              Try again
             </button>
             <Link
               href="/profil"

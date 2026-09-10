@@ -422,7 +422,7 @@ export default function ProfilPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-black/40 to-background" />
           <button
             onClick={() => setSettingsOpen(true)}
-            aria-label="Inställningar"
+            aria-label="Settings"
             className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-background/60 backdrop-blur text-foreground hover:bg-background/80 transition-colors"
           >
             <Settings className="h-5 w-5" />
@@ -462,13 +462,13 @@ export default function ProfilPage() {
               onClick={() => setEditOpen(true)}
               className="rounded-full border border-border text-foreground px-5 py-2 text-sm font-medium hover:border-foreground/30 transition-colors"
             >
-              Redigera profil
+              Edit profile
             </button>
             <ShareButton
               url={`/profile/${profile.username}`}
-              title={`${profile.displayName} på Moidello`}
-              text={`Kolla in min profil på Moidello`}
-              label="Dela profil"
+              title={`${profile.displayName} on Moidello`}
+              text={`Check out my profile on Moidello`}
+              label="Share profile"
             />
             <a
               href="/profil/statistik"
@@ -494,8 +494,8 @@ export default function ProfilPage() {
 
           <div className="mt-6 flex gap-8 border-y border-border py-4">
             <Stat label="Outfits" value={profile.outfitCount} />
-            <Stat label="Följare" value={profile.followers} />
-            <Stat label="Följer" value={profile.following} />
+            <Stat label="Followers" value={profile.followers} />
+            <Stat label="Following" value={profile.following} />
           </div>
 
           <div className="mt-2 flex gap-1 overflow-x-auto border-b border-border scrollbar-hide">
@@ -509,31 +509,31 @@ export default function ProfilPage() {
               active={tab === "saved"}
               onClick={() => setTab("saved")}
             >
-              Sparade
+              Saved
             </ProfileTabButton>
             <ProfileTabButton
               active={tab === "items"}
               onClick={() => setTab("items")}
             >
-              Sparade plagg ({savedItems.length})
+              Saved pieces ({savedItems.length})
             </ProfileTabButton>
             <ProfileTabButton
               active={tab === "following"}
               onClick={() => setTab("following")}
             >
-              Följer ({following.length})
+              Following ({following.length})
             </ProfileTabButton>
             <ProfileTabButton
               active={tab === "followers"}
               onClick={() => setTab("followers")}
             >
-              Följare ({followers.length})
+              Followers ({followers.length})
             </ProfileTabButton>
             <ProfileTabButton
               active={tab === "about"}
               onClick={() => setTab("about")}
             >
-              Om
+              About
             </ProfileTabButton>
           </div>
 
@@ -548,7 +548,7 @@ export default function ProfilPage() {
               >
                 {tab === "outfits" &&
                   (profileLoading ? (
-                    <Empty text="Laddar outfits…" />
+                    <Empty text="Loading outfits…" />
                   ) : filteredOutfits.length > 0 ? (
                     <OutfitGrid
                       outfits={filteredOutfits}
@@ -557,12 +557,12 @@ export default function ProfilPage() {
                       saved={savedSet}
                     />
                   ) : (
-                    <Empty text="Inga outfits ännu — tryck Skapa för att lägga upp din första." />
+                    <Empty text="No outfits yet." />
                   ))}
 
                 {tab === "saved" &&
                   (profileLoading ? (
-                    <Empty text="Laddar sparade…" />
+                    <Empty text="Loading saved…" />
                   ) : filteredSaved.length > 0 ? (
                     <OutfitGrid
                       outfits={filteredSaved}
@@ -571,41 +571,41 @@ export default function ProfilPage() {
                       saved={savedSet}
                     />
                   ) : (
-                    <Empty text="Du har inte sparat något än." />
+                    <Empty text="You haven’t saved anything yet." />
                   ))}
 
                 {tab === "items" &&
                   (savedItems.length > 0 ? (
                     <SavedItemGrid items={savedItems} />
                   ) : (
-                    <Empty text="Inga sparade plagg än. Tryck bokmärket bredvid ett plagg på en outfit-sida." />
+                    <Empty text="No saved pieces yet. Tap the bookmark next to a piece on an outfit page." />
                   ))}
 
                 {tab === "following" &&
                   (following.length > 0 ? (
                     <UserList users={following} />
                   ) : (
-                    <Empty text="Du följer ingen ännu." />
+                    <Empty text="You’re not following anyone yet." />
                   ))}
 
                 {tab === "followers" &&
                   (followers.length > 0 ? (
                     <UserList users={followers} />
                   ) : (
-                    <Empty text="Inga följare än." />
+                    <Empty text="No followers yet." />
                   ))}
 
                 {tab === "about" && (
                   <div className="max-w-2xl space-y-5 text-sm">
-                    <Field label="Namn" value={profile.displayName} />
+                    <Field label="Name" value={profile.displayName} />
                     <Field
-                      label="Användarnamn"
+                      label="Username"
                       value={`@${profile.username}`}
                     />
                     {profile.bio && <Field label="Bio" value={profile.bio} />}
                     <Field
-                      label="Antal outfits"
-                      value={profile.outfitCount.toLocaleString("sv-SE")}
+                      label="Outfits"
+                      value={profile.outfitCount.toLocaleString("en-GB")}
                     />
                   </div>
                 )}
@@ -643,11 +643,11 @@ export default function ProfilPage() {
               >
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground">
-                    Inställningar
+                    Settings
                   </h2>
                   <button
                     onClick={() => setSettingsOpen(false)}
-                    aria-label="Stäng"
+                    aria-label="Close"
                     className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-foreground/5 hover:text-foreground"
                   >
                     <X className="h-5 w-5" />
@@ -655,17 +655,17 @@ export default function ProfilPage() {
                 </div>
 
                 <ul className="divide-y divide-border">
-                  <SettingsRow icon={Bell} label="Notiser" />
+                  <SettingsRow icon={Bell} label="Notifications" />
                   <SettingsRow
                     icon={Lock}
-                    label="Konto & sekretess"
+                    label="Account & privacy"
                     href="/profil/installningar/konto"
                   />
-                  <SettingsRow icon={HelpCircle} label="Hjälp" href="/kontakt" />
-                  <SettingsRow icon={Info} label="Om Moidello" href="/om" />
+                  <SettingsRow icon={HelpCircle} label="Help" href="/kontakt" />
+                  <SettingsRow icon={Info} label="About Moidello" href="/om" />
                   <SettingsRow
                     icon={LogOut}
-                    label="Logga ut"
+                    label="Log out"
                     danger
                     onClick={handleSignOut}
                   />

@@ -49,7 +49,7 @@ export function FollowButton({
       size="sm"
       onClick={handleClick}
     >
-      {following ? "Följer" : "Följ"}
+      {following ? "Following" : "Follow"}
     </PremiumButton>
   );
 }

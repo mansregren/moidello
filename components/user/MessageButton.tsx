@@ -24,7 +24,7 @@ export function MessageButton({ userId }: { userId: string }) {
       <button
         type="button"
         disabled
-        title="Detta är ett demo-konto. Meddelanden funkar mellan riktiga konton."
+        title="This is a demo account. Messages work between real accounts."
         className="inline-flex items-center gap-2 rounded-full border border-border text-foreground-subtle px-5 py-2 text-sm font-medium cursor-not-allowed opacity-60"
       >
         <MessageCircle className="h-4 w-4" />
@@ -44,7 +44,7 @@ export function MessageButton({ userId }: { userId: string }) {
         router.push(`/meddelanden/${res.conversationId}`);
       } else {
         console.error("[MessageButton] failed to open conversation:", res.error);
-        alert(`Kunde inte öppna samtalet: ${res.error ?? "okänt fel"}`);
+        alert(`Could not open the conversation: ${res.error ?? "unknown error"}`);
       }
     });
   };
@@ -57,7 +57,7 @@ export function MessageButton({ userId }: { userId: string }) {
       className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-5 py-2 text-sm font-medium hover:border-foreground/30 transition-colors disabled:opacity-60"
     >
       <MessageCircle className="h-4 w-4" />
-      {pending ? "Öppnar…" : "Skicka meddelande"}
+      {pending ? "Opening…" : "Send message"}
     </button>
   );
 }

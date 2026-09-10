@@ -63,7 +63,7 @@ export function TwoFactorSettings() {
     });
     setBusy(false);
     if (enrollError || !data) {
-      setError(enrollError?.message ?? "Kunde inte starta enroll.");
+      setError(enrollError?.message ?? "Could not start enrollment.");
       return;
     }
     setStage({
@@ -89,7 +89,7 @@ export function TwoFactorSettings() {
     if (stage.kind !== "enrolling") return;
     const digits = code.replace(/\D/g, "");
     if (digits.length !== 6) {
-      setError("Mata in den 6-siffriga koden från authenticator-appen.");
+      setError("Enter the 6-digit code from your authenticator app.");
       return;
     }
     setBusy(true);
@@ -99,7 +99,7 @@ export function TwoFactorSettings() {
       await supabase.auth.mfa.challenge({ factorId: stage.factorId });
     if (challengeError || !challengeData) {
       setBusy(false);
-      setError(challengeError?.message ?? "Kunde inte skapa challenge.");
+      setError(challengeError?.message ?? "Could not create a challenge.");
       return;
     }
     const { error: verifyError } = await supabase.auth.mfa.verify({
@@ -113,7 +113,7 @@ export function TwoFactorSettings() {
       return;
     }
     setCode("");
-    setInfo("2FA aktiverat. Nästa inloggning kräver en kod.");
+    setInfo("2FA enabled. Your next login will require a code.");
     await reload();
   };
 
@@ -121,7 +121,7 @@ export function TwoFactorSettings() {
     if (stage.kind !== "on") return;
     if (
       !confirm(
-        "Inaktivera 2FA? Du kommer kunna logga in utan kod efter detta.",
+        "Disable 2FA? You’ll be able to log in without a code after this.",
       )
     )
       return;
@@ -136,7 +136,7 @@ export function TwoFactorSettings() {
       setError(unenrollError.message);
       return;
     }
-    setInfo("2FA inaktiverat.");
+    setInfo("2FA disabled.");
     await reload();
   };
 
@@ -156,18 +156,18 @@ export function TwoFactorSettings() {
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="font-heading text-xl uppercase tracking-tight text-foreground">
-            Tvåfaktorsautentisering
+            Two-factor authentication
           </h2>
           <p className="mt-1 text-sm text-foreground-muted">
             {stage.kind === "on"
-              ? "2FA är aktiverat på ditt konto."
-              : "Lägg till ett extra säkerhetslager med en authenticator-app (Google Authenticator, Authy, 1Password)."}
+              ? "2FA is enabled on your account."
+              : "Add an extra layer of security with an authenticator app (Google Authenticator, Authy, 1Password)."}
           </p>
 
           {stage.kind === "loading" && (
             <p className="mt-4 inline-flex items-center gap-2 text-sm text-foreground-subtle">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              Hämtar status…
+              Loading status…
             </p>
           )}
 
@@ -183,7 +183,7 @@ export function TwoFactorSettings() {
               ) : (
                 <ShieldCheck className="h-4 w-4" />
               )}
-              Aktivera 2FA
+              Enable 2FA
             </button>
           )}
 
@@ -195,7 +195,7 @@ export function TwoFactorSettings() {
               className="mt-4 inline-flex items-center gap-2 rounded-full border border-red-500/30 text-red-400 px-4 py-2 text-sm font-semibold hover:bg-red-500/10 disabled:opacity-60"
             >
               {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-              Inaktivera 2FA
+              Disable 2FA
             </button>
           )}
 
@@ -203,19 +203,19 @@ export function TwoFactorSettings() {
             <div className="mt-5 space-y-4">
               <div>
                 <p className="text-sm font-medium text-foreground">
-                  1. Scanna QR-koden med din authenticator-app
+                  1. Scan the QR code with your authenticator app
                 </p>
                 <div className="mt-3 inline-block rounded-xl bg-foreground p-3">
                   {/* Supabase returns the QR as a data:image/svg+xml URI */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={stage.qr}
-                    alt="QR-kod för 2FA"
+                    alt="2FA QR code"
                     className="block h-44 w-44"
                   />
                 </div>
                 <p className="mt-3 text-xs text-foreground-subtle">
-                  Kan du inte scanna? Mata in den här koden manuellt:
+                  Can’t scan? Enter this code manually:
                 </p>
                 <code className="mt-1 inline-block break-all rounded-md bg-background-tertiary px-2 py-1 text-xs text-foreground-muted">
                   {stage.secret}
@@ -224,7 +224,7 @@ export function TwoFactorSettings() {
 
               <div>
                 <p className="text-sm font-medium text-foreground">
-                  2. Bekräfta med en 6-siffrig kod från appen
+                  2. Confirm with a 6-digit code from the app
                 </p>
                 <input
                   type="text"
@@ -252,7 +252,7 @@ export function TwoFactorSettings() {
                   ) : (
                     <ShieldCheck className="h-4 w-4" />
                   )}
-                  Aktivera
+                  Enable
                 </button>
                 <button
                   type="button"
@@ -260,7 +260,7 @@ export function TwoFactorSettings() {
                   disabled={busy}
                   className="inline-flex items-center rounded-full border border-border text-foreground-muted px-4 py-2 text-sm font-semibold hover:text-foreground hover:border-foreground/30 disabled:opacity-60"
                 >
-                  Avbryt
+                  Cancel
                 </button>
               </div>
             </div>

@@ -27,7 +27,7 @@ export async function updateProfile(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Du måste logga in först." };
+  if (!user) return { error: "You must log in first." };
 
   const username = ((formData.get("username") as string | null) ?? "")
     .trim()
@@ -56,7 +56,7 @@ export async function updateProfile(
   if (!USERNAME_RE.test(username)) {
     return {
       fieldErrors: {
-        username: "3–24 tecken: små bokstäver, siffror, understreck.",
+        username: "3–24 characters: lowercase letters, digits, underscores.",
       },
     };
   }
@@ -64,20 +64,20 @@ export async function updateProfile(
   if (isReservedUsername(username)) {
     return {
       fieldErrors: {
-        username: "Det användarnamnet är reserverat — välj ett annat.",
+        username: "That username is reserved — pick another one.",
       },
     };
   }
 
   if (bio && bio.length > 500) {
-    return { fieldErrors: { bio: "För lång bio (max 500 tecken)." } };
+    return { fieldErrors: { bio: "Bio is too long (max 500 characters)." } };
   }
 
   if (accountType === "brand" && brandName.length === 0) {
-    return { error: "Märkets namn krävs för ett brand-konto." };
+    return { error: "A brand name is required for a brand account." };
   }
   if (brandWebsite && !/^https?:\/\//i.test(brandWebsite)) {
-    return { error: "Webbsidan måste börja med http:// eller https://" };
+    return { error: "The website must start with http:// or https://" };
   }
 
   // Username collision check (skip our own row).
@@ -88,16 +88,16 @@ export async function updateProfile(
     .neq("id", user.id)
     .maybeSingle();
   if (collision) {
-    return { fieldErrors: { username: "Användarnamnet är upptaget." } };
+    return { fieldErrors: { username: "That username is taken." } };
   }
 
   let avatarUrl: string | null = null;
   if (avatar instanceof File && avatar.size > 0) {
     if (!ACCEPTED_IMAGE_TYPES.includes(avatar.type)) {
-      return { error: "Avataren måste vara JPG, PNG eller WebP." };
+      return { error: "The avatar must be JPG, PNG or WebP." };
     }
     if (avatar.size > MAX_AVATAR_BYTES) {
-      return { error: "Avataren är för stor (max 5 MB)." };
+      return { error: "The avatar is too large (max 5 MB)." };
     }
     // Filename: "<user_id>/<username>-profile-<hash>.jpg" — search-engine
     // friendly slug instead of a Date-stamp UUID.
@@ -147,7 +147,7 @@ export async function updateProfile(
     .select("id");
 
   if (updateError) {
-    return { error: `Kunde inte spara profilen: ${updateError.message}` };
+    return { error: `Could not save the profile: ${updateError.message}` };
   }
 
   if (!updated || updated.length === 0) {
@@ -158,7 +158,7 @@ export async function updateProfile(
       .from("profiles")
       .insert(insertRow);
     if (insertError) {
-      return { error: `Kunde inte skapa profilen: ${insertError.message}` };
+      return { error: `Could not create the profile: ${insertError.message}` };
     }
   }
 

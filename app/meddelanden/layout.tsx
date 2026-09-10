@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Meddelanden",
-  description: "Direktmeddelanden mellan användare på Moidello.",
+  description: "Direct messages between users on Moidello.",
   alternates: { canonical: "/meddelanden" },
   robots: { index: false, follow: true },
 };

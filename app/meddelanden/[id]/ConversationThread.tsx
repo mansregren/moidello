@@ -130,7 +130,7 @@ export function ConversationThread({
       <div className="space-y-1">
         {messages.length === 0 && (
           <p className="text-center text-sm text-foreground-subtle py-12">
-            Inga meddelanden ännu. Säg hej!
+            No messages yet. Say hi!
           </p>
         )}
         {messages.map((m, i) => {

@@ -25,18 +25,18 @@ export default async function AccountSettingsPage() {
       <main id="main" tabIndex={-1} className="flex-1 pt-20 md:pt-24 pb-16">
         <Container className="max-w-2xl">
           <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-4">
-            Inställningar / Konto
+            Settings / Account
           </p>
           <h1 className="font-heading text-4xl md:text-6xl uppercase tracking-tight leading-none">
-            Konto & sekretess
+            Account & privacy
           </h1>
           <p className="mt-6 text-foreground-muted">
-            Hantera din data. Du kan när som helst exportera allt vi har om
-            dig eller radera ditt konto permanent.
+            Manage your data. You can export everything we hold about you or
+            permanently delete your account at any time.
           </p>
 
           <AccountSettingsClient
-            username={profile?.username ?? user.email ?? "ditt-konto"}
+            username={profile?.username ?? user.email ?? "your-account"}
           />
         </Container>
       </main>

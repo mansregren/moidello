@@ -59,11 +59,11 @@ export function AccountSettingsClient({ username }: { username: string }) {
           </div>
           <div className="flex-1">
             <h2 className="font-heading text-xl uppercase tracking-tight text-foreground">
-              Exportera mina data
+              Export my data
             </h2>
             <p className="mt-2 text-sm text-foreground-muted">
-              Ladda ner en JSON-fil med din profil, outfits, taggade plagg,
-              kommentarer, sparade objekt, följare, samlingar och meddelanden.
+              Download a JSON file with your profile, outfits, tagged pieces,
+              comments, saved items, followers, collections and messages.
             </p>
             <button
               type="button"
@@ -71,7 +71,7 @@ export function AccountSettingsClient({ username }: { username: string }) {
               onClick={handleExport}
               className="mt-5 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-60"
             >
-              {pending ? "Förbereder…" : "Ladda ner JSON"}
+              {pending ? "Preparing…" : "Download JSON"}
             </button>
             {exportError && (
               <p className="mt-3 text-xs text-red-400">{exportError}</p>
@@ -87,11 +87,11 @@ export function AccountSettingsClient({ username }: { username: string }) {
           </div>
           <div className="flex-1">
             <h2 className="font-heading text-xl uppercase tracking-tight text-foreground">
-              Radera mitt konto
+              Delete my account
             </h2>
             <p className="mt-2 text-sm text-foreground-muted">
-              Detta tar bort din profil, alla dina outfits, kommentarer,
-              följningar, samlingar och meddelanden. Det går inte att ångra.
+              This removes your profile, all your outfits, comments, follows,
+              collections and messages. It cannot be undone.
             </p>
 
             {!confirmDelete ? (
@@ -101,16 +101,16 @@ export function AccountSettingsClient({ username }: { username: string }) {
                 className="mt-5 inline-flex items-center gap-2 rounded-full border border-red-500/40 text-red-400 px-5 py-2.5 text-sm font-semibold hover:bg-red-500/10"
               >
                 <Trash2 className="h-4 w-4" />
-                Påbörja radering
+                Start deletion
               </button>
             ) : (
               <div className="mt-5 rounded-2xl border border-red-500/40 bg-background-tertiary p-5">
                 <div className="flex items-start gap-3 mb-4">
                   <AlertTriangle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
                   <p className="text-sm text-foreground-muted">
-                    Skriv ditt användarnamn{" "}
+                    Type your username{" "}
                     <span className="font-mono text-foreground">{username}</span>{" "}
-                    för att bekräfta.
+                    to confirm.
                   </p>
                 </div>
                 <input
@@ -135,7 +135,7 @@ export function AccountSettingsClient({ username }: { username: string }) {
                     }}
                     className="flex-1 rounded-full border border-border text-foreground py-2.5 text-sm font-medium hover:border-foreground/30"
                   >
-                    Avbryt
+                    Cancel
                   </button>
                   <button
                     type="button"
@@ -143,7 +143,7 @@ export function AccountSettingsClient({ username }: { username: string }) {
                     onClick={handleDelete}
                     className="flex-1 rounded-full bg-red-500 text-white py-2.5 text-sm font-semibold hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    {pending ? "Raderar…" : "Radera mitt konto"}
+                    {pending ? "Deleting…" : "Delete my account"}
                   </button>
                 </div>
               </div>

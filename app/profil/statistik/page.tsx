@@ -62,23 +62,23 @@ export default async function StatistikPage() {
             className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
-            Tillbaka till profilen
+            Back to profile
           </Link>
 
           <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
-            Statistik
+            Stats
           </h1>
           <p className="mt-3 text-foreground-muted">
-            Hur dina outfits presterar.
+            How your outfits are performing.
           </p>
 
           {/* Totals */}
           <section className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-            <SummaryCard icon={Eye} label="Visningar" value={totals.views} sub={`${totals.unique_views} unika`} />
-            <SummaryCard icon={Heart} label="Gillningar" value={totals.likes} />
-            <SummaryCard icon={Bookmark} label="Sparade" value={totals.saves} />
-            <SummaryCard icon={MessageCircle} label="Kommentarer" value={totals.comments} />
-            <SummaryCard icon={MousePointerClick} label="Klick på köplänk" value={totals.clicks} />
+            <SummaryCard icon={Eye} label="Views" value={totals.views} sub={`${totals.unique_views} unique`} />
+            <SummaryCard icon={Heart} label="Likes" value={totals.likes} />
+            <SummaryCard icon={Bookmark} label="Saves" value={totals.saves} />
+            <SummaryCard icon={MessageCircle} label="Comments" value={totals.comments} />
+            <SummaryCard icon={MousePointerClick} label="Buy-link clicks" value={totals.clicks} />
             <SummaryCard
               label="Outfits"
               value={rows.length}
@@ -95,14 +95,14 @@ export default async function StatistikPage() {
 
             {error && error.code === "42P01" && (
               <p className="text-sm text-amber-400">
-                Tabellen finns inte ännu. Kör migration 0005_views_clicks.sql i Supabase.
+                The table doesn’t exist yet. Run migration 0005_views_clicks.sql in Supabase.
               </p>
             )}
 
             {rows.length === 0 && !error && (
               <p className="text-sm text-foreground-muted">
-                Du har inte lagt upp någon outfit än, eller så har ingen sett
-                dina ännu. Statistik dyker upp här när folk börjar interagera.
+                You haven’t posted an outfit yet, or no one has seen yours
+                yet. Stats show up here once people start interacting.
               </p>
             )}
 
@@ -112,12 +112,12 @@ export default async function StatistikPage() {
                   <thead>
                     <tr className="border-b border-border">
                       <th className="text-left font-medium text-foreground-muted py-3 pr-4">Outfit</th>
-                      <th className="text-right font-medium text-foreground-muted py-3 px-2"><Eye className="h-3.5 w-3.5 inline mb-0.5 mr-1" />Visn.</th>
-                      <th className="text-right font-medium text-foreground-muted py-3 px-2">Unika</th>
-                      <th className="text-right font-medium text-foreground-muted py-3 px-2"><Heart className="h-3.5 w-3.5 inline mb-0.5 mr-1" />Gillas</th>
-                      <th className="text-right font-medium text-foreground-muted py-3 px-2"><Bookmark className="h-3.5 w-3.5 inline mb-0.5 mr-1" />Sparas</th>
-                      <th className="text-right font-medium text-foreground-muted py-3 px-2"><MessageCircle className="h-3.5 w-3.5 inline mb-0.5 mr-1" />Komm.</th>
-                      <th className="text-right font-medium text-foreground-muted py-3 px-2"><MousePointerClick className="h-3.5 w-3.5 inline mb-0.5 mr-1" />Klick</th>
+                      <th className="text-right font-medium text-foreground-muted py-3 px-2"><Eye className="h-3.5 w-3.5 inline mb-0.5 mr-1" />Views</th>
+                      <th className="text-right font-medium text-foreground-muted py-3 px-2">Unique</th>
+                      <th className="text-right font-medium text-foreground-muted py-3 px-2"><Heart className="h-3.5 w-3.5 inline mb-0.5 mr-1" />Likes</th>
+                      <th className="text-right font-medium text-foreground-muted py-3 px-2"><Bookmark className="h-3.5 w-3.5 inline mb-0.5 mr-1" />Saves</th>
+                      <th className="text-right font-medium text-foreground-muted py-3 px-2"><MessageCircle className="h-3.5 w-3.5 inline mb-0.5 mr-1" />Comm.</th>
+                      <th className="text-right font-medium text-foreground-muted py-3 px-2"><MousePointerClick className="h-3.5 w-3.5 inline mb-0.5 mr-1" />Clicks</th>
                       <th className="text-right font-medium text-foreground-muted py-3 pl-2">CTR</th>
                     </tr>
                   </thead>
@@ -148,7 +148,7 @@ export default async function StatistikPage() {
                                   {r.title}
                                 </p>
                                 <p className="text-xs text-foreground-subtle">
-                                  {new Date(r.created_at).toLocaleDateString("sv-SE")}
+                                  {new Date(r.created_at).toLocaleDateString("en-GB")}
                                 </p>
                               </div>
                             </Link>

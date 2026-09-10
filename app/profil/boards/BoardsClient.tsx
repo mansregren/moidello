@@ -40,10 +40,10 @@ export function BoardsClient({
       <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
         <div>
           <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
-            Samlingar
+            Collections
           </h1>
           <p className="mt-3 text-foreground-muted">
-            Skapa kuraterade samlingar — publika eller privata.
+            Create curated collections — public or private.
           </p>
         </div>
         <button
@@ -52,27 +52,27 @@ export function BoardsClient({
           className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90 transition-colors"
         >
           <Plus className="h-4 w-4" />
-          Ny samling
+          New collection
         </button>
       </div>
 
       {migrationMissing && (
         <p className="text-sm text-amber-400 mb-6">
-          Tabellen finns inte ännu. Kör migration 0006_boards.sql i Supabase.
+          The table doesn’t exist yet. Run migration 0006_boards.sql in Supabase.
         </p>
       )}
 
       {boards.length === 0 && !migrationMissing && (
         <div className="rounded-2xl border border-border bg-background-secondary p-10 text-center">
           <p className="text-foreground-muted">
-            Du har inga samlingar än.
+            You don’t have any collections yet.
           </p>
           <button
             type="button"
             onClick={() => setCreateOpen(true)}
             className="mt-4 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium hover:bg-foreground/90"
           >
-            Skapa din första
+            Create your first
           </button>
         </div>
       )}
@@ -96,17 +96,17 @@ export function BoardsClient({
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-foreground-subtle text-sm">
-                  Tom samling
+                  Empty collection
                 </div>
               )}
               <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-background/70 backdrop-blur px-2.5 py-1 text-[10px] uppercase tracking-wider text-foreground">
                 {b.isPublic ? (
                   <>
-                    <Globe className="h-3 w-3" /> Publik
+                    <Globe className="h-3 w-3" /> Public
                   </>
                 ) : (
                   <>
-                    <Lock className="h-3 w-3" /> Privat
+                    <Lock className="h-3 w-3" /> Private
                   </>
                 )}
               </span>
@@ -169,11 +169,11 @@ function CreateBoardModal({
           >
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground">
-                Ny samling
+                New collection
               </h2>
               <button
                 onClick={onClose}
-                aria-label="Stäng"
+                aria-label="Close"
                 className="flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-foreground/5 hover:text-foreground"
               >
                 <X className="h-5 w-5" />
@@ -183,14 +183,14 @@ function CreateBoardModal({
             <form action={formAction} className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
-                  Namn
+                  Name
                 </label>
                 <input
                   name="name"
                   type="text"
                   required
                   maxLength={80}
-                  placeholder="T.ex. Sommar 2026"
+                  placeholder="e.g. Summer 2026"
                   className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30"
                 />
                 {state.fieldErrors?.name && (
@@ -202,13 +202,13 @@ function CreateBoardModal({
 
               <div>
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
-                  Beskrivning (valfri)
+                  Description (optional)
                 </label>
                 <textarea
                   name="description"
                   rows={3}
                   maxLength={500}
-                  placeholder="Vad samlar du här?"
+                  placeholder="What are you collecting here?"
                   className="w-full rounded-xl bg-background-tertiary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 resize-none"
                 />
               </div>
@@ -216,10 +216,10 @@ function CreateBoardModal({
               <div className="flex items-center justify-between rounded-xl bg-background-tertiary border border-border px-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    Publik samling
+                    Public collection
                   </p>
                   <p className="text-xs text-foreground-subtle">
-                    Andra kan se den. Avmarkera för privat.
+                    Others can see it. Uncheck for private.
                   </p>
                 </div>
                 <label className="relative inline-flex cursor-pointer">
@@ -243,7 +243,7 @@ function CreateBoardModal({
                 disabled={pending}
                 className="w-full rounded-full bg-foreground text-background py-3 text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-60"
               >
-                {pending ? "Skapar…" : "Skapa samling"}
+                {pending ? "Creating…" : "Create collection"}
               </button>
             </form>
           </motion.div>

@@ -10,7 +10,7 @@ import { EditOwnOutfit, type OwnOutfitForm } from "./EditOwnOutfit";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Redigera inlägg",
+  title: "Edit post",
   robots: { index: false, follow: false },
 };
 
@@ -76,7 +76,7 @@ export default async function EditOwnOutfitPage({
 
           <div className="mb-6 flex items-center justify-between gap-3">
             <h1 className="font-heading text-3xl md:text-4xl uppercase tracking-tight text-foreground">
-              Redigera inlägg
+              Edit post
             </h1>
             <Link
               href={publicUrl}

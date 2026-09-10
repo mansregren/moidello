@@ -114,8 +114,8 @@ export function EditOwnOutfit({ form: initial }: { form: OwnOutfitForm }) {
           </Field>
 
           <p className="text-[11px] text-foreground-subtle">
-            SEO-meta, schemaläggning och kön hanteras av admin. Vill du dölja
-            eller radera inlägget, använd knapparna på{" "}
+            SEO meta, scheduling and gender are handled by an admin. To hide
+            or delete the post, use the buttons on{" "}
             <a
               href={form.publicUrl}
               className="underline hover:text-foreground"
