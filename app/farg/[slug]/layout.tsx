@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { fetchOutfitsByColor } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { slugify } from "@/lib/slug";
+import { colorQueryValue } from "@/lib/colors";
 
 const SITE = "Moidello";
 
@@ -19,21 +20,21 @@ export async function generateMetadata({
   const { slug } = await params;
   const color = slugToColor(slug);
   const outfits = await fetchOutfitsByColor(
-    color,
+    colorQueryValue(slug),
     undefined,
     createPublicClient(),
   );
 
   if (outfits.length === 0) {
     return {
-      title: `Outfits i ${color.toLowerCase()}`,
-      description: `Inga outfits i ${color.toLowerCase()} ännu — bli först med att tagga ett plagg.`,
+      title: `Outfits in ${color.toLowerCase()}`,
+      description: `No outfits in ${color.toLowerCase()} yet — be the first to tag a piece.`,
       robots: { index: false, follow: true },
     };
   }
 
-  const title = `${color}a outfits — ${outfits.length} stilade looks`;
-  const description = `Outfit-inspiration med ${color.toLowerCase()}a plagg från svenska kreatörer på ${SITE}. ${outfits.length} stylade looks med brand-info, pris och köp-länkar.`;
+  const title = `${color} outfits — ${outfits.length} styled looks`;
+  const description = `Outfit inspiration with ${color.toLowerCase()} pieces on ${SITE}. ${outfits.length} styled looks with brand info, price and buy links.`;
 
   return {
     title,

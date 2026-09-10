@@ -7,9 +7,9 @@ import { collectionPageJsonLd } from "@/lib/json-ld";
 import { GUIDES } from "@/lib/guides";
 
 export const metadata: Metadata = {
-  title: "Stilguider",
+  title: "Style guides",
   description:
-    "Stilguider från Moidello — skandinavisk minimalism, capsule wardrobe, smart casual för jobb, höstgarderob, baggy jeans och fler outfit-tips.",
+    "Style guides from Moidello — Scandinavian minimalism, capsule wardrobe, smart casual for work, an autumn wardrobe, baggy jeans and more outfit tips.",
   alternates: { canonical: "/guider" },
 };
 
@@ -21,9 +21,9 @@ export default function GuiderIndex() {
       <JsonLd
         data={collectionPageJsonLd({
           path: "/guider",
-          name: "Stilguider — Moidello",
+          name: "Style guides — Moidello",
           description:
-            "Praktiska guider till stilar, plagg och säsongs-outfits skrivna för svenskt klimat och svenska shopping-vanor.",
+            "Practical guides to styles, garments and seasonal outfits.",
           outfits: [],
         })}
       />
@@ -32,14 +32,13 @@ export default function GuiderIndex() {
         <Container className="py-16 md:py-24 max-w-3xl">
           <div className="border-b border-border pb-10 mb-12">
             <p className="text-xs uppercase tracking-[0.3em] text-foreground-subtle mb-4">
-              Guider
+              Guides
             </p>
             <h1 className="font-heading text-5xl md:text-7xl uppercase tracking-tight leading-none">
-              Stilguider
+              Style guides
             </h1>
             <p className="mt-6 text-lg text-foreground-muted max-w-2xl">
-              Praktiska guider till stilar, plagg och säsongs-outfits.
-              Skrivna för svenskt klimat och svenska shopping-vanor.
+              Practical guides to styles, garments and seasonal outfits.
             </p>
           </div>
 
@@ -57,7 +56,7 @@ export default function GuiderIndex() {
                     {g.intro}
                   </p>
                   <span className="mt-3 inline-block text-xs uppercase tracking-wider text-foreground-subtle group-hover:text-foreground transition-colors">
-                    Läs guiden →
+                    Read the guide →
                   </span>
                 </Link>
               </li>

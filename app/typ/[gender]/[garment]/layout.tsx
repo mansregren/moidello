@@ -49,18 +49,18 @@ export async function generateMetadata({
   );
 
   const noun = garment.toLowerCase();
-  const audience = gender === "herr" ? "herr" : "dam";
+  const audience = gender === "herr" ? "men" : "women";
 
   if (outfits.length === 0) {
     return {
       title: `${noun} ${audience} — outfits`,
-      description: `Inga ${audience}-outfits med ${noun} ännu på ${SITE}.`,
+      description: `No ${audience} outfits with ${noun} yet on ${SITE}.`,
       robots: { index: false, follow: true },
     };
   }
 
-  const title = `${noun} ${audience} — ${outfits.length} outfit-idéer`;
-  const description = `Outfit-inspiration med ${noun} för ${audience} från svenska kreatörer på ${SITE}. ${outfits.length} stylade looks med märke, pris och köp-länkar.`;
+  const title = `${noun} for ${audience} — ${outfits.length} outfit ideas`;
+  const description = `Outfit inspiration with ${noun} for ${audience} on ${SITE}. ${outfits.length} styled looks with brand, price and buy links.`;
 
   return {
     title,

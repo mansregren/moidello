@@ -152,9 +152,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  // Färg- och typ-landningssidor — long-tail-magneter. En route per
-  // distinkt color resp. (gender, garment)-kombo som har minst 2 outfits
-  // (under det blir det thin content och inte värt att indexera).
+  // Colour and type landing pages — long-tail magnets. One route per
+  // distinct colour and per (gender, garment) combo with at least 2
+  // outfits (below that it's thin content and not worth indexing).
   type TagDim = {
     color: string | null;
     garment: string | null;

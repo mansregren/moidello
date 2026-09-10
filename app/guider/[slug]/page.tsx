@@ -66,7 +66,7 @@ export default async function GuideDetail({
       <main id="main" tabIndex={-1} className="flex-1">
         <Container className="py-12 md:py-16 max-w-3xl">
           <nav
-            aria-label="Brödsmulor"
+            aria-label="Breadcrumbs"
             className="text-xs text-foreground-subtle mb-6"
           >
             <ol className="flex items-center gap-2">
@@ -78,7 +78,7 @@ export default async function GuideDetail({
               <li aria-hidden="true">/</li>
               <li>
                 <Link href="/guider" className="hover:text-foreground">
-                  Guider
+                  Guides
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
@@ -91,7 +91,7 @@ export default async function GuideDetail({
             className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-8"
           >
             <ArrowLeft className="h-4 w-4" />
-            Alla guider
+            All guides
           </Link>
 
           <article>
@@ -109,7 +109,7 @@ export default async function GuideDetail({
               {guide.steps.map((s, i) => (
                 <li key={s.name} className="border-t border-border pt-8">
                   <p className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-2">
-                    Steg {i + 1}
+                    Step {i + 1}
                   </p>
                   <h2 className="font-heading text-xl md:text-2xl uppercase tracking-tight text-foreground mb-3">
                     {s.name}
@@ -124,7 +124,7 @@ export default async function GuideDetail({
             {guide.related && (
               <section className="mt-16 pt-10 border-t border-border">
                 <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-5">
-                  Utforska vidare
+                  Explore further
                 </h2>
                 <ul className="flex flex-wrap gap-2">
                   {guide.related.styles?.map((s) => (
@@ -133,7 +133,7 @@ export default async function GuideDetail({
                         href={`/stil/${s}`}
                         className="inline-block rounded-full border border-border bg-background-secondary px-4 py-2 text-sm text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors capitalize"
                       >
-                        Stil: {s}
+                        Style: {s}
                       </Link>
                     </li>
                   ))}
@@ -143,7 +143,7 @@ export default async function GuideDetail({
                         href={`/farg/${c}`}
                         className="inline-block rounded-full border border-border bg-background-secondary px-4 py-2 text-sm text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors capitalize"
                       >
-                        Färg: {c}
+                        Colour: {c}
                       </Link>
                     </li>
                   ))}
@@ -153,7 +153,7 @@ export default async function GuideDetail({
                         href={`/typ/${g.gender}/${g.garment.toLowerCase()}`}
                         className="inline-block rounded-full border border-border bg-background-secondary px-4 py-2 text-sm text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors capitalize"
                       >
-                        {g.garment.toLowerCase()} {g.gender}
+                        {g.garment.toLowerCase()} {g.gender === "herr" ? "men" : "women"}
                       </Link>
                     </li>
                   ))}

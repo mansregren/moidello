@@ -109,7 +109,7 @@ export async function GET() {
       `  <url>\n    <loc>${escapeXml(pageUrl)}</loc>\n` +
         `    <image:image>\n      <image:loc>${escapeXml(imageUrl)}</image:loc>\n` +
         `      <image:title>${escapeXml(name)}</image:title>\n` +
-        `      <image:caption>${escapeXml(`${name} — kreatör på Moidello`)}</image:caption>\n` +
+        `      <image:caption>${escapeXml(`${name} — profile on Moidello`)}</image:caption>\n` +
         `    </image:image>\n  </url>`,
     );
   }

@@ -56,9 +56,9 @@ export default async function TypPage({
   if (outfits.length === 0) notFound();
 
   const noun = garment.toLowerCase();
-  const audience = gender === "herr" ? "herr" : "dam";
-  const heading = `${noun} för ${audience}`;
-  const intro = `Outfit-inspiration med ${noun} från svenska kreatörer. ${outfits.length} stylade looks att hämta idéer från.`;
+  const audience = gender === "herr" ? "men" : "women";
+  const heading = `${noun} for ${audience}`;
+  const intro = `Outfit inspiration with ${noun} on Moidello. ${outfits.length} styled looks to take ideas from.`;
 
   return (
     <>
@@ -74,7 +74,7 @@ export default async function TypPage({
       <main id="main" tabIndex={-1} className="flex-1 pt-6 md:pt-10">
         <Container>
           <nav
-            aria-label="Brödsmulor"
+            aria-label="Breadcrumbs"
             className="text-xs text-foreground-subtle mb-6"
           >
             <ol className="flex items-center gap-2">
@@ -118,7 +118,7 @@ export default async function TypPage({
 
           <section className="mt-20 mb-16 border-t border-border pt-10">
             <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-5">
-              Andra kategorier för {audience}
+              Other categories for {audience}
             </h2>
             <ul className="flex flex-wrap gap-2">
               {garmentsForGender(gender)

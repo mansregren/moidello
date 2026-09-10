@@ -8,6 +8,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { collectionPageJsonLd } from "@/lib/json-ld";
 import { slugify } from "@/lib/slug";
 import { fetchOutfitsByColor, fetchAllColors } from "@/lib/queries";
+import { colorQueryValue } from "@/lib/colors";
 import { createPublicClient } from "@/lib/supabase/public";
 
 // ISR: fetch a gender-agnostic, cacheable set; the dam/herr toggle + liked/
@@ -33,14 +34,14 @@ export default async function FargPage({
 
   const client = createPublicClient();
   const [outfits, otherColors] = await Promise.all([
-    fetchOutfitsByColor(color, undefined, client),
+    fetchOutfitsByColor(colorQueryValue(slug), undefined, client),
     fetchAllColors(client),
   ]);
   if (outfits.length === 0) notFound();
 
   const colorLower = color.toLowerCase();
-  const heading = `${color}a outfits`;
-  const intro = `Outfit-inspiration med ${colorLower}a plagg från svenska kreatörer. ${outfits.length} stylade looks att hämta idéer från.`;
+  const heading = `${color} outfits`;
+  const intro = `Outfit inspiration with ${colorLower} pieces on Moidello. ${outfits.length} styled looks to take ideas from.`;
 
   const relatedColors = otherColors
     .filter((c) => c.color !== colorLower && c.count >= 2)
@@ -60,7 +61,7 @@ export default async function FargPage({
       <main id="main" tabIndex={-1} className="flex-1 pt-6 md:pt-10">
         <Container>
           <nav
-            aria-label="Brödsmulor"
+            aria-label="Breadcrumbs"
             className="text-xs text-foreground-subtle mb-6"
           >
             <ol className="flex items-center gap-2">
@@ -85,12 +86,12 @@ export default async function FargPage({
             className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
-            Alla outfits
+            All outfits
           </Link>
 
           <div className="mb-12 max-w-2xl">
             <p className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-3">
-              Färg
+              Colour
             </p>
             <h1 className="font-heading text-[44px] md:text-[72px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
               {heading}
@@ -103,7 +104,7 @@ export default async function FargPage({
           {relatedColors.length > 0 && (
             <section className="mt-20 mb-16 border-t border-border pt-10">
               <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-5">
-                Andra färger
+                Other colours
               </h2>
               <ul className="flex flex-wrap gap-2">
                 {relatedColors.map((c) => (

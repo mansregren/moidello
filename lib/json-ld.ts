@@ -153,7 +153,7 @@ export function productJsonLd(item: {
   // been processed yet.
   const description =
     item.description?.trim() ||
-    `${item.brand} ${item.name} — taggat plagg från en outfit på ${SITE_NAME}.`;
+    `${item.brand} ${item.name} — a tagged piece from an outfit on ${SITE_NAME}.`;
 
   const additionalProperty: Array<{
     "@type": "PropertyValue";
@@ -307,8 +307,9 @@ export function produktPageJsonLd(item: {
       : `/outfit/${item.outfitId}`;
 
   // productJsonLd returns null when there's no price — the layout
-  // already noindex:ar prislösa produktsidor, så att utelämna Product
-  // från @graph håller markup-validatorn ren utan att bryta breadcrumben.
+  // already noindexes priceless product pages, so omitting Product from
+  // the @graph keeps the markup validator clean without breaking the
+  // breadcrumb.
   const product = productJsonLd({
     id: item.id,
     brand: item.brand,
@@ -381,7 +382,7 @@ export function brandPageJsonLd(brand: {
           {
             "@type": "ListItem",
             position: 2,
-            name: "Märken",
+            name: "Brands",
             item: `${SITE_BASE}/brands`,
           },
           {
@@ -413,9 +414,9 @@ export function brandPageJsonLd(brand: {
 }
 
 /**
- * HowTo schema for a step-by-step style guide. AI-sökmotorer favoriserar
- * HowTo-objekt när de svarar på handlings-frågor ("hur stylar man X")
- * eftersom stegen ger en färdig konsumerbar struktur.
+ * HowTo schema for a step-by-step style guide. AI search engines favour
+ * HowTo objects when answering action questions ("how do you style X")
+ * because the steps give a ready, consumable structure.
  */
 export function howToJsonLd(input: {
   path: string;
@@ -444,8 +445,8 @@ export function howToJsonLd(input: {
 }
 
 /**
- * DefinedTermSet for /ordlista — schema-baserad ordlista. AI-sök kan
- * lifta en hel definition utan att förstå sidans struktur.
+ * DefinedTermSet for /ordlista — a schema-based glossary. AI search can
+ * lift a whole definition without understanding the page structure.
  */
 export function definedTermSetJsonLd(terms: { term: string; description: string }[]) {
   return {

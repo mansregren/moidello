@@ -18,37 +18,37 @@ const STYLES: Record<string, { label: string; description: string }> = {
   minimalism: {
     label: "Minimalism",
     description:
-      "Lugna palletter, rena linjer, neutrala färger. Skandinavisk minimalism med fokus på passform och material.",
+      "Calm palettes, clean lines, neutral colours. Scandinavian minimalism with a focus on fit and material.",
   },
   vintage: {
     label: "Vintage",
     description:
-      "Retro-inspirerade plagg, second hand och utvalt äldre mode. Stil som åldras snyggt istället för att bytas ut.",
+      "Retro-inspired pieces, second hand and curated older fashion. A style that ages well instead of being replaced.",
   },
   casual: {
     label: "Casual",
     description:
-      "Avslappnade vardagsoutfits. Lättburet, bekvämt och praktiskt — utan att tappa stilen.",
+      "Relaxed everyday outfits. Easy to wear, comfortable and practical — without losing the style.",
   },
   streetwear: {
     label: "Streetwear",
     description:
-      "Urban stil med sneakers, oversized fits och statement-plagg. Influenser från skate, hiphop och japanska gator.",
+      "Urban style with sneakers, oversized fits and statement pieces. Influences from skate, hip-hop and Japanese streets.",
   },
   formal: {
     label: "Formal",
     description:
-      "Kostym, smarta klänningar och eleganta accessoarer. Outfits för middag, jobb och tillfällen som kräver mer.",
+      "Suits, sharp dresses and elegant accessories. Outfits for dinner, work and occasions that ask for more.",
   },
   sporty: {
     label: "Sporty",
     description:
-      "Athleisure och funktionella plagg — träningskläder som funkar utanför gymmet, lätt och rörlig stil.",
+      "Athleisure and functional pieces — sportswear that works outside the gym, a light and mobile style.",
   },
   preppy: {
     label: "Preppy",
     description:
-      "East coast-stil med stickade plagg, chinos, loafers och poloskjortor. Klassiskt och oansträngt sofistikerat.",
+      "East coast style with knits, chinos, loafers and polo shirts. Classic and effortlessly sophisticated.",
   },
 };
 
@@ -74,7 +74,7 @@ export default async function StilPage({
       <JsonLd
         data={collectionPageJsonLd({
           path: `/stil/${slug.toLowerCase()}`,
-          name: `${style.label} — outfit-inspiration`,
+          name: `${style.label} — outfit inspiration`,
           description: style.description,
           outfits,
         })}
@@ -82,7 +82,7 @@ export default async function StilPage({
       <main id="main" tabIndex={-1} className="flex-1 pt-6 md:pt-10">
         <Container>
           <nav
-            aria-label="Brödsmulor"
+            aria-label="Breadcrumbs"
             className="text-xs text-foreground-subtle mb-6"
           >
             <ol className="flex items-center gap-2">
@@ -107,12 +107,12 @@ export default async function StilPage({
             className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
-            Alla outfits
+            All outfits
           </Link>
 
           <div className="mb-12 max-w-2xl">
             <p className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-3">
-              Stil
+              Style
             </p>
             <h1 className="font-heading text-[44px] md:text-[72px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
               {style.label}
@@ -121,7 +121,7 @@ export default async function StilPage({
               {style.description}
             </p>
             <p className="mt-3 text-sm text-foreground-subtle">
-              {outfits.length} stylade outfits från svenska kreatörer.
+              {outfits.length} styled outfits.
             </p>
           </div>
 

@@ -11,44 +11,44 @@ const STYLES: Record<
   minimalism: {
     label: "Minimalism",
     description:
-      "Lugna palletter, rena linjer, neutrala färger. Skandinavisk minimalism med fokus på passform och material.",
-    lead: "Lugna palletter och tidlös passform",
+      "Calm palettes, clean lines, neutral colours. Scandinavian minimalism with a focus on fit and material.",
+    lead: "Calm palettes and timeless fit",
   },
   vintage: {
     label: "Vintage",
     description:
-      "Retro-inspirerade plagg, second hand och utvalt äldre mode. Stil som åldras snyggt istället för att bytas ut.",
-    lead: "Second hand och tidlöst",
+      "Retro-inspired pieces, second hand and curated older fashion. A style that ages well instead of being replaced.",
+    lead: "Second hand and timeless",
   },
   casual: {
     label: "Casual",
     description:
-      "Avslappnade vardagsoutfits. Lättburet, bekvämt och praktiskt — utan att tappa stilen.",
-    lead: "Vardagliga outfits utan ansträngning",
+      "Relaxed everyday outfits. Easy to wear, comfortable and practical — without losing the style.",
+    lead: "Everyday outfits without effort",
   },
   streetwear: {
     label: "Streetwear",
     description:
-      "Urban stil med sneakers, oversized fits och statement-plagg. Influenser från skate, hiphop och japanska gator.",
-    lead: "Urban stil med oversized fits",
+      "Urban style with sneakers, oversized fits and statement pieces. Influences from skate, hip-hop and Japanese streets.",
+    lead: "Urban style with oversized fits",
   },
   formal: {
     label: "Formal",
     description:
-      "Kostym, smarta klänningar och eleganta accessoarer. Outfits för middag, jobb och tillfällen som kräver mer.",
-    lead: "Kostym och smarta klänningar",
+      "Suits, sharp dresses and elegant accessories. Outfits for dinner, work and occasions that ask for more.",
+    lead: "Suits and sharp dresses",
   },
   sporty: {
     label: "Sporty",
     description:
-      "Athleisure och funktionella plagg — träningskläder som funkar utanför gymmet, lätt och rörlig stil.",
-    lead: "Athleisure och funktion",
+      "Athleisure and functional pieces — sportswear that works outside the gym, a light and mobile style.",
+    lead: "Athleisure and function",
   },
   preppy: {
     label: "Preppy",
     description:
-      "East coast-stil med stickade plagg, chinos, loafers och poloskjortor. Klassiskt och oansträngt sofistikerat.",
-    lead: "East coast-klassiker",
+      "East coast style with knits, chinos, loafers and polo shirts. Classic and effortlessly sophisticated.",
+    lead: "East coast classics",
   },
 };
 
@@ -65,7 +65,7 @@ export async function generateMetadata({
   const style = resolveStyle(slug);
   if (!style) {
     return {
-      title: "Stil",
+      title: "Style",
       robots: { index: false, follow: true },
     };
   }
@@ -78,14 +78,14 @@ export async function generateMetadata({
 
   if (outfits.length === 0) {
     return {
-      title: `${style.label} — outfit-inspiration`,
-      description: `Inga ${style.label.toLowerCase()}-outfits ännu på ${SITE}.`,
+      title: `${style.label} — outfit inspiration`,
+      description: `No ${style.label.toLowerCase()} outfits yet on ${SITE}.`,
       robots: { index: false, follow: true },
     };
   }
 
-  const title = `${style.label} — ${outfits.length} outfit-idéer`;
-  const description = `${style.description} Bläddra ${outfits.length} stylade outfits inom ${style.label.toLowerCase()} från svenska kreatörer på ${SITE}.`;
+  const title = `${style.label} — ${outfits.length} outfit ideas`;
+  const description = `${style.description} Browse ${outfits.length} styled ${style.label.toLowerCase()} outfits on ${SITE}.`;
 
   return {
     title,

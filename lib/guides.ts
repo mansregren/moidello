@@ -1,8 +1,8 @@
 /**
- * Hand-curated stilguider. Strukturerat som data så HowTo-schema och
- * sid-rendering delar samma källa. Per moidello-brand-namedropping:
- * inga märken nämns vid namn i texten utan formellt partnerskap, så
- * stegen håller sig till plagg-typer, material och proportioner.
+ * Hand-curated style guides. Structured as data so the HowTo schema and
+ * page rendering share one source. Per moidello-brand-namedropping: no
+ * brands are named in the text without a formal partnership, so the steps
+ * stick to garment types, materials and proportions.
  */
 
 export interface Guide {
@@ -12,7 +12,7 @@ export interface Guide {
   metaDescription: string;
   totalTime?: string;
   steps: { name: string; text: string }[];
-  /** Relaterade outfit-kategorier för cross-link på sidan. */
+  /** Related outfit categories for cross-linking on the page. */
   related?: {
     styles?: string[];
     garments?: { gender: "dam" | "herr"; garment: string }[];
@@ -22,80 +22,80 @@ export interface Guide {
 
 export const GUIDES: Guide[] = [
   {
-    slug: "skandinavisk-minimalism",
-    title: "Skandinavisk minimalism — guide till stilen",
+    slug: "scandinavian-minimalism",
+    title: "Scandinavian minimalism — a guide to the style",
     intro:
-      "Skandinavisk minimalism är en av de mest distinkta nordiska stilarna och bygger på neutrala färgpaletter, rena silhuetter och plagg av hög materialkvalitet. Stilen prioriterar passform och hållbarhet framför trender, och fungerar i alla åldrar.",
+      "Scandinavian minimalism is one of the most distinct Nordic styles and rests on neutral colour palettes, clean silhouettes and pieces of high material quality. It prioritises fit and durability over trends, and works at any age.",
     metaDescription:
-      "Guide till skandinavisk minimalism inom mode. Lär dig grunderna i den nordiska stilen — färgpalett, plagg, material och proportioner.",
+      "A guide to Scandinavian minimalism in fashion. Learn the fundamentals of the Nordic style — colour palette, garments, materials and proportions.",
     totalTime: "PT15M",
     steps: [
       {
-        name: "Bygg en neutral basgarderob",
-        text: "Börja med plagg i svart, vit, beige, grå och marinblå. Dessa fem färger kombineras fritt och ger en lugn helhet. Undvik intensiva mönster i baslagret — det är ett medvetet val, inte tristess.",
+        name: "Build a neutral base wardrobe",
+        text: "Start with pieces in black, white, beige, grey and navy. These five colours combine freely and give a calm whole. Avoid bold patterns in the base layer — it's a deliberate choice, not dullness.",
       },
       {
-        name: "Välj naturmaterial",
-        text: "Skandinavisk minimalism vilar på material som åldras snyggt — ull, linne, bomull, läder, mocka och kashmir. Material syns i alla led: i fall, i hur en stickad tröja sitter, i hur skinnet på en sko bryts.",
+        name: "Choose natural materials",
+        text: "Scandinavian minimalism relies on materials that age well — wool, linen, cotton, leather, suede and cashmere. Material shows everywhere: in the drape, in how a knit sits, in how the leather of a shoe breaks in.",
       },
       {
-        name: "Prioritera passform över storlek",
-        text: "Plaggen ska vara väl skurna men inte tighta. Lite extra material i ärm och längd ger den oansträngda volymen som definierar stilen. Helt oversize eller helt åtsittande hör inte hemma här.",
+        name: "Prioritise fit over size",
+        text: "Pieces should be well cut but not tight. A little extra fabric in the sleeve and length gives the effortless volume that defines the style. Fully oversized or fully skin-tight doesn't belong here.",
       },
       {
-        name: "Lägg till en accent per outfit",
-        text: "En enda accent håller helheten lugn. Det kan vara en mörk röd skjorta, en kamel-färgad jacka eller en kontrasterande väska. Två accenter blir för mycket.",
+        name: "Add one accent per outfit",
+        text: "A single accent keeps the whole calm. It could be a deep red shirt, a camel jacket or a contrasting bag. Two accents is too much.",
       },
       {
-        name: "Håll accessoarerna minimala",
-        text: "En klocka, en tunn halskedja, en mindre väska. Smycken är dämpade — guld eller silver, sällan båda, aldrig statement. Mindre är inte fattigare, det är medvetet.",
+        name: "Keep accessories minimal",
+        text: "A watch, a fine necklace, a small bag. Jewellery is muted — gold or silver, rarely both, never statement. Less isn't poorer, it's deliberate.",
       },
       {
-        name: "Behåll plaggen länge",
-        text: "Skandinavisk minimalism är anti-fast-fashion i sin natur. Plaggen är tänkta att bäras i flera år. Investera i högre kvalitet på basen (ytterkläder, skor, jeans) och håll i resten.",
+        name: "Keep pieces for a long time",
+        text: "Scandinavian minimalism is anti-fast-fashion by nature. Pieces are meant to be worn for years. Invest in higher quality on the base (outerwear, shoes, jeans) and hold on to the rest.",
       },
     ],
     related: {
       styles: ["minimalism", "casual"],
-      colors: ["beige", "svart", "vit"],
+      colors: ["beige", "black", "white"],
     },
   },
   {
-    slug: "bygg-en-grundgarderob",
-    title: "Bygg en grundgarderob — capsule wardrobe på svenska",
+    slug: "build-a-core-wardrobe",
+    title: "Build a core wardrobe — a capsule wardrobe",
     intro:
-      "En grundgarderob, eller capsule wardrobe, är en kärngarderob där varje plagg går att kombinera med varje annat. För svenskt klimat behövs lager för fyra säsonger. Räkna med 30–40 plagg om man undantar underkläder och sportkläder.",
+      "A core wardrobe, or capsule wardrobe, is a wardrobe where every piece combines with every other. For a Nordic climate you need layers for four seasons. Count on 30–40 pieces excluding underwear and sportswear.",
     metaDescription:
-      "Guide till capsule wardrobe på svenska — så bygger du en grundgarderob med 30–40 plagg som täcker hela året.",
+      "A guide to the capsule wardrobe — how to build a core wardrobe of 30–40 pieces that covers the whole year.",
     totalTime: "PT30M",
     steps: [
       {
-        name: "Definiera din färgpalett",
-        text: "Välj tre baskärnfärger (t.ex. svart, vit, beige) och två accent-färger (t.ex. mörkgrönt, kamel). Varje nytt plagg måste passa minst en bas- och en accent-färg. Detta är vad som låter alla plagg kombineras.",
+        name: "Define your colour palette",
+        text: "Choose three core base colours (e.g. black, white, beige) and two accent colours (e.g. dark green, camel). Every new piece must fit at least one base and one accent colour. This is what lets every piece combine.",
       },
       {
-        name: "Skapa lager 1 — basplagg",
-        text: "T-shirts (3–5), långärmad bas-topp (2–3), strumpor och underkläder. Detta är bas under allt annat och slits snabbast. Köp bra kvalitet men inte premium — de behöver ändå bytas ut.",
+        name: "Build layer 1 — base pieces",
+        text: "T-shirts (3–5), long-sleeve base tops (2–3), socks and underwear. This sits under everything else and wears out fastest. Buy good quality but not premium — they'll need replacing anyway.",
       },
       {
-        name: "Skapa lager 2 — mellanlager",
-        text: "Stickade tröjor (3–4), skjortor eller blusar (3–4), eventuellt en blazer. Detta är plagget som syns mest i en outfit och tål mer investering. Tänk material före färg.",
+        name: "Build layer 2 — mid layer",
+        text: "Knits (3–4), shirts or blouses (3–4), maybe a blazer. This is the piece that shows most in an outfit and is worth more investment. Think material before colour.",
       },
       {
-        name: "Skapa lager 3 — ytterplagg",
-        text: "En vinterkappa, en regn- eller höstkappa, en lättare jacka för vår. Tre ytterplagg täcker alla temperaturer. Investera mest här — en bra kappa håller tio år.",
+        name: "Build layer 3 — outerwear",
+        text: "A winter coat, a rain or autumn coat, a lighter jacket for spring. Three outerwear pieces cover every temperature. Invest most here — a good coat lasts ten years.",
       },
       {
-        name: "Skapa lager 4 — byxor och kjolar",
-        text: "Två par jeans (en mörk, en ljus), ett par chinos, en mer formell byxa eller en kjol. Fyra underdelar räcker längre än de flesta tror om passformen är rätt.",
+        name: "Build layer 4 — trousers and skirts",
+        text: "Two pairs of jeans (one dark, one light), a pair of chinos, a more formal trouser or a skirt. Four bottoms go further than most people think if the fit is right.",
       },
       {
-        name: "Skapa skofloran",
-        text: "Vita sneakers, läderboots, en mer formell sko (loafers, derbys, klacksko), regnboots eller -skor. Fyra par täcker alla situationer; fler är trevligt men inte nödvändigt.",
+        name: "Build the shoe set",
+        text: "White sneakers, leather boots, a more formal shoe (loafers, derbies, heels), rain boots or shoes. Four pairs cover every situation; more is nice but not necessary.",
       },
       {
-        name: "Audit:a en gång om året",
-        text: "Vid ett tillfälle per säsong: gå igenom garderoben och ta ut vad du inte burit på 12 månader. Sälj eller skänk. En capsule wardrobe är inte statisk — den växer långsamt och rensas medvetet.",
+        name: "Audit once a year",
+        text: "Once per season: go through the wardrobe and pull out anything you haven't worn in 12 months. Sell or donate. A capsule wardrobe isn't static — it grows slowly and is cleared deliberately.",
       },
     ],
     related: {
@@ -103,33 +103,33 @@ export const GUIDES: Guide[] = [
     },
   },
   {
-    slug: "smart-casual-jobb",
-    title: "Smart casual för jobb — så stylar du det",
+    slug: "smart-casual-for-work",
+    title: "Smart casual for work — how to style it",
     intro:
-      "Smart casual är den mest använda dresscoden för moderna kontorsmiljöer. Den balanserar mellan formellt och avslappnat och kräver att man förstår vad som signalerar respekt utan att vara stelt.",
+      "Smart casual is the most common dress code for modern office environments. It sits between formal and relaxed and requires you to understand what signals respect without being stiff.",
     metaDescription:
-      "Guide till smart casual för jobbet. Så bygger du outfits som signalerar professionellt utan att vara stelt — för dam och herr.",
+      "A guide to smart casual for work. How to build outfits that signal professional without being stiff — for women and men.",
     totalTime: "PT10M",
     steps: [
       {
-        name: "Välj underdel",
-        text: "Mörka jeans utan slitningar, chinos i beige eller mörkgrön ton, eller en mörk mid-rise byxa eller kjol. Joggers, shorts eller jeans med hål hör inte hit. Längden ska vara klar — antingen klippt vid ankel eller på fotled.",
+        name: "Choose the bottom",
+        text: "Dark jeans without distressing, chinos in a beige or dark green tone, or a dark mid-rise trouser or skirt. Joggers, shorts or ripped jeans don't belong here. The length should be clear — either cropped at the ankle or at the ankle bone.",
       },
       {
-        name: "Bygg överdelen i lager",
-        text: "Ett t-shirts-lager är för informellt; en blus eller skjorta är basen. Lägg en stickad tröja, en blazer eller en cardigan över. Två lager är minimum för att inte se underklädd ut.",
+        name: "Build the top in layers",
+        text: "A t-shirt layer is too informal; a blouse or shirt is the base. Add a knit, a blazer or a cardigan over it. Two layers is the minimum to not look underdressed.",
       },
       {
-        name: "Välj skor som binder samman",
-        text: "Läderskor eller minimalistiska sneakers (vita, beige eller svarta). Inga löparskor, inga klackar över 5 cm. Skon ska sitta rent under byxan och inte distrahera från resten.",
+        name: "Choose shoes that tie it together",
+        text: "Leather shoes or minimalist sneakers (white, beige or black). No running shoes, no heels over 5 cm. The shoe should sit cleanly under the trouser and not distract from the rest.",
       },
       {
-        name: "Håll accessoarerna kontrollerade",
-        text: "Klocka, ett par diskreta örhängen eller en tunn kedja, en väska i läder eller canvas. Inga statement-smycken, inga synliga logotyper. Bältet matchas mot skon i ton.",
+        name: "Keep accessories controlled",
+        text: "A watch, a pair of discreet earrings or a fine chain, a bag in leather or canvas. No statement jewellery, no visible logos. The belt is matched to the shoe in tone.",
       },
       {
-        name: "Justera efter företagskulturen",
-        text: "På en advokatbyrå är smart casual närmare formellt; på ett techbolag närmare casual. Titta på chefen — kläd dig en nivå mer än kollegan, en nivå mindre än chefen. Det är säker zon.",
+        name: "Adjust to the company culture",
+        text: "At a law firm, smart casual is closer to formal; at a tech company, closer to casual. Look at the manager — dress one level above your colleague, one level below your manager. That's the safe zone.",
       },
     ],
     related: {
@@ -137,72 +137,72 @@ export const GUIDES: Guide[] = [
     },
   },
   {
-    slug: "hostgarderob-sverige",
-    title: "Höstgarderob för svenskt klimat",
+    slug: "nordic-autumn-wardrobe",
+    title: "An autumn wardrobe for a Nordic climate",
     intro:
-      "Svensk höst innebär plusgrader på dagen och nära nollan på kvällen, regn flera gånger i veckan, och stark variation mellan augusti och november. Garderoben måste tåla alla dessa på samma dag.",
+      "A Nordic autumn means above freezing during the day and near zero in the evening, rain several times a week, and strong variation between August and November. The wardrobe has to handle all of that on the same day.",
     metaDescription:
-      "Guide till svensk höstgarderob — plagg, material och lager som klarar regn, vind och temperaturskiften under hela hösten.",
+      "A guide to a Nordic autumn wardrobe — pieces, materials and layers that handle rain, wind and temperature swings all season.",
     totalTime: "PT15M",
     steps: [
       {
-        name: "Investera i en bra trenchcoat eller läderjacka",
-        text: "Mellansäsongs-kappan är hösten viktigaste plagg. En trenchcoat i bomull eller gabardin tar regn och vind utan att bli för varm. Läderjacka funkar för torrare dagar och tål väder bättre än ull.",
+        name: "Invest in a good trench coat or leather jacket",
+        text: "The mid-season coat is autumn's most important piece. A trench coat in cotton or gabardine takes rain and wind without getting too warm. A leather jacket works for drier days and handles weather better than wool.",
       },
       {
-        name: "Stickade plagg som mellanlager",
-        text: "Två till tre stickade tröjor i olika tjocklek — en tunn (merinoull) som basplagg, en medium som ensamt överdel, en tjockare som ytterplagg under kappan. Mohair och kashmir är värmare men ömtåligare.",
+        name: "Knits as a mid layer",
+        text: "Two or three knits in different weights — a thin one (merino wool) as a base, a medium as a standalone top, a heavier one as a layer under the coat. Mohair and cashmere are warmer but more delicate.",
       },
       {
-        name: "Boots med ordentlig sula",
-        text: "Läder- eller mocka-boots med gummisula tar både regn och friska promenader. Skinnet behandlas före säsongen med vax eller impregnering. Två par roteras för att hinna torka ut mellan användningar.",
+        name: "Boots with a proper sole",
+        text: "Leather or suede boots with a rubber sole take both rain and brisk walks. Treat the leather before the season with wax or a waterproofer. Rotate two pairs so they can dry out between wears.",
       },
       {
-        name: "Jeans och chinos i tjockare material",
-        text: "Tunnare sommar-byxor byts mot 14oz+ denim eller chinos i kraftig bomull. Mörkare toner är hostsäsongens grundton. Veck och stryk hålls löst — höst är inte sommarens skarpa silhuett.",
+        name: "Jeans and chinos in a heavier fabric",
+        text: "Thinner summer trousers are swapped for 14oz+ denim or chinos in heavy cotton. Darker tones are the season's base note. Creases and pressing are kept loose — autumn isn't summer's sharp silhouette.",
       },
       {
-        name: "Skydda mot regn",
-        text: "Antingen en regnkappa över den vanliga kappan, eller ett paraply som ryms i väskan. Vid kraftigt regn (vanligt i oktober/november) är vattentät jacka ett måste. Vanliga ytterkläder klarar inte mer än duggregn.",
+        name: "Protect against rain",
+        text: "Either a rain coat over the usual coat, or an umbrella that fits in the bag. In heavy rain (common in October/November) a waterproof jacket is a must. Ordinary outerwear handles no more than drizzle.",
       },
       {
-        name: "Halsduk och mössa när det krävs",
-        text: "Från oktober blir halsduken obligatorisk. Tunn ylle är mångsidigast — funkar som accessoar tidigt i säsongen och som värme när det krävs. Mössa läggs till runt 5°C och under.",
+        name: "Scarf and hat when needed",
+        text: "From October a scarf becomes essential. Thin wool is the most versatile — it works as an accessory early in the season and as warmth when needed. A hat is added around 5°C and below.",
       },
     ],
     related: {
       styles: ["minimalism", "casual"],
-      colors: ["beige", "brun"],
+      colors: ["beige", "brown"],
     },
   },
   {
-    slug: "stylar-baggy-jeans",
-    title: "Hur stylar man baggy jeans",
+    slug: "how-to-style-baggy-jeans",
+    title: "How to style baggy jeans",
     intro:
-      "Baggy jeans har gått från statement till mainstream. Stilen kräver mer balansering än skinny jeans gjorde — när underdelen är voluminös måste resten av outfiten kompensera.",
+      "Baggy jeans have gone from statement to mainstream. The style needs more balancing than skinny jeans did — when the bottom is voluminous, the rest of the outfit has to compensate.",
     metaDescription:
-      "Guide till baggy jeans — så balanserar du proportioner, skor, midja och överdel för en outfit som ser medveten ut snarare än stor.",
+      "A guide to baggy jeans — how to balance proportions, shoes, waist and top for an outfit that reads deliberate rather than big.",
     totalTime: "PT8M",
     steps: [
       {
-        name: "Balansera med ett fitted ovandel",
-        text: "Volym i båda ändar gör hela outfiten amorf. En figursydd skjorta, en stickad tröja som sitter nära kroppen eller en vältuckad t-shirt skapar visuell motvikt. Oversize topp + baggy jeans funkar bara om ena är drastiskt kortare.",
+        name: "Balance with a fitted top",
+        text: "Volume at both ends makes the whole outfit shapeless. A tailored shirt, a knit that sits close to the body or a well-tucked t-shirt creates visual counterweight. An oversized top plus baggy jeans only works if one is drastically shorter.",
       },
       {
-        name: "Hantera midjan medvetet",
-        text: "Baggy jeans sitter ofta lågt eller mid-rise. Tuckas överdelen in syns midjan — det smalar av hela siluetten. Bälte i kontrasterande färg drar ögat och definierar punkten där proportionerna skiftar.",
+        name: "Handle the waist deliberately",
+        text: "Baggy jeans often sit low or mid-rise. Tuck the top in and the waist shows — that narrows the whole silhouette. A belt in a contrasting colour draws the eye and defines the point where the proportions shift.",
       },
       {
-        name: "Välj sko med rätt profil",
-        text: "Skon ska ta plats utan att slukas av jeansen. Sneakers med tjockare sula, loafers, eller chunky boots fungerar bäst. Tunna lågsneakers eller spetsiga finsko ser fel ut — de försvinner under tyget.",
+        name: "Choose a shoe with the right profile",
+        text: "The shoe should take up space without being swallowed by the jeans. Sneakers with a thicker sole, loafers, or chunky boots work best. Thin low sneakers or pointed dress shoes look wrong — they disappear under the fabric.",
       },
       {
-        name: "Justera längden",
-        text: "Baggy jeans ska antingen sluta strax över skon eller vika ner en gång ovanpå. Stack:ade (för långa, samlas vid foten) ger en specifik 90-tals-look. Avgör i förväg — mellanlägena ser ostädade ut.",
+        name: "Adjust the length",
+        text: "Baggy jeans should either stop just above the shoe or fold up once on top. Stacked (too long, pooling at the foot) gives a specific '90s look. Decide in advance — the in-between lengths look untidy.",
       },
       {
-        name: "Lägg till en jacka som följer voluymen",
-        text: "Bomberjacka, kort skinnjacka eller croppad trenchcoat. Långa raka kappor fungerar också om kappan har egen volym. Smala figursydda kappor krockar med jeansens silhuett.",
+        name: "Add a jacket that follows the volume",
+        text: "A bomber jacket, a short leather jacket or a cropped trench. Long straight coats also work if the coat has its own volume. Slim tailored coats clash with the jeans' silhouette.",
       },
     ],
     related: {
