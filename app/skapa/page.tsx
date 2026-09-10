@@ -69,9 +69,9 @@ interface Draft {
 }
 
 const REGION_OPTIONS: { code: string; label: string }[] = [
-  { code: "SE", label: "Sverige" },
-  { code: "NO", label: "Norge" },
-  { code: "DK", label: "Danmark" },
+  { code: "SE", label: "Sweden" },
+  { code: "NO", label: "Norway" },
+  { code: "DK", label: "Denmark" },
   { code: "FI", label: "Finland" },
 ];
 
@@ -88,31 +88,31 @@ const CATEGORIES = [
 // Common materials offered as autocomplete suggestions (free text — the user
 // can still type anything). Stored in tagged_items.material (migration 0036).
 const GARMENT_MATERIALS = [
-  "Bomull",
-  "Ekologisk bomull",
-  "Linne",
-  "Ull",
-  "Merinoull",
-  "Kashmir",
-  "Siden",
+  "Cotton",
+  "Organic cotton",
+  "Linen",
+  "Wool",
+  "Merino wool",
+  "Cashmere",
+  "Silk",
   "Denim",
-  "Skinn",
-  "Mocka",
-  "Mockaimitation",
-  "Läderimitation",
-  "Viskos",
+  "Leather",
+  "Suede",
+  "Faux suede",
+  "Faux leather",
+  "Viscose",
   "Lyocell",
   "Polyester",
   "Nylon",
-  "Akryl",
+  "Acrylic",
   "Fleece",
   "Mohair",
   "Tweed",
-  "Manchester",
+  "Corduroy",
   "Satin",
-  "Spets",
+  "Lace",
   "Jersey",
-  "Dun",
+  "Down",
 ] as const;
 
 const MAX_DRAFTS = 10;
@@ -171,10 +171,10 @@ export default function SkapaPage() {
   const categoryOptions = isHome ? HOME_CATEGORIES : CATEGORIES;
 
   const MODE_OPTIONS: { id: CreateMode; label: string }[] = [
-    { id: "dam", label: "Dam" },
-    { id: "herr", label: "Herr" },
+    { id: "dam", label: "Women" },
+    { id: "herr", label: "Men" },
     ...(canCreateHome
-      ? [{ id: "hem" as const, label: "Heminredning" }]
+      ? [{ id: "hem" as const, label: "Home interiors" }]
       : []),
   ];
 
@@ -225,7 +225,7 @@ export default function SkapaPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const addMoreInputRef = useRef<HTMLInputElement>(null);
 
-  // Paste-URL → autofill för nya taggar. Anropar samma preview-API som
+  // Paste-URL -> autofill for new tags. Calls the same preview API as
   // admin-editorn. Inga AI-anrop — bara OG-taggar + retailer-parsers.
   const [pasteUrl, setPasteUrl] = useState("");
   const [pasting, setPasting] = useState(false);
@@ -337,7 +337,7 @@ export default function SkapaPage() {
       }
 
       if (i < resized.length) {
-        setTopError(`Bara ${MAX_DRAFTS} bilder åt gången.`);
+        setTopError(`Only ${MAX_DRAFTS} images at a time.`);
       }
       return next;
     });
@@ -440,8 +440,8 @@ export default function SkapaPage() {
         is_affiliate: boolean;
       };
 
-      // Skapa en ny tagg i mitten av bilden — användaren kan dra den
-      // till rätt plats efter. Tom data fylls in manuellt.
+      // Create a new tag in the middle of the image - the user can drag it
+      // into place afterwards. Empty fields are filled in manually.
       const tag: DemoTag = {
         id: Date.now() + Math.random(),
         x: 50,
@@ -464,12 +464,12 @@ export default function SkapaPage() {
 
       if (!data.brand && !data.product_name) {
         setPasteError(
-          "Sidan svarade men vi hittade ingen produktdata — fyll i fälten manuellt.",
+          "The page responded but we found no product data - fill in the fields manually.",
         );
       }
     } catch (e) {
       setPasteError(
-        e instanceof Error ? e.message : "Kunde inte hämta från URL:en.",
+        e instanceof Error ? e.message : "Could not fetch from the URL.",
       );
     } finally {
       setPasting(false);
@@ -620,13 +620,13 @@ export default function SkapaPage() {
           } else {
             setDraftStatus(i, {
               status: "error",
-              error: result.error ?? "Okänt fel",
+              error: result.error ?? "Unknown error",
             });
           }
         } catch (e) {
           setDraftStatus(i, {
             status: "error",
-            error: e instanceof Error ? e.message : "Något gick fel",
+            error: e instanceof Error ? e.message : "Something went wrong",
           });
         }
       }
@@ -658,15 +658,15 @@ export default function SkapaPage() {
             transition={{ duration: 0.5 }}
           >
             <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-2">
-              Skapa{" "}
+              Create{" "}
               <span className="text-foreground-subtle">
-                {isHome ? "Rum" : "Outfit"}
+                {isHome ? "Room" : "Outfit"}
               </span>
             </h1>
             <p className="text-foreground-muted mb-6">
               {isHome
-                ? "Ladda upp en eller flera bilder. Tagga möblerna på varje, publicera allt samtidigt — varje rum får sin egen URL."
-                : "Ladda upp en eller flera bilder. Tagga plagg på varje, publicera allt samtidigt — varje outfit får sin egen URL."}
+                ? "Upload one or more images. Tag the furniture on each, publish them all at once - every room gets its own URL."
+                : "Upload one or more images. Tag the pieces on each, publish them all at once - every outfit gets its own URL."}
             </p>
           </motion.div>
 
@@ -675,7 +675,7 @@ export default function SkapaPage() {
               viewers who can see the home vertical (admins until launch). */}
           <div className="mb-8">
             <label className="text-sm font-medium text-foreground-muted block mb-2">
-              Vad skapar du?
+              What are you creating?
             </label>
             <div
               className={`grid gap-2 ${
@@ -741,7 +741,7 @@ export default function SkapaPage() {
                         href={`/profile/${profileUsername}`}
                         className="text-xs text-foreground underline hover:text-foreground/80"
                       >
-                        Visa min profil →
+                        View my profile →
                       </Link>
                     </div>
                   )}
@@ -767,7 +767,7 @@ export default function SkapaPage() {
                   {d.previewUrl ? (
                     <Image
                       src={d.previewUrl}
-                      alt={`Bild ${i + 1}`}
+                      alt={`Image ${i + 1}`}
                       fill
                       sizes="80px"
                       className="object-cover"
@@ -775,7 +775,7 @@ export default function SkapaPage() {
                     />
                   ) : (
                     <div className="absolute inset-0 bg-background-tertiary flex items-center justify-center text-foreground-subtle text-xs">
-                      Tom
+                      Empty
                     </div>
                   )}
                   <span className="absolute top-1 left-1 inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-background/70 text-[10px] font-semibold text-foreground">
@@ -797,7 +797,7 @@ export default function SkapaPage() {
                         removeDraft(i);
                       }}
                       role="button"
-                      aria-label="Ta bort bild"
+                      aria-label="Remove image"
                       className="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-background/70 hover:bg-red-500 flex items-center justify-center transition-colors"
                     >
                       <X className="h-3 w-3 text-white" />
@@ -812,7 +812,7 @@ export default function SkapaPage() {
                 >
                   <Plus className="h-5 w-5 text-foreground-muted" />
                   <span className="text-[10px] text-foreground-subtle">
-                    Lägg till
+                    Add
                   </span>
                 </label>
               )}
@@ -842,13 +842,13 @@ export default function SkapaPage() {
                 >
                   <Upload className="h-12 w-12 text-foreground-subtle mb-4 group-hover:text-foreground-muted transition-colors" />
                   <p className="text-foreground-muted font-medium">
-                    Dra & släpp dina bilder
+                    Drag & drop your images
                   </p>
                   <p className="text-sm text-foreground-subtle mt-1">
-                    eller klicka för att välja flera
+                    or click to select several
                   </p>
                   <p className="text-xs text-foreground-subtle mt-4">
-                    JPG, PNG, WebP — Max {MAX_DRAFTS} bilder
+                    JPG, PNG, WebP - max {MAX_DRAFTS} images
                   </p>
                 </label>
               ) : (
@@ -861,12 +861,12 @@ export default function SkapaPage() {
                   aria-label={
                     previewMode
                       ? undefined
-                      : "Klicka på bilden för att placera en tagg"
+                      : "Click the image to place a tag"
                   }
                 >
                   <Image
                     src={active.previewUrl!}
-                    alt="Förhandsvisning"
+                    alt="Preview"
                     fill
                     className="object-cover pointer-events-none transition-transform"
                     style={{ transform: `scale(${active.zoom})` }}
@@ -878,7 +878,7 @@ export default function SkapaPage() {
                   {!previewMode && active.tags.length === 0 && (
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pointer-events-none">
                       <p className="text-center text-sm font-medium text-white">
-                        Klicka på ett plagg för att tagga det
+                        Click a piece to tag it
                       </p>
                     </div>
                   )}
@@ -965,7 +965,7 @@ export default function SkapaPage() {
                   disabled={!active.file}
                 >
                   <Eye className="h-4 w-4" />
-                  {previewMode ? "Redigera" : "Förhandsvisa"}
+                  {previewMode ? "Edit" : "Preview"}
                 </PremiumButton>
               </div>
 
@@ -976,7 +976,7 @@ export default function SkapaPage() {
                       htmlFor="zoom"
                       className="text-xs uppercase tracking-[0.14em] text-foreground-muted"
                     >
-                      Zooma in bild
+                      Zoom image
                     </label>
                     {active.zoom > 1 && (
                       <button
@@ -984,7 +984,7 @@ export default function SkapaPage() {
                         onClick={() => updateActive({ zoom: 1 })}
                         className="text-[11px] text-foreground-subtle hover:text-foreground transition-colors"
                       >
-                        Återställ
+                        Reset
                       </button>
                     )}
                   </div>
@@ -1002,16 +1002,15 @@ export default function SkapaPage() {
                     className="w-full accent-foreground"
                   />
                   <p className="mt-1 text-[11px] text-foreground-subtle">
-                    Dra för att fylla rutan jämnt — alla bilder beskärs till
-                    samma format vid publicering.
+                    Drag to fill the frame evenly - all images are cropped to
+                    the same aspect at publish.
                   </p>
                 </div>
               )}
               {active.file && !previewMode && (
                 <p className="mt-3 text-xs text-foreground-subtle">
-                  Tips: dra prickarna för att flytta dem. {active.tags.length}{" "}
-                  {active.tags.length === 1 ? "tagg" : "taggar"} placerad
-                  {active.tags.length === 1 ? "" : "e"}.
+                  Tip: drag the dots to move them. {active.tags.length}{" "}
+                  {active.tags.length === 1 ? "tag" : "tags"} placed.
                 </p>
               )}
             </motion.div>
@@ -1052,7 +1051,7 @@ export default function SkapaPage() {
                   htmlFor="title"
                   className="text-sm font-medium text-foreground-muted block mb-2"
                 >
-                  Titel
+                  Title
                 </label>
                 <input
                   id="title"
@@ -1060,7 +1059,7 @@ export default function SkapaPage() {
                   required
                   value={active.title}
                   onChange={(e) => updateActive({ title: e.target.value })}
-                  placeholder="Ge din outfit ett namn..."
+                  placeholder="Give your outfit a name..."
                   disabled={active.status === "published" || publishing}
                   className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors disabled:opacity-60"
                 />
@@ -1071,7 +1070,7 @@ export default function SkapaPage() {
                   htmlFor="description"
                   className="text-sm font-medium text-foreground-muted block mb-2"
                 >
-                  Beskrivning
+                  Description
                 </label>
                 <textarea
                   id="description"
@@ -1079,7 +1078,7 @@ export default function SkapaPage() {
                   onChange={(e) =>
                     updateActive({ description: e.target.value })
                   }
-                  placeholder="Berätta om din outfit..."
+                  placeholder="Tell people about your outfit..."
                   rows={4}
                   disabled={active.status === "published" || publishing}
                   className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-foreground placeholder:text-foreground-subtle outline-none focus:border-foreground/30 transition-colors resize-none disabled:opacity-60"
@@ -1091,7 +1090,7 @@ export default function SkapaPage() {
                   htmlFor="category"
                   className="text-sm font-medium text-foreground-muted block mb-2"
                 >
-                  {isHome ? "Rum" : "Kategori"}
+                  {isHome ? "Room" : "Category"}
                 </label>
                 <select
                   id="category"
@@ -1101,7 +1100,7 @@ export default function SkapaPage() {
                   className="w-full rounded-xl bg-background-secondary border border-border px-4 py-3 text-foreground-subtle outline-none focus:border-foreground/30 transition-colors disabled:opacity-60"
                 >
                   <option value="">
-                    {isHome ? "Välj rum..." : "Välj kategori..."}
+                    {isHome ? "Select a room..." : "Select a category..."}
                   </option>
                   {categoryOptions.map((c) => (
                     <option key={c} value={c}>
@@ -1115,7 +1114,7 @@ export default function SkapaPage() {
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
                   Keywords ({active.keywords.length}/10){" "}
                   <span className="text-foreground-subtle font-normal">
-                    — valfritt, hjälper Google hitta din outfit
+                    - optional, helps Google find your outfit
                   </span>
                 </label>
                 <div className="flex flex-wrap gap-1.5 p-2 rounded-xl bg-background-secondary border border-border min-h-[48px]">
@@ -1129,7 +1128,7 @@ export default function SkapaPage() {
                         type="button"
                         onClick={() => removeKeyword(k)}
                         className="text-foreground/60 hover:text-foreground"
-                        aria-label={`Ta bort ${k}`}
+                        aria-label={`Remove ${k}`}
                       >
                         ×
                       </button>
@@ -1140,7 +1139,7 @@ export default function SkapaPage() {
                     placeholder={
                       active.keywords.length >= 10
                         ? "Max 10 keywords"
-                        : "Skriv + Enter"
+                        : "Type + Enter"
                     }
                     disabled={
                       active.keywords.length >= 10 ||
@@ -1167,7 +1166,7 @@ export default function SkapaPage() {
 
               <div>
                 <label className="text-sm font-medium text-foreground-muted block mb-2">
-                  {isHome ? "Taggade saker" : "Taggade plagg"} (
+                  {isHome ? "Tagged items" : "Tagged pieces"} (
                   {active.tags.length})
                 </label>
 
@@ -1178,17 +1177,17 @@ export default function SkapaPage() {
                   ))}
                 </datalist>
 
-                {/* Paste-URL → autofill. Tagg läggs i mitten av bilden,
-                    användaren drar dit den ska. Ingen AI — bara OG-taggar +
-                    retailer-parsers, så ~80–90% träffsäkert på stora butiker. */}
+                {/* Paste-URL -> autofill. The tag is placed in the middle of
+                    the image; the user drags it into place. No AI - just OG
+                    tags + retailer parsers, so ~80-90% accurate on big shops. */}
                 <div className="mb-4 rounded-xl border border-border bg-background-secondary p-4">
                   <p className="text-xs uppercase tracking-[0.14em] text-foreground-muted mb-2 flex items-center gap-1.5">
                     <Sparkles className="h-3 w-3" />
-                    Snabb-tagg från produkt-URL
+                    Quick tag from a product URL
                   </p>
                   <p className="text-xs text-foreground-subtle mb-3">
-                    Klistra in en länk till plagget — vi fyller i märke, namn,
-                    pris och bild automatiskt. Ändra fritt sedan.
+                    Paste a link to the piece - we fill in the brand, name,
+                    price and image automatically. Edit freely afterwards.
                   </p>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
@@ -1219,7 +1218,7 @@ export default function SkapaPage() {
                       ) : (
                         <Sparkles className="h-4 w-4" />
                       )}
-                      Hämta info
+                      Fetch info
                     </button>
                   </div>
                   {pasteError && (
@@ -1229,8 +1228,8 @@ export default function SkapaPage() {
 
                 {active.tags.length === 0 ? (
                   <p className="text-sm text-foreground-subtle">
-                    Klicka direkt på bilden för att placera en tagg, eller
-                    klistra in en produkt-URL ovan.
+                    Click directly on the image to place a tag, or paste a
+                    product URL above.
                   </p>
                 ) : (
                   <div className="space-y-3">
@@ -1241,13 +1240,13 @@ export default function SkapaPage() {
                       >
                         <div className="flex items-center justify-between">
                           <p className="text-sm font-medium text-foreground">
-                            {isHome ? "Sak" : "Plagg"} {i + 1}
+                            {isHome ? "Item" : "Piece"} {i + 1}
                           </p>
                           <IconButton
                             size="sm"
                             type="button"
                             onClick={() => removeTag(tag.id)}
-                            aria-label="Ta bort"
+                            aria-label="Remove"
                           >
                             <X className="h-4 w-4" />
                           </IconButton>
@@ -1283,7 +1282,7 @@ export default function SkapaPage() {
                         />
                         <input
                           type="text"
-                          placeholder="Namn (t.ex. Air Force 1)"
+                          placeholder="Name (e.g. Air Force 1)"
                           value={tag.name}
                           onChange={(e) =>
                             updateTag(tag.id, { name: e.target.value })
@@ -1292,7 +1291,7 @@ export default function SkapaPage() {
                         />
                         <input
                           type="url"
-                          placeholder="Köplänk (URL)"
+                          placeholder="Buy link (URL)"
                           value={tag.url}
                           onChange={(e) =>
                             updateTag(tag.id, { url: e.target.value })
@@ -1304,7 +1303,7 @@ export default function SkapaPage() {
                             type="number"
                             min="0"
                             step="1"
-                            placeholder="Pris"
+                            placeholder="Price"
                             value={tag.price}
                             onChange={(e) =>
                               updateTag(tag.id, { price: e.target.value })
@@ -1328,7 +1327,7 @@ export default function SkapaPage() {
                         </div>
                         <div>
                           <p className="text-[11px] uppercase tracking-wider text-foreground-subtle mb-1.5">
-                            Färg{tag.color ? ` — ${tag.color}` : ""}
+                            Colour{tag.color ? ` - ${tag.color}` : ""}
                           </p>
                           <ColorPicker
                             value={tag.color}
@@ -1342,12 +1341,12 @@ export default function SkapaPage() {
                         </div>
                         <div>
                           <p className="text-[11px] uppercase tracking-wider text-foreground-subtle mb-1.5">
-                            Material{tag.material ? ` — ${tag.material}` : ""}
+                            Material{tag.material ? ` - ${tag.material}` : ""}
                           </p>
                           <input
                             type="text"
                             list="garment-materials"
-                            placeholder="t.ex. Bomull, Ull, Linne, Denim, Skinn"
+                            placeholder="e.g. Cotton, Wool, Linen, Denim, Leather"
                             maxLength={60}
                             value={tag.material}
                             onChange={(e) =>
@@ -1361,7 +1360,7 @@ export default function SkapaPage() {
                         </div>
                         <input
                           type="url"
-                          placeholder="Bild-URL (valfritt)"
+                          placeholder="Image URL (optional)"
                           value={tag.imageUrl}
                           onChange={(e) =>
                             updateTag(tag.id, { imageUrl: e.target.value })
@@ -1380,10 +1379,10 @@ export default function SkapaPage() {
                             className="mt-0.5 h-4 w-4 rounded border-border bg-background-tertiary accent-white"
                           />
                           <span className="text-xs text-foreground-muted leading-snug">
-                            Affiliatelänk —{" "}
+                            Affiliate link -{" "}
                             <span className="text-foreground-subtle">
-                              kryssa i om du tjänar pengar när någon klickar.
-                              Outfit märks då med &quot;Reklam&quot;.
+                              tick this if you earn money when someone clicks.
+                              The outfit is then marked &quot;Ad&quot;.
                             </span>
                           </span>
                         </label>
@@ -1395,14 +1394,14 @@ export default function SkapaPage() {
                           className="text-[11px] uppercase tracking-wider text-foreground-subtle hover:text-foreground transition-colors text-left"
                         >
                           {tag.showRegions
-                            ? "Dölj region-länkar"
-                            : "+ Lägg till region-länkar"}
+                            ? "Hide region links"
+                            : "+ Add region links"}
                         </button>
                         {tag.showRegions && (
                           <div className="space-y-2 pt-1 border-t border-border/60">
                             <p className="text-[11px] text-foreground-subtle">
-                              Visa rätt butik per region. Lämna tomt för att
-                              använda standardlänken.
+                              Show the right shop per region. Leave blank to
+                              use the default link.
                             </p>
                             {REGION_OPTIONS.map((r) => (
                               <div
@@ -1414,7 +1413,7 @@ export default function SkapaPage() {
                                 </span>
                                 <input
                                   type="url"
-                                  placeholder={`Länk för ${r.label}`}
+                                  placeholder={`Link for ${r.label}`}
                                   value={tag.regionUrls[r.code] ?? ""}
                                   onChange={(e) =>
                                     updateTag(tag.id, {
@@ -1444,12 +1443,12 @@ export default function SkapaPage() {
                 onClick={handlePublishAll}
               >
                 {publishing
-                  ? `Publicerar ${
+                  ? `Publishing ${
                       drafts.findIndex((d) => d.status === "publishing") + 1
-                    } av ${drafts.length}…`
+                    } of ${drafts.length}...`
                   : pendingDrafts.length === 0
-                    ? "Allt publicerat"
-                    : `Publicera ${pendingDrafts.length} ${
+                    ? "All published"
+                    : `Publish ${pendingDrafts.length} ${
                         pendingDrafts.length === 1 ? "outfit" : "outfits"
                       }`}
               </PremiumButton>
@@ -1458,15 +1457,15 @@ export default function SkapaPage() {
                 pendingDrafts.length > 0 &&
                 !publishing && (
                   <p className="text-xs text-foreground-subtle">
-                    Varje bild behöver en titel innan du kan publicera.
+                    Every image needs a title before you can publish.
                   </p>
                 )}
 
               {incompleteTagCount > 0 && !publishing && (
                 <p className="text-xs text-amber-600">
                   {incompleteTagCount === 1
-                    ? "1 tagg saknar märke eller namn och publiceras inte. Fyll i den eller ta bort den."
-                    : `${incompleteTagCount} taggar saknar märke eller namn och publiceras inte. Fyll i dem eller ta bort dem.`}
+                    ? "1 tag is missing a brand or name and won't be published. Fill it in or remove it."
+                    : `${incompleteTagCount} tags are missing a brand or name and won't be published. Fill them in or remove them.`}
                 </p>
               )}
             </motion.div>

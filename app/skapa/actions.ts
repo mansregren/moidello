@@ -54,14 +54,14 @@ export async function createOutfit(
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: "Du måste logga in först." };
+  if (!user) return { error: "You must log in first." };
 
   // Publishing is admin-only while OUTFIT_CREATE_PUBLIC is off. The /skapa
   // page redirects non-admins away — enforce it here too so a hand-rolled
   // POST can't slip through.
   const isAdmin = await isCurrentUserAdmin();
   if (!canCreateOutfits(isAdmin)) {
-    return { error: "Det går inte att publicera outfits just nu." };
+    return { error: "You can’t publish outfits right now." };
   }
 
   // If an admin is impersonating someone, write the new outfit under that
@@ -86,19 +86,19 @@ export async function createOutfit(
   const tagsRaw = (formData.get("tags") as string | null) ?? "[]";
 
   if (!(image instanceof File) || image.size === 0) {
-    return { error: "Välj en bild." };
+    return { error: "Choose an image." };
   }
   if (!ACCEPTED_IMAGE_TYPES.includes(image.type)) {
-    return { error: "Bilden måste vara JPG, PNG eller WebP." };
+    return { error: "The image must be JPG, PNG or WebP." };
   }
   if (image.size > MAX_IMAGE_BYTES) {
-    return { error: "Bilden är för stor (max 10 MB)." };
+    return { error: "The image is too large (max 10 MB)." };
   }
   if (!title) {
-    return { error: "Skriv en titel." };
+    return { error: "Enter a title." };
   }
   if (vertical === "mode" && gender !== "dam" && gender !== "herr") {
-    return { error: "Välj kön." };
+    return { error: "Choose a category." };
   }
 
   // Keywords arrive as a JSON array; clean + cap the same way the admin
@@ -120,11 +120,11 @@ export async function createOutfit(
   try {
     const parsedTags = JSON.parse(tagsRaw);
     if (!Array.isArray(parsedTags)) {
-      return { error: "Kunde inte tolka taggar." };
+      return { error: "Could not parse tags." };
     }
     tags = parsedTags;
   } catch {
-    return { error: "Kunde inte tolka taggar." };
+    return { error: "Could not parse tags." };
   }
 
   // Upload image. Path lives under the target user (impersonated or self)
@@ -144,7 +144,7 @@ export async function createOutfit(
     });
 
   if (uploadError) {
-    return { error: `Bilduppladdning misslyckades: ${uploadError.message}` };
+    return { error: `Image upload failed: ${uploadError.message}` };
   }
 
   const {
@@ -205,7 +205,7 @@ export async function createOutfit(
   if (outfitError || !outfit) {
     await supabase.storage.from("outfits").remove([path]);
     return {
-      error: `Kunde inte spara outfit: ${outfitError?.message ?? "okänt fel"}`,
+      error: `Could not save the outfit: ${outfitError?.message ?? "unknown error"}`,
     };
   }
 
@@ -219,7 +219,7 @@ export async function createOutfit(
         buy_url: t.buyUrl.trim() || null,
         buy_urls:
           t.buyUrls && Object.keys(t.buyUrls).length > 0 ? t.buyUrls : null,
-        garment: t.garment || (vertical === "hem" ? "Dekoration" : "Toppar"),
+        garment: t.garment || (vertical === "hem" ? "Decor" : "Tops"),
         price:
           typeof t.price === "number" &&
           Number.isFinite(t.price) &&

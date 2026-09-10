@@ -84,7 +84,7 @@ export function BrandAutocomplete({
     <div ref={containerRef} className="relative">
       <input
         type="text"
-        placeholder="Märke (t.ex. Nike)"
+        placeholder="Brand (e.g. Nike)"
         value={brand}
         onChange={(e) => onChangeBrand(e.target.value)}
         onFocus={() => hits.length > 0 && setOpen(true)}
@@ -98,7 +98,7 @@ export function BrandAutocomplete({
         <div className="absolute z-30 mt-1 left-0 right-0 rounded-xl bg-background-secondary border border-border shadow-2xl max-h-72 overflow-y-auto">
           <p className="px-3 pt-3 pb-2 text-[10px] uppercase tracking-wider text-foreground-subtle inline-flex items-center gap-1.5">
             <Search className="h-3 w-3" />
-            Föreslagna plagg från katalogen
+            Suggested pieces from the catalogue
           </p>
           <ul className="pb-2">
             {hits.map((h) => (
