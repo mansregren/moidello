@@ -7,7 +7,6 @@ const footerLinks = {
   Platform: [
     { href: "/", label: "Home" },
     { href: "/upptack", label: "Discover" },
-    { href: "/trendigt", label: "Trending" },
     ...(OUTFIT_CREATE_PUBLIC ? [{ href: "/skapa", label: "Create" }] : []),
   ],
   Company: [

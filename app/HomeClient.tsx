@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ChevronRight, Sparkles, Search, Plus } from "lucide-react";
+import { ChevronRight, Search, Plus } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
@@ -142,13 +142,6 @@ export default function HomeClient({
                   >
                     <Search className="h-4 w-4" />
                     Explore
-                  </Link>
-                  <Link
-                    href="/trendigt"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/30 text-white px-5 py-2.5 text-sm font-medium transition-colors hover:bg-white/10"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    Trending now
                   </Link>
                 </div>
               </motion.div>
