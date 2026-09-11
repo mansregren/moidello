@@ -13,21 +13,12 @@ import { useGender, matchesGenderFilter } from "@/lib/gender-context";
 import { cn } from "@/lib/utils";
 import type { Outfit } from "@/lib/types";
 
-type FilterCategory =
-  | "garment"
-  | "style"
-  | "brand"
-  | "color"
-  | "season"
-  | "price";
+type FilterCategory = "garment" | "style" | "brand";
 
 interface FilterState {
   garment: Set<string>;
   style: Set<string>;
   brand: Set<string>;
-  color: Set<string>;
-  season: Set<string>;
-  price: Set<string>;
 }
 
 interface ActiveChip {
@@ -40,23 +31,14 @@ const EMPTY_FILTERS: FilterState = {
   garment: new Set(),
   style: new Set(),
   brand: new Set(),
-  color: new Set(),
-  season: new Set(),
-  price: new Set(),
 };
 
-const COLORS = ["Black", "White", "Beige", "Pastel", "Colourful"];
-const SEASONS = ["Summer", "Autumn", "Winter", "Spring"];
-const PRICES = ["Budget", "Mid", "Premium", "Luxury"];
 const STYLES = ["Streetwear", "Minimalism", "Vintage", "Luxury", "Casual", "Sporty"];
 
 const CATEGORY_LABELS: Record<FilterCategory, string> = {
   garment: "Garment",
   style: "Style",
   brand: "Brand",
-  color: "Colour",
-  season: "Season",
-  price: "Price",
 };
 
 export default function UpptackClient({
@@ -79,12 +61,7 @@ export default function UpptackClient({
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const totalActive =
-    filters.garment.size +
-    filters.style.size +
-    filters.brand.size +
-    filters.color.size +
-    filters.season.size +
-    filters.price.size;
+    filters.garment.size + filters.style.size + filters.brand.size;
 
   const activeChips: ActiveChip[] = useMemo(() => {
     const chips: ActiveChip[] = [];
@@ -128,7 +105,6 @@ export default function UpptackClient({
         const hit = o.tags.some((t) => filters.brand.has(t.brand));
         if (!hit) return false;
       }
-      // Color/season/price are dummy filters in phase 1 — always pass-through
       return true;
     });
   }, [search, gender, filters, outfits]);
@@ -234,27 +210,6 @@ export default function UpptackClient({
                 <BrandList
                   selected={filters.brand}
                   onToggle={(v) => toggleFilter("brand", v)}
-                />
-              </FilterDropdown>
-              <FilterDropdown label="Colour" badge={filters.color.size}>
-                <CheckList
-                  values={COLORS}
-                  selected={filters.color}
-                  onToggle={(v) => toggleFilter("color", v)}
-                />
-              </FilterDropdown>
-              <FilterDropdown label="Season" badge={filters.season.size}>
-                <CheckList
-                  values={SEASONS}
-                  selected={filters.season}
-                  onToggle={(v) => toggleFilter("season", v)}
-                />
-              </FilterDropdown>
-              <FilterDropdown label="Price" badge={filters.price.size}>
-                <CheckList
-                  values={PRICES}
-                  selected={filters.price}
-                  onToggle={(v) => toggleFilter("price", v)}
                 />
               </FilterDropdown>
 
@@ -454,30 +409,6 @@ function FilterPanel({
         <BrandList
           selected={filters.brand}
           onToggle={(v) => onToggle("brand", v)}
-        />
-      </Accordion>
-
-      <Accordion title="Colour" badge={filters.color.size}>
-        <CheckList
-          values={COLORS}
-          selected={filters.color}
-          onToggle={(v) => onToggle("color", v)}
-        />
-      </Accordion>
-
-      <Accordion title="Season" badge={filters.season.size}>
-        <CheckList
-          values={SEASONS}
-          selected={filters.season}
-          onToggle={(v) => onToggle("season", v)}
-        />
-      </Accordion>
-
-      <Accordion title="Price" badge={filters.price.size}>
-        <CheckList
-          values={PRICES}
-          selected={filters.price}
-          onToggle={(v) => onToggle("price", v)}
         />
       </Accordion>
     </div>
