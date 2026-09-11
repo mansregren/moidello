@@ -208,12 +208,6 @@ function BrandShell({
                       <p className="text-sm text-foreground line-clamp-2">
                         {p.name}
                       </p>
-                      {p.price !== null && p.price > 0 && (
-                        <p className="mt-1 text-sm font-semibold text-foreground tabular-nums">
-                          {p.price.toLocaleString("sv-SE")}{" "}
-                          {p.currency ?? "SEK"}
-                        </p>
-                      )}
                       {p.buy_url && (
                         <UserLink
                           href={p.buy_url}

@@ -760,11 +760,6 @@ function SavedItemGrid({ items }: { items: SavedItem[] }) {
             <p className="text-sm font-medium text-foreground mt-0.5 line-clamp-2">
               {it.name}
             </p>
-            {it.price !== null && it.price > 0 && (
-              <p className="text-sm font-semibold text-foreground mt-1">
-                {it.price.toLocaleString("sv-SE")} {it.currency ?? "SEK"}
-              </p>
-            )}
           </div>
         </Link>
       ))}

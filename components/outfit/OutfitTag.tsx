@@ -51,11 +51,6 @@ export function OutfitTag({ tag, outfitId, region }: OutfitTagProps) {
             )}
           </p>
           <p className="text-sm font-medium text-foreground">{tag.name}</p>
-          {tag.price > 0 && (
-            <p className="text-sm font-semibold text-foreground mt-1">
-              {tag.price.toLocaleString("sv-SE")} {tag.currency}
-            </p>
-          )}
           {href && (
             <a
               href={href}

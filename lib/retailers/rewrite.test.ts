@@ -22,6 +22,7 @@ import { arket } from "./arket";
 import { nakd } from "./nakd";
 import { nelly } from "./nelly";
 import { filippak } from "./filippak";
+import { cainte } from "./cainte";
 import type { Retailer, Locale } from "./types";
 
 function rewriteUrl(retailer: Retailer, raw: string, target: Locale): URL {
@@ -178,6 +179,33 @@ const PATH_CASES: PathRetailerCase[] = [
     },
     bare: "https://www.filippa-k.com/women/dresses",
   },
+  {
+    name: "cainte",
+    retailer: cainte,
+    urls: {
+      se: "https://cainte.com/en-se/products/coralseek-white-quartz",
+      de: "https://cainte.com/de-de/products/coralseek-white-quartz",
+      gb: "https://cainte.com/en-gb/products/coralseek-white-quartz",
+      dk: "https://cainte.com/en-dk/products/coralseek-white-quartz",
+      fr: "https://cainte.com/fr-fr/products/coralseek-white-quartz",
+    },
+    bare: "https://cainte.com/products/coralseek-white-quartz",
+    foreignLocaleUrl: {
+      // en-us is locale-shaped but not a market we rewrite TO (verified
+      // 404 live) — must still REPLACE, never prepend onto.
+      url: "https://cainte.com/en-us/products/coralseek-white-quartz",
+      expectAfter: (target) => {
+        const seg: Record<string, string> = {
+          se: "en-se",
+          de: "de-de",
+          gb: "en-gb",
+          dk: "en-dk",
+          fr: "fr-fr",
+        };
+        return `https://cainte.com/${seg[target] ?? seg.se}/products/coralseek-white-quartz`;
+      },
+    },
+  },
 ];
 
 for (const c of PATH_CASES) {
@@ -277,6 +305,7 @@ describe("rewrite invariants across all retailers", () => {
     nakd,
     nelly,
     filippak,
+    cainte,
   ] as const;
 
   test("no retailer produces a double-locale path", () => {

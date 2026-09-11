@@ -4,7 +4,7 @@ Each `.ts` file in this folder is a *retailer module* — a small adapter that
 teaches Moidello how to extract product metadata from a retailer's HTML and
 how to rewrite a product URL to the visitor's locale.
 
-The 9 retailers currently shipped:
+The 10 retailers currently shipped:
 
 | Module          | Domain            | Rewrite style              | Locales |
 |-----------------|-------------------|----------------------------|---------|
@@ -17,6 +17,7 @@ The 9 retailers currently shipped:
 | `nakd.ts`       | `na-kd.com`       | path segment `/<lang>/` or `/<lang>-<country>/` | 12 |
 | `nelly.ts`      | `nelly.com`       | path segment `/<2>/`       | 4 |
 | `filippak.ts`   | `filippa-k.com`   | path segment `/<lang>-<country>/` | 15 |
+| `cainte.ts`     | `cainte.com`      | path segment `/<lang>-<country>/` | 13 |
 
 There are also five *stub* retailers in `stubs.ts` (acnestudios, toteme,
 ganni, sezane, mango) — they recognise the domain and tag the retailer-id

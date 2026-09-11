@@ -123,12 +123,6 @@ export default async function ProduktPage({
                 </span>
               )}
 
-              {item.price > 0 && (
-                <p className="mt-6 text-2xl md:text-3xl font-semibold text-foreground tabular-nums">
-                  {item.price.toLocaleString("sv-SE")} {item.currency}
-                </p>
-              )}
-
               <div className="mt-7 flex flex-wrap items-center gap-3">
                 {isUsableBuyUrl(item.buyUrl) && (
                   <UserLink

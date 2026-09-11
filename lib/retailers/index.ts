@@ -15,6 +15,7 @@ import { nakd } from "./nakd";
 import { nelly } from "./nelly";
 import { filippak } from "./filippak";
 import { asos } from "./asos";
+import { cainte } from "./cainte";
 import {
   acnestudios,
   toteme,
@@ -34,6 +35,7 @@ const RETAILERS: Retailer[] = [
   nelly,
   filippak,
   asos,
+  cainte,
   acnestudios,
   toteme,
   ganni,

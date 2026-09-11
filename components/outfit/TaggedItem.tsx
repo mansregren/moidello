@@ -85,11 +85,6 @@ export function TaggedItemCard({
           <p className="text-sm font-medium text-foreground mt-1 line-clamp-1">
             {item.name}
           </p>
-          {item.price > 0 && (
-            <p className="text-sm text-foreground/90 mt-0.5 tabular-nums">
-              {item.price.toLocaleString("sv-SE")} {item.currency}
-            </p>
-          )}
         </Link>
 
         {/* Action buttons — compact, icon-only on mobile */}

@@ -238,12 +238,6 @@ export function ItemShareCard({
           <p className="text-sm font-medium text-foreground mt-0.5 line-clamp-2">
             {preview.name}
           </p>
-          {preview.price !== null && preview.price > 0 && (
-            <p className="text-sm font-semibold text-foreground mt-1">
-              {preview.price.toLocaleString("sv-SE")}{" "}
-              {preview.currency ?? "SEK"}
-            </p>
-          )}
         </div>
       </Link>
       {preview.buy_url &&
