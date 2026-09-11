@@ -854,7 +854,7 @@ export default function SkapaPage() {
               ) : (
                 <div
                   onClick={handleImageClick}
-                  className={`relative aspect-[3/4] rounded-2xl bg-background-secondary overflow-hidden select-none ${
+                  className={`relative aspect-[3/4] select-none ${
                     previewMode ? "cursor-default" : "cursor-crosshair"
                   }`}
                   role={previewMode ? undefined : "button"}
@@ -864,24 +864,31 @@ export default function SkapaPage() {
                       : "Click the image to place a tag"
                   }
                 >
-                  <Image
-                    src={active.previewUrl!}
-                    alt="Preview"
-                    fill
-                    className="object-cover pointer-events-none transition-transform"
-                    style={{ transform: `scale(${active.zoom})` }}
-                    sizes="(min-width: 1024px) 50vw, 100vw"
-                    unoptimized
-                    draggable={false}
-                  />
+                  {/* Image + empty-state overlay clip to the rounded frame.
+                      Tag markers live OUTSIDE this clipped layer (siblings,
+                      not children) so the delete-badge's negative offset
+                      never gets cut off near the edges (was: badge vanished
+                      when a tag was dragged close to top/right). */}
+                  <div className="absolute inset-0 rounded-2xl bg-background-secondary overflow-hidden pointer-events-none">
+                    <Image
+                      src={active.previewUrl!}
+                      alt="Preview"
+                      fill
+                      className="object-cover transition-transform"
+                      style={{ transform: `scale(${active.zoom})` }}
+                      sizes="(min-width: 1024px) 50vw, 100vw"
+                      unoptimized
+                      draggable={false}
+                    />
 
-                  {!previewMode && active.tags.length === 0 && (
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pointer-events-none">
-                      <p className="text-center text-sm font-medium text-white">
-                        Click a piece to tag it
-                      </p>
-                    </div>
-                  )}
+                    {!previewMode && active.tags.length === 0 && (
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                        <p className="text-center text-sm font-medium text-white">
+                          Click a piece to tag it
+                        </p>
+                      </div>
+                    )}
+                  </div>
 
                   {active.tags.map((tag, i) => (
                     <div
@@ -1232,7 +1239,7 @@ export default function SkapaPage() {
                     product URL above.
                   </p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {active.tags.map((tag, i) => (
                       <div
                         key={tag.id}
