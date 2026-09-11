@@ -132,7 +132,7 @@ export default async function RootLayout({
       lang="en"
       className={`${inter.variable} ${anton.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+      <body className="min-h-full flex flex-col bg-background text-foreground overflow-x-hidden">
         {/* Site-wide structured data: Organization + WebSite (with sitelinks
             search box). Page-level JSON-LD goes inside the route components. */}
         <JsonLd data={siteJsonLd()} />
