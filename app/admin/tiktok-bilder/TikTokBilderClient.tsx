@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Download, Hash, Check, Sparkles } from "lucide-react";
 import { PaketModal } from "./PaketModal";
 import { BulkPaketModal } from "./BulkPaketModal";
-import { shareOrSavePhotos } from "./share-files";
+import { shareOrSavePhotos } from "@/lib/share-files";
 
 interface OutfitTagLite {
   id: string;

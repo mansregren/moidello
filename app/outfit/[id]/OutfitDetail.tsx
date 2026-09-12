@@ -26,6 +26,7 @@ import {
 import { TrackView } from "@/components/outfit/TrackView";
 import { AddToBoardButton } from "@/components/outfit/AddToBoardButton";
 import { ShareButton } from "@/components/shared/ShareButton";
+import { SaveForTikTokButton } from "@/components/outfit/SaveForTikTokButton";
 import { ShareToDmSheet } from "@/components/shared/ShareToDmSheet";
 import { ReportButton } from "@/components/shared/ReportButton";
 import { HIDE_CREATORS } from "@/lib/flags";
@@ -307,6 +308,7 @@ export default function OutfitDetail({
                   label="Share link"
                   variant="outline"
                 />
+                {isPersisted && <SaveForTikTokButton outfitId={outfit.id} />}
                 {isPersisted && user?.id !== outfit.creator.id && (
                   <ReportButton targetType="outfit" targetId={outfit.id} />
                 )}

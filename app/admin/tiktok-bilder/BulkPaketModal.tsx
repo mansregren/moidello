@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X, Copy, Check, RefreshCw, Download } from "lucide-react";
-import { shareOrSavePhotos } from "./share-files";
+import { shareOrSavePhotos } from "@/lib/share-files";
 
 interface OutfitInput {
   id: string;
