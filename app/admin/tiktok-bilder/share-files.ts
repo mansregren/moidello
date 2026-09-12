@@ -23,43 +23,46 @@ function isIOS(): boolean {
 
 export async function shareOrSavePhotos(files: File[]): Promise<void> {
   const ios = isIOS();
-  const canShareAPI =
-    typeof navigator !== "undefined" && typeof navigator.canShare === "function";
+  // navigator.canShare() lögnar på vissa iOS-versioner (svarar nej trots
+  // att share() hade fungerat) — så vi förlitar oss inte på den som grind,
+  // bara på att navigator.share faktiskt finns, och försöker på riktigt.
+  const canShareFn =
+    typeof navigator !== "undefined" && typeof navigator.share === "function";
 
-  if (canShareAPI && navigator.canShare({ files })) {
+  if (canShareFn) {
     try {
       await navigator.share({ files });
       return;
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
-      // iOS Safari delar flera filer på en gång opålitligt (kastar även
-      // om canShare({files}) sa ja) — fall vidare till en-fil-i-taget
-      // nedan istället för att ge upp direkt.
+      // iOS Safari delar flera filer på en gång opålitligt — fall vidare
+      // till en-fil-i-taget nedan istället för att ge upp direkt.
     }
-  }
 
-  if (files.length > 1 && canShareAPI && navigator.canShare({ files: [files[0]] })) {
-    let shared = 0;
-    for (const file of files) {
-      try {
-        await navigator.share({ files: [file] });
-        shared++;
-      } catch (err) {
-        if (err instanceof Error && err.name === "AbortError") {
-          if (shared > 0) return;
-          continue;
+    if (files.length > 1) {
+      let shared = 0;
+      for (const file of files) {
+        try {
+          await navigator.share({ files: [file] });
+          shared++;
+        } catch (err) {
+          if (err instanceof Error && err.name === "AbortError") {
+            if (shared > 0) return;
+            continue;
+          }
+          // User-aktiveringen är troligen förbrukad — avbryt loopen,
+          // resten får sparas via long-press.
+          break;
         }
-        // User-aktiveringen är troligen förbrukad — avbryt loopen, resten
-        // får sparas via long-press.
-        break;
+      }
+      if (shared === files.length) return;
+      if (shared > 0) {
+        throw new Error(
+          `Saved ${shared} of ${files.length} images. Press and hold the rest below and choose Add to Photos.`,
+        );
       }
     }
-    if (shared === files.length) return;
-    if (shared > 0) {
-      throw new Error(
-        `Saved ${shared} of ${files.length} images. Press and hold the rest below and choose Add to Photos.`,
-      );
-    }
+
     if (ios) {
       throw new Error(
         "Saving via the share sheet failed. Press and hold an image below and choose Add to Photos.",
