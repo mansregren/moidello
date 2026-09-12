@@ -33,9 +33,9 @@ function shortLabel(brand: string, name: string): string {
 // --- HERO-variant: outfit + prickar + stor kod i footern ---
 
 const HERO_FRAME_W = 1000;
-const HERO_FRAME_H = 1375;
+const HERO_FRAME_H = 1525;
 const HERO_FRAME_X = (CANVAS_W - HERO_FRAME_W) / 2;
-const HERO_FRAME_Y = 70;
+const HERO_FRAME_Y = 55;
 
 function renderHero(outfit: Outfit) {
   const code = outfit.code ?? "—";
@@ -138,16 +138,16 @@ function renderHero(outfit: Outfit) {
           position: "absolute",
           left: 0,
           right: 0,
-          top: HERO_FRAME_Y + HERO_FRAME_H + 40,
+          top: HERO_FRAME_Y + HERO_FRAME_H + 25,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 8,
+          gap: 5,
         }}
       >
         <div
           style={{
-            fontSize: 20,
+            fontSize: 15,
             letterSpacing: "0.32em",
             textTransform: "uppercase",
             color: INK_MUTED,
@@ -159,7 +159,7 @@ function renderHero(outfit: Outfit) {
         <div
           style={{
             fontFamily: "Anton",
-            fontSize: 170,
+            fontSize: 110,
             lineHeight: 0.92,
             letterSpacing: "0.04em",
             color: INK,
@@ -170,12 +170,12 @@ function renderHero(outfit: Outfit) {
         </div>
         <div
           style={{
-            fontSize: 20,
+            fontSize: 15,
             letterSpacing: "0.18em",
             textTransform: "uppercase",
             color: INK_MUTED,
             display: "flex",
-            marginTop: 2,
+            marginTop: 1,
           }}
         >
           moidello.com
