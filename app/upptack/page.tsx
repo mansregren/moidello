@@ -20,7 +20,7 @@ export default async function UpptackPage() {
           path: "/upptack",
           name: "Discover outfits — Moidello",
           description:
-            "Browse outfits and filter by category and garment. Click to see the exact pieces and where to buy them.",
+            "Browse outfits by category. Click to see the exact pieces and where to buy them.",
           outfits,
         })}
       />
