@@ -30,15 +30,16 @@ function shortLabel(brand: string, name: string): string {
   return combined.length > 22 ? `${combined.slice(0, 21).trim()}…` : combined;
 }
 
-// --- HERO-variant: outfit + prickar + stor kod i footern ---
+// --- HERO-variant: outfit fullscreen + prickar + plagg-labels ---
+// Outfit-koden i footern borttagen tills vidare — bilden fyller hela
+// canvasen istället. Prickar + labels finns kvar.
 
-const HERO_FRAME_W = 1000;
-const HERO_FRAME_H = 1525;
-const HERO_FRAME_X = (CANVAS_W - HERO_FRAME_W) / 2;
-const HERO_FRAME_Y = 55;
+const HERO_FRAME_W = CANVAS_W;
+const HERO_FRAME_H = CANVAS_H;
+const HERO_FRAME_X = 0;
+const HERO_FRAME_Y = 0;
 
 function renderHero(outfit: Outfit) {
-  const code = outfit.code ?? "—";
   const imageUrl = absUrl(outfit.image);
   const dots = outfit.tags.map((tag) => ({
     id: tag.id,
@@ -69,9 +70,7 @@ function renderHero(outfit: Outfit) {
           width: HERO_FRAME_W,
           height: HERO_FRAME_H,
           display: "flex",
-          borderRadius: 28,
           overflow: "hidden",
-          boxShadow: "0 24px 60px -20px rgba(26,26,26,0.18)",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -131,55 +130,6 @@ function renderHero(outfit: Outfit) {
             )}
           </div>
         ))}
-      </div>
-
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          top: HERO_FRAME_Y + HERO_FRAME_H + 25,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 5,
-        }}
-      >
-        <div
-          style={{
-            fontSize: 15,
-            letterSpacing: "0.32em",
-            textTransform: "uppercase",
-            color: INK_MUTED,
-            display: "flex",
-          }}
-        >
-          Outfit Code
-        </div>
-        <div
-          style={{
-            fontFamily: "Anton",
-            fontSize: 110,
-            lineHeight: 0.92,
-            letterSpacing: "0.04em",
-            color: INK,
-            display: "flex",
-          }}
-        >
-          {code}
-        </div>
-        <div
-          style={{
-            fontSize: 15,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            color: INK_MUTED,
-            display: "flex",
-            marginTop: 1,
-          }}
-        >
-          moidello.com
-        </div>
       </div>
     </div>
   );
