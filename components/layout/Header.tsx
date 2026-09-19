@@ -184,7 +184,7 @@ export function Header() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed inset-0 md:absolute md:inset-0 z-50 md:z-10 flex flex-col bg-background/95 backdrop-blur-xl"
+              className="fixed inset-0 md:absolute md:inset-0 z-50 md:z-10 flex flex-col bg-background md:bg-background/95 md:backdrop-blur-xl"
               style={{ paddingTop: "env(safe-area-inset-top)" }}
               onSubmit={(e) => {
                 e.preventDefault();
