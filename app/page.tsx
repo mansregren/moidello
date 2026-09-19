@@ -25,10 +25,6 @@ export default async function HomePage() {
     pickBgs(["home-lifestyle"], HERO_POOL),
   ]);
 
-  // The homepage hero is a fixed image (no rotation) — the lifestyle
-  // banner further down still rotates per session.
-  const heroBg = "/images/bg/capferrat.webp";
-
   return (
     <>
       <JsonLd
@@ -43,7 +39,6 @@ export default async function HomePage() {
       <HomeClient
         outfits={outfits}
         creators={creators}
-        heroBg={heroBg}
         lifestyleBg={lifestyleBg}
       />
     </>

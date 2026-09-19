@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { ChevronRight, Search, Plus } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
+import { HeroSlideshow } from "@/components/home/HeroSlideshow";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { useGender, matchesGenderFilter } from "@/lib/gender-context";
@@ -15,15 +16,20 @@ import { canCreateOutfits, HIDE_CREATORS } from "@/lib/flags";
 import { getFollowingFeed } from "@/app/actions/engagement";
 import type { Outfit, User } from "@/lib/types";
 
+const HERO_SLIDES = [
+  "/images/hero/hero-1.jpg",
+  "/images/hero/hero-2.jpg",
+  "/images/hero/hero-3.jpg",
+  "/images/hero/hero-4.jpg",
+];
+
 export default function HomeClient({
   outfits,
   creators,
-  heroBg = "/images/bg/positano.webp",
   lifestyleBg = "/images/bg/parasols.webp",
 }: {
   outfits: Outfit[];
   creators: User[];
-  heroBg?: string;
   lifestyleBg?: string;
 }) {
   const { gender } = useGender();
@@ -71,13 +77,7 @@ export default function HomeClient({
       <main id="main" tabIndex={-1} className="flex-1">
         <section className="relative">
           <div className="relative h-[44vh] md:h-[60vh] min-h-[320px] overflow-hidden">
-            <Image
-              src={heroBg}
-              alt=""
-              fill
-              className="object-cover"
-              priority
-            />
+            <HeroSlideshow images={HERO_SLIDES} />
             {/* Dark scrim — heaviest at the bottom where the text sits, so
                 the white hero copy stays legible over any photo in both
                 themes. Intentionally NOT theme-tokenised (text-over-photo,
