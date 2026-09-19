@@ -9,47 +9,20 @@ import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { UserAvatar } from "@/components/user/UserAvatar";
-import { categories } from "@/lib/data";
 import { useGender, matchesGenderFilter } from "@/lib/gender-context";
 import { useAuth } from "@/lib/auth-context";
 import { canCreateOutfits, HIDE_CREATORS } from "@/lib/flags";
 import { getFollowingFeed } from "@/app/actions/engagement";
 import type { Outfit, User } from "@/lib/types";
 
-const CATEGORY_DESCRIPTIONS: Record<string, string> = {
-  Streetwear: "Edge meets comfort",
-  Minimalism: "Less is more",
-  Vintage: "Timeless & one-of-a-kind",
-  Casual: "Relaxed & easy",
-  Formal: "Tailored & polished",
-  Sporty: "Active everyday",
-  Preppy: "Classic & clean",
-};
-
-// Static cover per category — used when no real outfits exist for that
-// category yet. Avoids leaking placeholder outfit imagery in production.
-const CATEGORY_COVER: Record<string, string> = {
-  Streetwear: "/images/bg/harbor.webp",
-  Minimalism: "/images/bg/parasols.webp",
-  Vintage: "/images/bg/positano.webp",
-  Casual: "/images/bg/riviera.webp",
-  Formal: "/images/bg/boats.webp",
-  Sporty: "/images/bg/parasols.webp",
-  Preppy: "/images/bg/harbor.webp",
-};
-
-type CategoryCover = { category: string; gender: "herr" | "dam"; image: string };
-
 export default function HomeClient({
   outfits,
   creators,
-  categoryCovers = [],
   heroBg = "/images/bg/positano.webp",
   lifestyleBg = "/images/bg/parasols.webp",
 }: {
   outfits: Outfit[];
   creators: User[];
-  categoryCovers?: CategoryCover[];
   heroBg?: string;
   lifestyleBg?: string;
 }) {
@@ -91,17 +64,6 @@ export default function HomeClient({
         .slice(0, 6),
     [following, gender],
   );
-
-  // Real outfit image for a category card — strictly same-gender as the
-  // current filter. If the category has no outfit for this gender, fall
-  // back to the static background (never show the other gender's outfit).
-  const categoryImage = (cat: string): string => {
-    const match = categoryCovers.find(
-      (c) => c.category === cat && c.gender === gender,
-    );
-    if (match) return match.image;
-    return CATEGORY_COVER[cat] ?? "/images/bg/positano.webp";
-  };
 
   return (
     <>
@@ -150,58 +112,6 @@ export default function HomeClient({
         </section>
 
         <Container className="space-y-14 pt-10 md:pt-14">
-          {followingVisible.length > 0 && (
-            <Section
-              title="From people you follow"
-              href="/foljer"
-              seeAllLabel="Full feed"
-            >
-              <OutfitGrid outfits={followingVisible} columns={3} />
-            </Section>
-          )}
-
-          <Section
-            title="Browse categories"
-            href="/upptack"
-            seeAllLabel="All categories"
-          >
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-              {categories.map((cat, i) => (
-                <motion.div
-                  key={cat}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.2) }}
-                >
-                  <Link
-                    href={`/stil/${cat.toLowerCase()}`}
-                    aria-label={`${cat} — ${CATEGORY_DESCRIPTIONS[cat]}`}
-                    className="group relative block aspect-[4/5] rounded-2xl overflow-hidden"
-                  >
-                    <Image
-                      src={categoryImage(cat)}
-                      alt=""
-                      fill
-                      sizes="(min-width: 1024px) 22vw, (min-width: 640px) 33vw, 50vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      unoptimized={categoryImage(cat).startsWith("http")}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-                    <div className="absolute inset-x-3 bottom-3">
-                      <p className="font-heading text-lg md:text-xl uppercase tracking-tight text-white leading-tight">
-                        {cat}
-                      </p>
-                      <p className="text-[11px] text-white/70 mt-0.5">
-                        {CATEGORY_DESCRIPTIONS[cat]}
-                      </p>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </Section>
-
           <Section title="Latest on Moidello" href="/upptack">
             {recent.length > 0 ? (
               <OutfitGrid
@@ -227,6 +137,16 @@ export default function HomeClient({
               </div>
             )}
           </Section>
+
+          {followingVisible.length > 0 && (
+            <Section
+              title="From people you follow"
+              href="/foljer"
+              seeAllLabel="Full feed"
+            >
+              <OutfitGrid outfits={followingVisible} columns={3} />
+            </Section>
+          )}
 
           <motion.section
             initial={{ opacity: 0 }}

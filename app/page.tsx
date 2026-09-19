@@ -1,4 +1,4 @@
-import { fetchOutfits, fetchCategoryCovers } from "@/lib/queries";
+import { fetchOutfits } from "@/lib/queries";
 import { fetchTopCreatorsCached } from "@/lib/queries-cached";
 import { createPublicClient } from "@/lib/supabase/public";
 import { pickBgs, HERO_POOL } from "@/lib/session-background";
@@ -19,13 +19,11 @@ export const metadata = {
 
 export default async function HomePage() {
   const client = createPublicClient();
-  const [outfits, creators, [lifestyleBg], categoryCovers] =
-    await Promise.all([
-      fetchOutfits(12, client),
-      fetchTopCreatorsCached(6),
-      pickBgs(["home-lifestyle"], HERO_POOL),
-      fetchCategoryCovers(client),
-    ]);
+  const [outfits, creators, [lifestyleBg]] = await Promise.all([
+    fetchOutfits(12, client),
+    fetchTopCreatorsCached(6),
+    pickBgs(["home-lifestyle"], HERO_POOL),
+  ]);
 
   // The homepage hero is a fixed image (no rotation) — the lifestyle
   // banner further down still rotates per session.
@@ -45,7 +43,6 @@ export default async function HomePage() {
       <HomeClient
         outfits={outfits}
         creators={creators}
-        categoryCovers={categoryCovers}
         heroBg={heroBg}
         lifestyleBg={lifestyleBg}
       />
