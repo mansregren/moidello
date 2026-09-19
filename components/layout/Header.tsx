@@ -45,6 +45,19 @@ export function Header() {
     }
   }, [searchOpen]);
 
+  // Mobile search is a full-screen takeover (like MobileMenu), so lock
+  // background scroll while it's open — otherwise the feed behind it stays
+  // scrollable and the overlay reads as a stray floating bar instead of a
+  // proper modal.
+  useEffect(() => {
+    if (!searchOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [searchOpen]);
+
   const handleNavClick = (
     e: MouseEvent<HTMLAnchorElement>,
     authAction?: "create" | "profile"
@@ -161,7 +174,9 @@ export function Header() {
           <MobileMenu />
         </div>
 
-        {/* Search expansion */}
+        {/* Search expansion — full-screen takeover on mobile (matches
+            MobileMenu) so it never sits as a floating bar over a scrolled
+            feed; on desktop it stays an inline replacement of the header row. */}
         <AnimatePresence initial={false}>
           {searchOpen && (
             <motion.form
@@ -169,7 +184,8 @@ export function Header() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="absolute inset-0 flex items-center bg-background/95 backdrop-blur-xl px-4 md:px-6 z-10"
+              className="fixed inset-0 md:absolute md:inset-0 z-50 md:z-10 flex flex-col bg-background/95 backdrop-blur-xl"
+              style={{ paddingTop: "env(safe-area-inset-top)" }}
               onSubmit={(e) => {
                 e.preventDefault();
                 const q = searchInputRef.current?.value.trim();
@@ -179,17 +195,19 @@ export function Header() {
                 }
               }}
             >
-              <Search className="h-5 w-5 text-foreground-muted shrink-0" />
-              <input
-                ref={searchInputRef}
-                type="search"
-                name="q"
-                placeholder="Search outfits, brands, creators…"
-                className="flex-1 bg-transparent border-0 outline-none px-3 text-base text-foreground placeholder:text-foreground-subtle"
-              />
-              <IconButton aria-label="Close search" onClick={() => setSearchOpen(false)}>
-                <X className="h-5 w-5" />
-              </IconButton>
+              <div className="flex items-center h-14 md:h-20 px-4 md:px-6 gap-2 shrink-0">
+                <Search className="h-5 w-5 text-foreground-muted shrink-0" />
+                <input
+                  ref={searchInputRef}
+                  type="search"
+                  name="q"
+                  placeholder="Search outfits, brands, creators…"
+                  className="flex-1 bg-transparent border-0 outline-none px-3 text-base text-foreground placeholder:text-foreground-subtle"
+                />
+                <IconButton aria-label="Close search" onClick={() => setSearchOpen(false)}>
+                  <X className="h-5 w-5" />
+                </IconButton>
+              </div>
             </motion.form>
           )}
         </AnimatePresence>

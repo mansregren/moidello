@@ -202,6 +202,7 @@ export default function OutfitDetail({
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
+              className="min-w-0"
             >
               {!HIDE_CREATORS && (
                 <div className="flex items-center justify-between mb-6">
@@ -228,7 +229,7 @@ export default function OutfitDetail({
                 </div>
               )}
 
-              <h1 className="font-heading text-[32px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-1.5">
+              <h1 className="font-heading text-[32px] md:text-[48px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground mb-1.5 break-words">
                 {outfit.title}
               </h1>
               {outfit.code && (
@@ -250,7 +251,7 @@ export default function OutfitDetail({
                 </div>
               )}
 
-              <p className="text-foreground-muted mb-8">
+              <p className="text-foreground-muted mb-8 break-words">
                 {outfit.description}
               </p>
 
@@ -453,7 +454,7 @@ function CommentsSection({
                 size="sm"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-sm">
+                <p className="text-sm break-words">
                   <span className="font-medium text-foreground">
                     {comment.user.displayName}
                   </span>{" "}
