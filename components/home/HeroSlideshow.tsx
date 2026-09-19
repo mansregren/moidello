@@ -39,26 +39,13 @@ export function HeroSlideshow({ images }: { images: string[] }) {
           transition={{ duration: FADE_DURATION_S, ease: "easeInOut" }}
           className="absolute inset-0"
         >
-          {/* Source photos are ~736px wide phone shots — stretched full-bleed
-              with object-cover across a wide desktop viewport they turn
-              visibly blurry. This blurred, oversized copy fills the edges
-              (softness there is invisible) while the sharp copy below sits
-              contained at its native resolution, so it's never upscaled. */}
-          <Image
-            src={images[index]}
-            alt=""
-            fill
-            aria-hidden
-            sizes="100vw"
-            className="object-cover scale-110 blur-2xl opacity-50"
-          />
           <Image
             src={images[index]}
             alt=""
             fill
             priority={index === 0}
-            sizes="(min-width: 768px) 50vw, 100vw"
-            className="object-contain"
+            sizes="100vw"
+            className="object-cover"
           />
         </motion.div>
       </AnimatePresence>

@@ -78,7 +78,19 @@ export default function HomeClient({
       <main id="main" tabIndex={-1} className="flex-1">
         <section className="relative">
           <div className="relative h-[44vh] md:h-[60vh] min-h-[320px] overflow-hidden">
-            <HeroSlideshow images={HERO_SLIDES} />
+            <div className="md:hidden absolute inset-0">
+              <HeroSlideshow images={HERO_SLIDES} />
+            </div>
+            <div className="hidden md:block absolute inset-0">
+              <Image
+                src="/images/hero/hero-desktop.jpg"
+                alt=""
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
+              />
+            </div>
             {/* Dark scrim — heaviest at the bottom where the text sits, so
                 the white hero copy stays legible over any photo in both
                 themes. Intentionally NOT theme-tokenised (text-over-photo,
