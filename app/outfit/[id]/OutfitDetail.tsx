@@ -312,11 +312,7 @@ export default function OutfitDetail({
                 />
                 {isPersisted && <SaveForTikTokButton outfitId={outfit.id} />}
                 {isPersisted && viewerIsAdmin && (
-                  <SaveToPinterestButton
-                    imageUrl={outfit.image}
-                    pageUrl={outfitPath(outfit)}
-                    description={outfit.title}
-                  />
+                  <SaveToPinterestButton outfitId={outfit.id} />
                 )}
                 {isPersisted && user?.id !== outfit.creator.id && (
                   <ReportButton targetType="outfit" targetId={outfit.id} />

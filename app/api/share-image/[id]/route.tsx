@@ -7,8 +7,9 @@ export const runtime = "nodejs";
 const SITE_BASE = "https://moidello.com";
 
 // TikTok / Stories full-bleed canvas (1080x1920, 9:16).
-const CANVAS_W = 1080;
-const CANVAS_H = 1920;
+const TIKTOK_CANVAS = { w: 1080, h: 1920 };
+// Pinterest's recommended pin canvas (1000x1500, 2:3).
+const PINTEREST_CANVAS = { w: 1000, h: 1500 };
 const BG = "#FFFFFF";
 const INK = "#1A1A1A";
 
@@ -37,6 +38,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  const format = new URL(request.url).searchParams.get("format");
+  const { w: CANVAS_W, h: CANVAS_H } =
+    format === "pinterest" ? PINTEREST_CANVAS : TIKTOK_CANVAS;
 
   const [outfit, inter] = await Promise.all([
     fetchOutfitById(id),
