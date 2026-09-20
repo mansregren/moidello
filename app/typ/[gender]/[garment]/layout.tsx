@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { fetchOutfitsByGarment } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
-import { garmentsForGender, garmentQueryValue, canonicalGarment } from "@/lib/garments";
+import { garmentsForGender, garmentQueryValues, canonicalGarment } from "@/lib/garments";
 import { DAM_PUBLIC } from "@/lib/flags";
 
 const SITE = "Moidello";
@@ -32,7 +32,7 @@ export async function generateMetadata({
 
   const outfits = await fetchOutfitsByGarment(
     gender,
-    garmentQueryValue(gs),
+    garmentQueryValues(gs),
     createPublicClient(),
   );
 

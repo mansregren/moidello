@@ -3,6 +3,8 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { GUIDES } from "@/lib/guides";
 import { HOME_VERTICAL_PUBLIC, DAM_PUBLIC } from "@/lib/flags";
 import { HOME_ROOMS } from "@/lib/home-data";
+import { canonicalColorLabel } from "@/lib/colors";
+import { canonicalGarment } from "@/lib/garments";
 
 const BASE_URL = "https://moidello.com";
 
@@ -166,11 +168,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const garmentCounts = new Map<string, number>(); // key = "gender|garment"
   for (const r of tagDims) {
     if (r.color) {
-      const c = r.color.toLowerCase().trim();
+      // Canonicalize so a legacy Swedish value ("svart") and its English
+      // equivalent ("black") merge into one /farg page instead of two
+      // near-duplicate ones.
+      const raw = r.color.toLowerCase().trim();
+      const c = (canonicalColorLabel(raw) ?? raw).toLowerCase();
       if (c) colorCounts.set(c, (colorCounts.get(c) ?? 0) + 1);
     }
     if (r.outfits && r.garment) {
-      const g = r.garment.toLowerCase().trim();
+      const rawGarment = r.garment.toLowerCase().trim();
+      const g = (canonicalGarment(rawGarment) ?? rawGarment).toLowerCase();
       const key = `${r.outfits.gender}|${g}`;
       garmentCounts.set(key, (garmentCounts.get(key) ?? 0) + 1);
     }

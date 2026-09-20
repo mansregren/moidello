@@ -81,12 +81,45 @@ const EN_SLUG_TO_LEGACY: Record<string, string> = {
   lilac: "ljuslila",
 };
 
+// Reverse of EN_SLUG_TO_LEGACY, first-match-wins so aliases pointing at the
+// same Swedish word (grey/gray → grå) resolve to the one that's actually a
+// canonical GARMENT_COLORS name ("Grey", not "gray").
+const LEGACY_TO_EN: Record<string, string> = {};
+for (const [enSlug, svWord] of Object.entries(EN_SLUG_TO_LEGACY)) {
+  if (
+    !(svWord in LEGACY_TO_EN) &&
+    GARMENT_COLORS.some((c) => c.name.toLowerCase() === enSlug)
+  ) {
+    LEGACY_TO_EN[svWord] = enSlug;
+  }
+}
+
 /**
- * The value to pass to an ilike colour query for a given /farg slug.
- * Returns the legacy Swedish term when one is known, otherwise the slug
- * itself (which matches English-entered rows).
+ * The values to pass to an ilike colour query for a given /farg slug —
+ * both the slug itself and its legacy Swedish equivalent when one exists,
+ * so a single canonical page finds rows tagged in either language.
  */
-export function colorQueryValue(slug: string): string {
+export function colorQueryValues(slug: string): string[] {
   const lower = slug.toLowerCase();
-  return EN_SLUG_TO_LEGACY[lower] ?? lower;
+  const legacy = EN_SLUG_TO_LEGACY[lower];
+  return legacy ? [lower, legacy] : [lower];
+}
+
+/**
+ * Resolve a /farg slug (English or legacy Swedish, e.g. "black" or
+ * "svart") to its canonical English display name, or null if it isn't a
+ * known colour. Keeps old indexed /farg URLs working alongside the new
+ * English ones, and stops a Swedish-tagged colour from rendering as its
+ * raw Swedish word in a page title.
+ */
+export function canonicalColorLabel(slug: string): string | null {
+  const lower = slug.toLowerCase().trim();
+  if (!lower) return null;
+  const direct = GARMENT_COLORS.find((c) => c.name.toLowerCase() === lower);
+  if (direct) return direct.name;
+  const en = LEGACY_TO_EN[lower];
+  if (en) {
+    return GARMENT_COLORS.find((c) => c.name.toLowerCase() === en)?.name ?? null;
+  }
+  return null;
 }

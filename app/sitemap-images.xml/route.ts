@@ -49,10 +49,10 @@ function outfitCaption(o: OutfitRow): string {
     .join(", ");
   const creator = o.profiles?.display_name ?? o.profiles?.username ?? "";
   if (top && o.category) {
-    return `${o.category}-outfit med ${top}${creator ? ` av ${creator}` : ""}`;
+    return `${o.category}-outfit with ${top}${creator ? ` by ${creator}` : ""}`;
   }
-  if (top) return `Outfit med ${top}${creator ? ` av ${creator}` : ""}`;
-  return `${o.title}${creator ? ` av ${creator}` : ""}`;
+  if (top) return `Outfit with ${top}${creator ? ` by ${creator}` : ""}`;
+  return `${o.title}${creator ? ` by ${creator}` : ""}`;
 }
 
 export async function GET() {

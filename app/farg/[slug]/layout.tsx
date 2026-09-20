@@ -2,15 +2,9 @@ import type { Metadata } from "next";
 import { fetchOutfitsByColor } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { slugify } from "@/lib/slug";
-import { colorQueryValue } from "@/lib/colors";
+import { colorQueryValues, canonicalColorLabel } from "@/lib/colors";
 
 const SITE = "Moidello";
-
-function slugToColor(slug: string): string {
-  const lower = slug.toLowerCase();
-  if (!lower) return "";
-  return lower.charAt(0).toUpperCase() + lower.slice(1);
-}
 
 export async function generateMetadata({
   params,
@@ -18,9 +12,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const color = slugToColor(slug);
+  const color = canonicalColorLabel(slug);
+  if (!color) {
+    return { title: "Colour", robots: { index: false, follow: true } };
+  }
   const outfits = await fetchOutfitsByColor(
-    colorQueryValue(slug),
+    colorQueryValues(slug),
     undefined,
     createPublicClient(),
   );

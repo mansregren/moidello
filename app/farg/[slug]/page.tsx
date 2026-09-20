@@ -8,7 +8,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { collectionPageJsonLd } from "@/lib/json-ld";
 import { slugify } from "@/lib/slug";
 import { fetchOutfitsByColor, fetchAllColors } from "@/lib/queries";
-import { colorQueryValue } from "@/lib/colors";
+import { colorQueryValues, canonicalColorLabel } from "@/lib/colors";
 import { createPublicClient } from "@/lib/supabase/public";
 
 // ISR: fetch a gender-agnostic, cacheable set; the dam/herr toggle + liked/
@@ -17,24 +17,18 @@ import { createPublicClient } from "@/lib/supabase/public";
 export const dynamic = "force-static";
 export const revalidate = 300;
 
-function slugToColor(slug: string): string {
-  const lower = slug.toLowerCase();
-  if (!lower) return "";
-  return lower.charAt(0).toUpperCase() + lower.slice(1);
-}
-
 export default async function FargPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const color = slugToColor(slug);
+  const color = canonicalColorLabel(slug);
   if (!color) notFound();
 
   const client = createPublicClient();
   const [outfits, otherColors] = await Promise.all([
-    fetchOutfitsByColor(colorQueryValue(slug), undefined, client),
+    fetchOutfitsByColor(colorQueryValues(slug), undefined, client),
     fetchAllColors(client),
   ]);
   if (outfits.length === 0) notFound();

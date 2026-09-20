@@ -10,10 +10,10 @@ export async function generateMetadata({
   const { rum } = await params;
   const room = roomBySlug(rum);
   if (!room) {
-    return { title: "Hittades inte", robots: { index: false, follow: false } };
+    return { title: "Not found", robots: { index: false, follow: false } };
   }
   return {
-    title: `${room.label} – heminredning | Moidello`,
+    title: `${room.label} – home decor | Moidello`,
     description: room.description,
     alternates: { canonical: `/home/${room.slug}` },
     // Indexable only once the vertical is launched.

@@ -6,7 +6,7 @@ import { Container } from "@/components/layout/Container";
 import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { collectionPageJsonLd } from "@/lib/json-ld";
-import { garmentsForGender, garmentQueryValue, canonicalGarment } from "@/lib/garments";
+import { garmentsForGender, garmentQueryValues, canonicalGarment } from "@/lib/garments";
 import { fetchOutfitsByGarment } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { DAM_PUBLIC } from "@/lib/flags";
@@ -38,7 +38,7 @@ export default async function TypPage({
 
   const outfits = await fetchOutfitsByGarment(
     gender,
-    garmentQueryValue(gs),
+    garmentQueryValues(gs),
     createPublicClient(),
   );
   if (outfits.length === 0) notFound();
@@ -89,7 +89,7 @@ export default async function TypPage({
             className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
-            Alla outfits
+            All outfits
           </Link>
 
           <div className="mb-12 max-w-2xl">

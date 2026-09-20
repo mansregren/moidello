@@ -14,7 +14,7 @@ export async function generateMetadata({
 
   if (!user) {
     return {
-      title: "Profil hittades inte",
+      title: "Profile not found",
       robots: { index: false, follow: false },
     };
   }

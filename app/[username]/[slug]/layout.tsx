@@ -27,11 +27,11 @@ function buildDescription(outfit: {
   const cat = outfit.category?.trim();
   if (top && cat) {
     return isHome
-      ? `${cat} med ${top} av ${outfit.creator.displayName}.`
-      : `En ${cat.toLowerCase()}-outfit med ${top} av ${outfit.creator.displayName}.`;
+      ? `${cat} with ${top} by ${outfit.creator.displayName}.`
+      : `A ${cat.toLowerCase()}-outfit with ${top} by ${outfit.creator.displayName}.`;
   }
   if (top) {
-    return `${isHome ? "Rum" : "Outfit"} med ${top} av ${outfit.creator.displayName}.`;
+    return `${isHome ? "Room" : "Outfit"} with ${top} by ${outfit.creator.displayName}.`;
   }
   return `${isHome ? "Interior" : "Outfit"} by ${outfit.creator.displayName} on ${SITE}.`;
 }
@@ -45,7 +45,7 @@ export async function generateMetadata({
 
   if (isReservedUsername(username)) {
     return {
-      title: "Hittades inte",
+      title: "Not found",
       robots: { index: false, follow: false },
     };
   }
@@ -53,12 +53,12 @@ export async function generateMetadata({
   const outfit = await fetchOutfitBySlug(username, slug, createPublicClient());
   if (!outfit) {
     return {
-      title: "Outfit hittades inte",
+      title: "Outfit not found",
       robots: { index: false, follow: false },
     };
   }
 
-  const title = `${outfit.title} av ${outfit.creator.displayName}`;
+  const title = `${outfit.title} by ${outfit.creator.displayName}`;
   const description = buildDescription(outfit);
   const canonical = `/${username.toLowerCase()}/${slug}`;
   const hasOwnDescription =

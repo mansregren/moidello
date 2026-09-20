@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { canonicalColorLabel } from "@/lib/colors";
 import type {
   Outfit,
   TaggedItem,
@@ -933,16 +934,20 @@ export async function fetchOutfitsByItem(
 
 /**
  * Outfits where any tagged_item has the given color. Color match is
- * case-insensitive. Used by /farg/[slug] landing pages.
+ * case-insensitive. Used by /farg/[slug] landing pages. Accepts either a
+ * single value or several candidates (see colorQueryValues) so a page can
+ * match both the current English value and any legacy Swedish rows.
  */
 export async function fetchOutfitsByColor(
-  color: string,
+  color: string | string[],
   gender?: "dam" | "herr",
   client?: QueryClient,
 ): Promise<Outfit[]> {
   const supabase = await resolveClient(client);
-  const targetKey = color.toLowerCase().trim();
-  if (!targetKey) return [];
+  const candidates = (Array.isArray(color) ? color : [color])
+    .map((c) => c.toLowerCase().trim())
+    .filter(Boolean);
+  if (candidates.length === 0) return [];
 
   // Push the colour match to Postgres (case-insensitive, no wildcards since
   // colour names are plain words) instead of transferring every tagged row
@@ -950,7 +955,7 @@ export async function fetchOutfitsByColor(
   const { data: tagRows } = await supabase
     .from("tagged_items")
     .select("outfit_id")
-    .ilike("color", targetKey);
+    .or(candidates.map((c) => `color.ilike.${c}`).join(","));
   if (!tagRows) return [];
 
   const outfitIds = Array.from(
@@ -991,8 +996,12 @@ export async function fetchAllColors(
   if (!data) return [];
   const counts = new Map<string, number>();
   for (const r of data as Array<{ color: string }>) {
-    const c = r.color?.toLowerCase().trim();
-    if (!c) continue;
+    const raw = r.color?.toLowerCase().trim();
+    if (!raw) continue;
+    // Merge legacy Swedish values into their canonical English label so
+    // "svart" and "black" count as the same colour instead of splitting
+    // into two near-duplicate /farg pages.
+    const c = canonicalColorLabel(raw)?.toLowerCase() ?? raw;
     counts.set(c, (counts.get(c) ?? 0) + 1);
   }
   return Array.from(counts.entries())
@@ -1006,19 +1015,21 @@ export async function fetchAllColors(
  */
 export async function fetchOutfitsByGarment(
   gender: "dam" | "herr",
-  garment: string,
+  garment: string | string[],
   client?: QueryClient,
 ): Promise<Outfit[]> {
   const supabase = await resolveClient(client);
-  const garmentKey = garment.toLowerCase().trim();
-  if (!garmentKey) return [];
+  const candidates = (Array.isArray(garment) ? garment : [garment])
+    .map((g) => g.toLowerCase().trim())
+    .filter(Boolean);
+  if (candidates.length === 0) return [];
 
   // Filter in Postgres rather than transferring the whole table and
   // matching in JS.
   const { data: tagRows } = await supabase
     .from("tagged_items")
     .select("outfit_id")
-    .ilike("garment", garmentKey);
+    .or(candidates.map((g) => `garment.ilike.${g}`).join(","));
   if (!tagRows) return [];
 
   const outfitIds = Array.from(

@@ -24,10 +24,10 @@ function buildDescription(outfit: {
     .join(", ");
   const cat = outfit.category?.trim();
   if (top && cat) {
-    return `En ${cat.toLowerCase()}-outfit med ${top} av ${outfit.creator.displayName}.`;
+    return `A ${cat.toLowerCase()}-outfit with ${top} by ${outfit.creator.displayName}.`;
   }
   if (top) {
-    return `Outfit med ${top} av ${outfit.creator.displayName}.`;
+    return `Outfit with ${top} by ${outfit.creator.displayName}.`;
   }
   return `Outfit by ${outfit.creator.displayName} on ${SITE}.`;
 }
@@ -43,14 +43,14 @@ export async function generateMetadata({
 
   if (!outfit) {
     return {
-      title: "Outfit hittades inte",
+      title: "Outfit not found",
       robots: { index: false, follow: false },
     };
   }
 
   // Root layout's metadata.title.template appends " | Moidello" — don't
   // duplicate the suffix here.
-  const title = `${outfit.title} av ${outfit.creator.displayName}`;
+  const title = `${outfit.title} by ${outfit.creator.displayName}`;
   const description = buildDescription(outfit);
   // Canonical points at the new /<username>/<slug> URL when available;
   // the page itself 301-redirects there, but search engines that read

@@ -51,7 +51,7 @@ export async function generateMetadata({
 
   if (!item) {
     return {
-      title: "Plagg hittades inte",
+      title: "Item not found",
       robots: { index: false, follow: false },
     };
   }

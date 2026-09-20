@@ -107,13 +107,14 @@ const EN_SLUG_TO_LEGACY_GARMENT: Record<string, string> = {
 };
 
 /**
- * The value to pass to an ilike garment query for a given /typ slug.
- * Returns the legacy Swedish term when one is known, otherwise the slug
- * itself (which matches English-entered rows).
+ * The values to pass to an ilike garment query for a given /typ slug —
+ * both the slug itself and its legacy Swedish equivalent when one exists,
+ * so a single canonical page finds rows tagged in either language.
  */
-export function garmentQueryValue(slug: string): string {
+export function garmentQueryValues(slug: string): string[] {
   const lower = slug.toLowerCase();
-  return EN_SLUG_TO_LEGACY_GARMENT[lower] ?? lower;
+  const legacy = EN_SLUG_TO_LEGACY_GARMENT[lower];
+  return legacy ? [lower, legacy] : [lower];
 }
 
 const LEGACY_GARMENT_TO_EN: Record<string, string> = Object.fromEntries(

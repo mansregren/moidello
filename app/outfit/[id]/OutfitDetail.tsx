@@ -167,7 +167,7 @@ export default function OutfitDetail({
               <Image
                 src={outfit.image}
                 alt={(() => {
-                  // Auto-alt: "{category}-outfit med {brand1 name1}, ... av {creator}"
+                  // Auto-alt: "{category}-outfit with {brand1 name1}, ..."
                   // mirrors the meta description pattern so screen readers and
                   // image-search crawlers see consistent copy.
                   const top = outfit.tags

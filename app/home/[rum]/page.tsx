@@ -74,7 +74,7 @@ export default async function HomeRoomPage({
             className="inline-flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
-            Alla rum
+            All rooms
           </Link>
 
           <div className="mb-12 max-w-2xl">
