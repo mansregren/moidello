@@ -8,8 +8,8 @@ const SITE_BASE = "https://moidello.com";
 
 // TikTok / Stories full-bleed canvas (1080x1920, 9:16).
 const TIKTOK_CANVAS = { w: 1080, h: 1920 };
-// Pinterest's recommended pin canvas (1000x1500, 2:3).
-const PINTEREST_CANVAS = { w: 1000, h: 1500 };
+// Pinterest's recommended pin ratio (2:3) at 2x for a sharper download.
+const PINTEREST_CANVAS = { w: 2000, h: 3000 };
 const BG = "#FFFFFF";
 const INK = "#1A1A1A";
 
@@ -56,6 +56,10 @@ export async function GET(
   const photoH = PHOTO_RATIO_H * scale;
   const photoX = (CANVAS_W - photoW) / 2;
   const photoY = (CANVAS_H - photoH) / 2;
+  // Dot/label sizes below are tuned against the TikTok canvas's photo
+  // scale (360) — rescale proportionally so higher-res canvases (like
+  // Pinterest's 2x) don't end up with tiny-looking markers.
+  const sizeScale = scale / Math.min(TIKTOK_CANVAS.w / PHOTO_RATIO_W, TIKTOK_CANVAS.h / PHOTO_RATIO_H);
 
   const imageUrl = absUrl(outfit.image);
   const dots = outfit.tags.map((tag) => ({
@@ -115,8 +119,8 @@ export async function GET(
           >
             <div
               style={{
-                width: 22,
-                height: 22,
+                width: 22 * sizeScale,
+                height: 22 * sizeScale,
                 borderRadius: 999,
                 background: "#fff",
                 boxShadow: "0 0 12px rgba(0,0,0,0.45)",
@@ -128,13 +132,13 @@ export async function GET(
               <div
                 style={{
                   position: "absolute",
-                  [d.labelRight ? "left" : "right"]: 26,
+                  [d.labelRight ? "left" : "right"]: 26 * sizeScale,
                   display: "flex",
                   background: "rgba(255,255,255,0.95)",
                   color: INK,
-                  padding: "5px 10px",
+                  padding: `${5 * sizeScale}px ${10 * sizeScale}px`,
                   borderRadius: 999,
-                  fontSize: 15,
+                  fontSize: 15 * sizeScale,
                   fontWeight: 500,
                   letterSpacing: "0.01em",
                   whiteSpace: "nowrap",

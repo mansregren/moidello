@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { Pin, Loader2, RotateCcw } from "lucide-react";
-import { shareOrSavePhotos } from "@/lib/share-files";
 import { cn } from "@/lib/utils";
 
 /**
  * Same idea as SaveForTikTokButton, but requests the Pinterest-ratio
- * (2:3) export from the share-image route instead of the 9:16 one, with
- * the same dots + tag labels baked in. Admin-only, see OutfitDetail.
+ * (2:3, 2x res) export from the share-image route instead of the 9:16
+ * one, with the same dots + tag labels baked in. Downloads the file
+ * directly via <a download> instead of the share sheet — this is an
+ * admin-only desktop tool, not a mobile share flow. Admin-only gating
+ * lives in OutfitDetail.
  */
 export function SaveToPinterestButton({ outfitId }: { outfitId: string }) {
   const [file, setFile] = useState<File | null>(null);
@@ -50,9 +52,20 @@ export function SaveToPinterestButton({ outfitId }: { outfitId: string }) {
     if (!file) return;
     setBusy(true);
     setError(null);
-    shareOrSavePhotos([file])
-      .catch((e) => setError(e instanceof Error ? e.message : String(e)))
-      .finally(() => setBusy(false));
+    try {
+      const url = URL.createObjectURL(file);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
