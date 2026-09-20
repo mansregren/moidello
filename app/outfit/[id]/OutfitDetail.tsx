@@ -27,6 +27,7 @@ import { TrackView } from "@/components/outfit/TrackView";
 import { AddToBoardButton } from "@/components/outfit/AddToBoardButton";
 import { ShareButton } from "@/components/shared/ShareButton";
 import { SaveForTikTokButton } from "@/components/outfit/SaveForTikTokButton";
+import { SaveToPinterestButton } from "@/components/outfit/SaveToPinterestButton";
 import { ShareToDmSheet } from "@/components/shared/ShareToDmSheet";
 import { ReportButton } from "@/components/shared/ReportButton";
 import { HIDE_CREATORS } from "@/lib/flags";
@@ -310,6 +311,13 @@ export default function OutfitDetail({
                   variant="outline"
                 />
                 {isPersisted && <SaveForTikTokButton outfitId={outfit.id} />}
+                {isPersisted && viewerIsAdmin && (
+                  <SaveToPinterestButton
+                    imageUrl={outfit.image}
+                    pageUrl={outfitPath(outfit)}
+                    description={outfit.title}
+                  />
+                )}
                 {isPersisted && user?.id !== outfit.creator.id && (
                   <ReportButton targetType="outfit" targetId={outfit.id} />
                 )}
