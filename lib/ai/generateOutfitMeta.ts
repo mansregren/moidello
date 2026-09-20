@@ -10,6 +10,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import { HOME_CATEGORIES } from "@/lib/home-data";
 
 export const OUTFIT_CATEGORIES = [
   "streetwear",
@@ -23,31 +24,50 @@ export const OUTFIT_CATEGORIES = [
 
 export type OutfitCategory = (typeof OUTFIT_CATEGORIES)[number];
 
+export type Vertical = "mode" | "hem";
+
+/** The valid category enum for a given vertical — fashion styles for
+ *  "mode", room names (from home-data.ts) for "hem". Keeps the AI from
+ *  forcing a home-decor post into a fashion category or vice versa. */
+export function categoriesForVertical(vertical: Vertical): readonly string[] {
+  return vertical === "hem" ? HOME_CATEGORIES : OUTFIT_CATEGORIES;
+}
+
 export interface OutfitMeta {
   title: string;
   meta_description: string;
   keywords: string[];
   alt_text: string;
-  category: OutfitCategory;
+  category: string;
   suggested_items: string[];
 }
 
-const SYSTEM_PROMPT = `You are a fashion curator for Moidello, a platform for outfit inspiration. The tone is minimalist, editorial, Scandinavian. Avoid clichés like "outfit goals", "obsessed", "slay". Write like a considered magazine, not a TikTok comment. Write in English.`;
+const SYSTEM_PROMPT = `You are an editorial curator for Moidello, a platform for outfit and home-decor inspiration. The tone is minimalist, editorial, Scandinavian. Avoid clichés like "outfit goals", "obsessed", "slay", "cozy vibes". Write like a considered magazine, not a TikTok comment. Write in English.`;
 
-function userPrompt(categoryHint?: string | null): string {
-  return `Analyse the outfit in the image and return STRICT JSON with the fields:
+function userPrompt(
+  vertical: Vertical,
+  categoryHint?: string | null,
+): string {
+  const categories = categoriesForVertical(vertical);
+  const subject = vertical === "hem" ? "room or interior scene" : "outfit";
+  const titleExample =
+    vertical === "hem"
+      ? '"Walnut & Linen", "Warm Minimal Living"'
+      : '"Linen Set & Espadrilles", "Camel & Cream"';
 
-- title: 2–4 ord, engelska, evokativt (t.ex. "Linen Set & Espadrilles", "Camel & Cream"). Matcha stilen i befintliga Moidello-titlar.
-- meta_description: English, 140–155 characters including spaces. Start with the style/garment, weave in an emotion or season word, end naturally. No exclamation marks.
-- keywords: array med 5–8 svenska keywords. Blanda bred (outfit-inspiration, minimalism) med smal (linnedress, beige-look, sommar-outfit).
-- alt_text: English, descriptive, one sentence. Include garment types and colours so Google Images understands what the image shows.
-- category: pick ONE of: streetwear, minimalism, vintage, casual, formal, sporty, preppy.
-- suggested_items: array of 3–6 strings describing the visible pieces (e.g. "white linen dress", "beige espadrilles"). This is a hint for an admin to tag later — no brands, just garment type + colour.
+  return `Analyse the ${subject} in the image and return STRICT JSON with the fields:
+
+- title: 2–4 words, English, evocative (e.g. ${titleExample}). Match the style of existing Moidello titles.
+- meta_description: English, 140–155 characters including spaces. Start with the style/piece, weave in an emotion or season word, end naturally. No exclamation marks.
+- keywords: array of 5–8 English keywords, all lowercase. Mix general (e.g. "outfit inspiration", "minimalism") with specific (e.g. "linen dress", "beige look", "summer outfit").
+- alt_text: English, descriptive, one sentence. Include the piece types and colours so Google Images understands what the image shows.
+- category: pick ONE of: ${categories.join(", ")}.
+- suggested_items: array of 3–6 strings describing the visible pieces (e.g. "white linen dress", "beige espadrilles"). This is a hint for an admin to tag later — no brands, just type + colour.
 
 If a category hint is given, prioritise it if the image allows.
-Kategori-hint: ${categoryHint ?? "ingen"}
+Category hint: ${categoryHint ?? "none"}
 
-Returnera ENDAST JSON, ingen extra text.`;
+Return ONLY JSON, no extra text.`;
 }
 
 function getClient(): Anthropic {
@@ -133,25 +153,25 @@ async function fetchImageAsBase64(
   return { base64, mediaType: sniffed };
 }
 
-function validateMeta(raw: unknown): OutfitMeta {
+function validateMeta(raw: unknown, vertical: Vertical): OutfitMeta {
   if (typeof raw !== "object" || raw === null) {
-    throw new Error("Claude returnerade icke-objekt.");
+    throw new Error("Claude returned a non-object.");
   }
   const o = raw as Record<string, unknown>;
 
   const title = typeof o.title === "string" ? o.title.trim() : "";
   if (!title || title.length > 80) {
-    throw new Error("Ogiltig title.");
+    throw new Error("Invalid title.");
   }
 
   const meta_description =
     typeof o.meta_description === "string" ? o.meta_description.trim() : "";
   if (!meta_description || meta_description.length > 200) {
-    throw new Error("Ogiltig meta_description.");
+    throw new Error("Invalid meta_description.");
   }
 
   if (!Array.isArray(o.keywords) || o.keywords.length < 3 || o.keywords.length > 10) {
-    throw new Error("Ogiltig keywords-array.");
+    throw new Error("Invalid keywords array.");
   }
   const keywords = (o.keywords as unknown[])
     .filter((k): k is string => typeof k === "string" && k.trim().length > 0)
@@ -161,12 +181,15 @@ function validateMeta(raw: unknown): OutfitMeta {
 
   const alt_text = typeof o.alt_text === "string" ? o.alt_text.trim() : "";
   if (!alt_text || alt_text.length > 400) {
-    throw new Error("Ogiltig alt_text.");
+    throw new Error("Invalid alt_text.");
   }
 
-  const category = typeof o.category === "string" ? o.category.toLowerCase().trim() : "";
-  if (!OUTFIT_CATEGORIES.includes(category as OutfitCategory)) {
-    throw new Error(`Ogiltig kategori: ${category}`);
+  const rawCategory =
+    typeof o.category === "string" ? o.category.trim().toLowerCase() : "";
+  const categories = categoriesForVertical(vertical);
+  const category = categories.find((c) => c.toLowerCase() === rawCategory);
+  if (!category) {
+    throw new Error(`Invalid category: ${rawCategory}`);
   }
 
   const suggested_items = Array.isArray(o.suggested_items)
@@ -181,7 +204,7 @@ function validateMeta(raw: unknown): OutfitMeta {
     meta_description,
     keywords,
     alt_text,
-    category: category as OutfitCategory,
+    category,
     suggested_items,
   };
 }
@@ -194,6 +217,7 @@ function validateMeta(raw: unknown): OutfitMeta {
 export async function generateOutfitMeta(
   imageUrl: string,
   categoryHint?: string | null,
+  vertical: Vertical = "mode",
 ): Promise<OutfitMeta> {
   const client = getClient();
   const { base64, mediaType } = await fetchImageAsBase64(imageUrl);
@@ -216,7 +240,7 @@ export async function generateOutfitMeta(
           },
           {
             type: "text",
-            text: userPrompt(categoryHint),
+            text: userPrompt(vertical, categoryHint),
           },
         ],
       },
@@ -225,7 +249,7 @@ export async function generateOutfitMeta(
 
   const textBlock = response.content.find((b) => b.type === "text");
   if (!textBlock || textBlock.type !== "text") {
-    throw new Error("Claude returnerade ingen text.");
+    throw new Error("Claude returned no text.");
   }
 
   // Be lenient about leading/trailing whitespace or stray code-fence markers
@@ -239,8 +263,8 @@ export async function generateOutfitMeta(
   try {
     parsed = JSON.parse(jsonText);
   } catch {
-    throw new Error("Claude returnerade ogiltig JSON.");
+    throw new Error("Claude returned invalid JSON.");
   }
 
-  return validateMeta(parsed);
+  return validateMeta(parsed, vertical);
 }

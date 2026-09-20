@@ -16,11 +16,7 @@
 import { NextResponse } from "next/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { isCurrentUserAdmin } from "@/lib/admin";
-import {
-  generateOutfitMeta,
-  OUTFIT_CATEGORIES,
-  type OutfitCategory,
-} from "@/lib/ai/generateOutfitMeta";
+import { generateOutfitMeta } from "@/lib/ai/generateOutfitMeta";
 
 const MAX_BATCH = 30;
 
@@ -33,6 +29,7 @@ interface OutfitRow {
   keywords: string[] | null;
   alt_text: string | null;
   image_url: string;
+  vertical: "mode" | "hem";
 }
 
 function service() {
@@ -85,7 +82,7 @@ export async function POST(request: Request) {
   let query = supabase
     .from("outfits")
     .select(
-      "id, title, category, description, meta_description, keywords, alt_text, image_url",
+      "id, title, category, description, meta_description, keywords, alt_text, image_url, vertical",
     )
     .eq("is_published", true)
     .order("created_at", { ascending: false })
@@ -111,10 +108,11 @@ export async function POST(request: Request) {
       const meta = await generateOutfitMeta(
         o.image_url,
         (o.category as string | null) ?? null,
+        o.vertical,
       );
 
       const update: Record<string, unknown> = {
-        description: meta.meta_description, // använd som synlig beskrivning också
+        description: meta.meta_description, // used as the visible description too
         meta_description: meta.meta_description,
         keywords: meta.keywords,
         alt_text: meta.alt_text,
@@ -122,10 +120,7 @@ export async function POST(request: Request) {
       if (overwriteTitle) {
         update.title = meta.title;
       }
-      if (
-        OUTFIT_CATEGORIES.includes(meta.category as OutfitCategory) &&
-        (!o.category || o.category.trim() === "")
-      ) {
+      if (!o.category || o.category.trim() === "") {
         update.category = meta.category;
       }
 

@@ -136,7 +136,7 @@ export function ItemSeoBackfillClient({ missing }: Props) {
       {missing.length > 0 && (
         <section>
           <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-3">
-            Saknar SEO ({missing.length})
+            Missing SEO ({missing.length})
           </h2>
           <ul className="space-y-1.5">
             {missing.slice(0, 100).map((it) => (

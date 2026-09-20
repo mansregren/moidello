@@ -113,7 +113,7 @@ export default async function AdminSeoPage() {
 
       <section className="mt-16">
         <h2 className="font-heading text-2xl uppercase tracking-tight text-foreground mb-1">
-          Plagg
+          Pieces
         </h2>
         <p className="text-xs uppercase tracking-wider text-foreground-subtle mb-5">
           Description · keywords · alt-text · material

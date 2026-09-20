@@ -135,7 +135,7 @@ export function SeoBackfillClient({ missing }: Props) {
       {missing.length > 0 && (
         <section>
           <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-3">
-            Saknar SEO ({missing.length})
+            Missing SEO ({missing.length})
           </h2>
           <ul className="space-y-1.5">
             {missing.map((o) => (
@@ -152,7 +152,7 @@ export function SeoBackfillClient({ missing }: Props) {
                   {o.title}
                 </span>
                 <span className="text-[11px] text-foreground-subtle">
-                  {new Date(o.created_at).toLocaleDateString("sv-SE")}
+                  {new Date(o.created_at).toLocaleDateString("en-GB")}
                 </span>
               </li>
             ))}
