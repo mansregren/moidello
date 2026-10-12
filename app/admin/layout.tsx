@@ -26,6 +26,8 @@ export default async function AdminLayout({
             <AdminTab href="/admin" label="Overview" />
             <AdminTab href="/admin/statistik" label="Statistik" />
             <AdminTab href="/admin/inlagg" label="Posts" />
+            <AdminTab href="/admin/snabb-outfit" label="Snabb-outfit" />
+            <AdminTab href="/admin/plagg" label="Plaggbank" />
             <AdminTab href="/admin/anvandare" label="Users" />
             <AdminTab href="/admin/anmalningar" label="Reports" />
             <AdminTab href="/admin/tiktok-bilder" label="TikTok-bilder" />

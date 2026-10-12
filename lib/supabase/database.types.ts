@@ -225,6 +225,84 @@ export type Database = {
           },
         ]
       }
+      catalog_items: {
+        Row: {
+          affiliate_network: string | null
+          brand: string
+          buy_url: string | null
+          color: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          garment: string
+          gender: Database["public"]["Enums"]["outfit_gender"] | null
+          id: string
+          image_bg: string | null
+          image_path: string | null
+          image_url: string
+          is_affiliate: boolean
+          is_archived: boolean
+          material: string | null
+          name: string
+          price: number | null
+          retailer: string | null
+          retailer_locale: string | null
+          source_image_url: string | null
+          updated_at: string
+          url_key: string | null
+        }
+        Insert: {
+          affiliate_network?: string | null
+          brand: string
+          buy_url?: string | null
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          garment: string
+          gender?: Database["public"]["Enums"]["outfit_gender"] | null
+          id?: string
+          image_bg?: string | null
+          image_path?: string | null
+          image_url: string
+          is_affiliate?: boolean
+          is_archived?: boolean
+          material?: string | null
+          name: string
+          price?: number | null
+          retailer?: string | null
+          retailer_locale?: string | null
+          source_image_url?: string | null
+          updated_at?: string
+          url_key?: string | null
+        }
+        Update: {
+          affiliate_network?: string | null
+          brand?: string
+          buy_url?: string | null
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          garment?: string
+          gender?: Database["public"]["Enums"]["outfit_gender"] | null
+          id?: string
+          image_bg?: string | null
+          image_path?: string | null
+          image_url?: string
+          is_affiliate?: boolean
+          is_archived?: boolean
+          material?: string | null
+          name?: string
+          price?: number | null
+          retailer?: string | null
+          retailer_locale?: string | null
+          source_image_url?: string | null
+          updated_at?: string
+          url_key?: string | null
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           body: string
@@ -1277,6 +1355,7 @@ export type Database = {
           buy_url: string | null
           buy_urls: Json | null
           cached_metadata: Json | null
+          catalog_item_id: string | null
           color: string | null
           created_at: string
           currency: string | null
@@ -1304,6 +1383,7 @@ export type Database = {
           buy_url?: string | null
           buy_urls?: Json | null
           cached_metadata?: Json | null
+          catalog_item_id?: string | null
           color?: string | null
           created_at?: string
           currency?: string | null
@@ -1331,6 +1411,7 @@ export type Database = {
           buy_url?: string | null
           buy_urls?: Json | null
           cached_metadata?: Json | null
+          catalog_item_id?: string | null
           color?: string | null
           created_at?: string
           currency?: string | null

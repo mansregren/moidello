@@ -35,6 +35,8 @@ interface TagInput {
   x: number;
   y: number;
   isAffiliate?: boolean;
+  /** Set by the plaggbank builder — links the tag to its catalog row. */
+  catalogItemId?: string | null;
 }
 
 const ACCEPTED_IMAGE_TYPES = [
@@ -44,6 +46,8 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/avif",
 ];
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function createOutfit(
   _prev: CreateOutfitState,
@@ -84,6 +88,9 @@ export async function createOutfit(
     wantsHome && homeVerticalVisible(isAdmin) ? "hem" : "mode";
   const keywordsRaw = (formData.get("keywords") as string | null) ?? "[]";
   const tagsRaw = (formData.get("tags") as string | null) ?? "[]";
+  // The plaggbank builder publishes a rendered flatlay instead of a photo.
+  const outfitType =
+    formData.get("type") === "flatlay" ? ("flatlay" as const) : ("photo" as const);
 
   if (!(image instanceof File) || image.size === 0) {
     return { error: "Choose an image." };
@@ -179,7 +186,7 @@ export async function createOutfit(
         // buildDescription in the outfit layouts). The admin editor can
         // still set meta_description as an explicit override.
         keywords: keywords.length > 0 ? keywords : null,
-        type: "photo",
+        type: outfitType,
       })
       .select("id, slug")
       .single();
@@ -233,6 +240,8 @@ export async function createOutfit(
         position_x: t.x,
         position_y: t.y,
         is_affiliate: !!t.isAffiliate,
+        catalog_item_id:
+          t.catalogItemId && UUID_RE.test(t.catalogItemId) ? t.catalogItemId : null,
       }));
 
     if (taggedRows.length > 0) {
