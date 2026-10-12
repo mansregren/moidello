@@ -15,11 +15,13 @@ import {
   RotateCw,
   RotateCcw,
   Crop,
+  Eraser,
   Search,
 } from "lucide-react";
 import { createOutfit } from "@/app/skapa/actions";
 import { replaceCatalogImage } from "@/app/actions/catalog";
 import { CropDialog } from "@/components/admin/CropDialog";
+import { BgRemoveDialog } from "@/components/admin/BgRemoveDialog";
 import { CatalogThumb } from "@/components/admin/CatalogThumb";
 import { GARMENTS, GARMENTS_HERR, type Gender } from "@/lib/garments";
 import {
@@ -107,6 +109,7 @@ export function BuilderClient({
   // Local copy so a crop made here shows up in the picker immediately.
   const [catalog, setCatalog] = useState(items);
   const [cropId, setCropId] = useState<string | null>(null);
+  const [bgId, setBgId] = useState<string | null>(null);
   const [placed, setPlaced] = useState<Placed[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [manual, setManual] = useState(false);
@@ -364,36 +367,38 @@ export function BuilderClient({
           </div>
         )}
 
-        {cropId && (() => {
-          const target = placed.find((p) => p.item.id === cropId);
+        {(cropId || bgId) && (() => {
+          const target = placed.find((p) => p.item.id === (cropId ?? bgId));
           if (!target) return null;
-          return (
-            <CropDialog
-              src={target.item.imageUrl}
-              title={target.item.name}
-              onCancel={() => setCropId(null)}
-              onCropped={async (file) => {
-                const fd = new FormData();
-                fd.set("image", file);
-                const res = await replaceCatalogImage(target.item.id, fd);
-                if (!res.ok) throw new Error(res.error);
-                const img = await loadImage(res.item.imageUrl);
-                const aspect = img.naturalWidth / img.naturalHeight || target.aspect;
-                // Keep the garment's centre and width; height follows the new crop.
-                setPlaced((prev) =>
-                  prev.map((p) => {
-                    if (p.item.id !== target.item.id) return p;
-                    const cx = p.rect.x + p.rect.w / 2;
-                    const cy = p.rect.y + p.rect.h / 2;
-                    const w = p.rect.w;
-                    const h = w / aspect;
-                    return { ...p, item: { ...p.item, ...res.item }, aspect, rect: { x: cx - w / 2, y: cy - h / 2, w, h } };
-                  }),
-                );
-                setCatalog((prev) => prev.map((c) => (c.id === res.item.id ? { ...c, ...res.item, usage: c.usage } : c)));
-                setCropId(null);
-              }}
-            />
+          const close = () => {
+            setCropId(null);
+            setBgId(null);
+          };
+          const apply = async (file: File) => {
+            const fd = new FormData();
+            fd.set("image", file);
+            const res = await replaceCatalogImage(target.item.id, fd);
+            if (!res.ok) throw new Error(res.error);
+            const img = await loadImage(res.item.imageUrl);
+            const aspect = img.naturalWidth / img.naturalHeight || target.aspect;
+            // Keep the garment's centre and width; height follows the new image.
+            setPlaced((prev) =>
+              prev.map((p) => {
+                if (p.item.id !== target.item.id) return p;
+                const cx = p.rect.x + p.rect.w / 2;
+                const cy = p.rect.y + p.rect.h / 2;
+                const w = p.rect.w;
+                const h = w / aspect;
+                return { ...p, item: { ...p.item, ...res.item }, aspect, rect: { x: cx - w / 2, y: cy - h / 2, w, h } };
+              }),
+            );
+            setCatalog((prev) => prev.map((c) => (c.id === res.item.id ? { ...c, ...res.item, usage: c.usage } : c)));
+            close();
+          };
+          return cropId ? (
+            <CropDialog src={target.item.imageUrl} title={target.item.name} onCancel={close} onCropped={apply} />
+          ) : (
+            <BgRemoveDialog src={target.item.imageUrl} title={target.item.name} onCancel={close} onDone={apply} />
           );
         })()}
 
@@ -430,6 +435,14 @@ export function BuilderClient({
           )}
           <button type="button" className={toolBtn} disabled={!active} onClick={() => active && setCropId(active.item.id)}>
             <Crop className="h-3.5 w-3.5" /> Beskär
+          </button>
+          <button
+            type="button"
+            className={toolBtn}
+            disabled={!active || active.item.imageBg === "transparent"}
+            onClick={() => active && setBgId(active.item.id)}
+          >
+            <Eraser className="h-3.5 w-3.5" /> Ta bort bakgrund
           </button>
           <button type="button" className={toolBtn} disabled={!active} onClick={() => reorderActive(true)}>
             <ArrowUpToLine className="h-3.5 w-3.5" /> Fram
