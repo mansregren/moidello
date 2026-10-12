@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element -- remote preview images */
 
 import { useMemo, useState } from "react";
-import { Link2, Upload, Download, Search, X, ExternalLink } from "lucide-react";
+import { Link2, Upload, Download, Search, X, ExternalLink, Crop } from "lucide-react";
 import {
   createCatalogItemFromUpload,
   deleteCatalogItem,
@@ -15,6 +15,7 @@ import {
   updateCatalogItem,
 } from "@/app/actions/catalog";
 import { CatalogThumb } from "@/components/admin/CatalogThumb";
+import { CropDialog } from "@/components/admin/CropDialog";
 import { ColorPicker } from "@/components/shared/ColorPicker";
 import { GARMENTS, GARMENTS_HERR, type Gender } from "@/lib/garments";
 import { GARMENT_COLORS } from "@/lib/colors";
@@ -767,6 +768,7 @@ function EditDialog({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [cropping, setCropping] = useState(false);
 
   const set = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }));
 
@@ -827,6 +829,14 @@ function EditDialog({
               alt={item.name}
               className="aspect-[3/4] rounded-xl border border-border"
             />
+            <button
+              type="button"
+              className={`${secondaryBtn} w-full`}
+              disabled={busy}
+              onClick={() => setCropping(true)}
+            >
+              <Crop className="h-4 w-4" /> Beskär
+            </button>
             <label className={`${secondaryBtn} w-full cursor-pointer`}>
               <Upload className="h-4 w-4" /> Byt bild
               <input
@@ -960,6 +970,21 @@ function EditDialog({
                 {busy ? "Sparar…" : "Spara"}
               </button>
             </div>
+            {cropping && (
+              <CropDialog
+                src={item.imageUrl}
+                title={item.name}
+                onCancel={() => setCropping(false)}
+                onCropped={async (file) => {
+                  const fd = new FormData();
+                  fd.set("image", file);
+                  const res = await replaceCatalogImage(item.id, fd);
+                  if (!res.ok) throw new Error(res.error);
+                  onSaved(res.item);
+                  setCropping(false);
+                }}
+              />
+            )}
             {item.usage > 0 && confirmDelete && (
               <p className="text-xs text-foreground-subtle">
                 Outfits som använder plagget påverkas inte. Taggen ligger kvar, men kopplingen till plaggbanken försvinner.

@@ -14,9 +14,12 @@ import {
   LayoutGrid,
   RotateCw,
   RotateCcw,
+  Crop,
   Search,
 } from "lucide-react";
 import { createOutfit } from "@/app/skapa/actions";
+import { replaceCatalogImage } from "@/app/actions/catalog";
+import { CropDialog } from "@/components/admin/CropDialog";
 import { CatalogThumb } from "@/components/admin/CatalogThumb";
 import { GARMENTS, GARMENTS_HERR, type Gender } from "@/lib/garments";
 import {
@@ -101,6 +104,9 @@ export function BuilderClient({
   publishAs: string | null;
   impersonating: boolean;
 }) {
+  // Local copy so a crop made here shows up in the picker immediately.
+  const [catalog, setCatalog] = useState(items);
+  const [cropId, setCropId] = useState<string | null>(null);
   const [placed, setPlaced] = useState<Placed[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [manual, setManual] = useState(false);
@@ -341,7 +347,7 @@ export function BuilderClient({
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)]">
-      <Picker items={items} selected={selectedIds} onToggle={toggle} />
+      <Picker items={catalog} selected={selectedIds} onToggle={toggle} />
 
       <div className="space-y-4 lg:sticky lg:top-24 self-start">
         {published && (
@@ -357,6 +363,39 @@ export function BuilderClient({
             </div>
           </div>
         )}
+
+        {cropId && (() => {
+          const target = placed.find((p) => p.item.id === cropId);
+          if (!target) return null;
+          return (
+            <CropDialog
+              src={target.item.imageUrl}
+              title={target.item.name}
+              onCancel={() => setCropId(null)}
+              onCropped={async (file) => {
+                const fd = new FormData();
+                fd.set("image", file);
+                const res = await replaceCatalogImage(target.item.id, fd);
+                if (!res.ok) throw new Error(res.error);
+                const img = await loadImage(res.item.imageUrl);
+                const aspect = img.naturalWidth / img.naturalHeight || target.aspect;
+                // Keep the garment's centre and width; height follows the new crop.
+                setPlaced((prev) =>
+                  prev.map((p) => {
+                    if (p.item.id !== target.item.id) return p;
+                    const cx = p.rect.x + p.rect.w / 2;
+                    const cy = p.rect.y + p.rect.h / 2;
+                    const w = p.rect.w;
+                    const h = w / aspect;
+                    return { ...p, item: { ...p.item, ...res.item }, aspect, rect: { x: cx - w / 2, y: cy - h / 2, w, h } };
+                  }),
+                );
+                setCatalog((prev) => prev.map((c) => (c.id === res.item.id ? { ...c, ...res.item, usage: c.usage } : c)));
+                setCropId(null);
+              }}
+            />
+          );
+        })()}
 
         <Stage
           placed={placed}
@@ -389,6 +428,9 @@ export function BuilderClient({
               {Math.round(active.rotation)}° ×
             </button>
           )}
+          <button type="button" className={toolBtn} disabled={!active} onClick={() => active && setCropId(active.item.id)}>
+            <Crop className="h-3.5 w-3.5" /> Beskär
+          </button>
           <button type="button" className={toolBtn} disabled={!active} onClick={() => reorderActive(true)}>
             <ArrowUpToLine className="h-3.5 w-3.5" /> Fram
           </button>
