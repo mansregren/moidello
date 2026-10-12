@@ -12,6 +12,8 @@ import {
   ArrowDownToLine,
   Trash2,
   LayoutGrid,
+  RotateCw,
+  RotateCcw,
   Search,
 } from "lucide-react";
 import { createOutfit } from "@/app/skapa/actions";
@@ -56,6 +58,8 @@ interface Placed {
   item: CatalogItem;
   rect: Rect;
   aspect: number;
+  /** Degrees clockwise, around the item centre. */
+  rotation: number;
 }
 
 type Draw = "multiply" | "tile" | "rounded" | "plain";
@@ -148,7 +152,7 @@ export function BuilderClient({
     }
     setPlaced((prev) => {
       if (prev.some((p) => p.item.id === item.id)) return prev;
-      const next = [...prev, { item, aspect, rect: { x: 0, y: 0, w: 0, h: 0 } }];
+      const next = [...prev, { item, aspect, rotation: 0, rect: { x: 0, y: 0, w: 0, h: 0 } }];
       return relayout(next, manual);
     });
     setActiveId(item.id);
@@ -166,6 +170,23 @@ export function BuilderClient({
       const h = (w / r.w) * r.h;
       return { x: r.x + (r.w - w) / 2, y: r.y + (r.h - h) / 2, w, h };
     });
+  };
+
+  const patchItem = (id: string, patch: Partial<Pick<Placed, "rect" | "rotation">>) => {
+    setManual(true);
+    setPlaced((prev) => prev.map((p) => (p.item.id === id ? { ...p, ...patch } : p)));
+  };
+
+  const rotateActive = (delta: number) => {
+    if (!activeId) return;
+    setManual(true);
+    setPlaced((prev) =>
+      prev.map((p) =>
+        p.item.id === activeId
+          ? { ...p, rotation: ((((p.rotation + delta) % 360) + 540) % 360) - 180 }
+          : p,
+      ),
+    );
   };
 
   const reorderActive = (toFront: boolean) => {
@@ -197,6 +218,10 @@ export function BuilderClient({
         scaleActive(1.08);
       } else if (e.key === "-") {
         scaleActive(1 / 1.08);
+      } else if (e.key === "[" || e.key === "{") {
+        rotateActive(e.key === "{" ? -1 : -15);
+      } else if (e.key === "]" || e.key === "}") {
+        rotateActive(e.key === "}" ? 1 : 15);
       } else if (e.key.startsWith("Arrow")) {
         e.preventDefault();
         const step = e.shiftKey ? 40 : 10;
@@ -230,9 +255,14 @@ export function BuilderClient({
 
     for (const p of placed) {
       const img = await loadImage(p.item.imageUrl);
-      const { x, y, w, h } = p.rect;
+      const { w, h } = p.rect;
+      // Draw around the item centre so rotation matches the CSS transform.
+      const x = -w / 2;
+      const y = -h / 2;
       const mode = drawMode(p.item.imageBg);
       ctx.save();
+      ctx.translate(p.rect.x + w / 2, p.rect.y + h / 2);
+      ctx.rotate((p.rotation * Math.PI) / 180);
       if (mode === "tile") {
         const pad = tilePad(p.rect);
         ctx.fillStyle = p.item.imageBg!;
@@ -333,13 +363,7 @@ export function BuilderClient({
           bg={bg}
           activeId={activeId}
           onActivate={setActiveId}
-          onMove={(id, dx, dy) => updateRect(id, (r) => ({ ...r, x: r.x + dx, y: r.y + dy }))}
-          onResize={(id, dw) =>
-            updateRect(id, (r) => {
-              const w = Math.min(CANVAS_W * 1.2, Math.max(80, r.w + dw));
-              return { ...r, w, h: (w / r.w) * r.h };
-            })
-          }
+          onChange={patchItem}
         />
 
         <div className="flex flex-wrap items-center gap-1.5">
@@ -349,6 +373,22 @@ export function BuilderClient({
           <button type="button" className={toolBtn} disabled={!active} onClick={() => scaleActive(1.1)} aria-label="Större">
             <Plus className="h-3.5 w-3.5" />
           </button>
+          <button type="button" className={toolBtn} disabled={!active} onClick={() => rotateActive(-15)} aria-label="Rotera 15° moturs">
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+          <button type="button" className={toolBtn} disabled={!active} onClick={() => rotateActive(15)} aria-label="Rotera 15° medurs">
+            <RotateCw className="h-3.5 w-3.5" />
+          </button>
+          {active && active.rotation !== 0 && (
+            <button
+              type="button"
+              className={toolBtn}
+              onClick={() => patchItem(active.item.id, { rotation: 0 })}
+              title="Nollställ rotation"
+            >
+              {Math.round(active.rotation)}° ×
+            </button>
+          )}
           <button type="button" className={toolBtn} disabled={!active} onClick={() => reorderActive(true)}>
             <ArrowUpToLine className="h-3.5 w-3.5" /> Fram
           </button>
@@ -388,8 +428,9 @@ export function BuilderClient({
           </div>
         </div>
         <p className="text-xs text-foreground-subtle">
-          Dra för att flytta, dra i hörnet för att ändra storlek. Tangenter: piltangenter flyttar,
-          + / − ändrar storlek, Delete tar bort.
+          Dra för att flytta, dra i hörnet för att ändra storlek och i den runda pricken ovanför för att
+          rotera (Shift = steg om 15°). Tangenter: piltangenter flyttar, + / − ändrar storlek,
+          [ / ] roterar 15° (Shift: 1°), Delete tar bort.
         </p>
 
         <div className="rounded-2xl border border-border bg-background-secondary p-4 space-y-3">
@@ -462,24 +503,37 @@ export function BuilderClient({
 /* Stage: DOM preview drawn with the same geometry as the export       */
 /* ------------------------------------------------------------------ */
 
+type ItemPatch = Partial<Pick<Placed, "rect" | "rotation">>;
+
+type DragState =
+  | { kind: "move"; id: string; x: number; y: number }
+  | { kind: "resize"; id: string; cx: number; cy: number; d0: number; r0: Rect }
+  | { kind: "rotate"; id: string; cx: number; cy: number; a0: number; rot0: number };
+
+/** Normalise to [-180, 180) and snap to the nearest right angle within 4°. */
+function snapAngle(deg: number): number {
+  const norm = (((deg % 360) + 540) % 360) - 180;
+  const nearest = Math.round(norm / 90) * 90;
+  if (Math.abs(norm - nearest) > 4) return norm;
+  return nearest === 180 ? -180 : nearest;
+}
+
 function Stage({
   placed,
   bg,
   activeId,
   onActivate,
-  onMove,
-  onResize,
+  onChange,
 }: {
   placed: Placed[];
   bg: string;
   activeId: string | null;
   onActivate: (id: string | null) => void;
-  onMove: (id: string, dx: number, dy: number) => void;
-  onResize: (id: string, dw: number) => void;
+  onChange: (id: string, patch: ItemPatch) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.35);
-  const drag = useRef<{ id: string; kind: "move" | "resize"; x: number; y: number } | null>(null);
+  const drag = useRef<DragState | null>(null);
 
   useEffect(() => {
     const el = ref.current;
@@ -489,26 +543,76 @@ function Stage({
     return () => ro.disconnect();
   }, []);
 
+  /** Item centre in client (screen) coordinates. */
+  const centreOf = (r: Rect) => {
+    const box = ref.current!.getBoundingClientRect();
+    return {
+      cx: box.left + (r.x + r.w / 2) * scale,
+      cy: box.top + (r.y + r.h / 2) * scale,
+    };
+  };
+
   const onPointerMove = (e: React.PointerEvent) => {
     const d = drag.current;
     if (!d) return;
-    const dx = (e.clientX - d.x) / scale;
-    const dy = (e.clientY - d.y) / scale;
-    d.x = e.clientX;
-    d.y = e.clientY;
-    if (d.kind === "move") onMove(d.id, dx, dy);
-    else onResize(d.id, dx);
+    const p = placed.find((x) => x.item.id === d.id);
+    if (!p) return;
+    if (d.kind === "move") {
+      const dx = (e.clientX - d.x) / scale;
+      const dy = (e.clientY - d.y) / scale;
+      d.x = e.clientX;
+      d.y = e.clientY;
+      onChange(d.id, { rect: { ...p.rect, x: p.rect.x + dx, y: p.rect.y + dy } });
+    } else if (d.kind === "resize") {
+      // Scale by distance from the centre, so it behaves the same at any rotation.
+      const dist = Math.hypot(e.clientX - d.cx, e.clientY - d.cy);
+      const w = Math.min(CANVAS_W * 1.2, Math.max(80, d.r0.w * (dist / d.d0)));
+      const h = (w / d.r0.w) * d.r0.h;
+      const cx = d.r0.x + d.r0.w / 2;
+      const cy = d.r0.y + d.r0.h / 2;
+      onChange(d.id, { rect: { x: cx - w / 2, y: cy - h / 2, w, h } });
+    } else {
+      const a = (Math.atan2(e.clientY - d.cy, e.clientX - d.cx) * 180) / Math.PI;
+      const raw = d.rot0 + (a - d.a0);
+      onChange(d.id, {
+        rotation: e.shiftKey ? snapAngle(Math.round(raw / 15) * 15) : snapAngle(raw),
+      });
+    }
   };
 
-  const start = (e: React.PointerEvent, id: string, kind: "move" | "resize") => {
+  const start = (e: React.PointerEvent, p: Placed, kind: DragState["kind"]) => {
     e.stopPropagation();
     e.preventDefault();
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    drag.current = { id, kind, x: e.clientX, y: e.clientY };
-    onActivate(id);
+    const { cx, cy } = centreOf(p.rect);
+    if (kind === "move") {
+      drag.current = { kind, id: p.item.id, x: e.clientX, y: e.clientY };
+    } else if (kind === "resize") {
+      drag.current = {
+        kind,
+        id: p.item.id,
+        cx,
+        cy,
+        d0: Math.max(1, Math.hypot(e.clientX - cx, e.clientY - cy)),
+        r0: p.rect,
+      };
+    } else {
+      drag.current = {
+        kind,
+        id: p.item.id,
+        cx,
+        cy,
+        a0: (Math.atan2(e.clientY - cy, e.clientX - cx) * 180) / Math.PI,
+        rot0: p.rotation,
+      };
+    }
+    onActivate(p.item.id);
   };
 
   const px = (n: number) => `${n * scale}px`;
+  const end = () => {
+    drag.current = null;
+  };
 
   return (
     <div
@@ -517,8 +621,8 @@ function Stage({
       style={{ backgroundColor: bg, isolation: "isolate" }}
       onPointerDown={() => onActivate(null)}
       onPointerMove={onPointerMove}
-      onPointerUp={() => (drag.current = null)}
-      onPointerCancel={() => (drag.current = null)}
+      onPointerUp={end}
+      onPointerCancel={end}
     >
       {placed.length === 0 && (
         <p className="absolute inset-0 grid place-items-center text-sm text-foreground-subtle text-center px-8">
@@ -530,47 +634,68 @@ function Stage({
         const pad = tilePad(p.rect);
         const isActive = p.item.id === activeId;
         return (
-          <div key={p.item.id}>
+          <div
+            key={p.item.id}
+            role="button"
+            tabIndex={0}
+            aria-label={`${p.item.brand} ${p.item.name}`}
+            onPointerDown={(e) => start(e, p, "move")}
+            className={`absolute cursor-grab active:cursor-grabbing ${
+              isActive ? "outline outline-2 outline-offset-2 outline-foreground/60" : ""
+            }`}
+            style={{
+              left: px(p.rect.x),
+              top: px(p.rect.y),
+              width: px(p.rect.w),
+              height: px(p.rect.h),
+              transform: p.rotation ? `rotate(${p.rotation}deg)` : undefined,
+              // Blend on the transformed element itself: a transform creates
+              // its own stacking context, so a blended child would only see
+              // its (empty) parent instead of the canvas.
+              mixBlendMode: mode === "multiply" ? "multiply" : "normal",
+            }}
+          >
             {mode === "tile" && (
               <div
                 className="absolute pointer-events-none"
                 style={{
-                  left: px(p.rect.x - pad),
-                  top: px(p.rect.y - pad),
-                  width: px(p.rect.w + pad * 2),
-                  height: px(p.rect.h + pad * 2),
+                  inset: px(-pad),
                   backgroundColor: p.item.imageBg!,
                   borderRadius: px(RADIUS),
                 }}
               />
             )}
             <div
-              role="button"
-              tabIndex={0}
-              aria-label={`${p.item.brand} ${p.item.name}`}
-              onPointerDown={(e) => start(e, p.item.id, "move")}
-              className={`absolute cursor-grab active:cursor-grabbing ${
-                isActive ? "outline outline-2 outline-offset-2 outline-foreground/60" : ""
-              }`}
+              className="absolute inset-0"
               style={{
-                left: px(p.rect.x),
-                top: px(p.rect.y),
-                width: px(p.rect.w),
-                height: px(p.rect.h),
-                mixBlendMode: mode === "multiply" ? "multiply" : "normal",
                 borderRadius: mode === "rounded" ? px(RADIUS) : undefined,
                 overflow: mode === "rounded" ? "hidden" : undefined,
               }}
             >
               <img src={p.item.imageUrl} alt="" draggable={false} crossOrigin="anonymous" className="h-full w-full" />
-              {isActive && (
+            </div>
+            {isActive && (
+              <>
                 <span
-                  onPointerDown={(e) => start(e, p.item.id, "resize")}
+                  onPointerDown={(e) => start(e, p, "resize")}
+                  title="Dra för att ändra storlek"
                   className="absolute -right-2 -bottom-2 h-4 w-4 rounded-full bg-foreground border-2 border-background cursor-nwse-resize"
                   aria-hidden
                 />
-              )}
-            </div>
+                <span
+                  className="absolute left-1/2 -top-6 h-6 w-px bg-foreground/60 pointer-events-none"
+                  aria-hidden
+                />
+                <span
+                  onPointerDown={(e) => start(e, p, "rotate")}
+                  title="Dra för att rotera (Shift = steg om 15°)"
+                  className="absolute left-1/2 -top-11 -ml-2.5 h-5 w-5 rounded-full bg-background border-2 border-foreground cursor-grab grid place-items-center text-foreground"
+                  aria-hidden
+                >
+                  <RotateCw className="h-2.5 w-2.5" />
+                </span>
+              </>
+            )}
           </div>
         );
       })}
