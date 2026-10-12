@@ -36,7 +36,7 @@ export default async function AdminOutfitDetailPage({
   const { data: outfit } = await supabase
     .from("outfits")
     .select(
-      "id, slug, user_id, title, description, keywords, category, gender, vertical, is_published, scheduled_for, image_url, image_path, created_at",
+      "id, slug, user_id, title, description, keywords, category, gender, vertical, is_published, scheduled_for, image_url, image_path, created_at, builder_layout",
     )
     .eq("id", id)
     .maybeSingle();
@@ -150,6 +150,15 @@ export default async function AdminOutfitDetailPage({
             isPublished={!!outfit.is_published}
             tags={tagPositions}
           />
+
+          {outfit.builder_layout && (
+            <Link
+              href={`/admin/snabb-outfit?outfit=${outfit.id}`}
+              className="mt-4 flex w-full items-center justify-center rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-semibold hover:bg-foreground/90"
+            >
+              Redigera i Snabb-outfit
+            </Link>
+          )}
 
           {creator && (
             <div className="mt-4 flex items-center gap-3 p-3 rounded-2xl border border-border bg-background-secondary hover:border-foreground/30 transition-colors">

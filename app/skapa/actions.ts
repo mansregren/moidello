@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { slugify, storageFilename } from "@/lib/slug";
 import { getImpersonationTarget, isCurrentUserAdmin } from "@/lib/admin";
 import { homeVerticalVisible, canCreateOutfits } from "@/lib/flags";
+import { parseBuilderLayout } from "@/lib/catalog/layout";
 
 export interface PublishedOutfit {
   id: string;
@@ -91,6 +92,9 @@ export async function createOutfit(
   // The plaggbank builder publishes a rendered flatlay instead of a photo.
   const outfitType =
     formData.get("type") === "flatlay" ? ("flatlay" as const) : ("photo" as const);
+  // Snabb-outfit sends its layout so the flatlay can be reopened and edited.
+  const builderLayout =
+    outfitType === "flatlay" ? parseBuilderLayout(formData.get("builderLayout")) : null;
 
   if (!(image instanceof File) || image.size === 0) {
     return { error: "Choose an image." };
@@ -187,6 +191,7 @@ export async function createOutfit(
         // still set meta_description as an explicit override.
         keywords: keywords.length > 0 ? keywords : null,
         type: outfitType,
+        builder_layout: builderLayout ? JSON.parse(JSON.stringify(builderLayout)) : null,
       })
       .select("id, slug")
       .single();

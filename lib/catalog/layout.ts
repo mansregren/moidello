@@ -152,3 +152,53 @@ export function suggestTitle(items: Array<{ garment: string; color: string | nul
   if (words.length <= 1) return words[0] ? `All ${words[0]}` : "";
   return `${words.slice(0, -1).join(", ")} & ${words[words.length - 1]}`;
 }
+
+/** What a flatlay outfit stores in outfits.builder_layout so the builder can reopen it. */
+export interface BuilderLayout {
+  version: 1;
+  bg: string;
+  items: Array<{ catalogItemId: string; rect: Rect; rotation: number }>;
+}
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Validate untrusted layout JSON; returns null when it doesn't fit the shape. */
+export function parseBuilderLayout(raw: unknown): BuilderLayout | null {
+  let v = raw;
+  if (typeof v === "string") {
+    try {
+      v = JSON.parse(v);
+    } catch {
+      return null;
+    }
+  }
+  if (!v || typeof v !== "object") return null;
+  const o = v as { version?: unknown; bg?: unknown; items?: unknown };
+  if (o.version !== 1 || typeof o.bg !== "string" || !/^#[0-9a-f]{6}$/i.test(o.bg)) return null;
+  if (!Array.isArray(o.items) || o.items.length === 0 || o.items.length > 40) return null;
+  const num = (n: unknown, lo: number, hi: number) =>
+    typeof n === "number" && Number.isFinite(n) && n >= lo && n <= hi;
+  const items: BuilderLayout["items"] = [];
+  for (const it of o.items as Array<Record<string, unknown>>) {
+    const r = it?.rect as Record<string, unknown> | undefined;
+    if (
+      typeof it?.catalogItemId !== "string" ||
+      !UUID_RE.test(it.catalogItemId) ||
+      !r ||
+      !num(r.x, -CANVAS_W, CANVAS_W * 2) ||
+      !num(r.y, -CANVAS_H, CANVAS_H * 2) ||
+      !num(r.w, 1, CANVAS_W * 2) ||
+      !num(r.h, 1, CANVAS_H * 2) ||
+      !num(it.rotation, -360, 360)
+    ) {
+      return null;
+    }
+    items.push({
+      catalogItemId: it.catalogItemId,
+      rect: { x: r.x as number, y: r.y as number, w: r.w as number, h: r.h as number },
+      rotation: it.rotation as number,
+    });
+  }
+  return { version: 1, bg: o.bg.toUpperCase(), items };
+}

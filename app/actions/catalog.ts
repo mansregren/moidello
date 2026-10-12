@@ -19,6 +19,8 @@ import {
   type CatalogRow,
 } from "@/lib/catalog/types";
 import type { Gender } from "@/lib/garments";
+import { parseBuilderLayout } from "@/lib/catalog/layout";
+import { slugify, storageFilename } from "@/lib/slug";
 import type { Database } from "@/lib/supabase/database.types";
 
 type CatalogInsert = Database["public"]["Tables"]["catalog_items"]["Insert"];
@@ -613,4 +615,155 @@ export async function importTaggedItemsBatch(
     failed,
     remaining: Math.max(0, groups.size - batch.length),
   };
+}
+
+interface FlatlayTagInput {
+  brand: string;
+  name: string;
+  buyUrl: string;
+  garment: string;
+  price?: number | null;
+  currency?: string | null;
+  color?: string | null;
+  material?: string | null;
+  imageUrl?: string | null;
+  x: number;
+  y: number;
+  isAffiliate?: boolean;
+  catalogItemId?: string | null;
+}
+
+/**
+ * Save an edited Snabb-outfit flatlay in place: new rendered image, layout,
+ * title/category/gender/description, and tags. Tags are matched to the
+ * existing rows by catalog item, so unchanged garments keep their id (and
+ * their click history); removed garments are deleted, new ones inserted.
+ */
+export async function updateFlatlayOutfit(
+  outfitId: string,
+  formData: FormData,
+): Promise<Result<{ url: string }>> {
+  const ctx = await adminClient();
+  if (!ctx) return { ok: false, error: "Inte behörig." };
+  if (!UUID_RE.test(outfitId)) return { ok: false, error: "Ogiltigt id." };
+
+  const image = formData.get("image");
+  if (!(image instanceof File) || image.size === 0 || image.size > MAX_UPLOAD_BYTES) {
+    return { ok: false, error: "Bilden saknas eller är för stor." };
+  }
+  const title = String(formData.get("title") ?? "").trim().slice(0, 200);
+  if (!title) return { ok: false, error: "Titel saknas." };
+  const description = String(formData.get("description") ?? "").trim().slice(0, 2000);
+  const category = String(formData.get("category") ?? "").trim() || null;
+  const gender = formData.get("gender") === "dam" ? "dam" : "herr";
+  const layout = parseBuilderLayout(formData.get("builderLayout"));
+  if (!layout) return { ok: false, error: "Ogiltig layout." };
+
+  let tags: FlatlayTagInput[];
+  try {
+    const parsed = JSON.parse(String(formData.get("tags") ?? "[]"));
+    if (!Array.isArray(parsed)) throw new Error();
+    tags = parsed.filter((t) => t && String(t.brand ?? "").trim() && String(t.name ?? "").trim());
+  } catch {
+    return { ok: false, error: "Kunde inte läsa taggarna." };
+  }
+
+  const { data: outfit } = await ctx.supabase
+    .from("outfits")
+    .select("id, user_id, slug, title, image_path, profiles!outfits_user_id_fkey(username)")
+    .eq("id", outfitId)
+    .maybeSingle();
+  if (!outfit) return { ok: false, error: "Outfiten finns inte." };
+
+  const path = storageFilename({
+    userId: outfit.user_id as string,
+    slug: slugify((outfit.slug as string) || title),
+    ext: "jpg",
+    prefix: "flatlay",
+  });
+  const { error: upErr } = await ctx.supabase.storage
+    .from("outfits")
+    .upload(path, image, { contentType: "image/jpeg", upsert: false });
+  if (upErr) return { ok: false, error: `Uppladdning misslyckades: ${upErr.message}` };
+  const {
+    data: { publicUrl },
+  } = ctx.supabase.storage.from("outfits").getPublicUrl(path);
+
+  const { error: updErr } = await ctx.supabase
+    .from("outfits")
+    .update({
+      image_url: publicUrl,
+      image_path: path,
+      title,
+      description: description || null,
+      category,
+      gender,
+      type: "flatlay",
+      builder_layout: JSON.parse(JSON.stringify(layout)),
+    })
+    .eq("id", outfitId);
+  if (updErr) {
+    await ctx.supabase.storage.from("outfits").remove([path]);
+    return { ok: false, error: updErr.message };
+  }
+
+  // Sync tags.
+  const { data: existing } = await ctx.supabase
+    .from("tagged_items")
+    .select("id, catalog_item_id")
+    .eq("outfit_id", outfitId);
+  const byCatalog = new Map(
+    (existing ?? [])
+      .filter((t) => t.catalog_item_id)
+      .map((t) => [t.catalog_item_id as string, t.id as string]),
+  );
+  const keep = new Set<string>();
+  const clampPct = (n: unknown) =>
+    Math.min(100, Math.max(0, Number.isFinite(Number(n)) ? Number(n) : 50));
+  const toRow = (t: FlatlayTagInput) => ({
+    brand: String(t.brand).trim().slice(0, 120),
+    name: String(t.name).trim().slice(0, 200),
+    buy_url: String(t.buyUrl ?? "").trim() || null,
+    garment: String(t.garment || "Tops").slice(0, 40),
+    price: typeof t.price === "number" && Number.isFinite(t.price) && t.price >= 0 ? t.price : null,
+    currency: t.currency?.trim().toUpperCase().slice(0, 8) || "SEK",
+    color: t.color?.trim().slice(0, 40) || null,
+    material: t.material?.trim().slice(0, 60) || null,
+    image_url: t.imageUrl?.trim().slice(0, 1000) || null,
+    position_x: clampPct(t.x),
+    position_y: clampPct(t.y),
+    is_affiliate: !!t.isAffiliate,
+    catalog_item_id:
+      t.catalogItemId && UUID_RE.test(t.catalogItemId) ? t.catalogItemId : null,
+  });
+  const inserts = [];
+  for (const t of tags) {
+    const row = toRow(t);
+    const existingId = row.catalog_item_id ? byCatalog.get(row.catalog_item_id) : undefined;
+    if (existingId && !keep.has(existingId)) {
+      keep.add(existingId);
+      await ctx.supabase.from("tagged_items").update(row).eq("id", existingId);
+    } else {
+      inserts.push({ ...row, outfit_id: outfitId });
+    }
+  }
+  const remove = (existing ?? []).map((t) => t.id as string).filter((id) => !keep.has(id));
+  if (remove.length > 0) await ctx.supabase.from("tagged_items").delete().in("id", remove);
+  if (inserts.length > 0) {
+    const { error } = await ctx.supabase.from("tagged_items").insert(inserts);
+    if (error) console.error("flatlay tag insert failed:", error);
+  }
+
+  // The previous render is no longer referenced by anything.
+  if (outfit.image_path && outfit.image_path !== path) {
+    await ctx.supabase.storage.from("outfits").remove([outfit.image_path as string]);
+  }
+
+  const username = (outfit.profiles as { username?: string } | null)?.username?.toLowerCase();
+  const url = username && outfit.slug ? `/${username}/${outfit.slug}` : `/outfit/${outfitId}`;
+  revalidatePath(url);
+  revalidatePath(`/outfit/${outfitId}`);
+  revalidatePath("/admin/inlagg");
+  revalidatePath(`/admin/inlagg/${outfitId}`);
+  return { ok: true, url };
 }

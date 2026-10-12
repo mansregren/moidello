@@ -19,7 +19,7 @@ import {
   Search,
 } from "lucide-react";
 import { createOutfit } from "@/app/skapa/actions";
-import { replaceCatalogImage } from "@/app/actions/catalog";
+import { replaceCatalogImage, updateFlatlayOutfit } from "@/app/actions/catalog";
 import { CropDialog } from "@/components/admin/CropDialog";
 import { BgRemoveDialog } from "@/components/admin/BgRemoveDialog";
 import { CatalogThumb } from "@/components/admin/CatalogThumb";
@@ -29,6 +29,7 @@ import {
   CANVAS_W,
   autoLayout,
   suggestTitle,
+  type BuilderLayout,
   type Rect,
 } from "@/lib/catalog/layout";
 import type { CatalogItem } from "@/lib/catalog/types";
@@ -97,14 +98,27 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   return p;
 }
 
+/** A published flatlay reopened for editing (from ?outfit=<id>). */
+export interface EditingOutfit {
+  id: string;
+  url: string;
+  title: string;
+  description: string;
+  category: string;
+  gender: Gender;
+  layout: BuilderLayout;
+}
+
 export function BuilderClient({
   items,
   publishAs,
   impersonating,
+  editing,
 }: {
   items: CatalogItem[];
   publishAs: string | null;
   impersonating: boolean;
+  editing: EditingOutfit | null;
 }) {
   // Local copy so a crop made here shows up in the picker immediately.
   const [catalog, setCatalog] = useState(items);
@@ -112,18 +126,62 @@ export function BuilderClient({
   const [bgId, setBgId] = useState<string | null>(null);
   const [placed, setPlaced] = useState<Placed[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [manual, setManual] = useState(false);
-  const [bg, setBg] = useState(BACKGROUNDS[0].hex);
+  const [manual, setManual] = useState(!!editing);
+  const [bg, setBg] = useState(editing?.layout.bg ?? BACKGROUNDS[0].hex);
 
-  const [title, setTitle] = useState("");
-  const [titleTouched, setTitleTouched] = useState(false);
-  const [category, setCategory] = useState("Casual");
-  const [gender, setGender] = useState<Gender>("herr");
-  const [description, setDescription] = useState("");
-
+  const [title, setTitle] = useState(editing?.title ?? "");
+  const [titleTouched, setTitleTouched] = useState(!!editing);
+  const [category, setCategory] = useState(editing?.category ?? "Casual");
+  const [gender, setGender] = useState<Gender>(editing?.gender ?? "herr");
+  const [description, setDescription] = useState(editing?.description ?? "");
   const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [published, setPublished] = useState<{ id: string; url: string; title: string } | null>(null);
+  const [loadingLayout, setLoadingLayout] = useState(!!editing);
+  const [saved, setSaved] = useState(false);
+
+  // Edit mode: rebuild the placed items from the stored layout once.
+  useEffect(() => {
+    if (!editing) return;
+    let cancelled = false;
+    (async () => {
+      const byId = new Map(items.map((i) => [i.id, i]));
+      const restored: Placed[] = [];
+      const missing: string[] = [];
+      for (const li of editing.layout.items) {
+        const item = byId.get(li.catalogItemId);
+        if (!item) {
+          missing.push(li.catalogItemId);
+          continue;
+        }
+        let aspect = li.rect.w / li.rect.h;
+        try {
+          const img = await loadImage(item.imageUrl);
+          aspect = img.naturalWidth / img.naturalHeight || aspect;
+        } catch {
+          // keep the stored aspect
+        }
+        // If the photo changed since (crop / background removal), keep the
+        // garment's centre and width and let the height follow.
+        const cx = li.rect.x + li.rect.w / 2;
+        const cy = li.rect.y + li.rect.h / 2;
+        const w = li.rect.w;
+        const h = w / aspect;
+        restored.push({ item, aspect, rotation: li.rotation, rect: { x: cx - w / 2, y: cy - h / 2, w, h } });
+      }
+      if (cancelled) return;
+      setPlaced(restored);
+      setLoadingLayout(false);
+      if (missing.length > 0) {
+        setError(`${missing.length} plagg finns inte längre i plaggbanken och togs bort ur layouten.`);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once per opened outfit
+  }, []);
+
 
   const suggested = useMemo(
     () => suggestTitle(placed.map((p) => ({ garment: p.item.garment, color: p.item.color }))),
@@ -169,6 +227,7 @@ export function BuilderClient({
 
   const updateRect = (id: string, fn: (r: Rect, p: Placed) => Rect) => {
     setManual(true);
+    setSaved(false);
     setPlaced((prev) => prev.map((p) => (p.item.id === id ? { ...p, rect: fn(p.rect, p) } : p)));
   };
 
@@ -334,10 +393,26 @@ export function BuilderClient({
       fd.set("type", "flatlay");
       fd.set("keywords", "[]");
       fd.set("tags", JSON.stringify(tags));
-      const res = await createOutfit({}, fd);
-      if (res.error || !res.success) throw new Error(res.error ?? "Okänt fel.");
-      setPublished({ id: res.success.id, url: res.success.url, title: res.success.title });
-      reset();
+      const layout: BuilderLayout = {
+        version: 1,
+        bg,
+        items: placed.map((p) => ({
+          catalogItemId: p.item.id,
+          rect: p.rect,
+          rotation: p.rotation,
+        })),
+      };
+      fd.set("builderLayout", JSON.stringify(layout));
+      if (editing) {
+        const res = await updateFlatlayOutfit(editing.id, fd);
+        if (!res.ok) throw new Error(res.error);
+        setSaved(true);
+      } else {
+        const res = await createOutfit({}, fd);
+        if (res.error || !res.success) throw new Error(res.error ?? "Okänt fel.");
+        setPublished({ id: res.success.id, url: res.success.url, title: res.success.title });
+        reset();
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Kunde inte publicera.");
     } finally {
@@ -360,8 +435,28 @@ export function BuilderClient({
               <Link href={published.url} className="underline underline-offset-2" target="_blank">
                 Visa outfit
               </Link>
+              <Link href={`/admin/snabb-outfit?outfit=${published.id}`} className="underline underline-offset-2">
+                Redigera layout
+              </Link>
               <Link href={`/admin/inlagg/${published.id}`} className="underline underline-offset-2" target="_blank">
-                Redigera
+                Text och taggar
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {editing && (
+          <div className="rounded-xl border border-border bg-background-secondary p-4 text-sm">
+            <p className="text-foreground">
+              Du redigerar <span className="font-medium">”{editing.title}”</span>.
+              {saved && " Ändringarna är sparade."}
+            </p>
+            <div className="mt-2 flex gap-4">
+              <Link href={editing.url} className="underline underline-offset-2" target="_blank">
+                Visa outfit
+              </Link>
+              <Link href="/admin/snabb-outfit" className="underline underline-offset-2">
+                Bygg en ny outfit i stället
               </Link>
             </div>
           </div>
@@ -537,10 +632,16 @@ export function BuilderClient({
             className="w-full inline-flex items-center justify-center rounded-full bg-foreground text-background px-5 py-3 text-sm font-semibold hover:bg-foreground/90 disabled:opacity-50"
           >
             {publishing
-              ? "Publicerar…"
+              ? editing
+                ? "Sparar…"
+                : "Publicerar…"
               : placed.length === 0
-                ? "Välj plagg till vänster"
-                : `Publicera outfit (${placed.length} plagg)`}
+                ? loadingLayout
+                  ? "Laddar outfiten…"
+                  : "Välj plagg till vänster"
+                : editing
+                  ? `Spara ändringar (${placed.length} plagg)`
+                  : `Publicera outfit (${placed.length} plagg)`}
           </button>
           {publishAs && (
             <p className={`text-xs ${impersonating ? "text-amber-600" : "text-foreground-subtle"}`}>

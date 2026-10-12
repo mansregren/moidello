@@ -870,6 +870,7 @@ export type Database = {
       outfits: {
         Row: {
           alt_text: string | null
+          builder_layout: Json | null
           category: string | null
           code: string
           created_at: string
@@ -895,6 +896,7 @@ export type Database = {
         }
         Insert: {
           alt_text?: string | null
+          builder_layout?: Json | null
           category?: string | null
           code?: string
           created_at?: string
@@ -920,6 +922,7 @@ export type Database = {
         }
         Update: {
           alt_text?: string | null
+          builder_layout?: Json | null
           category?: string | null
           code?: string
           created_at?: string
