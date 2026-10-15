@@ -78,7 +78,16 @@ export function PlaggClient({
         />
       )}
 
-      <CatalogGrid items={items} onOpen={setEditing} />
+      <CatalogGrid
+        items={items}
+        onOpen={setEditing}
+        onBulkDeleted={(ids) => setItems((prev) => prev.filter((p) => !ids.has(p.id)))}
+        onBulkArchived={(ids, archived) =>
+          setItems((prev) =>
+            prev.map((p) => (ids.has(p.id) ? { ...p, isArchived: archived } : p)),
+          )
+        }
+      />
 
       {editing && (
         <EditDialog
@@ -758,10 +767,58 @@ type Sort = "new" | "used" | "brand";
 function CatalogGrid({
   items,
   onOpen,
+  onBulkDeleted,
+  onBulkArchived,
 }: {
   items: CatalogItem[];
   onOpen: (item: CatalogItem) => void;
+  onBulkDeleted: (ids: Set<string>) => void;
+  onBulkArchived: (ids: Set<string>, archived: boolean) => void;
 }) {
+  // Multi-select: pick several pieces, then archive or delete them in one go.
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkError, setBulkError] = useState<string | null>(null);
+  const toggleSelected = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const exitSelect = () => {
+    setSelectMode(false);
+    setSelected(new Set());
+    setConfirmBulkDelete(false);
+    setBulkError(null);
+  };
+  const runBulk = async (kind: "delete" | "archive" | "unarchive") => {
+    setBulkBusy(true);
+    setBulkError(null);
+    const done = new Set<string>();
+    const failed: string[] = [];
+    for (const id of selected) {
+      const res =
+        kind === "delete"
+          ? await deleteCatalogItem(id)
+          : await setCatalogArchived(id, kind === "archive");
+      if (res.ok) done.add(id);
+      else failed.push(res.error);
+    }
+    if (kind === "delete") onBulkDeleted(done);
+    else onBulkArchived(done, kind === "archive");
+    setBulkBusy(false);
+    setConfirmBulkDelete(false);
+    if (failed.length > 0) {
+      setSelected((prev) => new Set([...prev].filter((id) => !done.has(id))));
+      setBulkError(`${failed.length} gick inte: ${failed[0]}`);
+    } else {
+      exitSelect();
+    }
+  };
+
   const [q, setQ] = useState("");
   const [garment, setGarment] = useState("");
   const [color, setColor] = useState("");
@@ -803,8 +860,80 @@ function CatalogGrid({
             <span className="text-foreground-subtle font-normal"> · {items.length - activeCount} arkiverade</span>
           )}
         </h2>
-        <p className="text-xs text-foreground-subtle">Visar {filtered.length}</p>
+        <div className="flex items-center gap-3">
+          <p className="text-xs text-foreground-subtle">Visar {filtered.length}</p>
+          {!selectMode && (
+            <button type="button" className={secondaryBtn} onClick={() => setSelectMode(true)}>
+              Välj flera
+            </button>
+          )}
+        </div>
       </div>
+
+      {selectMode && (
+        <div className="sticky top-16 z-20 rounded-xl border border-border bg-background/95 backdrop-blur p-3 flex flex-wrap items-center gap-2">
+          <p className="text-sm font-medium text-foreground mr-2">
+            {selected.size} valda
+          </p>
+          <button
+            type="button"
+            className={secondaryBtn}
+            onClick={() => setSelected(new Set(filtered.map((i) => i.id)))}
+            disabled={bulkBusy}
+          >
+            Markera alla som visas ({filtered.length})
+          </button>
+          <button
+            type="button"
+            className={secondaryBtn}
+            onClick={() => setSelected(new Set())}
+            disabled={bulkBusy || selected.size === 0}
+          >
+            Avmarkera
+          </button>
+          <span className="flex-1" />
+          <button
+            type="button"
+            className={secondaryBtn}
+            onClick={() => runBulk(archived ? "unarchive" : "archive")}
+            disabled={bulkBusy || selected.size === 0}
+          >
+            {archived ? "Återställ valda" : "Arkivera valda"}
+          </button>
+          {confirmBulkDelete ? (
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-full bg-red-500 text-white px-5 py-2.5 text-sm font-semibold hover:bg-red-600 disabled:opacity-50"
+              onClick={() => runBulk("delete")}
+              disabled={bulkBusy || selected.size === 0}
+            >
+              {bulkBusy ? "Tar bort…" : `Ja, ta bort ${selected.size} för gott`}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-full border border-red-400 text-red-600 px-4 py-2 text-sm font-medium hover:bg-red-50 disabled:opacity-50"
+              onClick={() => setConfirmBulkDelete(true)}
+              disabled={bulkBusy || selected.size === 0}
+            >
+              Ta bort valda
+            </button>
+          )}
+          <button type="button" className={secondaryBtn} onClick={exitSelect} disabled={bulkBusy}>
+            Klar
+          </button>
+          {confirmBulkDelete && !bulkBusy && (
+            <p className="w-full text-xs text-foreground-muted">
+              Raderas permanent ur plaggbanken. Outfits som använder plaggen påverkas inte.
+              {(() => {
+                const used = items.filter((i) => selected.has(i.id) && i.usage > 0).length;
+                return used > 0 ? ` ${used} av dem används i outfits.` : "";
+              })()}
+            </p>
+          )}
+          {bulkError && <p className="w-full text-xs text-red-500">{bulkError}</p>}
+        </div>
+      )}
 
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_auto]">
         <div className="relative">
@@ -848,19 +977,35 @@ function CatalogGrid({
         </p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {filtered.map((i) => (
+          {filtered.map((i) => {
+            const isSel = selected.has(i.id);
+            return (
             <button
               key={i.id}
               type="button"
-              onClick={() => onOpen(i)}
-              className="text-left group"
+              onClick={() => (selectMode ? toggleSelected(i.id) : onOpen(i))}
+              aria-pressed={selectMode ? isSel : undefined}
+              className="text-left group relative"
             >
               <CatalogThumb
                 src={i.imageUrl}
                 bg={i.imageBg}
                 alt={i.name}
-                className="aspect-[3/4] rounded-xl border border-border group-hover:border-foreground/40 transition-colors"
+                className={`aspect-[3/4] rounded-xl border transition-colors ${
+                  selectMode && isSel
+                    ? "border-2 border-foreground"
+                    : "border-border group-hover:border-foreground/40"
+                }`}
               />
+              {selectMode && (
+                <span
+                  className={`absolute top-2 right-2 grid h-6 w-6 place-items-center rounded-full text-xs font-bold ${
+                    isSel ? "bg-foreground text-background" : "bg-background/90 border border-border"
+                  }`}
+                >
+                  {isSel ? "✓" : ""}
+                </span>
+              )}
               <p className="mt-1.5 text-[11px] uppercase tracking-wide text-foreground-subtle truncate">{i.brand}</p>
               <p className="text-sm text-foreground truncate">{i.name}</p>
               <p className="text-xs text-foreground-subtle truncate">
@@ -870,7 +1015,8 @@ function CatalogGrid({
                 {i.usage > 0 ? ` · i ${i.usage} outfit${i.usage === 1 ? "" : "s"}` : ""}
               </p>
             </button>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>
