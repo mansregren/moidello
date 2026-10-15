@@ -21,11 +21,17 @@ export async function generateMetadata({
     };
   }
 
-  // Root template appends " | Moidello".
-  const title = brand.name;
+  // Root template appends " | Moidello". Lead with what people search
+  // for ("<brand> outfits") rather than the bare brand name.
+  const audience = PUBLIC_GENDER === "herr" ? " for men" : "";
+  const looks = `${brand.outfitCount} styled ${brand.outfitCount === 1 ? "look" : "looks"}`;
+  const title =
+    brand.outfitCount > 0
+      ? `${brand.name} Outfits${audience} — ${looks}`
+      : brand.name;
   const description = brand.isClaimed
-    ? `Verified brand on ${SITE}. ${brand.outfitCount} ${brand.outfitCount === 1 ? "outfit" : "outfits"} tagged.`
-    : `Outfits tagging ${brand.name} on ${SITE}. ${brand.outfitCount} ${brand.outfitCount === 1 ? "outfit" : "outfits"}.`;
+    ? `Verified brand on ${SITE}. ${looks} featuring ${brand.name}, with every piece tagged.`
+    : `How to wear ${brand.name}: ${looks}${audience} on ${SITE}, with every piece tagged so you can see what it is paired with.`;
   const canonical = `/brand/${brand.slug}`;
 
   return {

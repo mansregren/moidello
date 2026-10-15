@@ -2,36 +2,7 @@ import type { Metadata } from "next";
 import { fetchOutfitById } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { DAM_PUBLIC } from "@/lib/flags";
-
-const SITE = "Moidello";
-
-function buildDescription(outfit: {
-  description: string;
-  metaDescription?: string;
-  category: string;
-  tags: { brand: string; name: string }[];
-  creator: { displayName: string };
-}): string {
-  // Admin-set SEO override wins; then the creator's own description;
-  // then an auto-derived line from category + first three tagged garments.
-  const meta = outfit.metaDescription?.trim();
-  if (meta) return meta;
-  const own = outfit.description?.trim();
-  if (own) return own;
-
-  const top = outfit.tags
-    .slice(0, 3)
-    .map((t) => `${t.brand} ${t.name}`)
-    .join(", ");
-  const cat = outfit.category?.trim();
-  if (top && cat) {
-    return `A ${cat.toLowerCase()}-outfit with ${top} by ${outfit.creator.displayName}.`;
-  }
-  if (top) {
-    return `Outfit with ${top} by ${outfit.creator.displayName}.`;
-  }
-  return `Outfit by ${outfit.creator.displayName} on ${SITE}.`;
-}
+import { outfitSeoTitle, outfitSeoDescription } from "@/lib/outfit-seo";
 
 export async function generateMetadata({
   params,
@@ -51,8 +22,8 @@ export async function generateMetadata({
 
   // Root layout's metadata.title.template appends " | Moidello" — don't
   // duplicate the suffix here.
-  const title = `${outfit.title} by ${outfit.creator.displayName}`;
-  const description = buildDescription(outfit);
+  const title = outfitSeoTitle(outfit);
+  const description = outfitSeoDescription(outfit);
   // Canonical points at the new /<username>/<slug> URL when available;
   // the page itself 301-redirects there, but search engines that read
   // metadata before following redirects need the canonical too.

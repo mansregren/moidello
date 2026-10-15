@@ -3,39 +3,7 @@ import { fetchOutfitBySlug } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { isReservedUsername } from "@/lib/reserved-usernames";
 import { DAM_PUBLIC } from "@/lib/flags";
-
-const SITE = "Moidello";
-
-function buildDescription(outfit: {
-  description: string;
-  metaDescription?: string;
-  category: string;
-  vertical?: "mode" | "hem";
-  tags: { brand: string; name: string }[];
-  creator: { displayName: string };
-}): string {
-  // Admin-set SEO override wins; then the creator's own description;
-  // then an auto-derived line from category + first tagged items.
-  const meta = outfit.metaDescription?.trim();
-  if (meta) return meta;
-  const own = outfit.description?.trim();
-  if (own) return own;
-  const isHome = outfit.vertical === "hem";
-  const top = outfit.tags
-    .slice(0, 3)
-    .map((t) => `${t.brand} ${t.name}`)
-    .join(", ");
-  const cat = outfit.category?.trim();
-  if (top && cat) {
-    return isHome
-      ? `${cat} with ${top} by ${outfit.creator.displayName}.`
-      : `A ${cat.toLowerCase()}-outfit with ${top} by ${outfit.creator.displayName}.`;
-  }
-  if (top) {
-    return `${isHome ? "Room" : "Outfit"} with ${top} by ${outfit.creator.displayName}.`;
-  }
-  return `${isHome ? "Interior" : "Outfit"} by ${outfit.creator.displayName} on ${SITE}.`;
-}
+import { outfitSeoTitle, outfitSeoDescription } from "@/lib/outfit-seo";
 
 export async function generateMetadata({
   params,
@@ -59,8 +27,8 @@ export async function generateMetadata({
     };
   }
 
-  const title = `${outfit.title} by ${outfit.creator.displayName}`;
-  const description = buildDescription(outfit);
+  const title = outfitSeoTitle(outfit);
+  const description = outfitSeoDescription(outfit);
   const canonical = `/${username.toLowerCase()}/${slug}`;
   const hasOwnDescription =
     !!outfit.metaDescription?.trim() || !!outfit.description?.trim();
