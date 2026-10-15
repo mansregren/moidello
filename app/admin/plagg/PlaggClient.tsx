@@ -231,11 +231,22 @@ function AddFromLinks({ onSaved }: { onSaved: (item: CatalogItem) => void }) {
   const patch = (key: string, p: Partial<DraftState>) =>
     setDrafts((prev) => prev.map((d) => (d.key === key ? { ...d, ...p } : d)));
 
+  // Drafts the admin has clicked away in the picker grid. Kept rather than
+  // removed so a mis-click can be undone.
+  const [deselected, setDeselected] = useState<Set<string>>(new Set());
+  const toggle = (key: string) =>
+    setDeselected((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+
   const saveAll = async () => {
     setSaving(true);
     let saved = 0;
     for (const d of drafts) {
-      if (d.duplicateOf) continue;
+      if (d.duplicateOf || deselected.has(d.key)) continue;
       patch(d.key, { status: "saving", error: undefined });
       const res = await saveCatalogDraft(d);
       if (res.ok) {
@@ -251,7 +262,7 @@ function AddFromLinks({ onSaved }: { onSaved: (item: CatalogItem) => void }) {
     return saved;
   };
 
-  const savable = drafts.filter((d) => !d.duplicateOf);
+  const savable = drafts.filter((d) => !d.duplicateOf && !deselected.has(d.key));
   const incomplete = savable.filter(
     (d) => !d.brand.trim() || !d.name.trim() || !d.garment || !d.sourceImageUrl.trim(),
   );
@@ -325,7 +336,15 @@ function AddFromLinks({ onSaved }: { onSaved: (item: CatalogItem) => void }) {
               )}
             </p>
             <div className="flex gap-2">
-              <button type="button" className={secondaryBtn} onClick={() => setDrafts([])} disabled={saving}>
+              <button
+                type="button"
+                className={secondaryBtn}
+                onClick={() => {
+                  setDrafts([]);
+                  setDeselected(new Set());
+                }}
+                disabled={saving}
+              >
                 Rensa
               </button>
               <button
@@ -338,14 +357,75 @@ function AddFromLinks({ onSaved }: { onSaved: (item: CatalogItem) => void }) {
               </button>
             </div>
           </div>
-          {drafts.map((d) => (
-            <DraftCard
-              key={d.key}
-              draft={d}
-              onChange={(p) => patch(d.key, p)}
-              onRemove={() => setDrafts((prev) => prev.filter((x) => x.key !== d.key))}
-            />
-          ))}
+          {/* Picker: click a picture to leave it out (click again to bring
+              it back). Only selected pieces are saved and shown below. */}
+          <div className="rounded-xl border border-border bg-background p-3 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm text-foreground">
+                Klicka på plaggen du inte vill ha.{" "}
+                <span className="text-foreground-muted">
+                  {savable.length} av {drafts.filter((d) => !d.duplicateOf).length} valda
+                </span>
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className={secondaryBtn}
+                  onClick={() => setDeselected(new Set())}
+                  disabled={saving}
+                >
+                  Välj alla
+                </button>
+                <button
+                  type="button"
+                  className={secondaryBtn}
+                  onClick={() => setDeselected(new Set(drafts.map((d) => d.key)))}
+                  disabled={saving}
+                >
+                  Avmarkera alla
+                </button>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-2">
+              {drafts.map((d) => {
+                const off = deselected.has(d.key) || !!d.duplicateOf;
+                return (
+                  <button
+                    key={d.key}
+                    type="button"
+                    onClick={() => !d.duplicateOf && toggle(d.key)}
+                    disabled={saving || !!d.duplicateOf}
+                    aria-pressed={!off}
+                    title={`${d.brand} — ${d.name}`}
+                    className={`relative aspect-[3/4] rounded-lg overflow-hidden border-2 bg-white transition ${
+                      off ? "border-transparent opacity-30" : "border-foreground"
+                    }`}
+                  >
+                    {d.sourceImageUrl && (
+                      <img src={d.sourceImageUrl} alt="" className="h-full w-full object-contain" />
+                    )}
+                    <span
+                      className={`absolute top-1 right-1 grid h-5 w-5 place-items-center rounded-full text-[11px] font-bold ${
+                        off ? "bg-background text-foreground-subtle border border-border" : "bg-foreground text-background"
+                      }`}
+                    >
+                      {off ? "" : "✓"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          {drafts
+            .filter((d) => !deselected.has(d.key))
+            .map((d) => (
+              <DraftCard
+                key={d.key}
+                draft={d}
+                onChange={(p) => patch(d.key, p)}
+                onRemove={() => setDrafts((prev) => prev.filter((x) => x.key !== d.key))}
+              />
+            ))}
         </div>
       )}
     </section>
