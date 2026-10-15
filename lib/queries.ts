@@ -461,6 +461,34 @@ export async function fetchOutfitBySlug(
   return withStats;
 }
 
+/**
+ * Current canonical path for a published outfit known only by its slug —
+ * used when /<username>/<slug> misses because the creator was renamed
+ * (e.g. a "user_xxx" default username that was later changed). Returns
+ * null unless exactly one published outfit carries the slug, so an
+ * ambiguous slug never redirects to the wrong creator.
+ */
+export async function fetchOutfitPathBySlug(
+  slug: string,
+  client?: QueryClient,
+): Promise<string | null> {
+  const supabase = await resolveClient(client);
+  const { data } = await supabase
+    .from("outfits")
+    .select("slug, profiles!outfits_user_id_fkey(username)")
+    .eq("slug", slug)
+    .eq("is_published", true)
+    .limit(2);
+  const rows = (data ?? []) as unknown as Array<{
+    slug: string;
+    profiles: { username: string | null } | null;
+  }>;
+  if (rows.length !== 1) return null;
+  const username = rows[0].profiles?.username?.toLowerCase();
+  if (!username) return null;
+  return `/${username}/${rows[0].slug}`;
+}
+
 export async function fetchOutfitById(
   id: string,
   client?: QueryClient,

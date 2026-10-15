@@ -12,6 +12,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { produktPageJsonLd } from "@/lib/json-ld";
 import { outfitPathFromParts } from "@/lib/outfit-url";
 import { slugify } from "@/lib/slug";
+import { canonicalColorLabel } from "@/lib/colors";
 import { ProduktSaveAndShare } from "./ProduktSaveAndShare";
 
 function isUsableBuyUrl(url: string | undefined): url is string {
@@ -238,12 +239,16 @@ export default async function ProduktPage({
                       Colour
                     </dt>
                     <dd className="mt-1 text-foreground font-medium capitalize">
-                      <Link
-                        href={`/farg/${slugify(item.color)}`}
-                        className="hover:underline underline-offset-4"
-                      >
-                        {item.color}
-                      </Link>
+                      {canonicalColorLabel(item.color) ? (
+                        <Link
+                          href={`/farg/${slugify(canonicalColorLabel(item.color)!)}`}
+                          className="hover:underline underline-offset-4"
+                        >
+                          {item.color}
+                        </Link>
+                      ) : (
+                        item.color
+                      )}
                     </dd>
                   </div>
                 )}
@@ -262,17 +267,16 @@ export default async function ProduktPage({
               {item.keywords && item.keywords.length > 0 && (
                 <div className="mt-8">
                   <h3 className="text-[11px] uppercase tracking-wider text-foreground-subtle mb-3">
-                    Nyckelord
+                    Keywords
                   </h3>
                   <ul className="flex flex-wrap gap-2">
                     {item.keywords.slice(0, 10).map((kw) => (
                       <li key={kw}>
-                        <Link
-                          href={`/sok?q=${encodeURIComponent(kw)}`}
-                          className="inline-block rounded-full border border-border bg-background-secondary px-3 py-1 text-xs text-foreground-muted hover:text-foreground hover:border-foreground/40 transition-colors"
-                        >
+                        {/* Plain chips: linking each keyword to /sok minted
+                            dozens of thin search URLs for Google to crawl. */}
+                        <span className="inline-block rounded-full border border-border bg-background-secondary px-3 py-1 text-xs text-foreground-muted">
                           {kw}
-                        </Link>
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -286,7 +290,7 @@ export default async function ProduktPage({
             <div className="flex items-center gap-2 mb-6">
               <Tag className="h-4 w-4 text-foreground-muted" />
               <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider">
-                Stylas i {seenInOutfits}{" "}
+                Styled in {seenInOutfits}{" "}
                 {seenInOutfits === 1 ? "outfit" : "outfits"}
               </h2>
             </div>

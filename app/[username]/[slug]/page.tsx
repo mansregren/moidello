@@ -1,6 +1,7 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   fetchOutfitBySlug,
+  fetchOutfitPathBySlug,
   fetchOutfits,
   fetchHomePosts,
   fetchOutfitComments,
@@ -33,7 +34,13 @@ export default async function OutfitPageBySlug({
 
   const client = createPublicClient();
   const outfit = await fetchOutfitBySlug(username, slug, client);
-  if (!outfit) notFound();
+  if (!outfit) {
+    // Creator renamed since Google indexed the URL (e.g. "user_xxx" →
+    // a real username): follow the slug to the outfit's current address.
+    const moved = await fetchOutfitPathBySlug(slug, client);
+    if (moved && moved !== `/${username}/${slug}`) permanentRedirect(moved);
+    notFound();
+  }
 
   const isHome = outfit.vertical === "hem";
   const [pool, comments] = await Promise.all([

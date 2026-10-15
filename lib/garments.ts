@@ -120,6 +120,12 @@ export function garmentQueryValues(slug: string): string[] {
 const LEGACY_GARMENT_TO_EN: Record<string, string> = Object.fromEntries(
   Object.entries(EN_SLUG_TO_LEGACY_GARMENT).map(([en, sv]) => [sv, en]),
 );
+const LEGACY_GARMENT_TO_EN_ASCII: Record<string, string> = Object.fromEntries(
+  Object.entries(LEGACY_GARMENT_TO_EN).map(([sv, en]) => [
+    sv.normalize("NFD").replace(/[̀-ͯ]/g, ""),
+    en,
+  ]),
+);
 // Same-in-both slugs that never appear in the legacy map.
 const PASSTHROUGH_GARMENT_SLUGS = new Set([
   "t-shirt",
@@ -145,8 +151,12 @@ export function canonicalGarment(slug: string): string | null {
     (g) => g.toLowerCase() === lower.replace(/-/g, " "),
   );
   if (spaced) return spaced;
-  if (LEGACY_GARMENT_TO_EN[lower]) {
-    const en = LEGACY_GARMENT_TO_EN[lower];
+  const legacyEn =
+    LEGACY_GARMENT_TO_EN[lower] ??
+    // Slugified Swedish URLs lost their diacritics: /typ/herr/troja.
+    LEGACY_GARMENT_TO_EN_ASCII[lower];
+  if (legacyEn) {
+    const en = legacyEn;
     return GARMENTS.find((g) => g.toLowerCase() === en) ?? null;
   }
   if (PASSTHROUGH_GARMENT_SLUGS.has(lower)) {

@@ -120,6 +120,12 @@ const COLOR_ALIASES: Record<string, string> = {
   "off-white": "cream",
   ecru: "cream",
 };
+const LEGACY_TO_EN_ASCII: Record<string, string> = Object.fromEntries(
+  Object.entries(LEGACY_TO_EN).map(([sv, en]) => [
+    sv.normalize("NFD").replace(/[̀-ͯ]/g, ""),
+    en,
+  ]),
+);
 const EXTRA_QUERY_VALUES: Record<string, string[]> = {};
 for (const [alias, en] of Object.entries(COLOR_ALIASES)) {
   if (alias.includes("-")) continue;
@@ -138,7 +144,11 @@ export function canonicalColorLabel(slug: string): string | null {
   if (!lower) return null;
   const direct = GARMENT_COLORS.find((c) => c.name.toLowerCase() === lower);
   if (direct) return direct.name;
-  const en = LEGACY_TO_EN[lower] ?? COLOR_ALIASES[lower];
+  const en =
+    LEGACY_TO_EN[lower] ??
+    COLOR_ALIASES[lower] ??
+    // Slugified Swedish URLs lost their diacritics: /farg/gron, /farg/rod.
+    LEGACY_TO_EN_ASCII[lower];
   if (en) {
     return GARMENT_COLORS.find((c) => c.name.toLowerCase() === en)?.name ?? null;
   }

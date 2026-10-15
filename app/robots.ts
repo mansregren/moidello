@@ -22,6 +22,8 @@ export default function robots(): MetadataRoute.Robots {
           "/signup",
           // Filtered/searched discover URLs are duplicates of /upptack
           "/upptack?",
+          // Outbound buy-link redirects (click tracking) — not pages.
+          "/go/",
         ],
       },
       {
