@@ -7,8 +7,14 @@ import { Container } from "@/components/layout/Container";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { howToJsonLd } from "@/lib/json-ld";
 import { findGuide, GUIDES } from "@/lib/guides";
+import { fetchActiveCategories, fetchAllColors, fetchGarmentCounts } from "@/lib/queries";
+import { createPublicClient } from "@/lib/supabase/public";
+import { DAM_PUBLIC, PUBLIC_GENDER } from "@/lib/flags";
+import { slugify } from "@/lib/slug";
 
 export const dynamic = "force-static";
+// Related links depend on which landing pages have outfits — refresh hourly.
+export const revalidate = 3600;
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }));
@@ -50,6 +56,37 @@ export default async function GuideDetail({
   const { slug } = await params;
   const guide = findGuide(slug);
   if (!guide) notFound();
+
+  // Only link the related landing pages that currently exist for the
+  // public — a style, colour or garment with no public outfits 404s.
+  const client = createPublicClient();
+  const [activeStyles, colors, herrGarments] = await Promise.all([
+    fetchActiveCategories(PUBLIC_GENDER, client),
+    fetchAllColors(client, PUBLIC_GENDER),
+    fetchGarmentCounts("herr", client),
+  ]);
+  const damGarments = DAM_PUBLIC
+    ? await fetchGarmentCounts("dam", client)
+    : new Map<string, number>();
+  const activeColors = new Set(colors.map((c) => c.color));
+  const relatedStyles = (guide.related?.styles ?? []).filter((s) =>
+    activeStyles.has(s),
+  );
+  const relatedColors = (guide.related?.colors ?? []).filter((c) =>
+    activeColors.has(c),
+  );
+  const relatedGarments = (guide.related?.garments ?? []).filter(
+    (g) =>
+      ((g.gender === "herr" ? herrGarments : damGarments).get(
+        g.garment.toLowerCase(),
+      ) ?? 0) > 0,
+  );
+  const related = {
+    styles: relatedStyles,
+    colors: relatedColors,
+    garments: relatedGarments,
+    count: relatedStyles.length + relatedColors.length + relatedGarments.length,
+  };
 
   return (
     <>
@@ -121,13 +158,13 @@ export default async function GuideDetail({
               ))}
             </ol>
 
-            {guide.related && (
+            {related.count > 0 && (
               <section className="mt-16 pt-10 border-t border-border">
                 <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-5">
                   Explore further
                 </h2>
                 <ul className="flex flex-wrap gap-2">
-                  {guide.related.styles?.map((s) => (
+                  {related.styles.map((s) => (
                     <li key={`s-${s}`}>
                       <Link
                         href={`/stil/${s}`}
@@ -137,7 +174,7 @@ export default async function GuideDetail({
                       </Link>
                     </li>
                   ))}
-                  {guide.related.colors?.map((c) => (
+                  {related.colors.map((c) => (
                     <li key={`c-${c}`}>
                       <Link
                         href={`/farg/${c}`}
@@ -147,10 +184,10 @@ export default async function GuideDetail({
                       </Link>
                     </li>
                   ))}
-                  {guide.related.garments?.map((g) => (
+                  {related.garments.map((g) => (
                     <li key={`g-${g.gender}-${g.garment}`}>
                       <Link
-                        href={`/typ/${g.gender}/${g.garment.toLowerCase()}`}
+                        href={`/typ/${g.gender}/${slugify(g.garment)}`}
                         className="inline-block rounded-full border border-border bg-background-secondary px-4 py-2 text-sm text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors capitalize"
                       >
                         {g.garment.toLowerCase()} {g.gender === "herr" ? "men" : "women"}

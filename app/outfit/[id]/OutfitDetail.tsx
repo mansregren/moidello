@@ -30,7 +30,9 @@ import { SaveForTikTokButton } from "@/components/outfit/SaveForTikTokButton";
 import { SaveToPinterestButton } from "@/components/outfit/SaveToPinterestButton";
 import { ShareToDmSheet } from "@/components/shared/ShareToDmSheet";
 import { ReportButton } from "@/components/shared/ReportButton";
-import { HIDE_CREATORS } from "@/lib/flags";
+import { HIDE_CREATORS, DAM_PUBLIC } from "@/lib/flags";
+import { canonicalColorLabel } from "@/lib/colors";
+import { canonicalGarment } from "@/lib/garments";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { outfitPageJsonLd } from "@/lib/json-ld";
 import { outfitPath } from "@/lib/outfit-url";
@@ -332,7 +334,7 @@ export default function OutfitDetail({
                 <div className="rounded-2xl border border-border bg-background-secondary p-4">
                   {outfit.tags.length === 0 ? (
                     <p className="text-sm text-foreground-subtle">
-                      {isHome ? "Inga taggade saker." : "Inga taggade plagg."}
+                      {isHome ? "No tagged items." : "No tagged pieces."}
                     </p>
                   ) : (
                     outfit.tags.map((tag) => (
@@ -599,18 +601,24 @@ function ExploreLinks({ outfit }: { outfit: Outfit }) {
   const colors = Array.from(
     new Set(
       outfit.tags
-        .map((t) => t.color?.toLowerCase().trim())
-        .filter((c): c is string => !!c && c.length > 0),
+        // Canonical English label only — legacy Swedish values ("svart")
+        // and colours without a /farg page are mapped or dropped.
+        .map((t) => canonicalColorLabel(t.color ?? "")?.toLowerCase())
+        .filter((c): c is string => !!c),
     ),
   ).slice(0, 5);
 
-  const garments = Array.from(
-    new Set(
-      outfit.tags
-        .map((t) => t.garment?.toLowerCase().trim())
-        .filter((g): g is string => !!g && g.length > 0),
-    ),
-  ).slice(0, 5);
+  // /typ/dam/* 404s while Dam is admin-only, so no garment chips there.
+  const garments =
+    outfit.gender === "dam" && !DAM_PUBLIC
+      ? []
+      : Array.from(
+          new Set(
+            outfit.tags
+              .map((t) => canonicalGarment(t.garment ?? "")?.toLowerCase())
+              .filter((g): g is string => !!g),
+          ),
+        ).slice(0, 5);
 
   if (colors.length === 0 && garments.length === 0) return null;
 

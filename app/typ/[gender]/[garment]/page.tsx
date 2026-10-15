@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
@@ -7,7 +7,8 @@ import { OutfitGrid } from "@/components/outfit/OutfitGrid";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { collectionPageJsonLd } from "@/lib/json-ld";
 import { garmentsForGender, garmentQueryValues, canonicalGarment } from "@/lib/garments";
-import { fetchOutfitsByGarment } from "@/lib/queries";
+import { fetchOutfitsByGarment, fetchGarmentCounts } from "@/lib/queries";
+import { slugify } from "@/lib/slug";
 import { createPublicClient } from "@/lib/supabase/public";
 import { DAM_PUBLIC } from "@/lib/flags";
 
@@ -35,17 +36,23 @@ export default async function TypPage({
   if (gender === "dam" && !DAM_PUBLIC) notFound();
   const garment = canonicalGarment(gs);
   if (!garment) notFound();
+  // Legacy Swedish slugs (/typ/herr/byxor) and upper-case variants are still
+  // indexed — send them to the one canonical English URL.
+  const canonicalSlug = slugify(garment);
+  if (g !== gender || gs !== canonicalSlug) {
+    permanentRedirect(`/typ/${gender}/${canonicalSlug}`);
+  }
 
-  const outfits = await fetchOutfitsByGarment(
-    gender,
-    garmentQueryValues(gs),
-    createPublicClient(),
-  );
+  const client = createPublicClient();
+  const [outfits, garmentCounts] = await Promise.all([
+    fetchOutfitsByGarment(gender, garmentQueryValues(garment), client),
+    fetchGarmentCounts(gender, client),
+  ]);
   if (outfits.length === 0) notFound();
 
   const noun = garment.toLowerCase();
   const audience = gender === "herr" ? "men" : "women";
-  const heading = `${noun} for ${audience}`;
+  const heading = `${garment} for ${audience}`;
   const intro = `Outfit inspiration with ${noun} on Moidello. ${outfits.length} styled looks to take ideas from.`;
 
   return (
@@ -53,7 +60,7 @@ export default async function TypPage({
       <Header />
       <JsonLd
         data={collectionPageJsonLd({
-          path: `/typ/${gender}/${noun}`,
+          path: `/typ/${gender}/${canonicalSlug}`,
           name: heading,
           description: intro,
           outfits,
@@ -111,10 +118,13 @@ export default async function TypPage({
             <ul className="flex flex-wrap gap-2">
               {garmentsForGender(gender)
                 .filter((g) => g.toLowerCase() !== garment.toLowerCase())
+                // Only link siblings that have a page (≥1 outfit) — the
+                // rest 404.
+                .filter((g) => (garmentCounts.get(g.toLowerCase()) ?? 0) > 0)
                 .map((g) => (
                   <li key={g}>
                     <Link
-                      href={`/typ/${gender}/${g.toLowerCase()}`}
+                      href={`/typ/${gender}/${slugify(g)}`}
                       className="inline-block rounded-full border border-border bg-background-secondary px-3.5 py-1.5 text-xs text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors capitalize"
                     >
                       {g.toLowerCase()}

@@ -11,6 +11,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { brandPageJsonLd } from "@/lib/json-ld";
 import { createPublicClient } from "@/lib/supabase/public";
 import { fetchBrandsAggregated, fetchBrandOutfits } from "@/lib/queries";
+import { PUBLIC_GENDER } from "@/lib/flags";
 
 interface BrandProduct {
   id: string;
@@ -31,7 +32,7 @@ export const revalidate = 300;
 type Tier = "luxury" | "premium" | "contemporary" | "high-street";
 
 const tierLabels: Record<Tier, { label: string; icon: typeof Crown }> = {
-  luxury: { label: "Lyx", icon: Crown },
+  luxury: { label: "Luxury", icon: Crown },
   premium: { label: "Premium", icon: Gem },
   contemporary: { label: "Contemporary", icon: Star },
   "high-street": { label: "High Street", icon: ShoppingBag },
@@ -44,11 +45,14 @@ export default async function BrandPage({
 }) {
   const { slug } = await params;
 
-  const aggregated = await fetchBrandsAggregated();
+  const aggregated = await fetchBrandsAggregated(undefined, PUBLIC_GENDER);
   const dbMatch = aggregated.find((b) => b.slug === slug);
   if (!dbMatch) notFound();
 
-  const dbOutfits = await fetchBrandOutfits(dbMatch.name);
+  const dbOutfits = await fetchBrandOutfits(dbMatch.name, PUBLIC_GENDER);
+  // A brand only tagged on hidden (Dam) outfits renders an empty grid for
+  // the public — unless it is a claimed brand with its own profile.
+  if (dbOutfits.length === 0 && !dbMatch.isClaimed) notFound();
 
   // Fetch the brand's official catalog (uploaded via brand-dashboard/import).
   const supabase = createPublicClient();
@@ -62,7 +66,7 @@ export default async function BrandPage({
 
   const description = dbMatch.isClaimed
     ? "Verified brand on Moidello"
-    : `Outfits som taggar ${dbMatch.name}.`;
+    : `Outfits tagging ${dbMatch.name}.`;
 
   return (
     <>

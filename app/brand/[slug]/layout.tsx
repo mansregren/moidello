@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { fetchBrandsAggregated } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
+import { PUBLIC_GENDER } from "@/lib/flags";
 
 const SITE = "Moidello";
 
@@ -10,7 +11,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const aggregated = await fetchBrandsAggregated(createPublicClient());
+  const aggregated = await fetchBrandsAggregated(createPublicClient(), PUBLIC_GENDER);
   const brand = aggregated.find((b) => b.slug === slug);
 
   if (!brand) {

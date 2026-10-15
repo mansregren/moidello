@@ -24,6 +24,14 @@ export function homeVerticalVisible(isAdmin: boolean): boolean {
  */
 export const DAM_PUBLIC = false;
 
+/**
+ * Gender to scope the static, public SEO pages (/farg, /stil, /brand,
+ * sitemap) to. While Dam is admin-only those pages render for an anonymous
+ * viewer locked to Herr, so counting or listing Dam outfits there produces
+ * titles like "3 styled looks" over an empty grid. `undefined` = no scope.
+ */
+export const PUBLIC_GENDER: "herr" | undefined = DAM_PUBLIC ? undefined : "herr";
+
 /** Whether the Dam gender filter is available to this viewer. */
 export function damVisible(isAdmin: boolean): boolean {
   return DAM_PUBLIC || isAdmin;

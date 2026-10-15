@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { canonicalColorLabel } from "@/lib/colors";
+import { canonicalGarment } from "@/lib/garments";
 import type {
   Outfit,
   TaggedItem,
@@ -986,26 +987,36 @@ export async function fetchOutfitsByColor(
  */
 export async function fetchAllColors(
   client?: QueryClient,
+  gender?: "dam" | "herr",
 ): Promise<Array<{ color: string; count: number }>> {
   const supabase = await resolveClient(client);
-  const { data } = await supabase
+  // Same universe as fetchOutfitsByColor (published fashion outfits), so a
+  // colour listed here always has a /farg page behind it.
+  let query = supabase
     .from("tagged_items")
-    .select("color")
+    .select("color, outfit_id, outfits!inner(gender, is_published, vertical)")
     .eq("is_active", true)
-    .not("color", "is", null);
+    .not("color", "is", null)
+    .eq("outfits.is_published", true)
+    .eq("outfits.vertical", "mode");
+  if (gender) query = query.eq("outfits.gender", gender);
+  const { data } = await query;
   if (!data) return [];
-  const counts = new Map<string, number>();
-  for (const r of data as Array<{ color: string }>) {
+  const outfitsPerColor = new Map<string, Set<string>>();
+  for (const r of data as Array<{ color: string; outfit_id: string }>) {
     const raw = r.color?.toLowerCase().trim();
     if (!raw) continue;
-    // Merge legacy Swedish values into their canonical English label so
-    // "svart" and "black" count as the same colour instead of splitting
-    // into two near-duplicate /farg pages.
-    const c = canonicalColorLabel(raw)?.toLowerCase() ?? raw;
-    counts.set(c, (counts.get(c) ?? 0) + 1);
+    // Merge legacy Swedish values and aliases into their canonical English
+    // label so "svart" and "black" count as the same colour. Colours with
+    // no canonical label have no /farg page, so they're left out.
+    const c = canonicalColorLabel(raw)?.toLowerCase();
+    if (!c) continue;
+    const set = outfitsPerColor.get(c) ?? new Set<string>();
+    set.add(r.outfit_id);
+    outfitsPerColor.set(c, set);
   }
-  return Array.from(counts.entries())
-    .map(([color, count]) => ({ color, count }))
+  return Array.from(outfitsPerColor.entries())
+    .map(([color, ids]) => ({ color, count: ids.size }))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -1051,6 +1062,61 @@ export async function fetchOutfitsByGarment(
 
   const mapped = ((data ?? []) as unknown as OutfitRow[]).map(rowToOutfit);
   return attachOutfitStats(mapped, supabase);
+}
+
+/**
+ * Canonical garment label (lower-case) → number of published fashion
+ * outfits of the given gender tagged with it. Lets /typ link only to
+ * sibling categories that actually have a page.
+ */
+export async function fetchGarmentCounts(
+  gender: "dam" | "herr",
+  client?: QueryClient,
+): Promise<Map<string, number>> {
+  const supabase = await resolveClient(client);
+  const { data } = await supabase
+    .from("tagged_items")
+    .select("garment, outfit_id, outfits!inner(gender, is_published, vertical)")
+    .eq("is_active", true)
+    .not("garment", "is", null)
+    .eq("outfits.is_published", true)
+    .eq("outfits.vertical", "mode")
+    .eq("outfits.gender", gender);
+  const perGarment = new Map<string, Set<string>>();
+  for (const r of (data ?? []) as Array<{ garment: string; outfit_id: string }>) {
+    const g = canonicalGarment(r.garment ?? "")?.toLowerCase();
+    if (!g) continue;
+    const set = perGarment.get(g) ?? new Set<string>();
+    set.add(r.outfit_id);
+    perGarment.set(g, set);
+  }
+  return new Map(
+    Array.from(perGarment.entries()).map(([g, ids]) => [g, ids.size]),
+  );
+}
+
+/**
+ * Lower-cased categories (styles) that have at least one published
+ * fashion outfit — the /stil pages that exist.
+ */
+export async function fetchActiveCategories(
+  gender?: "dam" | "herr",
+  client?: QueryClient,
+): Promise<Set<string>> {
+  const supabase = await resolveClient(client);
+  let query = supabase
+    .from("outfits")
+    .select("category")
+    .eq("is_published", true)
+    .eq("vertical", "mode")
+    .not("category", "is", null);
+  if (gender) query = query.eq("gender", gender);
+  const { data } = await query;
+  return new Set(
+    ((data ?? []) as Array<{ category: string }>)
+      .map((r) => r.category.toLowerCase().trim())
+      .filter(Boolean),
+  );
 }
 
 /**

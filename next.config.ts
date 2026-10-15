@@ -61,6 +61,9 @@ const nextConfig: NextConfig = {
       // /welcome togs bort 2026-05-17 — hemsidan täcker samma syfte.
       // 308 (permanent) så Google flyttar ev. indexerad signal vidare.
       { source: "/welcome", destination: "/", permanent: true },
+      // Early routes that were removed — keep any indexed links landing.
+      { source: "/discover", destination: "/upptack", permanent: true },
+      { source: "/feed", destination: "/foljer", permanent: true },
 
       // Guide slugs went sv → en (site language switch). Keep the old
       // indexed URLs alive with a permanent redirect to the new slug.

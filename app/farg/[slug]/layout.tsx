@@ -3,6 +3,7 @@ import { fetchOutfitsByColor } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { slugify } from "@/lib/slug";
 import { colorQueryValues, canonicalColorLabel } from "@/lib/colors";
+import { PUBLIC_GENDER } from "@/lib/flags";
 
 const SITE = "Moidello";
 
@@ -17,8 +18,8 @@ export async function generateMetadata({
     return { title: "Colour", robots: { index: false, follow: true } };
   }
   const outfits = await fetchOutfitsByColor(
-    colorQueryValues(slug),
-    undefined,
+    colorQueryValues(slugify(color)),
+    PUBLIC_GENDER,
     createPublicClient(),
   );
 

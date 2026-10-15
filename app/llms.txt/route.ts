@@ -13,7 +13,7 @@
  */
 
 import { fetchOutfits, fetchAllColors } from "@/lib/queries";
-import { HOME_VERTICAL_PUBLIC } from "@/lib/flags";
+import { HOME_VERTICAL_PUBLIC, PUBLIC_GENDER } from "@/lib/flags";
 
 export const revalidate = 3600;
 
@@ -32,7 +32,7 @@ const STYLES = [
 export async function GET(): Promise<Response> {
   const [outfits, colors] = await Promise.all([
     fetchOutfits(200),
-    fetchAllColors(),
+    fetchAllColors(undefined, PUBLIC_GENDER),
   ]);
 
   const outfitCount = outfits.length;

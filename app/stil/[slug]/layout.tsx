@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { fetchOutfitsByCategory } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
+import { PUBLIC_GENDER } from "@/lib/flags";
 
 const SITE = "Moidello";
 
@@ -72,7 +73,7 @@ export async function generateMetadata({
 
   const outfits = await fetchOutfitsByCategory(
     style.label,
-    undefined,
+    PUBLIC_GENDER,
     createPublicClient(),
   );
 

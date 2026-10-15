@@ -6,8 +6,9 @@ import { Container } from "@/components/layout/Container";
 import { GenderFilteredGrid } from "@/components/outfit/GenderFilteredGrid";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { collectionPageJsonLd } from "@/lib/json-ld";
-import { fetchOutfitsByCategory } from "@/lib/queries";
+import { fetchOutfitsByCategory, fetchActiveCategories } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
+import { PUBLIC_GENDER } from "@/lib/flags";
 
 // ISR: gender-agnostic cacheable fetch, dam/herr + liked/saved applied
 // client-side. Public client → no cookies → static render.
@@ -61,11 +62,11 @@ export default async function StilPage({
   const style = STYLES[slug.toLowerCase()];
   if (!style) notFound();
 
-  const outfits = await fetchOutfitsByCategory(
-    style.label,
-    undefined,
-    createPublicClient(),
-  );
+  const client = createPublicClient();
+  const [outfits, activeStyles] = await Promise.all([
+    fetchOutfitsByCategory(style.label, PUBLIC_GENDER, client),
+    fetchActiveCategories(PUBLIC_GENDER, client),
+  ]);
   if (outfits.length === 0) notFound();
 
   return (
@@ -129,11 +130,12 @@ export default async function StilPage({
 
           <section className="mt-20 mb-16 border-t border-border pt-10">
             <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-5">
-              Fler stilar
+              More styles
             </h2>
             <ul className="flex flex-wrap gap-2">
               {Object.entries(STYLES)
                 .filter(([s]) => s !== slug.toLowerCase())
+                .filter(([s]) => activeStyles.has(s))
                 .map(([s, info]) => (
                   <li key={s}>
                     <Link

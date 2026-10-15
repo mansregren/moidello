@@ -80,7 +80,7 @@ export async function completeOnboarding(
     .eq("id", user.id);
 
   if (profileError) {
-    return { error: `Kunde inte spara profilen: ${profileError.message}` };
+    return { error: `Could not save your profile: ${profileError.message}` };
   }
 
   let followIds: string[] = [];

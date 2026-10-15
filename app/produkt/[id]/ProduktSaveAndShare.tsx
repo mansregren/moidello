@@ -59,7 +59,7 @@ export function ProduktSaveAndShare({
         )}
       >
         <Bookmark className={cn("h-4 w-4", saved && "fill-foreground text-foreground")} />
-        {saved ? "Sparat" : "Spara plagg"}
+        {saved ? "Saved" : "Save piece"}
       </button>
       <button
         type="button"

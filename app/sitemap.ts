@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { createPublicClient } from "@/lib/supabase/public";
 import { GUIDES } from "@/lib/guides";
-import { HOME_VERTICAL_PUBLIC, DAM_PUBLIC } from "@/lib/flags";
+import { HOME_VERTICAL_PUBLIC, DAM_PUBLIC, PUBLIC_GENDER } from "@/lib/flags";
+import { fetchBrandsAggregated } from "@/lib/queries";
 import { HOME_ROOMS } from "@/lib/home-data";
 import { canonicalColorLabel } from "@/lib/colors";
 import { canonicalGarment } from "@/lib/garments";
@@ -62,23 +63,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // public-readable subset (published outfits, named profiles, etc.).
   const supabase = createPublicClient();
 
-  const [outfitsRes, profilesRes, brandsRes, tagDimsRes] = await Promise.all([
-    supabase
-      .from("outfits")
-      .select(
-        `id, slug, updated_at, created_at,
-         profiles!outfits_user_id_fkey(username)`,
-      )
-      .eq("is_published", true)
-      .eq("vertical", "mode")
-      .order("created_at", { ascending: false })
-      .limit(10000),
+  // While Dam is admin-only, Dam outfits are noindex and every landing
+  // page is scoped to Herr — keep the sitemap to the same public subset so
+  // it never lists a page that 404s or renders an empty grid.
+  let outfitsQuery = supabase
+    .from("outfits")
+    .select(
+      `id, slug, updated_at, created_at, category,
+       profiles!outfits_user_id_fkey(username)`,
+    )
+    .eq("is_published", true)
+    .eq("vertical", "mode");
+  if (PUBLIC_GENDER) outfitsQuery = outfitsQuery.eq("gender", PUBLIC_GENDER);
+
+  const [outfitsRes, profilesRes, brands, tagDimsRes] = await Promise.all([
+    outfitsQuery.order("created_at", { ascending: false }).limit(10000),
     supabase
       .from("profiles")
       .select("username, updated_at"),
-    supabase
-      .from("tagged_items")
-      .select("brand"),
+    fetchBrandsAggregated(supabase, PUBLIC_GENDER),
     supabase
       .from("tagged_items")
       .select("color, garment, outfit_id, outfits!inner(gender, is_published, vertical)")
@@ -92,6 +95,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     slug: string | null;
     updated_at: string | null;
     created_at: string | null;
+    category: string | null;
     profiles: { username: string } | null;
   };
   const outfitRoutes: MetadataRoute.Sitemap = (
@@ -134,21 +138,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     }));
 
-  // Distinct brand slugs from tagged_items.
-  const brandSlugs = new Set<string>();
-  for (const row of brandsRes.data ?? []) {
-    const name = (row.brand as string)?.trim();
-    if (!name) continue;
-    const slug = name
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[̀-ͯ]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-    if (slug) brandSlugs.add(slug);
-  }
-  const brandRoutes: MetadataRoute.Sitemap = Array.from(brandSlugs).map((slug) => ({
-    url: `${BASE_URL}/brand/${slug}`,
+  // Same aggregation the /brand pages resolve against, so every listed
+  // slug has a page (home-decor brands and Dam-only brands are left out).
+  const brandRoutes: MetadataRoute.Sitemap = brands
+    .filter((b) => b.outfitCount > 0)
+    .map((b) => ({
+    url: `${BASE_URL}/brand/${b.slug}`,
     lastModified: now,
     changeFrequency: "weekly",
     priority: 0.6,
@@ -160,28 +155,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   type TagDim = {
     color: string | null;
     garment: string | null;
+    outfit_id: string;
     outfits: { gender: "dam" | "herr" } | null;
   };
   const tagDims = (tagDimsRes.data ?? []) as unknown as TagDim[];
 
-  const colorCounts = new Map<string, number>();
-  const garmentCounts = new Map<string, number>(); // key = "gender|garment"
+  // Count distinct outfits (what the pages count), canonicalised so a
+  // legacy Swedish value ("svart") and its English equivalent ("black")
+  // merge into one page. Values with no canonical label have no page.
+  const colorOutfits = new Map<string, Set<string>>();
+  const garmentOutfits = new Map<string, Set<string>>(); // key = "gender|garment"
+  const add = (m: Map<string, Set<string>>, k: string, id: string) => {
+    const set = m.get(k) ?? new Set<string>();
+    set.add(id);
+    m.set(k, set);
+  };
   for (const r of tagDims) {
-    if (r.color) {
-      // Canonicalize so a legacy Swedish value ("svart") and its English
-      // equivalent ("black") merge into one /farg page instead of two
-      // near-duplicate ones.
-      const raw = r.color.toLowerCase().trim();
-      const c = (canonicalColorLabel(raw) ?? raw).toLowerCase();
-      if (c) colorCounts.set(c, (colorCounts.get(c) ?? 0) + 1);
+    if (r.color && (!PUBLIC_GENDER || r.outfits?.gender === PUBLIC_GENDER)) {
+      const c = canonicalColorLabel(r.color.toLowerCase().trim())?.toLowerCase();
+      if (c) add(colorOutfits, c, r.outfit_id);
     }
     if (r.outfits && r.garment) {
-      const rawGarment = r.garment.toLowerCase().trim();
-      const g = (canonicalGarment(rawGarment) ?? rawGarment).toLowerCase();
-      const key = `${r.outfits.gender}|${g}`;
-      garmentCounts.set(key, (garmentCounts.get(key) ?? 0) + 1);
+      const g = canonicalGarment(r.garment.toLowerCase().trim())?.toLowerCase();
+      if (g) add(garmentOutfits, `${r.outfits.gender}|${g}`, r.outfit_id);
     }
   }
+  const colorCounts = new Map(
+    Array.from(colorOutfits, ([k, ids]) => [k, ids.size] as const),
+  );
+  const garmentCounts = new Map(
+    Array.from(garmentOutfits, ([k, ids]) => [k, ids.size] as const),
+  );
 
   function slug(s: string): string {
     return s
@@ -215,10 +219,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       };
     });
 
-  // Hard-coded list of canonical outfit-styles. We don't gate on count
-  // here — these are top-level taxonomy nodes; the page itself does a
-  // notFound() if zero outfits match, so unused slugs just return 404
-  // instead of being broken sitemap entries.
+  // Canonical outfit styles — listed only when at least one public outfit
+  // carries the style, since /stil/<slug> 404s on zero matches.
   const styleSlugs = [
     "minimalism",
     "vintage",
@@ -228,7 +230,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "sporty",
     "preppy",
   ];
-  const styleRoutes: MetadataRoute.Sitemap = styleSlugs.map((s) => ({
+  const publicCategories = new Set(
+    ((outfitsRes.data ?? []) as unknown as OutfitRow[])
+      .map((o) => o.category?.toLowerCase().trim())
+      .filter(Boolean),
+  );
+  const styleRoutes: MetadataRoute.Sitemap = styleSlugs
+    .filter((s) => publicCategories.has(s))
+    .map((s) => ({
     url: `${BASE_URL}/stil/${s}`,
     lastModified: now,
     changeFrequency: "weekly" as const,

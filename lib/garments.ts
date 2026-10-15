@@ -139,6 +139,12 @@ export function canonicalGarment(slug: string): string | null {
   if (!lower) return null;
   const direct = GARMENTS.find((g) => g.toLowerCase() === lower);
   if (direct) return direct;
+  // URL slugs hyphenate multi-word garments ("tank-top" → "Tank top");
+  // "t-shirt" is matched above before the hyphen is touched.
+  const spaced = GARMENTS.find(
+    (g) => g.toLowerCase() === lower.replace(/-/g, " "),
+  );
+  if (spaced) return spaced;
   if (LEGACY_GARMENT_TO_EN[lower]) {
     const en = LEGACY_GARMENT_TO_EN[lower];
     return GARMENTS.find((g) => g.toLowerCase() === en) ?? null;

@@ -39,7 +39,7 @@ export async function subscribePush(
       { onConflict: "endpoint" },
     );
 
-  if (error) return { ok: false, error: "Kunde inte spara prenumeration." };
+  if (error) return { ok: false, error: "Could not save the subscription." };
   return { ok: true };
 }
 

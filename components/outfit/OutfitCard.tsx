@@ -167,7 +167,7 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
 
           <button
             onClick={handleSave}
-            aria-label={saved ? "Ta bort sparad" : "Spara outfit"}
+            aria-label={saved ? "Remove from saved" : "Save outfit"}
             aria-pressed={saved}
             className={cn(
               "absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-md transition-all duration-300 active:scale-90",

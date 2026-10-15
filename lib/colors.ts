@@ -102,7 +102,28 @@ for (const [enSlug, svWord] of Object.entries(EN_SLUG_TO_LEGACY)) {
 export function colorQueryValues(slug: string): string[] {
   const lower = slug.toLowerCase();
   const legacy = EN_SLUG_TO_LEGACY[lower];
-  return legacy ? [lower, legacy] : [lower];
+  const extra = EXTRA_QUERY_VALUES[lower] ?? [];
+  return [lower, ...(legacy ? [legacy] : []), ...extra];
+}
+
+// Free-text English colours that ended up in tagged_items.color (AI item
+// meta, the 0044 translation) without being a palette name. Mapped onto
+// the closest palette colour so they merge into its /farg page instead of
+// producing a URL like /farg/light-blue that has no page behind it.
+const COLOR_ALIASES: Record<string, string> = {
+  "light blue": "sky",
+  "light-blue": "sky",
+  "dark blue": "navy",
+  "dark-blue": "navy",
+  gray: "grey",
+  "off white": "cream",
+  "off-white": "cream",
+  ecru: "cream",
+};
+const EXTRA_QUERY_VALUES: Record<string, string[]> = {};
+for (const [alias, en] of Object.entries(COLOR_ALIASES)) {
+  if (alias.includes("-")) continue;
+  (EXTRA_QUERY_VALUES[en] ??= []).push(alias);
 }
 
 /**
@@ -117,7 +138,7 @@ export function canonicalColorLabel(slug: string): string | null {
   if (!lower) return null;
   const direct = GARMENT_COLORS.find((c) => c.name.toLowerCase() === lower);
   if (direct) return direct.name;
-  const en = LEGACY_TO_EN[lower];
+  const en = LEGACY_TO_EN[lower] ?? COLOR_ALIASES[lower];
   if (en) {
     return GARMENT_COLORS.find((c) => c.name.toLowerCase() === en)?.name ?? null;
   }

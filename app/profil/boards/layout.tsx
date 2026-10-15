@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Mina samlingar",
-  description: "Skapa och hantera dina samlingar med outfits.",
+  description: "Create and manage your outfit collections.",
   alternates: { canonical: "/profil/boards" },
 };
 

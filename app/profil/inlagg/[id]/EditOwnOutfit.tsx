@@ -47,7 +47,7 @@ export function EditOwnOutfit({ form: initial }: { form: OwnOutfitForm }) {
         category: form.category || null,
       });
       if (res.ok) {
-        setSuccess("Sparat.");
+        setSuccess("Saved.");
         router.refresh();
       } else {
         setError(res.error);

@@ -92,7 +92,7 @@ export function TaggedItemCard({
           <button
             type="button"
             onClick={handleToggleSave}
-            aria-label={saved ? "Ta bort sparad" : "Spara plagg"}
+            aria-label={saved ? "Remove from saved" : "Save piece"}
             aria-pressed={saved}
             className={cn(
               "flex h-11 w-11 items-center justify-center rounded-full border transition-colors",

@@ -3,6 +3,7 @@ import { fetchOutfitsByGarment } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { garmentsForGender, garmentQueryValues, canonicalGarment } from "@/lib/garments";
 import { DAM_PUBLIC } from "@/lib/flags";
+import { slugify } from "@/lib/slug";
 
 const SITE = "Moidello";
 
@@ -32,32 +33,33 @@ export async function generateMetadata({
 
   const outfits = await fetchOutfitsByGarment(
     gender,
-    garmentQueryValues(gs),
+    garmentQueryValues(garment),
     createPublicClient(),
   );
 
   const noun = garment.toLowerCase();
   const audience = gender === "herr" ? "men" : "women";
+  const canonical = `/typ/${gender}/${slugify(garment)}`;
 
   if (outfits.length === 0) {
     return {
-      title: `${noun} ${audience} — outfits`,
+      title: `${garment} for ${audience} — outfits`,
       description: `No ${audience} outfits with ${noun} yet on ${SITE}.`,
       robots: { index: false, follow: true },
     };
   }
 
-  const title = `${noun} for ${audience} — ${outfits.length} outfit ideas`;
+  const title = `${garment} for ${audience} — ${outfits.length} outfit ideas`;
   const description = `Outfit inspiration with ${noun} for ${audience} on ${SITE}. ${outfits.length} styled looks with brand, price and buy links.`;
 
   return {
     title,
     description,
-    alternates: { canonical: `/typ/${gender}/${noun}` },
+    alternates: { canonical },
     openGraph: {
       title,
       description,
-      url: `/typ/${gender}/${noun}`,
+      url: canonical,
       type: "website",
     },
     twitter: { card: "summary_large_image", title, description },

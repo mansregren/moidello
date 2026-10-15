@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { fetchOutfitBySlug } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { isReservedUsername } from "@/lib/reserved-usernames";
+import { DAM_PUBLIC } from "@/lib/flags";
 
 const SITE = "Moidello";
 
@@ -64,12 +65,15 @@ export async function generateMetadata({
   const hasOwnDescription =
     !!outfit.metaDescription?.trim() || !!outfit.description?.trim();
   const isThin = !hasOwnDescription && outfit.tags.length === 0;
+  // Dam is admin-only while DAM_PUBLIC is off: keep those pages reachable
+  // but out of the index (they are also left out of the sitemap).
+  const damHidden = outfit.gender === "dam" && !DAM_PUBLIC;
 
   return {
     title,
     description,
     alternates: { canonical },
-    robots: isThin
+    robots: isThin || damHidden
       ? { index: false, follow: true }
       : { index: true, follow: true },
     // OG + Twitter images come from opengraph-image.tsx in this route.

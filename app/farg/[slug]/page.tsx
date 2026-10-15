@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
@@ -10,6 +10,7 @@ import { slugify } from "@/lib/slug";
 import { fetchOutfitsByColor, fetchAllColors } from "@/lib/queries";
 import { colorQueryValues, canonicalColorLabel } from "@/lib/colors";
 import { createPublicClient } from "@/lib/supabase/public";
+import { PUBLIC_GENDER } from "@/lib/flags";
 
 // ISR: fetch a gender-agnostic, cacheable set; the dam/herr toggle + liked/
 // saved are applied client-side (GenderFilteredGrid). Public client → no
@@ -25,11 +26,15 @@ export default async function FargPage({
   const { slug } = await params;
   const color = canonicalColorLabel(slug);
   if (!color) notFound();
+  // Legacy Swedish (/farg/svart) and alias (/farg/light-blue) slugs still
+  // sit in Google's index — move them onto the one canonical English page.
+  const canonicalSlug = slugify(color);
+  if (slug !== canonicalSlug) permanentRedirect(`/farg/${canonicalSlug}`);
 
   const client = createPublicClient();
   const [outfits, otherColors] = await Promise.all([
-    fetchOutfitsByColor(colorQueryValues(slug), undefined, client),
-    fetchAllColors(client),
+    fetchOutfitsByColor(colorQueryValues(canonicalSlug), PUBLIC_GENDER, client),
+    fetchAllColors(client, PUBLIC_GENDER),
   ]);
   if (outfits.length === 0) notFound();
 
