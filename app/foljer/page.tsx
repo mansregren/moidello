@@ -11,6 +11,7 @@ import {
 import { fetchTopCreatorsCached as fetchTopCreators } from "@/lib/queries-cached";
 import { OUTFIT_CREATE_PUBLIC, HIDE_CREATORS } from "@/lib/flags";
 import { FoljerClient } from "./FoljerClient";
+import { toCardOutfits } from "@/lib/card-outfit";
 
 export const metadata = {
   title: "Following",
@@ -99,7 +100,7 @@ function Shell({
           {mode === "feed" && (
             <section className="mt-12">
               <FoljerClient
-                outfits={outfits}
+                outfits={toCardOutfits(outfits)}
                 likedIds={likedIds}
                 savedIds={savedIds}
               />

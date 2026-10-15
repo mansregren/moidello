@@ -3,6 +3,7 @@ import { fetchProfileByUsername, fetchOutfitsByUser } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { HOME_VERTICAL_PUBLIC } from "@/lib/flags";
 import ProfileDetail, { type PublicBoardSummary } from "./ProfileDetail";
+import { toCardOutfits } from "@/lib/card-outfit";
 
 // ISR: a creator's profile is public content. Liked/saved + follow state and
 // the dam/herr toggle are all client-side now, so cache + background-refresh.
@@ -99,7 +100,7 @@ export default async function ProfilePage({
   return (
     <ProfileDetail
       user={profile}
-      outfits={visibleOutfits}
+      outfits={toCardOutfits(visibleOutfits)}
       publicBoards={publicBoards}
       showHome={showHome}
     />

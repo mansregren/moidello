@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { canOptimizeImage } from "@/lib/image-host";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, Tag } from "lucide-react";
@@ -104,7 +105,7 @@ export default async function ProduktPage({
                   objectPosition: `${item.positionX}% ${item.positionY}%`,
                 }}
                 className="object-cover"
-                unoptimized={item.outfitImage.startsWith("http")}
+                unoptimized={!canOptimizeImage(item.outfitImage)}
               />
             </div>
 
@@ -164,7 +165,7 @@ export default async function ProduktPage({
                       fill
                       sizes="64px"
                       className="object-cover"
-                      unoptimized={item.outfitImage.startsWith("http")}
+                      unoptimized={!canOptimizeImage(item.outfitImage)}
                     />
                   </div>
                   <div className="min-w-0">

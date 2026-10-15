@@ -5,6 +5,7 @@ import { pickBgs, HERO_POOL } from "@/lib/session-background";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { collectionPageJsonLd } from "@/lib/json-ld";
 import HomeClient from "./HomeClient";
+import { toCardOutfits } from "@/lib/card-outfit";
 
 // ISR: the homepage's public content (latest outfits, creators, categories)
 // is the same for everyone and is cached + background-refreshed. The
@@ -37,7 +38,7 @@ export default async function HomePage() {
         })}
       />
       <HomeClient
-        outfits={outfits}
+        outfits={toCardOutfits(outfits)}
         creators={creators}
         lifestyleBg={lifestyleBg}
       />

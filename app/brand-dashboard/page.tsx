@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { canOptimizeImage } from "@/lib/image-host";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Heart, Bookmark, MessageCircle, MousePointerClick, Globe } from "lucide-react";
@@ -185,7 +186,7 @@ export default async function BrandDashboardPage() {
                             fill
                             className="object-cover"
                             sizes="48px"
-                            unoptimized={r.image_url.startsWith("http")}
+                            unoptimized={!canOptimizeImage(r.image_url)}
                           />
                         </div>
                         <div className="min-w-0">

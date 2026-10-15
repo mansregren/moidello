@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { canOptimizeImage } from "@/lib/image-host";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -100,7 +101,7 @@ export default function HomeVerticalClient({
                             fill
                             sizes="(min-width: 1024px) 18vw, (min-width: 640px) 33vw, 50vw"
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
-                            unoptimized={cover.startsWith("http")}
+                            unoptimized={!canOptimizeImage(cover)}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
                           <div className="absolute inset-x-3 bottom-3">

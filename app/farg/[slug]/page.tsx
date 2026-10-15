@@ -11,6 +11,7 @@ import { fetchOutfitsByColor, fetchAllColors } from "@/lib/queries";
 import { colorQueryValues, canonicalColorLabel } from "@/lib/colors";
 import { createPublicClient } from "@/lib/supabase/public";
 import { PUBLIC_GENDER } from "@/lib/flags";
+import { toCardOutfits } from "@/lib/card-outfit";
 
 // ISR: fetch a gender-agnostic, cacheable set; the dam/herr toggle + liked/
 // saved are applied client-side (GenderFilteredGrid). Public client → no
@@ -98,7 +99,7 @@ export default async function FargPage({
             <p className="mt-4 text-lg text-foreground-muted">{intro}</p>
           </div>
 
-          <GenderFilteredGrid outfits={outfits} columns={3} />
+          <GenderFilteredGrid outfits={toCardOutfits(outfits)} columns={3} />
 
           {relatedColors.length > 0 && (
             <section className="mt-20 mb-16 border-t border-border pt-10">

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { canOptimizeImage } from "@/lib/image-host";
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -92,7 +93,7 @@ export function BoardsClient({
                   fill
                   sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  unoptimized={b.coverImage.startsWith("http")}
+                  unoptimized={!canOptimizeImage(b.coverImage)}
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-foreground-subtle text-sm">

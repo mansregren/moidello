@@ -35,6 +35,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   images: {
+    // Uploaded files get a unique hashed name and are never overwritten,
+    // so an optimised variant can be cached for a month instead of the
+    // 4-hour default (fewer re-transformations, faster repeat loads).
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       { hostname: "images.unsplash.com" },
       { hostname: "i.pravatar.cc" },

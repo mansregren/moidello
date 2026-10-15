@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { canOptimizeImage } from "@/lib/image-host";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Globe, Crown, Star, Gem, ShoppingBag, ArrowLeft, BadgeCheck, ExternalLink } from "lucide-react";
@@ -12,6 +13,7 @@ import { brandPageJsonLd } from "@/lib/json-ld";
 import { createPublicClient } from "@/lib/supabase/public";
 import { fetchBrandsAggregated, fetchBrandOutfits } from "@/lib/queries";
 import { PUBLIC_GENDER } from "@/lib/flags";
+import { toCardOutfits } from "@/lib/card-outfit";
 
 interface BrandProduct {
   id: string;
@@ -168,7 +170,7 @@ function BrandShell({
               <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-6">
                 Outfits med {name}
               </h2>
-              <GenderFilteredGrid outfits={outfits} columns={3} />
+              <GenderFilteredGrid outfits={toCardOutfits(outfits)} columns={3} />
             </section>
           ) : (
             <div className="py-24 text-center mb-16">
@@ -200,7 +202,7 @@ function BrandShell({
                           fill
                           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
                           className="object-cover"
-                          unoptimized={p.image_url.startsWith("http")}
+                          unoptimized={!canOptimizeImage(p.image_url)}
                         />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center text-foreground-subtle text-xs uppercase tracking-wider">

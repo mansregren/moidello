@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { canOptimizeImage } from "@/lib/image-host";
 import Link from "next/link";
 import { Heart, Bookmark, LayoutGrid, Tag } from "lucide-react";
 import { Outfit } from "@/lib/types";
@@ -34,8 +35,7 @@ function buildOutfitAlt(outfit: Outfit): string {
   if (cat) parts.push(cat.toLowerCase());
   // Home posts carry no gender — a room isn't dam/herr. Only fashion gets it.
   if (!isHome) {
-    const gender = outfit.gender === "herr" ? "herr" : "dam";
-    parts.push(`outfit ${gender}`);
+    parts.push(outfit.gender === "herr" ? "men's outfit" : "women's outfit");
   }
 
   const garments = Array.from(
@@ -142,7 +142,7 @@ export function OutfitCard({ outfit }: OutfitCardProps) {
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
-            unoptimized={outfit.image.startsWith("http")}
+            unoptimized={!canOptimizeImage(outfit.image)}
           />
 
           <div

@@ -3,6 +3,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { collectionPageJsonLd } from "@/lib/json-ld";
 import UpptackClient from "./UpptackClient";
+import { toCardOutfits } from "@/lib/card-outfit";
 
 // ISR: the outfit feed is identical for everyone — gender filtering and
 // liked/saved state are applied client-side — so cache it and refresh in the
@@ -24,7 +25,7 @@ export default async function UpptackPage() {
           outfits,
         })}
       />
-      <UpptackClient outfits={outfits} />
+      <UpptackClient outfits={toCardOutfits(outfits)} />
     </>
   );
 }

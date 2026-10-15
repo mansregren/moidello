@@ -1,5 +1,6 @@
 import { Outfit } from "@/lib/types";
 import { OutfitCard } from "./OutfitCard";
+import { toCardOutfit } from "@/lib/card-outfit";
 
 interface OutfitGridProps {
   outfits: Outfit[];
@@ -22,7 +23,8 @@ export function OutfitGrid({ outfits, columns = 3, liked, saved }: OutfitGridPro
       {outfits.map((outfit) => (
         <OutfitCard
           key={outfit.id}
-          outfit={outfit}
+          // Slim before the client boundary when rendered from a server page.
+          outfit={toCardOutfit(outfit)}
           initiallyLiked={liked?.has(outfit.id)}
           initiallySaved={saved?.has(outfit.id)}
         />

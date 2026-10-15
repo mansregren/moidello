@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { canOptimizeImage } from "@/lib/image-host";
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { Heart, Bookmark, MessageCircle, X } from "lucide-react";
@@ -188,9 +189,10 @@ export default function OutfitDetail({
                 })()}
                 width={800}
                 height={1100}
+                sizes="(min-width: 768px) 50vw, 100vw"
                 className="w-full object-cover"
                 priority
-                unoptimized={outfit.image.startsWith("http")}
+                unoptimized={!canOptimizeImage(outfit.image)}
               />
               {outfit.tags.map((tag) => (
                 <OutfitTag

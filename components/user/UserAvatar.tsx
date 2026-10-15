@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { canOptimizeImage } from "@/lib/image-host";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -58,7 +59,7 @@ export function UserAvatar({ src, alt, size = "md", className }: UserAvatarProps
           width={pixelMap[size]}
           height={pixelMap[size]}
           className="object-cover w-full h-full"
-          unoptimized={trimmed.startsWith("http")}
+          unoptimized={!canOptimizeImage(trimmed)}
           onError={() => setErrored(true)}
         />
       ) : (

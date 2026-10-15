@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { canOptimizeImage } from "@/lib/image-host";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
@@ -65,7 +66,7 @@ export function EditOwnOutfit({ form: initial }: { form: OwnOutfitForm }) {
             fill
             sizes="200px"
             className="object-cover"
-            unoptimized={form.imageUrl.startsWith("http")}
+            unoptimized={!canOptimizeImage(form.imageUrl)}
           />
           {!form.isPublished && (
             <span className="absolute top-2 left-2 inline-flex rounded-full bg-amber-500/90 text-black px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold">

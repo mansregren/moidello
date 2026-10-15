@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { canOptimizeImage } from "@/lib/image-host";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Tag, ExternalLink } from "lucide-react";
@@ -122,7 +123,7 @@ export function OutfitShareCard({
             fill
             sizes="280px"
             className="object-cover"
-            unoptimized={preview.image_url.startsWith("http")}
+            unoptimized={!canOptimizeImage(preview.image_url)}
           />
           <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-background/70 backdrop-blur-sm px-2.5 py-1 text-[10px] font-medium text-foreground">
             <Tag className="h-3 w-3" />
@@ -227,7 +228,7 @@ export function ItemShareCard({
               fill
               sizes="80px"
               className="object-cover"
-              unoptimized={preview.outfit_image.startsWith("http")}
+              unoptimized={!canOptimizeImage(preview.outfit_image)}
             />
           )}
         </div>

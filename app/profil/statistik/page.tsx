@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { canOptimizeImage } from "@/lib/image-host";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Eye, Heart, Bookmark, MessageCircle, MousePointerClick } from "lucide-react";
@@ -140,7 +141,7 @@ export default async function StatistikPage() {
                                   fill
                                   className="object-cover"
                                   sizes="48px"
-                                  unoptimized={r.image_url.startsWith("http")}
+                                  unoptimized={!canOptimizeImage(r.image_url)}
                                 />
                               </div>
                               <div className="min-w-0">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { canOptimizeImage } from "@/lib/image-host";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -749,7 +750,7 @@ function SavedItemGrid({ items }: { items: SavedItem[] }) {
                 fill
                 sizes="(min-width: 1024px) 22vw, 50vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
-                unoptimized={it.outfitImage.startsWith("http")}
+                unoptimized={!canOptimizeImage(it.outfitImage)}
               />
             )}
           </div>

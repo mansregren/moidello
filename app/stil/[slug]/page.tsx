@@ -9,6 +9,7 @@ import { collectionPageJsonLd } from "@/lib/json-ld";
 import { fetchOutfitsByCategory, fetchActiveCategories } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
 import { PUBLIC_GENDER } from "@/lib/flags";
+import { toCardOutfits } from "@/lib/card-outfit";
 
 // ISR: gender-agnostic cacheable fetch, dam/herr + liked/saved applied
 // client-side. Public client → no cookies → static render.
@@ -126,7 +127,7 @@ export default async function StilPage({
             </p>
           </div>
 
-          <GenderFilteredGrid outfits={outfits} columns={3} />
+          <GenderFilteredGrid outfits={toCardOutfits(outfits)} columns={3} />
 
           <section className="mt-20 mb-16 border-t border-border pt-10">
             <h2 className="text-xs uppercase tracking-[0.25em] text-foreground-subtle mb-5">

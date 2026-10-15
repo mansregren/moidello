@@ -4,6 +4,7 @@ import {
   fetchBrandsAggregatedCached,
 } from "@/lib/queries-cached";
 import TrendigtClient from "./TrendigtClient";
+import { toCardOutfits } from "@/lib/card-outfit";
 
 // ISR: rankings are the same for everyone; gender + liked/saved apply
 // client-side. Cache + background-refresh.
@@ -33,7 +34,7 @@ export default async function TrendigtPage() {
 
   return (
     <TrendigtClient
-      outfits={topOutfits}
+      outfits={toCardOutfits(topOutfits)}
       creators={topCreators}
       brandsAll={toUi(brandsAll)}
       brandsDam={toUi(brandsDam)}
