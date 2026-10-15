@@ -246,12 +246,13 @@ export default function ProfileDetail({
             </div>
           </motion.div>
 
-          <div className="flex justify-center border-b border-border mb-8">
+          {/* Scrolls sideways on phones instead of pushing the page wider. */}
+          <div className="flex sm:justify-center overflow-x-auto scrollbar-hide border-b border-border mb-8 -mx-6 px-6 sm:mx-0 sm:px-0">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`px-6 py-3 text-sm font-medium transition-colors relative ${
+                className={`shrink-0 px-4 sm:px-6 py-3 text-sm font-medium transition-colors relative ${
                   activeTab === tab.key
                     ? "text-foreground"
                     : "text-foreground-subtle hover:text-foreground-muted"

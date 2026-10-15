@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 
 export const metadata = {
-  title: "404 — Page not found | Moidello",
+  title: "404 — Page not found",
   description: "The page you're looking for no longer exists or has moved.",
 };
 

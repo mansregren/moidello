@@ -177,3 +177,13 @@
   -webkit-backdrop-filter: blur(40px);
   border: 1px solid rgba(20, 19, 15, 0.1);
 }
+
+/* Horizontal chip rows (category filters, profile tabs) scroll without a
+   visible scrollbar. Used across the app but was never defined. */
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
