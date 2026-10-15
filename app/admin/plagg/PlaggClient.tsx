@@ -132,6 +132,41 @@ function PanelButton({
 /* Add from links                                                      */
 /* ------------------------------------------------------------------ */
 
+/** Parse a pasted JSON array of prepared drafts; null if it isn't one. */
+function parsePreparedDrafts(
+  text: string,
+  gender: Gender | null,
+): CatalogDraft[] | null {
+  const t = text.trim();
+  if (!t.startsWith("[")) return null;
+  try {
+    const arr = JSON.parse(t) as Array<Partial<CatalogDraft>>;
+    if (!Array.isArray(arr) || arr.length === 0) return null;
+    return arr
+      .filter((d) => d && typeof d.url === "string" && typeof d.sourceImageUrl === "string")
+      .map((d) => ({
+        url: String(d.url),
+        brand: String(d.brand ?? ""),
+        name: String(d.name ?? ""),
+        garment: String(d.garment ?? ""),
+        gender: d.gender === undefined ? gender : d.gender,
+        color: String(d.color ?? ""),
+        material: String(d.material ?? ""),
+        price: typeof d.price === "number" ? d.price : null,
+        currency: String(d.currency ?? "SEK"),
+        sourceImageUrl: String(d.sourceImageUrl),
+        retailer: d.retailer ?? null,
+        retailerLocale: d.retailerLocale ?? null,
+        isAffiliate: !!d.isAffiliate,
+        affiliateNetwork: d.affiliateNetwork ?? null,
+        duplicateOf: null,
+        warning: null,
+      }));
+  } catch {
+    return null;
+  }
+}
+
 type DraftState = CatalogDraft & { key: string; status: "idle" | "saving" | "error"; error?: string };
 
 function AddFromLinks({ onSaved }: { onSaved: (item: CatalogItem) => void }) {
@@ -143,10 +178,29 @@ function AddFromLinks({ onSaved }: { onSaved: (item: CatalogItem) => void }) {
   const [saving, setSaving] = useState(false);
   const [savedCount, setSavedCount] = useState(0);
 
-  const urls = text
-    .split(/[\s,]+/)
-    .map((u) => u.trim())
-    .filter((u) => /^https?:\/\//i.test(u));
+  // A pasted JSON array of prepared drafts (e.g. a curated list with a
+  // chosen packshot per product) skips the fetch step and lands straight
+  // in the review list.
+  const jsonDrafts = parsePreparedDrafts(text, gender || null);
+  const urls = jsonDrafts
+    ? []
+    : text
+        .split(/[\s,]+/)
+        .map((u) => u.trim())
+        .filter((u) => /^https?:\/\//i.test(u));
+
+  const addPrepared = () => {
+    if (!jsonDrafts) return;
+    setDrafts((prev) => [
+      ...prev,
+      ...jsonDrafts.map((d) => ({
+        ...d,
+        key: `${d.url}-${Math.random()}`,
+        status: "idle" as const,
+      })),
+    ]);
+    setText("");
+  };
 
   const fetchDrafts = async () => {
     setError(null);
@@ -232,14 +286,20 @@ function AddFromLinks({ onSaved }: { onSaved: (item: CatalogItem) => void }) {
             <option value="dam">Dam</option>
             <option value="">Unisex</option>
           </select>
-          <button
-            type="button"
-            onClick={fetchDrafts}
-            disabled={loading || urls.length === 0 || urls.length > 100}
-            className={primaryBtn}
-          >
-            {loading ? "Hämtar…" : `Hämta ${urls.length || ""} plagg`}
-          </button>
+          {jsonDrafts ? (
+            <button type="button" onClick={addPrepared} className={primaryBtn}>
+              {`Lägg till ${jsonDrafts.length} förberedda plagg`}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={fetchDrafts}
+              disabled={loading || urls.length === 0 || urls.length > 100}
+              className={primaryBtn}
+            >
+              {loading ? "Hämtar…" : `Hämta ${urls.length || ""} plagg`}
+            </button>
+          )}
         </div>
       </div>
       {urls.length > 100 && (
