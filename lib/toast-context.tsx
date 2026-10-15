@@ -40,7 +40,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="pointer-events-auto rounded-full bg-white text-black px-5 py-2.5 text-sm font-medium shadow-[0_8px_28px_rgba(0,0,0,0.4)]"
+              className="pointer-events-auto rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium shadow-[0_8px_28px_rgba(0,0,0,0.25)]"
             >
               {t.message}
             </m.div>

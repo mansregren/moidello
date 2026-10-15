@@ -182,6 +182,14 @@ function AuthPrompt({
   const config = PROMPTS[action];
   const Icon = config.icon;
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   return (
     <m.div
       initial={{ opacity: 0 }}
@@ -197,21 +205,27 @@ function AuthPrompt({
         exit={{ y: 40, opacity: 0 }}
         transition={{ duration: 0.25, ease: "easeOut" }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl bg-background-secondary border border-white/10 p-8 relative"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="auth-prompt-title"
+        className="w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl bg-background-secondary border border-border p-8 relative"
       >
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-white/5 hover:text-white transition-colors"
+          className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full text-foreground-muted hover:bg-foreground/5 hover:text-foreground transition-colors"
         >
           <X className="h-5 w-5" />
         </button>
 
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-black mb-5">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-foreground text-background mb-5">
           <Icon className="h-5 w-5" />
         </div>
 
-        <h2 className="font-heading text-3xl uppercase tracking-tight text-white leading-tight">
+        <h2
+          id="auth-prompt-title"
+          className="font-heading text-3xl uppercase tracking-tight text-foreground leading-tight"
+        >
           {config.title}
         </h2>
         <p className="mt-3 text-sm text-foreground-muted">
@@ -222,7 +236,7 @@ function AuthPrompt({
           <Link
             href="/login"
             onClick={onClose}
-            className="inline-flex items-center justify-center rounded-full bg-white text-black px-6 py-3 text-sm font-medium transition-transform active:scale-[0.98]"
+            className="inline-flex items-center justify-center rounded-full bg-foreground text-background px-6 py-3 text-sm font-medium transition-transform active:scale-[0.98] hover:bg-foreground/90"
           >
             Create account / log in
           </Link>
