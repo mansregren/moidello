@@ -4,7 +4,7 @@ import Image from "next/image";
 import { canOptimizeImage } from "@/lib/image-host";
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Plus, Lock, Globe, X } from "lucide-react";
 import { createBoard, type BoardActionResult } from "@/app/actions/boards";
 
@@ -152,7 +152,7 @@ function CreateBoardModal({
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -160,7 +160,7 @@ function CreateBoardModal({
           className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md"
           onClick={onClose}
         >
-          <motion.div
+          <m.div
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
@@ -247,8 +247,8 @@ function CreateBoardModal({
                 {pending ? "Creating…" : "Create collection"}
               </button>
             </form>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

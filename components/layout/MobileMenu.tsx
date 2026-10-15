@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, MouseEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { Menu, X, LogOut, Bookmark, MessageCircle } from "lucide-react";
 import { IconButton } from "../shared/IconButton";
 import { visiblePrimaryNav } from "@/lib/nav";
@@ -82,7 +82,7 @@ export function MobileMenu() {
       <AnimatePresence>
         {open && (
           <>
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -90,7 +90,7 @@ export function MobileMenu() {
               className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
               onClick={() => setOpen(false)}
             />
-            <motion.nav
+            <m.nav
               aria-label="Main navigation"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
@@ -190,7 +190,7 @@ export function MobileMenu() {
                   </Link>
                 </div>
               )}
-            </motion.nav>
+            </m.nav>
           </>
         )}
       </AnimatePresence>

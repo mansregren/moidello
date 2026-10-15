@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { ChevronRight, Search, Plus } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
@@ -97,7 +97,7 @@ export default function HomeClient({
                 same rationale as image-scrim gradients elsewhere). */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/30 to-black/70" />
             <Container className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12">
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -119,7 +119,7 @@ export default function HomeClient({
                     Explore
                   </Link>
                 </div>
-              </motion.div>
+              </m.div>
             </Container>
           </div>
         </section>
@@ -161,7 +161,7 @@ export default function HomeClient({
             </Section>
           )}
 
-          <motion.section
+          <m.section
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-50px" }}
@@ -187,13 +187,13 @@ export default function HomeClient({
                 </p>
               </div>
             </div>
-          </motion.section>
+          </m.section>
 
           {!HIDE_CREATORS && creators.length > 0 && (
             <Section title="Profiles to follow" href="/trendigt">
               <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
                 {creators.map((u, i) => (
-                  <motion.div
+                  <m.div
                     key={u.id}
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -216,13 +216,13 @@ export default function HomeClient({
                         </p>
                       </div>
                     </Link>
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
             </Section>
           )}
 
-          <motion.section
+          <m.section
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
@@ -256,7 +256,7 @@ export default function HomeClient({
                 Learn more
               </Link>
             </div>
-          </motion.section>
+          </m.section>
 
           <div className="py-12" />
         </Container>

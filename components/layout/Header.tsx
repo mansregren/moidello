@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { useEffect, useRef, useState, MouseEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { Container } from "./Container";
 import { IconButton } from "../shared/IconButton";
 import { GenderToggle } from "../shared/GenderToggle";
@@ -179,7 +179,7 @@ export function Header() {
             feed; on desktop it stays an inline replacement of the header row. */}
         <AnimatePresence initial={false}>
           {searchOpen && (
-            <motion.form
+            <m.form
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -208,7 +208,7 @@ export function Header() {
                   <X className="h-5 w-5" />
                 </IconButton>
               </div>
-            </motion.form>
+            </m.form>
           )}
         </AnimatePresence>
       </Container>

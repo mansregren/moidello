@@ -6,7 +6,7 @@ import { Search, Crown, Star, Gem, ShoppingBag, BadgeCheck } from "lucide-react"
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useMemo, useState } from "react";
 
 type Tier = "luxury" | "premium" | "contemporary" | "high-street";
@@ -50,7 +50,7 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
           <Image src="/images/bg/boats.webp" alt="" fill className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/30 to-black/60" />
           <Container className="relative z-10 h-full flex items-end pb-8">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -61,7 +61,7 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
               <p className="mt-2 text-white/70">
                 Explore every brand on Moidello
               </p>
-            </motion.div>
+            </m.div>
           </Container>
         </div>
 
@@ -111,7 +111,7 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
             {filtered.map((brand, i) => {
               const { icon: TierIcon, label: tierLabel } = tierLabels[brand.tier];
               return (
-                <motion.div
+                <m.div
                   key={brand.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -145,7 +145,7 @@ export default function BrandsClient({ brands }: { brands: BrandRow[] }) {
                       </div>
                     </div>
                   </Link>
-                </motion.div>
+                </m.div>
               );
             })}
           </div>

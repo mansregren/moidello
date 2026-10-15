@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { ChevronRight, MapPin, Flame } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
@@ -62,7 +62,7 @@ export default function TrendigtClient({
       <Header />
       <main id="main" tabIndex={-1} className="flex-1">
         <Container className="pt-6 md:pt-10 space-y-14">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -74,13 +74,13 @@ export default function TrendigtClient({
             <p className="mt-3 text-foreground-muted">
               What everyone is talking about right now
             </p>
-          </motion.div>
+          </m.div>
 
           {trendingNow.length > 0 && (
             <Section title="Trending right now" href="/upptack">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                 {trendingNow.map((outfit, i) => (
-                  <motion.div
+                  <m.div
                     key={outfit.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -91,7 +91,7 @@ export default function TrendigtClient({
                       initiallyLiked={liked.has(outfit.id)}
                       initiallySaved={saved.has(outfit.id)}
                     />
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
             </Section>
@@ -101,7 +101,7 @@ export default function TrendigtClient({
             <Section title="Top profiles this week" href="/upptack">
               <div className="-mx-6 md:-mx-12 px-6 md:px-12 flex gap-5 overflow-x-auto pb-3 scrollbar-hide">
                 {creators.map((user, i) => (
-                  <motion.div
+                  <m.div
                     key={user.id}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -123,7 +123,7 @@ export default function TrendigtClient({
                         </p>
                       </div>
                     </Link>
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
             </Section>
@@ -133,7 +133,7 @@ export default function TrendigtClient({
             <Section title="Hot brands" href="/brands">
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 {brands.map((b, i) => (
-                  <motion.div
+                  <m.div
                     key={b.id}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -151,7 +151,7 @@ export default function TrendigtClient({
                         {b.newOutfits === 1 ? "outfit" : "outfits"}
                       </p>
                     </Link>
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
             </Section>
@@ -165,7 +165,7 @@ export default function TrendigtClient({
             >
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                 {localOutfits.map((outfit, i) => (
-                  <motion.div
+                  <m.div
                     key={outfit.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -176,7 +176,7 @@ export default function TrendigtClient({
                       initiallyLiked={liked.has(outfit.id)}
                       initiallySaved={saved.has(outfit.id)}
                     />
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
             </Section>

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { X, Check, Search, Send } from "lucide-react";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import {
@@ -91,7 +91,7 @@ export function ShareToDmSheet({
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -99,7 +99,7 @@ export function ShareToDmSheet({
           className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md"
           onClick={onClose}
         >
-          <motion.div
+          <m.div
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
@@ -213,8 +213,8 @@ export function ShareToDmSheet({
                   ? `Send to ${selected.size}`
                   : "Send"}
             </button>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

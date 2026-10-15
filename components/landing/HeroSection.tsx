@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Container } from "../layout/Container";
 import { PremiumButton } from "../shared/PremiumButton";
 import { ArrowRight } from "lucide-react";
@@ -46,7 +46,7 @@ export function HeroSection() {
       <Container className="relative z-10 flex-1 flex items-center pt-24 pb-12">
         <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
           {/* Left — Text */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -78,10 +78,10 @@ export function HeroSection() {
                 </PremiumButton>
               </Link>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Mobile: Scrollable image row */}
-          <motion.div
+          <m.div
             key={gender}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -102,10 +102,10 @@ export function HeroSection() {
                 />
               </div>
             ))}
-          </motion.div>
+          </m.div>
 
           {/* Desktop: Editorial images grid */}
-          <motion.div
+          <m.div
             key={`desktop-${gender}`}
             initial={{ opacity: 0, x: 60 }}
             animate={{ opacity: 1, x: 0 }}
@@ -143,7 +143,7 @@ export function HeroSection() {
                 />
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </Container>
     </section>

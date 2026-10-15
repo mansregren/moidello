@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { Bell, Heart, UserPlus, MessageCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { createClient } from "@/lib/supabase/client";
@@ -173,7 +173,7 @@ export function NotificationBell() {
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
@@ -233,7 +233,7 @@ export function NotificationBell() {
                 );
               })}
             </ul>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

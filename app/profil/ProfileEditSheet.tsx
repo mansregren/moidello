@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { X, Camera } from "lucide-react";
 import Image from "next/image";
 import { UserAvatar } from "@/components/user/UserAvatar";
@@ -101,7 +101,7 @@ export function ProfileEditSheet({
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -109,7 +109,7 @@ export function ProfileEditSheet({
           className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md"
           onClick={onClose}
         >
-          <motion.div
+          <m.div
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
@@ -383,8 +383,8 @@ export function ProfileEditSheet({
                 </button>
               </div>
             </form>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

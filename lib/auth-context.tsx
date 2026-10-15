@@ -9,7 +9,7 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import Link from "next/link";
 import { X, Heart, Bookmark, UserPlus, Plus, User, Flag } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -95,7 +95,10 @@ export function AuthProvider({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const next = session?.user ?? null;
+      // Keep the same object for the same account so token refreshes don't
+      // re-render everything that reads auth.
+      setUser((prev) => (prev && next && prev.id === next.id ? prev : next));
       // When the user signs out we should clear the cached profile too.
       if (!session?.user) setProfile(null);
     });
@@ -103,15 +106,19 @@ export function AuthProvider({
     return () => subscription.unsubscribe();
   }, [supabase]);
 
-  // Refresh profile when user changes (e.g. after sign-in via OAuth)
+  // Refresh profile when the signed-in account changes (e.g. after sign-in
+  // via OAuth). Keyed on the id, not the user object: Supabase hands back a
+  // new object on every token refresh / tab refocus, which used to refetch
+  // the profile and re-render every auth consumer each time.
+  const userId = user?.id ?? null;
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     let cancelled = false;
     (async () => {
       const { data } = await supabase
         .from("profiles")
         .select("username, display_name, avatar_url, is_admin")
-        .eq("id", user.id)
+        .eq("id", userId)
         .maybeSingle();
       if (cancelled || !data) return;
       setProfile({
@@ -124,7 +131,7 @@ export function AuthProvider({
     return () => {
       cancelled = true;
     };
-  }, [user, supabase]);
+  }, [userId, supabase]);
 
   const isLoggedIn = !!user;
 
@@ -141,10 +148,13 @@ export function AuthProvider({
     await supabase.auth.signOut();
   }, [supabase]);
 
+  const value = useMemo(
+    () => ({ user, profile, isLoggedIn, loading, signOut, requireAuth }),
+    [user, profile, isLoggedIn, loading, signOut, requireAuth],
+  );
+
   return (
-    <AuthContext.Provider
-      value={{ user, profile, isLoggedIn, loading, signOut, requireAuth }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
       <AnimatePresence>
         {activePrompt && (
@@ -173,7 +183,7 @@ function AuthPrompt({
   const Icon = config.icon;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -181,7 +191,7 @@ function AuthPrompt({
       className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md p-0 sm:p-6"
       onClick={onClose}
     >
-      <motion.div
+      <m.div
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 40, opacity: 0 }}
@@ -217,7 +227,7 @@ function AuthPrompt({
             Create account / log in
           </Link>
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

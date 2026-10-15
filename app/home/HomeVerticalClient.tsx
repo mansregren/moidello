@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { canOptimizeImage } from "@/lib/image-host";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Plus } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
@@ -50,7 +50,7 @@ export default function HomeVerticalClient({
                 same rationale as the fashion hero. */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/30 to-black/70" />
             <Container className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12">
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -67,7 +67,7 @@ export default function HomeVerticalClient({
                   Rooms to take inspiration from. Tag every piece of furniture
                   and find where to buy it.
                 </p>
-              </motion.div>
+              </m.div>
             </Container>
           </div>
         </section>
@@ -81,7 +81,7 @@ export default function HomeVerticalClient({
               {HOME_ROOMS.map((room, i) => {
                 const cover = coverFor(room.label);
                 return (
-                  <motion.div
+                  <m.div
                     key={room.slug}
                     initial={{ opacity: 0, y: 12 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -129,7 +129,7 @@ export default function HomeVerticalClient({
                         </div>
                       )}
                     </Link>
-                  </motion.div>
+                  </m.div>
                 );
               })}
             </div>
@@ -162,7 +162,7 @@ export default function HomeVerticalClient({
             )}
           </section>
 
-          <motion.section
+          <m.section
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
@@ -187,7 +187,7 @@ export default function HomeVerticalClient({
                 Post a room
               </Link>
             </div>
-          </motion.section>
+          </m.section>
 
           <div className="py-12" />
         </Container>

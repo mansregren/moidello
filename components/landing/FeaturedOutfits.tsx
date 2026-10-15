@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Container } from "../layout/Container";
 import { OutfitCard } from "../outfit/OutfitCard";
 import { outfits } from "@/lib/data";
@@ -16,7 +16,7 @@ export function FeaturedOutfits() {
   return (
     <section className="py-16 md:py-24 bg-background-secondary">
       <Container>
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -36,12 +36,12 @@ export function FeaturedOutfits() {
               <ArrowRight className="h-4 w-4" />
             </PremiumButton>
           </Link>
-        </motion.div>
+        </m.div>
 
         {/* Grid — 3 columns masonry-style */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {featured.map((outfit, i) => (
-            <motion.div
+            <m.div
               key={outfit.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -50,7 +50,7 @@ export function FeaturedOutfits() {
               className={i % 3 === 1 ? "sm:mt-12" : ""}
             >
               <OutfitCard outfit={outfit} />
-            </motion.div>
+            </m.div>
           ))}
         </div>
 

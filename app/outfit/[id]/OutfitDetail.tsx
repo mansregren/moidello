@@ -16,7 +16,7 @@ import { IconButton } from "@/components/shared/IconButton";
 import { useAuth } from "@/lib/auth-context";
 import { useViewerEngagement } from "@/lib/viewer-engagement-context";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import type { Outfit } from "@/lib/types";
 import {
   toggleLike,
@@ -158,7 +158,7 @@ export default function OutfitDetail({
             </ol>
           </nav>
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
@@ -201,9 +201,9 @@ export default function OutfitDetail({
                   outfitId={isPersisted ? outfit.id : undefined}
                 />
               ))}
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
@@ -360,7 +360,7 @@ export default function OutfitDetail({
                 requireAuth={() => requireAuth("comment")}
                 viewerAvatar={user?.user_metadata?.avatar_url ?? ""}
               />
-            </motion.div>
+            </m.div>
           </div>
 
           {/* ExploreLinks links garments→/typ and colors→/farg, both mode

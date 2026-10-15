@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Container } from "../layout/Container";
 import { PremiumButton } from "../shared/PremiumButton";
 import { ArrowRight } from "lucide-react";
@@ -21,7 +21,7 @@ export function CtaBanner() {
       </div>
 
       <Container className="relative z-10">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -45,7 +45,7 @@ export function CtaBanner() {
               </PremiumButton>
             </Link>
           </div>
-        </motion.div>
+        </m.div>
       </Container>
     </section>
   );

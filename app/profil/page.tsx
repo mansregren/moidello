@@ -5,7 +5,7 @@ import { canOptimizeImage } from "@/lib/image-host";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import {
   Settings,
   X,
@@ -540,7 +540,7 @@ export default function ProfilPage() {
 
           <div className="mt-8">
             <AnimatePresence mode="wait">
-              <motion.div
+              <m.div
                 key={tab}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -610,7 +610,7 @@ export default function ProfilPage() {
                     />
                   </div>
                 )}
-              </motion.div>
+              </m.div>
             </AnimatePresence>
           </div>
 
@@ -626,7 +626,7 @@ export default function ProfilPage() {
 
         <AnimatePresence>
           {settingsOpen && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -634,7 +634,7 @@ export default function ProfilPage() {
               className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md"
               onClick={() => setSettingsOpen(false)}
             >
-              <motion.div
+              <m.div
                 initial={{ y: 40, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 40, opacity: 0 }}
@@ -671,8 +671,8 @@ export default function ProfilPage() {
                     onClick={handleSignOut}
                   />
                 </ul>
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           )}
         </AnimatePresence>
       </main>
@@ -702,7 +702,7 @@ function ProfileTabButton({
     >
       {children}
       {active && (
-        <motion.span
+        <m.span
           layoutId="profile-tab-indicator"
           className="absolute inset-x-3 -bottom-px h-0.5 bg-foreground rounded-full"
           transition={{ duration: 0.3, ease: "easeOut" }}

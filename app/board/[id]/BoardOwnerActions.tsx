@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { Pencil, Trash2, X } from "lucide-react";
 import { deleteBoard, updateBoard } from "@/app/actions/boards";
 
@@ -63,7 +63,7 @@ export function BoardOwnerActions({
 
       <AnimatePresence>
         {confirmDelete && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -71,7 +71,7 @@ export function BoardOwnerActions({
             className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-6"
             onClick={() => setConfirmDelete(false)}
           >
-            <motion.div
+            <m.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 20, opacity: 0 }}
@@ -103,8 +103,8 @@ export function BoardOwnerActions({
                   {pending ? "Deleting…" : "Delete"}
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     </>
@@ -157,7 +157,7 @@ function EditBoardModal({
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -165,7 +165,7 @@ function EditBoardModal({
           className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md"
           onClick={onClose}
         >
-          <motion.div
+          <m.div
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
@@ -240,8 +240,8 @@ function EditBoardModal({
                 {pending ? "Saving…" : "Save"}
               </button>
             </form>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

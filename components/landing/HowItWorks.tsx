@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Camera, Tag, ShoppingBag } from "lucide-react";
 import { Container } from "../layout/Container";
 
@@ -38,7 +38,7 @@ export function HowItWorks() {
       </div>
 
       <Container className="relative z-10">
-        <motion.h2
+        <m.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -46,11 +46,11 @@ export function HowItWorks() {
           className="font-heading text-[36px] md:text-[56px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground text-center mb-16"
         >
           Hur det <span className="text-foreground/50">fungerar</span>
-        </motion.h2>
+        </m.h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
           {steps.map((step, i) => (
-            <motion.div
+            <m.div
               key={step.title}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -67,7 +67,7 @@ export function HowItWorks() {
               <p className="text-sm text-foreground/60 max-w-xs mx-auto">
                 {step.description}
               </p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </Container>

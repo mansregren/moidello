@@ -7,7 +7,7 @@ import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { PremiumButton } from "@/components/shared/PremiumButton";
 import { IconButton } from "@/components/shared/IconButton";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
@@ -652,7 +652,7 @@ export default function SkapaPage() {
       <Header />
       <main id="main" tabIndex={-1} className="flex-1 pt-6 md:pt-10">
         <Container className="max-w-5xl">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -668,7 +668,7 @@ export default function SkapaPage() {
                 ? "Upload one or more images. Tag the furniture on each, publish them all at once - every room gets its own URL."
                 : "Upload one or more images. Tag the pieces on each, publish them all at once - every outfit gets its own URL."}
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Up-front, explicit choice of what's being created. Drives both the
               vertical (mode/hem) and the gender. Heminredning only appears for
@@ -830,7 +830,7 @@ export default function SkapaPage() {
 
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Image upload + tag placement */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -1020,10 +1020,10 @@ export default function SkapaPage() {
                   {active.tags.length === 1 ? "tag" : "tags"} placed.
                 </p>
               )}
-            </motion.div>
+            </m.div>
 
             {/* Form for active draft */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -1475,7 +1475,7 @@ export default function SkapaPage() {
                     : `${incompleteTagCount} tags are missing a brand or name and won't be published. Fill them in or remove them.`}
                 </p>
               )}
-            </motion.div>
+            </m.div>
           </div>
 
           <div className="py-16" />

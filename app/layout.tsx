@@ -16,6 +16,7 @@ import { damVisible } from "@/lib/flags";
 import { siteJsonLd } from "@/lib/json-ld";
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
+import { MotionProvider } from "@/components/layout/MotionProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -133,6 +134,7 @@ export default async function RootLayout({
       className={`${inter.variable} ${anton.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground overflow-x-hidden">
+        <MotionProvider>
         {/* Site-wide structured data: Organization + WebSite (with sitelinks
             search box). Page-level JSON-LD goes inside the route components. */}
         <JsonLd data={siteJsonLd()} />
@@ -155,6 +157,7 @@ export default async function RootLayout({
         <CookieBanner />
         <Analytics />
         <SpeedInsights />
+        </MotionProvider>
       </body>
     </html>
   );

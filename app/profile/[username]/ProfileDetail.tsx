@@ -22,7 +22,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useViewerEngagement } from "@/lib/viewer-engagement-context";
 // gender-context is no longer used here — the profile shows all outfits
 // regardless of the viewer's filter.
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import type { Outfit, User as MoidelloUser } from "@/lib/types";
 import { toggleFollow } from "@/app/actions/engagement";
 
@@ -155,7 +155,7 @@ export default function ProfileDetail({
         )}
 
         <Container>
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -244,7 +244,7 @@ export default function ProfileDetail({
                 <ReportButton targetType="profile" targetId={user.id} />
               )}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Scrolls sideways on phones instead of pushing the page wider. */}
           <div className="flex sm:justify-center overflow-x-auto scrollbar-hide border-b border-border mb-8 -mx-6 px-6 sm:mx-0 sm:px-0">
@@ -265,7 +265,7 @@ export default function ProfileDetail({
                   </span>
                 )}
                 {activeTab === tab.key && (
-                  <motion.div
+                  <m.div
                     layoutId="profileTab"
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground"
                   />
@@ -274,7 +274,7 @@ export default function ProfileDetail({
             ))}
           </div>
 
-          <motion.div
+          <m.div
             key={activeTab}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -343,7 +343,7 @@ export default function ProfileDetail({
                 )}
               </div>
             )}
-          </motion.div>
+          </m.div>
         </Container>
       </main>
     </>

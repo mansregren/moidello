@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { UserAvatar } from "@/components/user/UserAvatar";
@@ -157,7 +157,7 @@ export default function OnboardingPage() {
           />
 
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={step}
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -181,7 +181,7 @@ export default function OnboardingPage() {
               {step === 3 && (
                 <StepFollow value={following} onChange={setFollowing} />
               )}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
 
           {state.error && (

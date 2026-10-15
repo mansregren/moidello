@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { LogOut, User as UserIcon, Plus, Bookmark, MessageCircle } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { useAuth } from "@/lib/auth-context";
 import { canCreateOutfits } from "@/lib/flags";
@@ -63,7 +63,7 @@ export function UserMenu() {
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
@@ -120,7 +120,7 @@ export function UserMenu() {
                 </button>
               </li>
             </ul>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
