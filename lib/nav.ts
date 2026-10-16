@@ -12,7 +12,7 @@ export interface NavItem {
 
 export const primaryNav: NavItem[] = [
   { href: "/", label: "Home", icon: Home },
-  { href: "/upptack", label: "Discover", icon: Search },
+  { href: "/upptack", label: "Latest outfits", icon: Search },
   { href: "/skapa", label: "Create", icon: Plus, primary: true, authAction: "create" },
   { href: "/foljer", label: "Following", icon: Users },
   { href: "/profil", label: "Profile", icon: User, authAction: "profile" },

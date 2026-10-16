@@ -81,7 +81,7 @@ export function ReportButton({
           onClick={handleOpen}
           aria-label="Report"
           title="Report"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground-muted hover:text-foreground hover:border-foreground/30 transition-colors"
         >
           <Flag className="h-4 w-4" />
         </button>

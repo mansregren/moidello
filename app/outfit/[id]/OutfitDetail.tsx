@@ -65,6 +65,7 @@ export default function OutfitDetail({
   const [likeCount, setLikeCount] = useState(outfit.likes);
   const [saveCount, setSaveCount] = useState(outfit.saves);
   const [shareOpen, setShareOpen] = useState(false);
+  const [openTagId, setOpenTagId] = useState<string | null>(null);
 
   useEffect(() => {
     setLikeCount(outfit.likes);
@@ -199,6 +200,10 @@ export default function OutfitDetail({
                   key={tag.id}
                   tag={tag}
                   outfitId={isPersisted ? outfit.id : undefined}
+                  open={openTagId === tag.id}
+                  onOpenChange={(open) =>
+                    setOpenTagId((cur) => (open ? tag.id : cur === tag.id ? null : cur))
+                  }
                 />
               ))}
             </m.div>
@@ -260,72 +265,75 @@ export default function OutfitDetail({
                 {outfit.description}
               </p>
 
-              <div className="flex flex-wrap items-center gap-2 mb-8">
-                <button
-                  type="button"
-                  onClick={handleLike}
-                  aria-label={liked ? "Remove like" : "Like"}
-                  aria-pressed={liked}
-                  className={cn(
-                    "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-                    liked
-                      ? "bg-foreground/10 border-foreground/40 text-foreground"
-                      : "border-border text-foreground hover:border-foreground/30",
-                  )}
-                >
-                  <Heart
-                    className={cn("h-4 w-4", liked && "fill-foreground text-foreground")}
-                  />
-                  <span className="tabular-nums">{likeCount}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  aria-label={saved ? "Remove from saved" : "Save"}
-                  aria-pressed={saved}
-                  className={cn(
-                    "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-                    saved
-                      ? "bg-foreground/10 border-foreground/40 text-foreground"
-                      : "border-border text-foreground hover:border-foreground/30",
-                  )}
-                >
-                  <Bookmark
-                    className={cn("h-4 w-4", saved && "fill-foreground text-foreground")}
-                  />
-                  <span className="tabular-nums">{saveCount}</span>
-                </button>
-
-                {isPersisted && (
+              <div className="flex items-center justify-between gap-2 mb-8">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => setShareOpen(true)}
-                    className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2 text-sm font-medium hover:border-foreground/30 transition-colors"
+                    onClick={handleLike}
+                    aria-label={liked ? "Remove like" : "Like"}
+                    aria-pressed={liked}
+                    className={cn(
+                      "inline-flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors",
+                      liked
+                        ? "bg-foreground/10 border-foreground/40 text-foreground"
+                        : "border-border text-foreground hover:border-foreground/30",
+                    )}
                   >
-                    <Send className="h-4 w-4" />
-                    Send to a friend
+                    <Heart
+                      className={cn("h-4 w-4", liked && "fill-foreground text-foreground")}
+                    />
+                    <span className="tabular-nums">{likeCount}</span>
                   </button>
-                )}
-                <ShareButton
-                  url={outfitPath(outfit)}
-                  title={outfit.title}
-                  text={outfit.description || outfit.title}
-                  label="Share link"
-                  variant="outline"
-                />
-                {isPersisted && <SaveForTikTokButton outfitId={outfit.id} />}
-                {isPersisted && viewerIsAdmin && (
-                  <SaveToPinterestButton outfitId={outfit.id} />
-                )}
-                {isPersisted && user?.id !== outfit.creator.id && (
-                  <ReportButton targetType="outfit" targetId={outfit.id} />
-                )}
+
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    aria-label={saved ? "Remove from saved" : "Save"}
+                    aria-pressed={saved}
+                    className={cn(
+                      "inline-flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors",
+                      saved
+                        ? "bg-foreground/10 border-foreground/40 text-foreground"
+                        : "border-border text-foreground hover:border-foreground/30",
+                    )}
+                  >
+                    <Bookmark
+                      className={cn("h-4 w-4", saved && "fill-foreground text-foreground")}
+                    />
+                    <span className="tabular-nums">{saveCount}</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  {isPersisted && <AddToBoardButton outfitId={outfit.id} iconOnly />}
+                  {isPersisted && (
+                    <button
+                      type="button"
+                      onClick={() => setShareOpen(true)}
+                      aria-label="Send to a friend"
+                      title="Send to a friend"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground hover:border-foreground/30 transition-colors"
+                    >
+                      <Send className="h-4 w-4" />
+                    </button>
+                  )}
+                  <ShareButton
+                    url={outfitPath(outfit)}
+                    title={outfit.title}
+                    text={outfit.description || outfit.title}
+                    variant="outline"
+                    iconOnly
+                  />
+                  {isPersisted && user?.id !== outfit.creator.id && (
+                    <ReportButton targetType="outfit" targetId={outfit.id} />
+                  )}
+                </div>
               </div>
 
-              {isPersisted && (
-                <div className="mb-8">
-                  <AddToBoardButton outfitId={outfit.id} />
+              {isPersisted && viewerIsAdmin && (
+                <div className="flex flex-wrap items-center gap-2 -mt-5 mb-8">
+                  <SaveForTikTokButton outfitId={outfit.id} />
+                  <SaveToPinterestButton outfitId={outfit.id} />
                 </div>
               )}
 

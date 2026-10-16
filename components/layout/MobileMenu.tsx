@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, MouseEvent } from "react";
+import { createPortal } from "react-dom";
 import { m, AnimatePresence } from "framer-motion";
 import { Menu, X, LogOut, Bookmark, MessageCircle } from "lucide-react";
 import { IconButton } from "../shared/IconButton";
@@ -21,6 +22,11 @@ export function MobileMenu() {
   const router = useRouter();
   const { isLoggedIn, requireAuth, signOut, profile } = useAuth();
   const [open, setOpen] = useState(false);
+  // The drawer is portalled to <body>: the header gets backdrop-blur once
+  // the page is scrolled, and a backdrop-filter ancestor turns position:fixed
+  // into "fixed to the header", squashing the drawer to header height.
+  // Set on first open so server and client render the same markup.
+  const [portalReady, setPortalReady] = useState(false);
   const navItems = visiblePrimaryNav(!!profile?.isAdmin);
 
   const isHomeArea = pathname?.startsWith("/home") ?? false;
@@ -47,7 +53,7 @@ export function MobileMenu() {
 
   const handleNavClick = (
     e: MouseEvent<HTMLAnchorElement>,
-    authAction?: "create" | "profile"
+    authAction?: "create" | "profile",
   ) => {
     if (!authAction || isLoggedIn) {
       setOpen(false);
@@ -74,126 +80,149 @@ export function MobileMenu() {
         aria-label="Menu"
         aria-haspopup="menu"
         aria-expanded={open}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setPortalReady(true);
+          setOpen(true);
+        }}
       >
         <Menu className="h-5 w-5" />
       </IconButton>
 
-      <AnimatePresence>
-        {open && (
-          <>
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-              onClick={() => setOpen(false)}
-            />
-            <m.nav
-              aria-label="Main navigation"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "tween", duration: 0.25, ease: "easeOut" }}
-              className="fixed inset-y-0 right-0 z-50 flex w-[78%] max-w-xs flex-col bg-background-secondary border-l border-border shadow-2xl shadow-black/50"
-              style={{
-                paddingTop: "env(safe-area-inset-top)",
-                paddingBottom: "env(safe-area-inset-bottom)",
-              }}
-            >
-              <div className="flex items-center justify-between px-4 h-14 border-b border-border">
-                <span className="font-heading text-lg uppercase tracking-tight text-foreground">
-                  Moidello
-                </span>
-                <IconButton aria-label="Close menu" onClick={() => setOpen(false)}>
-                  <X className="h-5 w-5" />
-                </IconButton>
-              </div>
+      {portalReady &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
+              <>
+                <m.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
+                  onClick={() => setOpen(false)}
+                />
+                <m.nav
+                  aria-label="Main navigation"
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  transition={{
+                    type: "tween",
+                    duration: 0.25,
+                    ease: "easeOut",
+                  }}
+                  className="fixed inset-y-0 right-0 z-[60] flex w-[78%] max-w-xs flex-col bg-background-secondary border-l border-border shadow-2xl shadow-black/50"
+                  style={{
+                    paddingTop: "env(safe-area-inset-top)",
+                    paddingBottom: "env(safe-area-inset-bottom)",
+                  }}
+                >
+                  <div className="flex items-center justify-between px-4 h-14 border-b border-border">
+                    <span className="font-heading text-lg uppercase tracking-tight text-foreground">
+                      Moidello
+                    </span>
+                    <IconButton
+                      aria-label="Close menu"
+                      onClick={() => setOpen(false)}
+                    >
+                      <X className="h-5 w-5" />
+                    </IconButton>
+                  </div>
 
-              <ul className="flex-1 overflow-y-auto py-2">
-                {navItems.map((item) => {
-                  const active = isActive(pathname, item.href);
-                  const Icon = item.icon;
-                  const href =
-                    item.authAction === "create" && isHomeArea
-                      ? "/skapa?vertical=hem"
-                      : item.href;
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={href}
-                        aria-current={active ? "page" : undefined}
-                        onClick={(e) => handleNavClick(e, item.authAction)}
-                        className={cn(
-                          "flex items-center gap-3 px-5 py-3.5 text-base transition-colors",
-                          active
-                            ? "text-foreground font-semibold bg-foreground/10"
-                            : "text-foreground/70 hover:text-foreground hover:bg-foreground/5"
-                        )}
-                      >
-                        <Icon
-                          className="h-5 w-5 shrink-0"
-                          strokeWidth={active ? 2.4 : 1.8}
-                        />
-                        {item.label}
-                      </Link>
-                    </li>
-                  );
-                })}
+                  <ul className="flex-1 overflow-y-auto py-2">
+                    {navItems.map((item) => {
+                      const active = isActive(pathname, item.href);
+                      const Icon = item.icon;
+                      const href =
+                        item.authAction === "create" && isHomeArea
+                          ? "/skapa?vertical=hem"
+                          : item.href;
+                      return (
+                        <li key={item.href}>
+                          <Link
+                            href={href}
+                            aria-current={active ? "page" : undefined}
+                            onClick={(e) => handleNavClick(e, item.authAction)}
+                            className={cn(
+                              "flex items-center gap-3 px-5 py-3.5 text-base transition-colors",
+                              active
+                                ? "text-foreground font-semibold bg-foreground/10"
+                                : "text-foreground/70 hover:text-foreground hover:bg-foreground/5",
+                            )}
+                          >
+                            <Icon
+                              className="h-5 w-5 shrink-0"
+                              strokeWidth={active ? 2.4 : 1.8}
+                            />
+                            {item.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
 
-                {isLoggedIn && (
-                  <>
-                    <li className="my-2 border-t border-border" />
-                    <li>
+                    {isLoggedIn && (
+                      <>
+                        <li className="my-2 border-t border-border" />
+                        <li>
+                          <Link
+                            href="/meddelanden"
+                            onClick={() => setOpen(false)}
+                            className="flex items-center gap-3 px-5 py-3.5 text-base text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
+                          >
+                            <MessageCircle
+                              className="h-5 w-5 shrink-0"
+                              strokeWidth={1.8}
+                            />
+                            Messages
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/profil"
+                            onClick={() => setOpen(false)}
+                            className="flex items-center gap-3 px-5 py-3.5 text-base text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
+                          >
+                            <Bookmark
+                              className="h-5 w-5 shrink-0"
+                              strokeWidth={1.8}
+                            />
+                            Saved
+                          </Link>
+                        </li>
+                        <li>
+                          <button
+                            type="button"
+                            onClick={handleSignOut}
+                            className="w-full flex items-center gap-3 px-5 py-3.5 text-base text-red-400 hover:bg-foreground/5 transition-colors"
+                          >
+                            <LogOut
+                              className="h-5 w-5 shrink-0"
+                              strokeWidth={1.8}
+                            />
+                            Log out
+                          </button>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+
+                  {!isLoggedIn && (
+                    <div className="border-t border-border p-4">
                       <Link
-                        href="/meddelanden"
+                        href="/login"
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-3 px-5 py-3.5 text-base text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
+                        className="flex items-center justify-center rounded-full bg-foreground text-background px-4 py-2.5 text-sm font-semibold uppercase tracking-wider transition-transform active:scale-95"
                       >
-                        <MessageCircle className="h-5 w-5 shrink-0" strokeWidth={1.8} />
-                        Messages
+                        Log in
                       </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/profil"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center gap-3 px-5 py-3.5 text-base text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
-                      >
-                        <Bookmark className="h-5 w-5 shrink-0" strokeWidth={1.8} />
-                        Saved
-                      </Link>
-                    </li>
-                    <li>
-                      <button
-                        type="button"
-                        onClick={handleSignOut}
-                        className="w-full flex items-center gap-3 px-5 py-3.5 text-base text-red-400 hover:bg-foreground/5 transition-colors"
-                      >
-                        <LogOut className="h-5 w-5 shrink-0" strokeWidth={1.8} />
-                        Log out
-                      </button>
-                    </li>
-                  </>
-                )}
-              </ul>
-
-              {!isLoggedIn && (
-                <div className="border-t border-border p-4">
-                  <Link
-                    href="/login"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center justify-center rounded-full bg-foreground text-background px-4 py-2.5 text-sm font-semibold uppercase tracking-wider transition-transform active:scale-95"
-                  >
-                    Log in
-                  </Link>
-                </div>
-              )}
-            </m.nav>
-          </>
+                    </div>
+                  )}
+                </m.nav>
+              </>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>
     </div>
   );
 }

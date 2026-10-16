@@ -18,7 +18,14 @@ interface BoardListItem {
   contains: boolean;
 }
 
-export function AddToBoardButton({ outfitId }: { outfitId: string }) {
+export function AddToBoardButton({
+  outfitId,
+  iconOnly = false,
+}: {
+  outfitId: string;
+  /** Round icon button for a compact action row. */
+  iconOnly?: boolean;
+}) {
   const { isLoggedIn, requireAuth, user } = useAuth();
   const [open, setOpen] = useState(false);
 
@@ -35,10 +42,16 @@ export function AddToBoardButton({ outfitId }: { outfitId: string }) {
       <button
         type="button"
         onClick={handleClick}
-        className="inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2 text-sm hover:border-foreground/30 transition-colors"
+        aria-label="Add to collection"
+        title={iconOnly ? "Add to collection" : undefined}
+        className={
+          iconOnly
+            ? "inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground hover:border-foreground/30 transition-colors"
+            : "inline-flex items-center gap-2 rounded-full border border-border text-foreground px-4 py-2 text-sm hover:border-foreground/30 transition-colors"
+        }
       >
         <FolderPlus className="h-4 w-4" />
-        Add to collection
+        {!iconOnly && "Add to collection"}
       </button>
       {open && user && (
         <BoardSheet

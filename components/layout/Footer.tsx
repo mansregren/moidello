@@ -6,7 +6,7 @@ import { OUTFIT_CREATE_PUBLIC } from "@/lib/flags";
 const footerLinks = {
   Platform: [
     { href: "/", label: "Home" },
-    { href: "/upptack", label: "Discover" },
+    { href: "/upptack", label: "Latest outfits" },
     ...(OUTFIT_CREATE_PUBLIC ? [{ href: "/skapa", label: "Create" }] : []),
   ],
   Company: [

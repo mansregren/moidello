@@ -14,6 +14,7 @@ export function ShareButton({
   text,
   variant = "outline",
   label = "Dela",
+  iconOnly = false,
   className,
 }: {
   url: string;
@@ -21,6 +22,8 @@ export function ShareButton({
   text?: string;
   variant?: "outline" | "solid" | "ghost";
   label?: string;
+  /** Round icon button; the copied state swaps the icon instead of the text. */
+  iconOnly?: boolean;
   className?: string;
 }) {
   const [copied, setCopied] = useState(false);
@@ -65,9 +68,12 @@ export function ShareButton({
       type="button"
       onClick={handleClick}
       aria-label="Share link"
-      className={cn(base, styles, className)}
+      title={iconOnly ? (copied ? "Link copied" : "Share link") : undefined}
+      className={cn(base, styles, iconOnly && "h-10 w-10 justify-center p-0", className)}
     >
-      {copied ? (
+      {iconOnly ? (
+        copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />
+      ) : copied ? (
         <>
           <Check className="h-4 w-4" />
           Link copied

@@ -51,7 +51,7 @@ export default function UpptackClient({
           {/* Title + search */}
           <div className="mb-5">
             <h1 className="font-heading text-[40px] md:text-[64px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
-              Discover
+              Latest outfits
             </h1>
             <div className="relative mt-5 max-w-xl">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground-subtle" />
