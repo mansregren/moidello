@@ -7,7 +7,8 @@
 //
 // Auth: `Authorization: Bearer <CATALOG_IMPORT_TOKEN>`. If the env var is
 // unset the route answers 404, so it is off unless explicitly configured.
-// Body: { drafts: CatalogDraft-like[] } (max 25 per call).
+// Body: { drafts: CatalogDraft-like[] } (max 25 per call). A draft may
+// carry imageBase64 to upload that image instead of fetching sourceImageUrl.
 // Returns { results: [{ url, ok, id?, error? }] }.
 
 import { timingSafeEqual } from "crypto";
@@ -75,6 +76,9 @@ export async function POST(request: Request) {
     const name = str(raw.name, 200);
     const garment = str(raw.garment, 40);
     const image = str(raw.sourceImageUrl, 2000);
+    // Optional pre-processed image (e.g. a background-removed cut-out),
+    // base64-encoded. sourceImageUrl is still stored as the provenance.
+    const imageData = typeof raw.imageBase64 === "string" ? raw.imageBase64 : "";
     if (!/^https?:\/\//i.test(buyUrl) || !brand || !name || !garment || !image) {
       results.push({ url: buyUrl, ok: false, error: "Missing url/brand/name/garment/image." });
       continue;
@@ -85,7 +89,7 @@ export async function POST(request: Request) {
         // Same storage calls as the cookie client; the service client
         // bypasses RLS, which the admin storage policy would allow anyway.
         supabase as unknown as Parameters<typeof storeCatalogImage>[0],
-        await downloadImage(image),
+        imageData ? Buffer.from(imageData, "base64") : await downloadImage(image),
       );
     } catch (e) {
       results.push({ url: buyUrl, ok: false, error: e instanceof Error ? e.message : "Image error." });
