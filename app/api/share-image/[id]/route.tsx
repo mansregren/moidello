@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import sharp from "sharp";
 import { fetchOutfitById } from "@/lib/queries";
 import { loadInter } from "@/lib/og-fonts";
 
@@ -10,13 +11,14 @@ const SITE_BASE = "https://moidello.com";
 const TIKTOK_CANVAS = { w: 1080, h: 1920 };
 // Pinterest's recommended pin ratio (2:3) at 2x for a sharper download.
 const PINTEREST_CANVAS = { w: 2000, h: 3000 };
-const BG = "#FFFFFF";
+const FALLBACK_BG = "#FFFFFF";
 const INK = "#1A1A1A";
 
 // Outfit photos are always cropped to 3:4 at upload (lib/image-resize.ts) —
 // contain-fit that ratio onto the white canvas so nothing gets cropped off,
-// with the leftover top/bottom filled white instead of TikTok's own black
-// letterbox bars.
+// with the leftover top/bottom filled in the photo's own background colour
+// (builder outfits sit on off-white/sand/grey) instead of TikTok's black
+// letterbox bars — a white band around a grey photo reads as a box.
 const PHOTO_RATIO_W = 3;
 const PHOTO_RATIO_H = 4;
 
@@ -24,6 +26,35 @@ function absUrl(src: string): string {
   if (!src) return "";
   if (src.startsWith("http")) return src;
   return `${SITE_BASE}${src.startsWith("/") ? src : `/${src}`}`;
+}
+
+/** The photo's edge colour when its corners agree, else white. */
+async function edgeColor(buf: Buffer): Promise<string> {
+  try {
+    const { data, info } = await sharp(buf)
+      .resize(64, 64, { fit: "fill" })
+      .removeAlpha()
+      .toColourspace("srgb")
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const { width: w, height: h, channels: ch } = info;
+    const at = (x: number, y: number) => {
+      const i = (y * w + x) * ch;
+      return [data[i], data[i + 1], data[i + 2]];
+    };
+    const corners = [at(1, 1), at(w - 2, 1), at(1, h - 2), at(w - 2, h - 2)];
+    for (const c of corners) {
+      for (let k = 0; k < 3; k++) {
+        if (Math.abs(c[k] - corners[0][k]) > 12) return FALLBACK_BG;
+      }
+    }
+    const avg = [0, 1, 2].map((k) =>
+      Math.round(corners.reduce((sum, c) => sum + c[k], 0) / corners.length),
+    );
+    return `#${avg.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
+  } catch {
+    return FALLBACK_BG;
+  }
 }
 
 function shortLabel(brand: string, name: string): string {
@@ -61,7 +92,21 @@ export async function GET(
   // Pinterest's 2x) don't end up with tiny-looking markers.
   const sizeScale = scale / Math.min(TIKTOK_CANVAS.w / PHOTO_RATIO_W, TIKTOK_CANVAS.h / PHOTO_RATIO_H);
 
-  const imageUrl = absUrl(outfit.image);
+  // Fetch the photo once: sample its background, then hand the same bytes
+  // to the renderer as a data URL.
+  let imageUrl = absUrl(outfit.image);
+  let bg = FALLBACK_BG;
+  try {
+    const res = await fetch(imageUrl);
+    if (res.ok) {
+      const buf = Buffer.from(await res.arrayBuffer());
+      bg = await edgeColor(buf);
+      const type = res.headers.get("content-type") ?? "image/jpeg";
+      imageUrl = `data:${type};base64,${buf.toString("base64")}`;
+    }
+  } catch {
+    // Fall back to letting the renderer fetch the URL on a white canvas.
+  }
   const dots = outfit.tags.map((tag) => ({
     id: tag.id,
     xPx: photoX + (tag.x / 100) * photoW,
@@ -75,7 +120,7 @@ export async function GET(
       style={{
         width: "100%",
         height: "100%",
-        background: BG,
+        background: bg,
         display: "flex",
         fontFamily: "Inter",
         color: INK,
