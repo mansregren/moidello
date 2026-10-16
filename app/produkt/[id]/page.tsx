@@ -21,6 +21,7 @@ function isUsableBuyUrl(url: string | undefined): url is string {
 }
 import { fetchTaggedItemById, fetchOutfitsByItem } from "@/lib/queries";
 import { HIDE_CREATORS } from "@/lib/flags";
+import { brandHref } from "@/lib/brands";
 import { createPublicClient } from "@/lib/supabase/public";
 
 // ISR: product detail is public. Saved-product state hydrates client-side
@@ -219,7 +220,7 @@ export default async function ProduktPage({
                   </dt>
                   <dd className="mt-1 text-foreground font-medium">
                     <Link
-                      href={`/brand/${item.brand.toLowerCase()}`}
+                      href={brandHref(item.brand)}
                       className="hover:underline underline-offset-4"
                     >
                       {item.brand}

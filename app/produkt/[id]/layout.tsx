@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { fetchTaggedItemById } from "@/lib/queries";
 import { createPublicClient } from "@/lib/supabase/public";
+import { fetchCanonicalProducts, productKey } from "@/lib/product-canonical";
 
 const SITE = "Moidello";
 
@@ -47,7 +48,11 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const item = await fetchTaggedItemById(id, createPublicClient());
+  const supabase = createPublicClient();
+  const [item, canonicalProducts] = await Promise.all([
+    fetchTaggedItemById(id, supabase),
+    fetchCanonicalProducts(supabase),
+  ]);
 
   if (!item) {
     return {
@@ -69,16 +74,14 @@ export async function generateMetadata({
   const title = titleParts.join(" — ").slice(0, 60);
 
   const description = buildDescription(item);
-  const canonical = `/produkt/${item.id}`;
+  // Repeat tags of the same piece defer to one page (see product-canonical).
+  const canonicalId = canonicalProducts.get(productKey(item.brand, item.name));
+  const canonical = `/produkt/${canonicalId ?? item.id}`;
 
-  // Thin-content guard: noindex if we don't have enough signal (no buy URL,
-  // no price, or barely a name) — these pages won't rank and dilute the
-  // site's SERP quality.
-  const isThin =
-    !item.buyUrl ||
-    item.price <= 0 ||
-    !item.name?.trim() ||
-    item.name.trim().length < 3;
+  // Thin-content guard: noindex when there is no buy link or barely a name,
+  // or the piece is only on non-public outfits. Price is not required —
+  // most plaggbank pieces are saved without one.
+  const isThin = !canonicalId;
 
   return {
     title,

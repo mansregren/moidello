@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { canonicalColorLabel } from "@/lib/colors";
 import { canonicalGarment } from "@/lib/garments";
+import { brandSlug, canonicalBrand } from "@/lib/brands";
 import type {
   Outfit,
   TaggedItem,
@@ -142,7 +143,7 @@ function rowToOutfit(row: OutfitRow): Outfit {
 
   const tags: TaggedItem[] = row.tagged_items.map((t) => ({
     id: t.id,
-    brand: t.brand,
+    brand: canonicalBrand(t.brand),
     name: t.name,
     price: t.price ?? 0,
     currency: t.currency ?? "SEK",
@@ -690,16 +691,12 @@ export interface BrandAggregate {
   outfitCount: number;
   isClaimed: boolean;
   claimedBy?: { username: string; avatar: string; website: string | null };
+  /** Raw brand values on tags that fold into this brand. */
+  variants: string[];
+  /** Slugs those raw values had before canonicalisation (for redirects). */
+  aliasSlugs: string[];
 }
 
-function brandSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
 
 interface ClaimedBrandRow {
   id: string;
@@ -748,29 +745,35 @@ export async function fetchBrandsAggregated(
 
   const claimedRows = (claimed ?? []) as unknown as ClaimedBrandRow[];
 
-  const counts = new Map<string, { display: string; outfits: Set<string> }>();
+  const counts = new Map<
+    string,
+    { display: string; outfits: Set<string>; variants: Set<string> }
+  >();
   for (const row of items ?? []) {
-    const display = (row.brand as string).trim();
-    if (!display) continue;
+    const raw = (row.brand as string).trim();
+    if (!raw) continue;
     const outfitId = row.outfit_id as string;
     if (hemOutfitIds.has(outfitId)) continue;
     if (outfitGenderFilter && !outfitGenderFilter.has(outfitId)) continue;
-    const key = display.toLowerCase();
-    const entry = counts.get(key) ?? { display, outfits: new Set<string>() };
+    const display = canonicalBrand(raw);
+    const key = brandSlug(display);
+    const entry =
+      counts.get(key) ?? { display, outfits: new Set<string>(), variants: new Set<string>() };
     entry.outfits.add(outfitId);
+    entry.variants.add(raw);
     counts.set(key, entry);
   }
 
   const claimedByKey = new Map<string, ClaimedBrandRow>();
   for (const c of claimedRows) {
-    if (c.brand_name) claimedByKey.set(c.brand_name.toLowerCase(), c);
+    if (c.brand_name) claimedByKey.set(brandSlug(canonicalBrand(c.brand_name)), c);
   }
   // Brands with claimed profiles but zero tagged outfits should still appear.
   for (const c of claimedRows) {
     if (!c.brand_name) continue;
-    const key = c.brand_name.toLowerCase();
+    const key = brandSlug(canonicalBrand(c.brand_name));
     if (!counts.has(key)) {
-      counts.set(key, { display: c.brand_name, outfits: new Set() });
+      counts.set(key, { display: c.brand_name, outfits: new Set(), variants: new Set() });
     }
   }
 
@@ -781,6 +784,8 @@ export async function fetchBrandsAggregated(
       name: claim?.brand_name ?? value.display,
       slug: brandSlug(claim?.brand_name ?? value.display),
       outfitCount: value.outfits.size,
+      variants: Array.from(value.variants),
+      aliasSlugs: Array.from(value.variants, brandSlug).filter((s) => s !== key),
       isClaimed: !!claim,
       claimedBy: claim
         ? {
@@ -889,7 +894,7 @@ export async function fetchTaggedItemById(
   const profile = r.outfits.profiles;
   return {
     id: r.id,
-    brand: r.brand,
+    brand: canonicalBrand(r.brand),
     name: r.name,
     price: r.price ?? 0,
     currency: r.currency ?? "SEK",
@@ -933,14 +938,14 @@ export async function fetchOutfitsByItem(
     .select("outfit_id, brand, name");
   if (!tagRows) return [];
 
-  const targetBrand = brand.toLowerCase();
+  const targetBrand = brandSlug(canonicalBrand(brand));
   const targetName = name.toLowerCase();
   const ids = Array.from(
     new Set(
       tagRows
         .filter(
           (r) =>
-            (r.brand as string).toLowerCase() === targetBrand &&
+            brandSlug(canonicalBrand(r.brand as string)) === targetBrand &&
             (r.name as string).toLowerCase() === targetName,
         )
         .map((r) => r.outfit_id as string)
@@ -1173,17 +1178,17 @@ export async function fetchOutfitsByCategory(
 }
 
 export async function fetchBrandOutfits(
-  brandName: string,
+  /** Raw tag values for the brand (BrandAggregate.variants). */
+  variants: string[],
   gender?: "dam" | "herr",
 ): Promise<Outfit[]> {
+  if (variants.length === 0) return [];
   const supabase = await createClient();
 
-  // Match the brand in Postgres (case-insensitive) instead of pulling every
-  // tagged row and filtering in JS.
   const { data: tagRows } = await supabase
     .from("tagged_items")
     .select("outfit_id")
-    .ilike("brand", brandName);
+    .in("brand", variants);
 
   if (!tagRows) return [];
   const outfitIds = Array.from(

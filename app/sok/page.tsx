@@ -9,6 +9,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { outfitPathFromParts } from "@/lib/outfit-url";
 import { getViewerGender } from "@/lib/gender-server";
 import { HIDE_CREATORS } from "@/lib/flags";
+import { brandHref, canonicalBrand } from "@/lib/brands";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -141,7 +142,7 @@ async function SearchResults({ q }: { q: string }) {
   // Aggregate brand hits client-side to avoid running an extra distinct query.
   const brandCounts = new Map<string, number>();
   for (const r of (brandsRes.data ?? []) as Array<{ brand: string }>) {
-    const k = r.brand;
+    const k = canonicalBrand(r.brand);
     brandCounts.set(k, (brandCounts.get(k) ?? 0) + 1);
   }
   const brands: BrandHit[] = Array.from(brandCounts.entries())
@@ -214,7 +215,7 @@ async function SearchResults({ q }: { q: string }) {
             {brands.map((b) => (
               <Link
                 key={b.brand}
-                href={`/brand/${encodeURIComponent(b.brand.toLowerCase())}`}
+                href={brandHref(b.brand)}
                 className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-foreground hover:border-foreground/30 transition-colors"
               >
                 {b.brand}

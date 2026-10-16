@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { canOptimizeImage } from "@/lib/image-host";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Globe, Crown, Star, Gem, ShoppingBag, ArrowLeft, BadgeCheck, ExternalLink } from "lucide-react";
+import { notFound, permanentRedirect } from "next/navigation";
+import { Globe, ArrowLeft, BadgeCheck, ExternalLink } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Container } from "@/components/layout/Container";
 import { GenderFilteredGrid } from "@/components/outfit/GenderFilteredGrid";
@@ -14,6 +14,8 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { fetchBrandsAggregated, fetchBrandOutfits } from "@/lib/queries";
 import { PUBLIC_GENDER } from "@/lib/flags";
 import { toCardOutfits } from "@/lib/card-outfit";
+import { slugify } from "@/lib/slug";
+import { brandIntro, garmentPlural, summariseBrand } from "@/lib/brand-summary";
 
 interface BrandProduct {
   id: string;
@@ -31,15 +33,6 @@ interface BrandProduct {
 export const dynamic = "force-static";
 export const revalidate = 300;
 
-type Tier = "luxury" | "premium" | "contemporary" | "high-street";
-
-const tierLabels: Record<Tier, { label: string; icon: typeof Crown }> = {
-  luxury: { label: "Luxury", icon: Crown },
-  premium: { label: "Premium", icon: Gem },
-  contemporary: { label: "Contemporary", icon: Star },
-  "high-street": { label: "High Street", icon: ShoppingBag },
-};
-
 export default async function BrandPage({
   params,
 }: {
@@ -49,9 +42,14 @@ export default async function BrandPage({
 
   const aggregated = await fetchBrandsAggregated(undefined, PUBLIC_GENDER);
   const dbMatch = aggregated.find((b) => b.slug === slug);
-  if (!dbMatch) notFound();
+  if (!dbMatch) {
+    // Old URL of a brand-name variant ("drakes-uk-row") → the merged brand.
+    const merged = aggregated.find((b) => b.aliasSlugs.includes(slug));
+    if (merged) permanentRedirect(`/brand/${merged.slug}`);
+    notFound();
+  }
 
-  const dbOutfits = await fetchBrandOutfits(dbMatch.name, PUBLIC_GENDER);
+  const dbOutfits = await fetchBrandOutfits(dbMatch.variants, PUBLIC_GENDER);
   // A brand only tagged on hidden (Dam) outfits renders an empty grid for
   // the public — unless it is a claimed brand with its own profile.
   if (dbOutfits.length === 0 && !dbMatch.isClaimed) notFound();
@@ -66,9 +64,12 @@ export default async function BrandPage({
     .order("created_at", { ascending: false })
     .limit(60);
 
-  const description = dbMatch.isClaimed
-    ? "Verified brand on Moidello"
-    : `Outfits tagging ${dbMatch.name}.`;
+  const summary = summariseBrand(dbMatch.slug, dbOutfits);
+  const audience = PUBLIC_GENDER === "herr" ? " for men" : "";
+  const intro =
+    dbOutfits.length > 0
+      ? brandIntro(dbMatch.name, dbOutfits.length, summary, audience)
+      : "Verified brand on Moidello.";
 
   return (
     <>
@@ -78,48 +79,10 @@ export default async function BrandPage({
           name: dbMatch.name,
           logo: null,
           website: dbMatch.claimedBy?.website ?? null,
-          description,
+          description: intro,
           outfits: dbOutfits,
         })}
       />
-      <BrandShell
-        name={dbMatch.name}
-        description={description}
-        website={dbMatch.claimedBy?.website ?? null}
-        tierLabel="Contemporary"
-        TierIcon={Star}
-        outfits={dbOutfits}
-        outfitsCount={dbOutfits.length}
-        verified={dbMatch.isClaimed}
-        products={(productRows as BrandProduct[] | null) ?? []}
-      />
-    </>
-  );
-}
-
-function BrandShell({
-  name,
-  description,
-  website,
-  tierLabel,
-  TierIcon,
-  outfits,
-  outfitsCount,
-  verified,
-  products = [],
-}: {
-  name: string;
-  description: string;
-  website: string | null;
-  tierLabel: string;
-  TierIcon: typeof Crown;
-  outfits: import("@/lib/types").Outfit[];
-  outfitsCount: number;
-  verified: boolean;
-  products?: BrandProduct[];
-}) {
-  return (
-    <>
       <Header />
       <main id="main" tabIndex={-1} className="flex-1 pt-20 md:pt-24">
         <Container>
@@ -132,64 +95,111 @@ function BrandShell({
           </Link>
 
           <div className="mb-12">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex items-center gap-2 rounded-full border border-border bg-background-secondary px-3 py-1">
-                <TierIcon className="h-3.5 w-3.5 text-foreground-muted" />
-                <span className="text-xs text-foreground-muted">{tierLabel}</span>
-              </div>
-              {verified && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1 text-[11px] uppercase tracking-wider font-semibold">
-                  <BadgeCheck className="h-3.5 w-3.5" />
-                  Verifierat
-                </span>
-              )}
-            </div>
-            <h1 className="font-heading text-[48px] md:text-[80px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground">
-              {name}
-            </h1>
-            <p className="mt-4 text-lg text-foreground-muted max-w-xl">
-              {description}
-            </p>
-            <div className="mt-6 flex items-center gap-4 flex-wrap">
-              {website && (
-                <a href={website} target="_blank" rel="noopener noreferrer">
-                  <PremiumButton variant="secondary" size="sm">
-                    <Globe className="h-4 w-4" />
-                    Visit website
-                  </PremiumButton>
-                </a>
-              )}
-              <span className="text-sm text-foreground-subtle">
-                {outfitsCount} {outfitsCount === 1 ? "outfit" : "outfits"}
+            {dbMatch.isClaimed && (
+              <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1 text-[11px] uppercase tracking-wider font-semibold">
+                <BadgeCheck className="h-3.5 w-3.5" />
+                Verified
               </span>
-            </div>
+            )}
+            <h1 className="font-heading text-[48px] md:text-[80px] leading-[0.95] uppercase tracking-[-0.02em] text-foreground break-words">
+              {dbMatch.name}
+            </h1>
+            <p className="mt-4 text-lg text-foreground-muted max-w-2xl">{intro}</p>
+            {dbMatch.claimedBy?.website && (
+              <a
+                href={dbMatch.claimedBy.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-block"
+              >
+                <PremiumButton variant="secondary" size="sm">
+                  <Globe className="h-4 w-4" />
+                  Visit website
+                </PremiumButton>
+              </a>
+            )}
           </div>
 
-          {outfits.length > 0 ? (
+          {dbOutfits.length > 0 && (
             <section className="mb-16">
               <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-6">
-                Outfits med {name}
+                Outfits with {dbMatch.name}
               </h2>
-              <GenderFilteredGrid outfits={toCardOutfits(outfits)} columns={3} />
+              <GenderFilteredGrid outfits={toCardOutfits(dbOutfits)} columns={3} />
             </section>
-          ) : (
-            <div className="py-24 text-center mb-16">
-              <p className="text-foreground-muted text-lg">
-                No outfits with {name} yet
-              </p>
-              <p className="text-sm text-foreground-subtle mt-2">
-                Be the first to tag a piece from {name}!
-              </p>
-            </div>
           )}
 
-          {products.length > 0 && (
+          {summary.pieces.length > 0 && (
+            <section className="mb-16">
+              <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-6">
+                {dbMatch.name} pieces
+              </h2>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8">
+                {summary.pieces.map((p) => (
+                  <li key={p.id} className="min-w-0 border-b border-border">
+                    <Link
+                      href={`/produkt/${p.id}`}
+                      className="flex items-baseline justify-between gap-4 py-3.5 hover:opacity-80 transition-opacity"
+                    >
+                      <span className="min-w-0 truncate text-foreground">{p.name}</span>
+                      <span className="shrink-0 text-xs uppercase tracking-wider text-foreground-subtle">
+                        {p.garment}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {(summary.pairedBrands.length > 0 || summary.garments.length > 0) && (
+            <section className="mb-16 grid gap-10 md:grid-cols-2">
+              {summary.pairedBrands.length > 0 && (
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-4">
+                    Worn with
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {summary.pairedBrands.slice(0, 12).map((b) => (
+                      <Link
+                        key={b.slug}
+                        href={`/brand/${b.slug}`}
+                        className="inline-flex items-center rounded-full border border-border px-4 py-2 text-sm text-foreground hover:border-foreground/30 transition-colors"
+                      >
+                        {b.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {PUBLIC_GENDER && summary.garments.length > 0 && (
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-4">
+                    More outfits by piece
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {summary.garments.map((g) => (
+                      <Link
+                        key={g}
+                        href={`/typ/${PUBLIC_GENDER}/${slugify(g)}`}
+                        className="inline-flex items-center rounded-full border border-border px-4 py-2 text-sm text-foreground hover:border-foreground/30 transition-colors"
+                      >
+                        {garmentPlural(g).replace(/^./, (c) => c.toUpperCase())}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
+          {(productRows?.length ?? 0) > 0 && (
             <section className="mb-20">
               <h2 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider mb-6">
-                Officiell katalog ({products.length})
+                Official catalog ({productRows!.length})
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
-                {products.map((p) => (
+                {(productRows as BrandProduct[]).map((p) => (
                   <article
                     key={p.id}
                     className="rounded-2xl border border-border bg-background-secondary overflow-hidden flex flex-col"
@@ -206,14 +216,12 @@ function BrandShell({
                         />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center text-foreground-subtle text-xs uppercase tracking-wider">
-                          {name}
+                          {dbMatch.name}
                         </div>
                       )}
                     </div>
                     <div className="p-3 flex-1 flex flex-col">
-                      <p className="text-sm text-foreground line-clamp-2">
-                        {p.name}
-                      </p>
+                      <p className="text-sm text-foreground line-clamp-2">{p.name}</p>
                       {p.buy_url && (
                         <UserLink
                           href={p.buy_url}

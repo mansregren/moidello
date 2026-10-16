@@ -5,6 +5,7 @@ import { HOME_VERTICAL_PUBLIC, DAM_PUBLIC, PUBLIC_GENDER } from "@/lib/flags";
 import { fetchBrandsAggregated } from "@/lib/queries";
 import { HOME_ROOMS } from "@/lib/home-data";
 import { canonicalColorLabel } from "@/lib/colors";
+import { fetchCanonicalProducts } from "@/lib/product-canonical";
 import { canonicalGarment } from "@/lib/garments";
 
 const BASE_URL = "https://moidello.com";
@@ -76,7 +77,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .eq("vertical", "mode");
   if (PUBLIC_GENDER) outfitsQuery = outfitsQuery.eq("gender", PUBLIC_GENDER);
 
-  const [outfitsRes, profilesRes, brands, tagDimsRes] = await Promise.all([
+  const [outfitsRes, profilesRes, brands, tagDimsRes, canonicalProducts] = await Promise.all([
     outfitsQuery.order("created_at", { ascending: false }).limit(10000),
     supabase
       .from("profiles")
@@ -88,6 +89,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .eq("is_active", true)
       .eq("outfits.is_published", true)
       .eq("outfits.vertical", "mode"),
+    fetchCanonicalProducts(supabase),
   ]);
 
   type OutfitRow = {
@@ -244,6 +246,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.65,
   }));
 
+  // One page per distinct piece (brand + name) — the long tail of
+  // "<brand> <product>" searches.
+  const productRoutes: MetadataRoute.Sitemap = Array.from(canonicalProducts.values(), (id) => ({
+    url: `${BASE_URL}/produkt/${id}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
   return [
     ...staticRoutes,
     ...guideRoutes,
@@ -254,5 +265,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...colorRoutes,
     ...typeRoutes,
     ...styleRoutes,
+    ...productRoutes,
   ];
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { fetchBrandsAggregated } from "@/lib/queries";
+import { fetchBrandsAggregated, fetchBrandOutfits } from "@/lib/queries";
+import { brandIntro, summariseBrand } from "@/lib/brand-summary";
 import { createPublicClient } from "@/lib/supabase/public";
 import { PUBLIC_GENDER } from "@/lib/flags";
 
@@ -29,9 +30,13 @@ export async function generateMetadata({
     brand.outfitCount > 0
       ? `${brand.name} Outfits${audience} — ${looks}`
       : brand.name;
-  const description = brand.isClaimed
-    ? `Verified brand on ${SITE}. ${looks} featuring ${brand.name}, with every piece tagged.`
-    : `How to wear ${brand.name}: ${looks}${audience} on ${SITE}, with every piece tagged so you can see what it is paired with.`;
+  // Same data-derived copy as the page intro: which pieces, worn with what.
+  const outfits =
+    brand.outfitCount > 0 ? await fetchBrandOutfits(brand.variants, PUBLIC_GENDER) : [];
+  const description =
+    outfits.length > 0
+      ? `How to wear ${brand.name}: ${brandIntro(brand.name, outfits.length, summariseBrand(brand.slug, outfits), audience)}`
+      : `${brand.name} — verified brand on ${SITE}.`;
   const canonical = `/brand/${brand.slug}`;
 
   return {

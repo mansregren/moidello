@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { brandHref } from "@/lib/brands";
 import { useState, useTransition } from "react";
 import { Bookmark, ExternalLink, Send } from "lucide-react";
 import { TaggedItem as TaggedItemType, Region } from "@/lib/types";
@@ -68,12 +69,14 @@ export function TaggedItemCard({
     <>
       <article className="flex items-center gap-4 py-4 border-b border-border last:border-0">
         {/* Brand / garment / name / price — typografisk, ingen thumbnail */}
-        <Link
-          href={`/produkt/${item.id}`}
-          className="flex-1 min-w-0 hover:opacity-90 transition-opacity"
-        >
+        <div className="flex-1 min-w-0">
           <p className="text-[10px] text-foreground-muted uppercase tracking-[0.14em] truncate">
-            <span>{item.brand}</span>
+            <Link
+              href={brandHref(item.brand)}
+              className="hover:text-foreground underline-offset-2 hover:underline"
+            >
+              {item.brand}
+            </Link>
             <span className="mx-1.5 text-foreground-subtle">·</span>
             <span>{item.garment}</span>
             {item.isAffiliate && (
@@ -82,10 +85,13 @@ export function TaggedItemCard({
               </span>
             )}
           </p>
-          <p className="text-sm font-medium text-foreground mt-1 line-clamp-1">
+          <Link
+            href={`/produkt/${item.id}`}
+            className="block text-sm font-medium text-foreground mt-1 line-clamp-1 hover:opacity-80 transition-opacity"
+          >
             {item.name}
-          </p>
-        </Link>
+          </Link>
+        </div>
 
         {/* Action buttons — compact, icon-only on mobile */}
         <div className="flex items-center gap-1.5 shrink-0">
